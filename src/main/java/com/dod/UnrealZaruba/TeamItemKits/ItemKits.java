@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
 
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
@@ -68,6 +69,7 @@ public class ItemKits {
     }
 
     public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, DyeColor color) {
+        serverPlayer.sendMessage(new TextComponent(color.toString()), serverPlayer.getUUID());
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(color).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());

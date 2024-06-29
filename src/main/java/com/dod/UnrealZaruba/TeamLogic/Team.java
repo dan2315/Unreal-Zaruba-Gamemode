@@ -39,12 +39,11 @@ public class Team {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             TeamManager.GiveKitTo(server, player);
         }
-
     }
 
     public void TryRemove(ServerPlayer player) {
-        if (members.contains(player)) {
-            members.remove(player);
+        if (members.contains(player.getUUID())) {
+            members.remove(player.getUUID());
         }
     }
 

@@ -37,13 +37,13 @@ public class TeamManager {
     }
 
     public static boolean IsInTeam(Player player) {
-        return defenders.members.contains(player) || attackers.members.contains(player);
+        return defenders.members.contains(player.getUUID()) || attackers.members.contains(player.getUUID());
     }
 
     public static DyeColor GetPlayersTeam(Player player) {
-        if (defenders.members.contains(player))
+        if (defenders.members.contains(player.getUUID()))
             return defenders.color;
-        if (attackers.members.contains(player))
+        if (attackers.members.contains(player.getUUID()))
             return attackers.color;
         else
             return DyeColor.WHITE;
