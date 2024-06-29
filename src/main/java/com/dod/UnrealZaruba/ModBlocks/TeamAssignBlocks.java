@@ -1,7 +1,5 @@
-package com.dod.UnrealZaruba.TeamLogic;
+package com.dod.UnrealZaruba.ModBlocks;
 
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import com.dod.UnrealZaruba.ModBlocks.TeamBlock;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 
 import net.minecraft.world.item.BlockItem;

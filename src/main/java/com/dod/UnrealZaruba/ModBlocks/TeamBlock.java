@@ -3,6 +3,7 @@ package com.dod.UnrealZaruba.ModBlocks;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -21,7 +22,7 @@ public class TeamBlock extends Block {
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState blockState, Entity entity) {
         if (!world.isClientSide && entity instanceof Player) {
-            Player player = (Player) entity;
+            ServerPlayer player = (ServerPlayer) entity;
             if (player.isCrouching()) {
                 TeamManager.AssignTo(teamColor, player);
             }

@@ -8,20 +8,19 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.ColorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.commands.SetSpawnCommand;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -82,6 +81,11 @@ public class CommandRegistration {
                 .then(Commands.argument("color", DyeColorArgument.color())
                         .executes(CommandRegistration::SetTeamSpawn)));
 
+        // dispatcher.register(Commands.literal("giveteamkits")
+        // .requires(cs -> cs.hasPermission(3))
+        // .executes(context ->
+        // TeamManager.GiveKitToAll(context.getSource().getServer())));
+
     }
 
     private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -93,7 +97,9 @@ public class CommandRegistration {
         DyeColor color = DyeColorArgument.getColor(context, "color");
 
         TeamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position), true);
+        context.getSource().sendSuccess(
+                new TextComponent("Spawn of team " + color.toString().toUpperCase() + " was set to " + position),
+                true);
         return 0;
     }
 
@@ -102,7 +108,9 @@ public class CommandRegistration {
         DyeColor color = DyeColorArgument.getColor(context, "color");
 
         TeamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position), true);
+        context.getSource().sendSuccess(
+                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
+                true);
         return 0;
     }
 
@@ -148,4 +156,6 @@ public class CommandRegistration {
         source.sendSuccess(new TextComponent("Given all colored wool to " + player.getName().getString()), true);
         return 1;
     }
+
+
 }
