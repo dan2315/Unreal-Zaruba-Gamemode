@@ -13,10 +13,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 
-public class TeamManager {
+public class TeamManager{
     static HashMap<DyeColor, Team> teams = new HashMap<>();
 
     private static Team defenders = new Team(null, DyeColor.BLUE);
@@ -37,13 +38,13 @@ public class TeamManager {
     }
 
     public static boolean IsInTeam(Player player) {
-        return defenders.members.contains(player) || attackers.members.contains(player);
+        return defenders.members.contains(player.getUUID()) || attackers.members.contains(player.getUUID());
     }
 
     public static DyeColor GetPlayersTeam(Player player) {
-        if (defenders.members.contains(player))
+        if (defenders.members.contains(player.getUUID()))
             return defenders.color;
-        if (attackers.members.contains(player))
+        if (attackers.members.contains(player.getUUID()))
             return attackers.color;
         else
             return DyeColor.WHITE;
@@ -107,5 +108,10 @@ public class TeamManager {
             var player = playerList.getPlayer(playerId);
             if (player != null) player.setGameMode(gameType);
         }
+    }
+
+    public static void teleportToSpawn(Player player) {
+        BlockPos spawn = teams.get(GetPlayersTeam(player)).spawn;
+        player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
     }
 }
