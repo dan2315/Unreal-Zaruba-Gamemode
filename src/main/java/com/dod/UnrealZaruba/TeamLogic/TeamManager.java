@@ -15,6 +15,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+
 public class TeamManager {
     static HashMap<DyeColor, Team> teams = new HashMap<>();
 

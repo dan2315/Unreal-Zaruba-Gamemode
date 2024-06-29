@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,7 +19,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import java.util.stream.Collectors;
-import java.util.Timer;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("unrealzaruba")
@@ -31,8 +30,9 @@ public class unrealzaruba
 
     public unrealzaruba()
     {
-        Timer timer = new Timer();
-        timer.toString();
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -60,7 +60,6 @@ public class unrealzaruba
 
     private void processIMC(final InterModProcessEvent event)
     {
-        
         // Some example code to receive and process InterModComms from other mods
         LOGGER.info("Got IMC {}", event.getIMCStream().
                 map(m->m.messageSupplier().get()).
