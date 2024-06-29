@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.RespawnCooldown;
+
 import com.dod.UnrealZaruba.Title.TitleMessage;
+import static com.dod.UnrealZaruba.TeamLogic.TeamManager.teleportToSpawn;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -45,8 +47,9 @@ public class PlayerRespawnEventHandler {
             scheduler.schedule(() -> {
                 ServerPlayer serverPlayer = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(player.getUUID());
                 if (serverPlayer != null) {
-                    serverPlayer.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
+//                    serverPlayer.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
                     serverPlayer.setGameMode(GameType.SURVIVAL);
+                    teleportToSpawn(player);
                     serverPlayer.sendMessage(new TextComponent("Вы возродились."), serverPlayer.getUUID());
                 }
                 scheduler.shutdown();
