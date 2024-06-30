@@ -65,5 +65,4 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
     public static void RegisterArgument() {
         ArgumentTypes.register("team_color", TeamColorArgument.class, new Serializer());
     }
-
 }

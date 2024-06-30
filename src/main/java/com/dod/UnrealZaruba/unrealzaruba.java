@@ -7,7 +7,6 @@ import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.client.event.RenderLevelStageEvent.RegisterStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -25,6 +24,7 @@ import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("unrealzaruba")
+@Mod.EventBusSubscriber
 public class unrealzaruba {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -83,6 +83,7 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
+        LOGGER.info("COMMANDS Registered");
         TeamColorArgument.RegisterArgument();
         CommandRegistration.onCommandRegister(event);
     }
@@ -97,7 +98,5 @@ public class unrealzaruba {
             // Register a new block here
             LOGGER.info("HELLO from Register Block");
         }   
-
-
     }
 }
