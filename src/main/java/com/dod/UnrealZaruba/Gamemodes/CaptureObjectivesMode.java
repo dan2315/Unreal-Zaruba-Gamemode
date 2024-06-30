@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -38,6 +39,10 @@ public class CaptureObjectivesMode {
         gameStage = GameStage.Battle;
         TeamManager.DeleteBarriersAtSpawn();
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
+        for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
+            TitleMessage.showTitle(player, new TextComponent("§6 Игра началась, в бой!"),
+                    new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
+        }
 
         return 1;
     }
@@ -64,15 +69,16 @@ public class CaptureObjectivesMode {
         if (server == null)
             return;
 
-        if (!TeamManager.IsInTeam(player)) {
+        if (!TeamManager.IsInTeam(serverPlayer)) {
             BlockPos spawn = server.overworld().getSharedSpawnPos();
-            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+            setSpawnPoint(serverPlayer, new BlockPos(62, 55, 163));
+            serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
         }
 
         if (gameStage == GameStage.Preparation) {
             serverPlayer.setGameMode(GameType.ADVENTURE);
         } else if (gameStage == GameStage.Battle) {
-            if (!TeamManager.IsInTeam(player)) {
+            if (!TeamManager.IsInTeam(serverPlayer)) {
                 serverPlayer.setGameMode(GameType.SPECTATOR);
             }
         }
@@ -97,6 +103,16 @@ public class CaptureObjectivesMode {
         scoreboard.getOrCreatePlayerScore("Villager", attackersObjective).setScore(30);
         scoreboard.getOrCreatePlayerScore("Container", attackersObjective).setScore(50);
         scoreboard.getOrCreatePlayerScore("Infrastructure", attackersObjective).setScore(10);
+    }
+
+    public static void setSpawnPoint(ServerPlayer player, BlockPos pos) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            CommandSourceStack commandSourceStack = server.createCommandSourceStack();
+            String command = String.format("/spawnpoint %s %d %d %d", player.getName().getString(),
+             pos.getX(), pos.getY(), pos.getZ());
+            server.getCommands().performCommand(commandSourceStack, command);
+        }
     }
 
     public static void deleteBarriers(BlockPos pos, int chunkRadius) {

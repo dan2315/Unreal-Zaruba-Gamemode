@@ -81,11 +81,6 @@ public class CommandRegistration {
                 .then(Commands.argument("color", DyeColorArgument.color())
                         .executes(CommandRegistration::SetTeamSpawn)));
 
-        // dispatcher.register(Commands.literal("giveteamkits")
-        // .requires(cs -> cs.hasPermission(3))
-        // .executes(context ->
-        // TeamManager.GiveKitToAll(context.getSource().getServer())));
-
     }
 
     private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

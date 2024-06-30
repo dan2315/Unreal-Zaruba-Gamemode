@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 
 import net.minecraft.ChatFormatting;
@@ -33,7 +34,8 @@ public class Team {
                     new TextComponent("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
                             .withStyle(color == DyeColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
-            player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
+            // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
+            CaptureObjectivesMode.setSpawnPoint(player, spawn);
             player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
