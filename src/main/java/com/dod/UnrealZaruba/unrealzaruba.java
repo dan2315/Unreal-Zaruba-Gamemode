@@ -4,9 +4,12 @@ import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
+import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
+import com.dod.UnrealZaruba.RespawnCooldown.SimplePlayerRespawnEventHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.client.event.RenderLevelStageEvent.RegisterStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -33,7 +36,7 @@ public class unrealzaruba {
     public unrealzaruba() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
-        // MinecraftForge.EVENT_BUS.register(new SimplePlayerRespawnEventHandler());
+        MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         // Register the enqueueIMC method for modloading
@@ -97,6 +100,6 @@ public class unrealzaruba {
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
             // Register a new block here
             LOGGER.info("HELLO from Register Block");
-        }   
+        }
     }
 }

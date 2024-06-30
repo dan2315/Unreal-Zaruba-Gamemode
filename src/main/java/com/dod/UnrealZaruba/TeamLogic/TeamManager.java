@@ -6,11 +6,17 @@ import java.util.UUID;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
 
+import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -109,8 +115,8 @@ public class TeamManager{
         }
     }
 
-    public static void teleportToSpawn(Player player) {
-        BlockPos spawn = GetPlayersTeam(player).spawn;
-        player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+    public static void teleportToSpawn(ServerPlayer serverPlayer) {
+        BlockPos Spawn = GetPlayersTeam(serverPlayer).spawn;
+        serverPlayer.teleportTo(Spawn.getX(), Spawn.getY(), Spawn.getZ());
     }
 }
