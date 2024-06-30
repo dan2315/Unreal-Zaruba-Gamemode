@@ -21,19 +21,12 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CommandRegistration {
     private static final Map<DyeColor, Item> itemMap = new HashMap<>();
-
-    public static void register() {
-        MinecraftForge.EVENT_BUS.register(CommandRegistration.class);
-    }
 
     static {
         initializeItemMap();
@@ -73,12 +66,13 @@ public class CommandRegistration {
                 .executes(context -> CaptureObjectivesMode.StartPreparation(context)));
 
         dispatcher.register(Commands.literal("setteamspawn")
-                .then(Commands.argument("color", TeamColorArgument.color())
+                .then(Commands.argument("team_color", TeamColorArgument.color())
                         .executes(CommandRegistration::SetTeamSpawn)
                         .then(Commands.argument("x", IntegerArgumentType.integer())
                                 .then(Commands.argument("y", IntegerArgumentType.integer())
                                         .then(Commands.argument("z", IntegerArgumentType.integer())
                                                 .executes(CommandRegistration::SetTeamSpawnTo))))));
+
 
     }
 

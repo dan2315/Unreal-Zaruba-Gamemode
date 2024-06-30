@@ -56,7 +56,7 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
         @Override
         public void serializeToJson(TeamColorArgument argument, JsonObject buffer) {
-            buffer.addProperty("color", argument.getColor().name());
+            buffer.addProperty("team_color", argument.getColor().name());
         }
 
         

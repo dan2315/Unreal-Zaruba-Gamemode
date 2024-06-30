@@ -33,18 +33,11 @@ public class unrealzaruba {
     public unrealzaruba() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
-        // MinecraftForge.EVENT_BUS.register(new SimplePlayerRespawnEventHandler());
-        // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        // Register the enqueueIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-        // Register the processIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-        CommandRegistration.register();
     }
 
     private void setup(final FMLCommonSetupEvent event) {
