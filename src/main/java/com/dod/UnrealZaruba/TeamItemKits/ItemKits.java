@@ -5,17 +5,17 @@ import java.util.HashMap;
 import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.TeamLogic.Team;
 
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.DyeColor;
 
 public class ItemKits {
     public static final HashMap<String, Integer> blueTeamKit;
     public static final HashMap<String, Integer> redTeamKit;
 
-    public static final HashMap<DyeColor, HashMap<String, Integer>> TeamKits;
+    public static final HashMap<TeamColor, HashMap<String, Integer>> TeamKits;
 
     static {
         redTeamKit = new HashMap<>();
@@ -40,6 +40,8 @@ public class ItemKits {
         redTeamKit.put("cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}", 1);
         redTeamKit.put("cgm:basic_bullet", 300);
         
+
+
         blueTeamKit = new HashMap<>();
         // blueTeamKit.put("tacz:modern_kinetic_gun{GunId:\"tacz:m4a1\",
         // GunFireMod:\"AUTO\"}", 1);
@@ -64,13 +66,14 @@ public class ItemKits {
         blueTeamKit.put("cgm:basic_bullet", 300);
 
         TeamKits = new HashMap<>();
-        TeamKits.put(DyeColor.RED, redTeamKit);
-        TeamKits.put(DyeColor.BLUE, blueTeamKit);
+        TeamKits.put(TeamColor.RED, redTeamKit);
+        TeamKits.put(TeamColor.BLUE, blueTeamKit);
     }
 
-    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, DyeColor color) {
-        serverPlayer.sendMessage(new TextComponent(color.toString()), serverPlayer.getUUID());
-        for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(color).entrySet()) {
+
+
+    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, Team team) {
+        for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
         }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 
@@ -12,15 +13,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.DyeColor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class Team {
     BlockPos spawn;
     List<UUID> members = new ArrayList<>();
-    DyeColor color;
+    TeamColor color;
+    public TeamColor Color() {return color;}
 
-    public Team(BlockPos spawn, DyeColor color) {
+    public Team(BlockPos spawn, TeamColor color) {
         this.spawn = spawn;
         this.color = color;
     }
@@ -32,7 +33,7 @@ public class Team {
             members.add(player.getUUID());
             player.displayClientMessage(
                     new TextComponent("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
-                            .withStyle(color == DyeColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
+                            .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
             // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
             CaptureObjectivesMode.setSpawnPoint(player, spawn);
@@ -59,7 +60,7 @@ public class Team {
 
     public void GiveKit(MinecraftServer server) {
         for (UUID playerId : members) {
-            ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), color);
+            ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);
         }
     }
 }

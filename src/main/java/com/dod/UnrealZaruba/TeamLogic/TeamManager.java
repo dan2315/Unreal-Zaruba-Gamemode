@@ -3,6 +3,7 @@ package com.dod.UnrealZaruba.TeamLogic;
 import java.util.HashMap;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 
@@ -11,28 +12,26 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 
 public class TeamManager{
-    static HashMap<DyeColor, Team> teams = new HashMap<>();
+    static HashMap<TeamColor, Team> teams = new HashMap<>();
 
-    private static Team defenders = new Team(null, DyeColor.BLUE);
-    private static Team attackers = new Team(null, DyeColor.RED);
+    private static Team defenders = new Team(null, TeamColor.BLUE);
+    private static Team attackers = new Team(null, TeamColor.RED);
 
     public static void Initialize() {
-        teams.put(DyeColor.RED, attackers);
-        teams.put(DyeColor.BLUE, defenders);
+        teams.put(TeamColor.RED, attackers);
+        teams.put(TeamColor.BLUE, defenders);
     }
 
     static {
         Initialize();
     }
 
-    public static void SetSpawn(DyeColor color, BlockPos spawn) {
+    public static void SetSpawn(TeamColor color, BlockPos spawn) {
         teams.get(color).SetSpawn(spawn);
 
     }
@@ -41,13 +40,13 @@ public class TeamManager{
         return defenders.members.contains(player.getUUID()) || attackers.members.contains(player.getUUID());
     }
 
-    public static DyeColor GetPlayersTeam(Player player) {
+    public static Team GetPlayersTeam(Player player) {
         if (defenders.members.contains(player.getUUID()))
-            return defenders.color;
+            return teams.get(defenders.color);
         if (attackers.members.contains(player.getUUID()))
-            return attackers.color;
+            return teams.get(attackers.color);
         else
-            return DyeColor.WHITE;
+            return null;
     }
 
     public static void DeleteBarriersAtSpawn() {
@@ -55,14 +54,14 @@ public class TeamManager{
         CaptureObjectivesMode.deleteBarriers(defenders.spawn, 1);
     }
 
-    public static void AssignTo(DyeColor dyeColor, ServerPlayer player) {
+    public static void AssignTo(TeamColor dyeColor, ServerPlayer player) {
         boolean areTeamsBalanced = true;
 
-        if (dyeColor == DyeColor.RED) {
+        if (dyeColor == TeamColor.RED) {
             if (attackers.MembersCount() - 1 > defenders.MembersCount()) {
                 areTeamsBalanced = false;
             }
-        } else if (dyeColor == DyeColor.BLUE) {
+        } else if (dyeColor == TeamColor.BLUE) {
             if (defenders.MembersCount() - 1 > attackers.MembersCount()) {
                 areTeamsBalanced = false;
             }
@@ -76,12 +75,12 @@ public class TeamManager{
             return;
         }
 
-        if (dyeColor == DyeColor.RED) {
+        if (dyeColor == TeamColor.RED) {
             defenders.TryRemove(player);
             attackers.TryRemove(player);
             attackers.Assign(player);
         }
-        if (dyeColor == DyeColor.BLUE) {
+        if (dyeColor == TeamColor.BLUE) {
             defenders.TryRemove(player);
             attackers.TryRemove(player);
             defenders.Assign(player);

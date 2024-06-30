@@ -1,10 +1,10 @@
 package com.dod.UnrealZaruba.ModBlocks;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
@@ -14,9 +14,9 @@ import net.minecraftforge.registries.RegistryObject;
 public class TeamAssignBlocks {
 
     public static final RegistryObject<Block> RED_BLOCK = ModBlocks.BLOCKS.register("red_block",
-            () -> new TeamBlock(DyeColor.RED,  Block.Properties.of(Material.WOOL)));
+            () -> new TeamBlock(TeamColor.RED,  Block.Properties.of(Material.WOOL)));
     public static final RegistryObject<Block> BLUE_BLOCK = ModBlocks.BLOCKS.register("blue_block",
-            () -> new TeamBlock(DyeColor.BLUE,  Block.Properties.of(Material.WOOL)));
+            () -> new TeamBlock(TeamColor.BLUE,  Block.Properties.of(Material.WOOL)));
     
 
 

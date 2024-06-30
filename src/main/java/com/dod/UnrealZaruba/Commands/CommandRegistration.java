@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Commands;
 
-import com.dod.UnrealZaruba.Commands.Arguments.DyeColorArgument;
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.mojang.brigadier.CommandDispatcher;
@@ -71,14 +72,14 @@ public class CommandRegistration {
                 .executes(context -> CaptureObjectivesMode.StartPreparation(context)));
 
         dispatcher.register(Commands.literal("setteamspawn")
-                .then(Commands.argument("color", DyeColorArgument.color())
+                .then(Commands.argument("color", TeamColorArgument.color())
                         .then(Commands.argument("x", IntegerArgumentType.integer())
                                 .then(Commands.argument("y", IntegerArgumentType.integer())
                                         .then(Commands.argument("z", IntegerArgumentType.integer())
                                                 .executes(CommandRegistration::SetTeamSpawnTo))))));
 
         dispatcher.register(Commands.literal("setteamspawn")
-                .then(Commands.argument("color", DyeColorArgument.color())
+                .then(Commands.argument("color", TeamColorArgument.color())
                         .executes(CommandRegistration::SetTeamSpawn)));
 
     }
@@ -89,7 +90,7 @@ public class CommandRegistration {
         int y = IntegerArgumentType.getInteger(context, "y");
         int z = IntegerArgumentType.getInteger(context, "z");
         BlockPos position = new BlockPos(x, y, z);
-        DyeColor color = DyeColorArgument.getColor(context, "color");
+        TeamColor color = TeamColorArgument.getColor(context, "color");
 
         TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(
@@ -100,7 +101,7 @@ public class CommandRegistration {
 
     private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         BlockPos position = new BlockPos(context.getSource().getPlayerOrException().position());
-        DyeColor color = DyeColorArgument.getColor(context, "color");
+        TeamColor color = TeamColorArgument.getColor(context, "color");
 
         TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(
