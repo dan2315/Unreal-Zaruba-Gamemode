@@ -3,14 +3,18 @@ package com.dod.UnrealZaruba.RespawnCooldown;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import static com.dod.UnrealZaruba.TeamLogic.TeamManager.teleportToSpawn;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraft.server.level.ServerPlayer;
 
 
 import java.util.concurrent.Executors;
@@ -20,12 +24,26 @@ import java.util.concurrent.TimeUnit;
 @Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Bus.FORGE)
 public class PlayerRespawnEventHandler {
     int start_time = 11;
+    double deathX = 0;
+    double deathY = 0;
+    double deathZ = 0;
+
+    @SubscribeEvent
+    public void OnPlayerDeath(LivingDeathEvent event) {
+        if (event.getEntityLiving() instanceof ServerPlayer) {
+            ServerPlayer serverPlayer = (ServerPlayer) event.getEntity();
+            this.deathX = serverPlayer.getX();
+            this.deathY = serverPlayer.getY();
+            this.deathZ = serverPlayer.getZ();
+        }
+    }
 
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getPlayer() instanceof ServerPlayer) {
             ServerPlayer player = (ServerPlayer) event.getPlayer();
             player.setGameMode(GameType.SPECTATOR);
+            player.teleportTo(deathX, deathY, deathZ);
             player.sendMessage(new TextComponent("§4Вы мертвы. . ."), player.getUUID());
 
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -47,9 +65,9 @@ public class PlayerRespawnEventHandler {
             scheduler.schedule(() -> {
                 ServerPlayer serverPlayer = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(player.getUUID());
                 if (serverPlayer != null) {
-//                    serverPlayer.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
+//                  serverPlayer.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
                     serverPlayer.setGameMode(GameType.SURVIVAL);
-                    teleportToSpawn(player);
+                    teleportToSpawn(serverPlayer);
                     serverPlayer.sendMessage(new TextComponent("Вы возродились."), serverPlayer.getUUID());
                 }
                 scheduler.shutdown();

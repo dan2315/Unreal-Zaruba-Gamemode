@@ -1,7 +1,13 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Title.TitleMessage;
+
+import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
+import static com.dod.UnrealZaruba.TeamLogic.TeamManager.GetPlayersTeam;
+
 import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -11,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
@@ -23,8 +30,14 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Mod.EventBusSubscriber
 public class CaptureObjectivesMode {
+
     private static GameStage gameStage = GameStage.Preparation;
 
     public static int StartPreparation(CommandContext<CommandSourceStack> context) {
@@ -36,14 +49,45 @@ public class CaptureObjectivesMode {
     }
 
     public static int StartGame(CommandContext<CommandSourceStack> context) {
+        AtomicInteger until_time = new AtomicInteger(11);
         gameStage = GameStage.Battle;
+
         TeamManager.DeleteBarriersAtSpawn();
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-            TitleMessage.showTitle(player, new TextComponent("§6 Игра началась, в бой!"),
-                    new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
+            if (GetPlayersTeam(player).Color() == TeamColor.RED) {
+                playSound(player, ModSounds.horn_dire, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
+            } else if (GetPlayersTeam(player).Color() == TeamColor.BLUE) {
+                playSound(player, ModSounds.horn_radiant, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
+            } else {
+                player.sendMessage(new TextComponent("Лох пидр"), player.getUUID());
+
+            }
         }
 
+        Runnable task = () -> {
+            //Pray to God this code works
+            until_time.set(until_time.get() - 1);
+            System.out.println("Task executed at Пенис" + System.currentTimeMillis());
+
+            if (until_time.get() < 0){
+                scheduler.shutdown();
+                until_time.set(11);
+            }
+        };
+
+        // Schedule the task to run every 5 seconds with an initial delay of 0 seconds
+        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
+
+        scheduler.schedule(() -> {
+            for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
+                TitleMessage.showTitle(player, new TextComponent("§6 Игра началась, в бой!"),
+                        new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
+            }
+            scheduler.shutdown();
+//          until_time = 11;
+        }, 10, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
         return 1;
     }
 
@@ -142,3 +186,4 @@ public class CaptureObjectivesMode {
         }
     }
 }
+

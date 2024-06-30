@@ -1,0 +1,14 @@
+{
+  "horn_dire": {
+    "subtitles": "sounds.unrealzaruba.horn_dire",
+    "sounds": [
+      "unrealzaruba:horn_dire"
+    ]
+  },
+  "horn_radiant": {
+    "subtitles": "sounds.unrealzaruba.horn_radiant",
+    "sounds": [
+      "unrealzaruba:horn_radiant"
+    ]
+  }
+}
