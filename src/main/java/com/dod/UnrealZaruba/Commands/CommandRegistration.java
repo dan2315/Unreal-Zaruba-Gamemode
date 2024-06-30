@@ -14,24 +14,24 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import java.util.HashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber
 public class CommandRegistration {
-
     private static final Map<DyeColor, Item> itemMap = new HashMap<>();
+
+    public static void register() {
+        MinecraftForge.EVENT_BUS.register(CommandRegistration.class);
+    }
 
     static {
         initializeItemMap();
@@ -57,7 +57,6 @@ public class CommandRegistration {
         itemMap.put(DyeColor.BLACK, Items.BLACK_WOOL);
     }
 
-    @SubscribeEvent
     public static void onCommandRegister(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
@@ -73,14 +72,11 @@ public class CommandRegistration {
 
         dispatcher.register(Commands.literal("setteamspawn")
                 .then(Commands.argument("color", TeamColorArgument.color())
+                        .executes(CommandRegistration::SetTeamSpawn)
                         .then(Commands.argument("x", IntegerArgumentType.integer())
                                 .then(Commands.argument("y", IntegerArgumentType.integer())
                                         .then(Commands.argument("z", IntegerArgumentType.integer())
                                                 .executes(CommandRegistration::SetTeamSpawnTo))))));
-
-        dispatcher.register(Commands.literal("setteamspawn")
-                .then(Commands.argument("color", TeamColorArgument.color())
-                        .executes(CommandRegistration::SetTeamSpawn)));
 
     }
 
@@ -152,6 +148,5 @@ public class CommandRegistration {
         source.sendSuccess(new TextComponent("Given all colored wool to " + player.getName().getString()), true);
         return 1;
     }
-
 
 }

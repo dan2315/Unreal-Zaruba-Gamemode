@@ -110,7 +110,7 @@ public class TeamManager{
     }
 
     public static void teleportToSpawn(Player player) {
-        BlockPos spawn = teams.get(GetPlayersTeam(player)).spawn;
+        BlockPos spawn = GetPlayersTeam(player).spawn;
         player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
     }
 }

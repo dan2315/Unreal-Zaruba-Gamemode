@@ -56,14 +56,14 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
         @Override
         public void serializeToJson(TeamColorArgument argument, JsonObject buffer) {
-
+            buffer.addProperty("color", argument.getColor().name());
         }
 
         
     }
 
-    static {
-        ArgumentTypes.register("dye_color", TeamColorArgument.class, new Serializer());
+    public static void RegisterArgument() {
+        ArgumentTypes.register("team_color", TeamColorArgument.class, new Serializer());
     }
 
 }
