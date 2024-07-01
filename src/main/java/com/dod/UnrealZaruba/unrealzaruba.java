@@ -33,7 +33,6 @@ public class unrealzaruba {
     public static final String MOD_ID = "unrealzaruba";
 
     public unrealzaruba() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
