@@ -66,6 +66,7 @@ public class CommandRegistration {
                 .executes(context -> CaptureObjectivesMode.StartPreparation(context)));
 
         dispatcher.register(Commands.literal("setteamspawn")
+                .requires(cs -> cs.hasPermission(3))
                 .then(Commands.argument("team_color", TeamColorArgument.color())
                         .executes(CommandRegistration::SetTeamSpawn)
                         .then(Commands.argument("x", IntegerArgumentType.integer())
@@ -82,18 +83,19 @@ public class CommandRegistration {
         int y = IntegerArgumentType.getInteger(context, "y");
         int z = IntegerArgumentType.getInteger(context, "z");
         BlockPos position = new BlockPos(x, y, z);
-        TeamColor color = TeamColorArgument.getColor(context, "color");
+        TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
 
         TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(
-                new TextComponent("Spawn of team " + color.toString().toUpperCase() + " was set to " + position),
+                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
                 true);
         return 0;
     }
 
     private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        BlockPos position = new BlockPos(context.getSource().getPlayerOrException().position());
-        TeamColor color = TeamColorArgument.getColor(context, "color");
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        BlockPos position = new BlockPos(player.position());
+        TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
 
         TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(

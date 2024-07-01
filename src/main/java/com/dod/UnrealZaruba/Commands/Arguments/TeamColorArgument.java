@@ -13,6 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 
 
 public class TeamColorArgument implements ArgumentType<TeamColor> {
+    public static final String PropertyName = "team_color";
     private final TeamColor color;  
 
     public TeamColorArgument(TeamColor color) {
@@ -25,7 +26,7 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
     public static TeamColorArgument color()
     {
-        return new TeamColorArgument(TeamColor.Undefined);
+        return new TeamColorArgument(TeamColor.UNDEFINED);
     }
 
     public static TeamColor getColor(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
@@ -56,13 +57,13 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
         @Override
         public void serializeToJson(TeamColorArgument argument, JsonObject buffer) {
-            buffer.addProperty("team_color", argument.getColor().name());
+            buffer.addProperty(PropertyName, argument.getColor().name());
         }
 
         
     }
 
     public static void RegisterArgument() {
-        ArgumentTypes.register("team_color", TeamColorArgument.class, new Serializer());
+        ArgumentTypes.register(PropertyName, TeamColorArgument.class, new Serializer());
     }
 }

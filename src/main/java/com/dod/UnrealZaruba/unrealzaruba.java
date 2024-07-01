@@ -27,10 +27,9 @@ import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("unrealzaruba")
-@Mod.EventBusSubscriber
 public class unrealzaruba {
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
 
     public unrealzaruba() {
@@ -74,17 +73,18 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        // WorldManager.OnPlayerLoggedIn(event);
         CaptureObjectivesMode.ProcessNewPlayer(event.getPlayer());
     }
 
-    @SubscribeEvent
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-        LOGGER.info("COMMANDS Registered");
-        TeamColorArgument.RegisterArgument();
-        CommandRegistration.onCommandRegister(event);
+    @Mod.EventBusSubscriber
+    public class CommandRegistryEvent {
+        @SubscribeEvent
+        public static void onRegisterCommands(RegisterCommandsEvent event) {
+            LOGGER.info("COMMANDS Registered");
+            TeamColorArgument.RegisterArgument();
+            CommandRegistration.onCommandRegister(event);
+        }
     }
-
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {

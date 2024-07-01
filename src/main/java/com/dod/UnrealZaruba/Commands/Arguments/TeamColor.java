@@ -1,7 +1,7 @@
 package com.dod.UnrealZaruba.Commands.Arguments;
 
 public enum TeamColor {
-    Undefined,
+    UNDEFINED,
     RED,
     BLUE
 }

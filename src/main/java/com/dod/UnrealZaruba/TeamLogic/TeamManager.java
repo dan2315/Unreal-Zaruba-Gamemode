@@ -6,17 +6,11 @@ import java.util.UUID;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
-import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
 
-import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -55,9 +49,12 @@ public class TeamManager{
             return null;
     }
 
-    public static void DeleteBarriersAtSpawn() {
+    public static boolean DeleteBarriersAtSpawn() {
+        if (attackers.spawn== null || defenders.spawn == null) return false;
+
         CaptureObjectivesMode.deleteBarriers(attackers.spawn, 1);
         CaptureObjectivesMode.deleteBarriers(defenders.spawn, 1);
+        return true;
     }
 
     public static void AssignTo(TeamColor dyeColor, ServerPlayer player) {
