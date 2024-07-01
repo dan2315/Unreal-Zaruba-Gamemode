@@ -49,6 +49,10 @@ public class TeamManager{
             return null;
     }
 
+    public static BlockPos GetTeamSpawnPos(TeamColor color) {
+        return teams.get(color).spawn;
+    }
+
     public static boolean DeleteBarriersAtSpawn() {
         if (attackers.spawn== null || defenders.spawn == null) return false;
 

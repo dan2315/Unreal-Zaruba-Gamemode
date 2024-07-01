@@ -6,8 +6,10 @@ import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 
-import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
+import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSoundFromPosition;
+import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSoundToPlayer;
 import static com.dod.UnrealZaruba.TeamLogic.TeamManager.GetPlayersTeam;
+import static com.dod.UnrealZaruba.TeamLogic.TeamManager.GetTeamSpawnPos;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -59,17 +61,11 @@ public class CaptureObjectivesMode {
         TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
         
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-            if (GetPlayersTeam(player) == null) {
-                player.sendMessage(new TextComponent("Лох пидр"), player.getUUID());
-                continue;
-            }
-            if (GetPlayersTeam(player).Color() == TeamColor.RED) {
-                playSound(player, ModSounds.horn_dire, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            } else if (GetPlayersTeam(player).Color() == TeamColor.BLUE) {
-                playSound(player, ModSounds.horn_radiant, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            }
-        }
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        BlockPos SpawnRed = GetTeamSpawnPos(TeamColor.RED);
+        BlockPos SpawnBlue = GetTeamSpawnPos(TeamColor.BLUE);
+        playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(), SoundSource.BLOCKS, 5.0F, 1.0F);
+        playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(), SoundSource.BLOCKS, 5.0F, 1.0F);
 
         Runnable task = () -> {
             //Pray to God this code works
@@ -86,13 +82,13 @@ public class CaptureObjectivesMode {
         scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
 
         scheduler.schedule(() -> {
-            for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-                TitleMessage.showTitle(player, new TextComponent("§6 Игра началась, в бой!"),
+            for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+                TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
                         new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
             }
             scheduler.shutdown();
 //          until_time = 11;
-        }, 10, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
+        }, 7, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
         return 1;
     }
 

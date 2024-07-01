@@ -6,7 +6,9 @@ import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.RespawnCooldown.SimplePlayerRespawnEventHandler;
+import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.mojang.logging.LogUtils;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.event.RenderLevelStageEvent.RegisterStageEvent;
@@ -14,6 +16,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
@@ -33,13 +36,14 @@ public class unrealzaruba {
     public static final String MOD_ID = "unrealzaruba";
 
     public unrealzaruba() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
+//        MinecraftForge.EVENT_BUS.register(new ModSounds());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
+        ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
@@ -77,13 +81,14 @@ public class unrealzaruba {
     }
 
     @Mod.EventBusSubscriber
-    public class CommandRegistryEvent {
+    public static class CommandRegistryEvent {
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             LOGGER.info("COMMANDS Registered");
             TeamColorArgument.RegisterArgument();
             CommandRegistration.onCommandRegister(event);
         }
+
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
