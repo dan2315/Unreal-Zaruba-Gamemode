@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
+import com.dod.UnrealZaruba.Utils.TickTimer;
+import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.Aaaaaaaa.StartGameText;
@@ -19,12 +21,14 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 
+import javax.security.auth.login.CredentialException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DestroyObjectivesGamemode extends BaseGamemode {
+    int until_time = 11;
 
     public static void initialize() {
         TeamManager.AddTeam(TeamColor.RED);
@@ -36,7 +40,6 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         currentGamemode.startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "\"§9 Игра началась, в бой!\"",
                 "Продержитесь 40 минут"));
-
     }
 
     public int StartPreparation(CommandContext<CommandSourceStack> context) {
@@ -48,7 +51,6 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     }
 
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        AtomicInteger until_time = new AtomicInteger(11);
         gameStage = GameStage.Battle;
 
         var success = DestroyObjectivesGamemode.TeamManager.DeleteBarriersAtSpawn();
@@ -60,33 +62,25 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
 
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
-        BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
-        SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(), SoundSource.BLOCKS,
-                5.0F, 1.0F);
+        BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
+        SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
+                SoundSource.BLOCKS, 5.0F, 1.0F);
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
 
-        Runnable task = () -> {
-            // Pray to God this code works
-            until_time.set(until_time.get() - 1);
-            System.out.println("Task executed at Пенис" + System.currentTimeMillis());
-
-            if (until_time.get() < 0) {
-                scheduler.shutdown();
-                until_time.set(11);
-            }
-        };
-
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
-
-        scheduler.schedule(() -> {
-            for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
-                        new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
-            }
-            scheduler.shutdown();
-            // until_time = 11;
-        }, 7, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
+        TickTimer tickTimer = TimerManager.Create(10000
+                ,() -> {
+                    for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
+                                new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
+                    }
+                },
+                ticks -> {
+                    for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+                        TitleMessage.showTitle(serverPlayer, new TextComponent(String.valueOf(ticks / 20)),
+                                new TextComponent(""));
+                    }
+                });
         return 1;
     }
 

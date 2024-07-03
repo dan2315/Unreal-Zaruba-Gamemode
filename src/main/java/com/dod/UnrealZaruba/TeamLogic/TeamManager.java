@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 
@@ -52,6 +53,9 @@ public class TeamManager {
 
     public boolean DeleteBarriersAtSpawn() {
         for (Team team : teams.values()) {
+            if (team.spawn == null) {
+                return false;
+            }
             Utils.deleteBarriers(team.spawn, 1);
         }
         return true;

@@ -4,11 +4,11 @@ import com.dod.UnrealZaruba.unrealzaruba;
 
 public class TickTimer {
 
-    private float duration; // time in milliseconds
+    private int duration; // time in milliseconds
     private boolean started;
     private int currentAccumulatedTicks;
 
-    public TickTimer(float duration, boolean preventStart)
+    public TickTimer(int duration, boolean preventStart)
     {
         this.duration = duration;
 

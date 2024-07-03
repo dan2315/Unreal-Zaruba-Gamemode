@@ -4,11 +4,12 @@ import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TimerManager;
+import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
+
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -34,6 +35,7 @@ public class unrealzaruba {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
+    TimerManager timerManager = new TimerManager();
 
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -70,6 +72,9 @@ public class unrealzaruba {
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
+        // Do something when the server starts
+//        MesilovoGamemode.setupScoreboard(event.getServer());
+        ScoreboardManager.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
     }
 

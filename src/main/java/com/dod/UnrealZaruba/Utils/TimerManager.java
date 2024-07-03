@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class TimerManager {
     static ArrayList<TickTimer> activeTimers = new ArrayList<TickTimer>();
 
-    public static TickTimer Create(float duration, TimerCompletedCallback completedCallback, TimerUpdatedCallback updatedCallback)
+    public static TickTimer Create(int duration, TimerCompletedCallback completedCallback, TimerUpdatedCallback updatedCallback)
     {
         TickTimer timer = new TickTimer(duration, false)
         {

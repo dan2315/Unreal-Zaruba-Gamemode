@@ -4,7 +4,6 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -57,12 +56,18 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
 
         dispatcher.register(Commands.literal("startgame")
-                .requires(cs -> cs.hasPermission(3)).executes(context -> BaseGamemode.currentGamemode.StartGame(context)));
+                .requires(cs -> cs.hasPermission(3))
+                .executes(context -> {
+                    BaseGamemode.currentGamemode.StartGame(context);
+                    return 1;
+                }));
 
         dispatcher.register(Commands.literal("startpreparation")
                 .requires(cs -> cs.hasPermission(3))
                 .executes(context -> BaseGamemode.currentGamemode.StartPreparation(context)));
 
+
+                //Pray to Dod this code works
                 //Бермудский треугольник, не раскоменчивать
                 //Ошибка происходит после  .requires(cs -> cs.hasPermission(3))
         // dispatcher.register(Commands.literal("setteamspawn")

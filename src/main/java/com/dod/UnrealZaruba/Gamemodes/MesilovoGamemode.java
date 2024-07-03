@@ -31,7 +31,5 @@ public class MesilovoGamemode {
         scoreboard.getOrCreatePlayerScore("Container", attackersObjective).setScore(50);
         scoreboard.getOrCreatePlayerScore("Infrastructure", attackersObjective).setScore(10);
     }
-
-
 }
 
