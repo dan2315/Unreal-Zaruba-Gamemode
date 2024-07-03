@@ -17,6 +17,10 @@ public class TeamAssignBlocks {
             () -> new TeamBlock(TeamColor.RED,  Block.Properties.of(Material.WOOL)));
     public static final RegistryObject<Block> BLUE_BLOCK = ModBlocks.BLOCKS.register("blue_block",
             () -> new TeamBlock(TeamColor.BLUE,  Block.Properties.of(Material.WOOL)));
+    public static final RegistryObject<Block> RED_SPAWN_BLOCK = ModBlocks.BLOCKS.register("red_spawn_block",
+            () -> new SpawnBlock(TeamColor.RED, Block.Properties.of(Material.WOOL)));
+    public static final RegistryObject<Block> BLUE_SPAWN_BLOCK = ModBlocks.BLOCKS.register("blue_spawn_block",
+            () -> new SpawnBlock(TeamColor.BLUE, Block.Properties.of(Material.WOOL)));
     
 
 
@@ -24,6 +28,10 @@ public class TeamAssignBlocks {
             () -> new BlockItem(RED_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
     public static final RegistryObject<Item> BLUE_BLOCK_ITEM = ModItems.ITEMS.register("blue_block",
             () -> new BlockItem(BLUE_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> RED_SPAWN_ITEM = ModItems.ITEMS.register("red_spawn_block",
+            () -> new BlockItem(RED_SPAWN_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
+    public static final RegistryObject<Item> BLUE_SPAWN_ITEM = ModItems.ITEMS.register("blue_spawn_block",
+            () -> new BlockItem(BLUE_SPAWN_BLOCK.get(), new Item.Properties().tab(CreativeModeTab.TAB_BUILDING_BLOCKS)));
 
 
 

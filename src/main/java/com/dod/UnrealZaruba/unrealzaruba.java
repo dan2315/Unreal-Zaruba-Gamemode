@@ -88,7 +88,6 @@ public class unrealzaruba {
             TeamColorArgument.RegisterArgument();
             CommandRegistration.onCommandRegister(event);
         }
-
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)

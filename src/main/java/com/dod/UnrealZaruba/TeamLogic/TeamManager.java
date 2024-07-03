@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
+import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
+import com.dod.UnrealZaruba.ModBlocks.TeamBlock;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 
 import net.minecraft.core.BlockPos;
@@ -13,6 +16,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 
@@ -21,6 +28,8 @@ public class TeamManager{
 
     private static Team defenders = new Team(null, TeamColor.BLUE);
     private static Team attackers = new Team(null, TeamColor.RED);
+
+    static BlockPos Spawn = null;
 
     public static void Initialize() {
         teams.put(TeamColor.RED, attackers);
