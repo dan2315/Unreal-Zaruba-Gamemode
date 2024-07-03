@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
+import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
+import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjective;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 
 import net.minecraft.ChatFormatting;
@@ -19,6 +21,8 @@ public class Team {
     BlockPos spawn;
     List<UUID> members = new ArrayList<>();
     TeamColor color;
+    private List<IObjective> objectives;
+
     public TeamColor Color() {return color;}
 
     public Team(BlockPos spawn, TeamColor color) {
@@ -36,11 +40,11 @@ public class Team {
                             .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
             // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
-            CaptureObjectivesMode.setSpawnPoint(player, spawn);
+            MesilovoGamemode.setSpawnPoint(player, spawn);
             player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            TeamManager.GiveKitTo(server, player);
+            DestroyObjectivesGamemode.TeamManager.GiveKitTo(server, player);
         }
     }
 
@@ -56,6 +60,22 @@ public class Team {
 
     public void SetSpawn(BlockPos pos) {
         spawn = pos;
+    }
+
+    public void addObjective(IObjective objective) {
+        objectives.add(objective);
+    }
+
+    public List<IObjective> getObjectives() {
+        return objectives;
+    }
+
+    public void ProcessWin() {
+        
+    }
+
+    public void ProcessLose() {
+        
     }
 
     public void GiveKit(MinecraftServer server) {

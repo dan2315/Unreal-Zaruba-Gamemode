@@ -2,14 +2,12 @@ package com.dod.UnrealZaruba.Commands;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
+import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.CommandNode;
-import com.mojang.brigadier.tree.RootCommandNode;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -59,11 +57,11 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
 
         dispatcher.register(Commands.literal("startgame")
-                .requires(cs -> cs.hasPermission(3)).executes(context -> CaptureObjectivesMode.StartGame(context)));
+                .requires(cs -> cs.hasPermission(3)).executes(context -> MesilovoGamemode.StartGame(context)));
 
         dispatcher.register(Commands.literal("startpreparation")
                 .requires(cs -> cs.hasPermission(3))
-                .executes(context -> CaptureObjectivesMode.StartPreparation(context)));
+                .executes(context -> MesilovoGamemode.StartPreparation(context)));
 
         dispatcher.register(Commands.literal("setteamspawn")
                 .requires(cs -> cs.hasPermission(3))
@@ -78,14 +76,13 @@ public class CommandRegistration {
     }
 
     private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-
         int x = IntegerArgumentType.getInteger(context, "x");
         int y = IntegerArgumentType.getInteger(context, "y");
         int z = IntegerArgumentType.getInteger(context, "z");
         BlockPos position = new BlockPos(x, y, z);
         TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
 
-        TeamManager.SetSpawn(color, position);
+        DestroyObjectivesGamemode.TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(
                 new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
                 true);
@@ -97,7 +94,7 @@ public class CommandRegistration {
         BlockPos position = new BlockPos(player.position());
         TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
 
-        TeamManager.SetSpawn(color, position);
+        DestroyObjectivesGamemode.TeamManager.SetSpawn(color, position);
         context.getSource().sendSuccess(
                 new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
                 true);
@@ -118,12 +115,6 @@ public class CommandRegistration {
 
         player.sendMessage(new TextComponent("Нашёл тебя"), player.getUUID());
 
-        if (!player.isCreative()) {
-            source.sendFailure(new TextComponent("This command can only be run by a player."));
-            return 0;
-        }
-
-        player.sendMessage(new TextComponent("Прошёл проверку на креатив"), player.getUUID());
 
         DyeColor[] colors = DyeColor.values(); // Get all wool colors.
         for (DyeColor color : colors) {

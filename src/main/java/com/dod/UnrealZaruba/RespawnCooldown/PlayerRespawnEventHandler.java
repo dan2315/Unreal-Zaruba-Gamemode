@@ -1,20 +1,17 @@
 package com.dod.UnrealZaruba.RespawnCooldown;
 
+import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Title.TitleMessage;
-import static com.dod.UnrealZaruba.TeamLogic.TeamManager.teleportToSpawn;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraft.server.level.ServerPlayer;
 
 
 import java.util.concurrent.Executors;
@@ -67,7 +64,7 @@ public class PlayerRespawnEventHandler {
                 if (serverPlayer != null) {
 //                  serverPlayer.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
                     serverPlayer.setGameMode(GameType.SURVIVAL);
-                    teleportToSpawn(serverPlayer);
+                    DestroyObjectivesGamemode.TeamManager.teleportToSpawn(serverPlayer);
                     serverPlayer.sendMessage(new TextComponent("Вы возродились."), serverPlayer.getUUID());
                 }
                 scheduler.shutdown();

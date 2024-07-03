@@ -3,11 +3,9 @@ package com.dod.UnrealZaruba.Gamemodes;
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 
 import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
-import static com.dod.UnrealZaruba.TeamLogic.TeamManager.GetPlayersTeam;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -38,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Mod.EventBusSubscriber
-public class CaptureObjectivesMode {
+public class MesilovoGamemode {
 
     private static GameStage gameStage = GameStage.Preparation;
 
@@ -54,19 +52,19 @@ public class CaptureObjectivesMode {
         AtomicInteger until_time = new AtomicInteger(11);
         gameStage = GameStage.Battle;
 
-        var success = TeamManager.DeleteBarriersAtSpawn();
+        var success = DestroyObjectivesGamemode.TeamManager.DeleteBarriersAtSpawn();
         if (!success) context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
-        TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
+        DestroyObjectivesGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
         
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-            if (GetPlayersTeam(player) == null) {
+            if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player) == null) {
                 player.sendMessage(new TextComponent("Лох пидр"), player.getUUID());
                 continue;
             }
-            if (GetPlayersTeam(player).Color() == TeamColor.RED) {
+            if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player).Color() == TeamColor.RED) {
                 playSound(player, ModSounds.horn_dire, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            } else if (GetPlayersTeam(player).Color() == TeamColor.BLUE) {
+            } else if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player).Color() == TeamColor.BLUE) {
                 playSound(player, ModSounds.horn_radiant, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
@@ -118,7 +116,7 @@ public class CaptureObjectivesMode {
         if (server == null)
             return;
 
-        if (!TeamManager.IsInTeam(serverPlayer)) {
+        if (!DestroyObjectivesGamemode.TeamManager.IsInTeam(serverPlayer)) {
             BlockPos spawn = server.overworld().getSharedSpawnPos();
             setSpawnPoint(serverPlayer, new BlockPos(62, 55, 163));
             serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
@@ -127,7 +125,7 @@ public class CaptureObjectivesMode {
         if (gameStage == GameStage.Preparation) {
             serverPlayer.setGameMode(GameType.ADVENTURE);
         } else if (gameStage == GameStage.Battle) {
-            if (!TeamManager.IsInTeam(serverPlayer)) {
+            if (!DestroyObjectivesGamemode.TeamManager.IsInTeam(serverPlayer)) {
                 serverPlayer.setGameMode(GameType.SPECTATOR);
             }
         }
@@ -165,20 +163,16 @@ public class CaptureObjectivesMode {
     }
 
     public static void deleteBarriers(BlockPos pos, int chunkRadius) {
-        unrealzaruba.LOGGER.info("РАЗ БЛЯ");
         ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-        unrealzaruba.LOGGER.info("РАЗ БЛЯ");
         if (world == null){
             unrealzaruba.LOGGER.warn("[Ай, бля] World not found");
             return;
         }
-        unrealzaruba.LOGGER.info("РАЗ БЛЯ");
 
         for (int x = -chunkRadius; x <= chunkRadius; x++) {
             for (int z = -chunkRadius; z <= chunkRadius; z++) {
                 int chunkX = new ChunkPos(pos).x + x;
                 int chunkZ = new ChunkPos(pos).z + z;
-                unrealzaruba.LOGGER.info("РАЗ БЛЯ");
                 if (world.hasChunk(chunkX, chunkZ)) {
                     for (int bx = 0; bx < 16; bx++) {
                         for (int bz = 0; bz < 16; bz++) {

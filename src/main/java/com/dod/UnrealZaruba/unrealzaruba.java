@@ -2,14 +2,12 @@ package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
-import com.dod.UnrealZaruba.Gamemodes.CaptureObjectivesMode;
+import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
-import com.dod.UnrealZaruba.RespawnCooldown.SimplePlayerRespawnEventHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.client.event.RenderLevelStageEvent.RegisterStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -66,13 +64,13 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-        CaptureObjectivesMode.setupScoreboard(event.getServer());
+        MesilovoGamemode.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
     }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        CaptureObjectivesMode.ProcessNewPlayer(event.getPlayer());
+        MesilovoGamemode.ProcessNewPlayer(event.getPlayer());
     }
 
     @Mod.EventBusSubscriber
@@ -89,7 +87,6 @@ public class unrealzaruba {
     public static class RegistryEvents {
         @SubscribeEvent
         public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // Register a new block here
             LOGGER.info("HELLO from Register Block");
         }
     }
