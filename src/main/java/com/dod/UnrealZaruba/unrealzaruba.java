@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
+import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,10 +34,12 @@ public class unrealzaruba {
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
+//        MinecraftForge.EVENT_BUS.register(new ModSounds());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
+        ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
@@ -74,7 +77,7 @@ public class unrealzaruba {
     }
 
     @Mod.EventBusSubscriber
-    public class CommandRegistryEvent {
+    public static class CommandRegistryEvent {
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             LOGGER.info("COMMANDS Registered");

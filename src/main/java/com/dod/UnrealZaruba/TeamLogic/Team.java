@@ -18,7 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class Team {
-    BlockPos spawn;
+    public BlockPos spawn;
     List<UUID> members = new ArrayList<>();
     TeamColor color;
     private List<IObjective> objectives;

@@ -16,7 +16,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 
-public class TeamManager{
+public class TeamManager {
+
     HashMap<TeamColor, Team> teams = new HashMap<>();
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -37,6 +38,11 @@ public class TeamManager{
             }
         }
         return null;
+    }
+
+    public Team Get(TeamColor color)
+    {
+        return teams.get(color);
     }
 
     public boolean DeleteBarriersAtSpawn() {

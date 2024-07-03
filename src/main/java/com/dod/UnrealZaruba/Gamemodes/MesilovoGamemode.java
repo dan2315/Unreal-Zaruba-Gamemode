@@ -4,9 +4,7 @@ import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Title.TitleMessage;
-
-import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSound;
-
+import static com.dod.UnrealZaruba.SoundHandler.SoundHandler.playSoundFromPosition;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -57,17 +55,12 @@ public class MesilovoGamemode {
         DestroyObjectivesGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
         
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-            if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player) == null) {
-                player.sendMessage(new TextComponent("Лох пидр"), player.getUUID());
-                continue;
-            }
-            if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player).Color() == TeamColor.RED) {
-                playSound(player, ModSounds.horn_dire, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            } else if (DestroyObjectivesGamemode.TeamManager.GetPlayersTeam(player).Color() == TeamColor.BLUE) {
-                playSound(player, ModSounds.horn_radiant, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-            }
-        }
+
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
+        BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
+        playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(), SoundSource.BLOCKS, 5.0F, 1.0F);
+        playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(), SoundSource.BLOCKS, 5.0F, 1.0F);
 
         Runnable task = () -> {
             //Pray to God this code works
@@ -84,13 +77,13 @@ public class MesilovoGamemode {
         scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
 
         scheduler.schedule(() -> {
-            for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-                TitleMessage.showTitle(player, new TextComponent("§6 Игра началась, в бой!"),
+            for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+                TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
                         new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
             }
             scheduler.shutdown();
 //          until_time = 11;
-        }, 10, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
+        }, 7, TimeUnit.SECONDS);// stops the scheduler after 10 seconds
         return 1;
     }
 
