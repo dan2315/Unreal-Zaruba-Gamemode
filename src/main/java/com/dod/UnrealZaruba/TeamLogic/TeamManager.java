@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import com.dod.UnrealZaruba.Utils.Utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -19,6 +20,11 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public class TeamManager {
 
     HashMap<TeamColor, Team> teams = new HashMap<>();
+
+    public void AddTeam(TeamColor teamColor)
+    {
+        teams.put(teamColor, new Team(null, teamColor));
+    }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
         teams.get(color).SetSpawn(spawn);
@@ -47,7 +53,7 @@ public class TeamManager {
 
     public boolean DeleteBarriersAtSpawn() {
         for (Team team : teams.values()) {
-            MesilovoGamemode.deleteBarriers(team.spawn, 1);
+            Utils.deleteBarriers(team.spawn, 1);
         }
         return true;
     }

@@ -2,6 +2,7 @@ package com.dod.UnrealZaruba.Commands;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.mojang.brigadier.CommandDispatcher;
@@ -31,7 +32,6 @@ public class CommandRegistration {
     }
 
     private static void initializeItemMap() {
-        // Adding entries for all wool colors
         itemMap.put(DyeColor.WHITE, Items.WHITE_WOOL);
         itemMap.put(DyeColor.ORANGE, Items.ORANGE_WOOL);
         itemMap.put(DyeColor.MAGENTA, Items.MAGENTA_WOOL);
@@ -57,20 +57,22 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
 
         dispatcher.register(Commands.literal("startgame")
-                .requires(cs -> cs.hasPermission(3)).executes(context -> MesilovoGamemode.StartGame(context)));
+                .requires(cs -> cs.hasPermission(3)).executes(context -> BaseGamemode.currentGamemode.StartGame(context)));
 
         dispatcher.register(Commands.literal("startpreparation")
                 .requires(cs -> cs.hasPermission(3))
-                .executes(context -> MesilovoGamemode.StartPreparation(context)));
+                .executes(context -> BaseGamemode.currentGamemode.StartPreparation(context)));
 
-        dispatcher.register(Commands.literal("setteamspawn")
-                .requires(cs -> cs.hasPermission(3))
-                .then(Commands.argument("team_color", TeamColorArgument.color())
-                        .executes(CommandRegistration::SetTeamSpawn)
-                        .then(Commands.argument("x", IntegerArgumentType.integer())
-                                .then(Commands.argument("y", IntegerArgumentType.integer())
-                                        .then(Commands.argument("z", IntegerArgumentType.integer())
-                                                .executes(CommandRegistration::SetTeamSpawnTo))))));
+                //Бермудский треугольник, не раскоменчивать
+                //Ошибка происходит после  .requires(cs -> cs.hasPermission(3))
+        // dispatcher.register(Commands.literal("setteamspawn")
+        //         .requires(cs -> cs.hasPermission(3))
+        //         .then(Commands.argument("team_color", TeamColorArgument.color())
+        //                 .executes(CommandRegistration::SetTeamSpawn)
+        //                 .then(Commands.argument("x", IntegerArgumentType.integer())
+        //                         .then(Commands.argument("y", IntegerArgumentType.integer())
+        //                                 .then(Commands.argument("z", IntegerArgumentType.integer())
+        //                                         .executes(CommandRegistration::SetTeamSpawnTo))))));
 
 
     }

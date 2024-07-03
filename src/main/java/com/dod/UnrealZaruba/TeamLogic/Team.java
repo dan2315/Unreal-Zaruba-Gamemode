@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjective;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import com.dod.UnrealZaruba.Utils.Utils;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,7 @@ public class Team {
                             .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
             // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
-            MesilovoGamemode.setSpawnPoint(player, spawn);
+            Utils.setSpawnPoint(player, spawn);
             player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();

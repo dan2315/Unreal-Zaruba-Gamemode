@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
@@ -34,13 +36,13 @@ public class unrealzaruba {
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
-//        MinecraftForge.EVENT_BUS.register(new ModSounds());
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
         ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
+        DestroyObjectivesGamemode.initialize();
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -73,7 +75,7 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        MesilovoGamemode.ProcessNewPlayer(event.getPlayer());
+        BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
     }
 
     @Mod.EventBusSubscriber
