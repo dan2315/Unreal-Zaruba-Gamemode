@@ -8,12 +8,14 @@ import com.dod.UnrealZaruba.Gamemodes.MesilovoGamemode;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
+import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -32,6 +34,7 @@ public class unrealzaruba {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
+    TimerManager timerManager = new TimerManager();
 
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -68,14 +71,20 @@ public class unrealzaruba {
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        MesilovoGamemode.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
+    }
+
+    @SubscribeEvent
+    public void onServerTick(ServerTickEvent event) {
+        timerManager.UpdateAll();
     }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
+        timerManager.Create(10, () -> {
+            unrealzaruba.LOGGER.info("asdsadsad");
+        } );
     }
 
     @Mod.EventBusSubscriber
