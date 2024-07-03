@@ -34,7 +34,6 @@ public class unrealzaruba {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
-    TimerManager timerManager = new TimerManager();
 
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -76,15 +75,13 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent event) {
-        timerManager.UpdateAll();
+        unrealzaruba.LOGGER.info("HELLO from server tick");
+        TimerManager.UpdateAll();
     }
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
-        timerManager.Create(10, () -> {
-            unrealzaruba.LOGGER.info("asdsadsad");
-        } );
     }
 
     @Mod.EventBusSubscriber

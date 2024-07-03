@@ -5,13 +5,18 @@ import java.util.ArrayList;
 public class TimerManager {
     static ArrayList<TickTimer> activeTimers = new ArrayList<TickTimer>();
 
-    public static TickTimer Create(float duration, TimerEndedCallback callback)
+    public static TickTimer Create(float duration, TimerCompletedCallback completedCallback, TimerUpdatedCallback updatedCallback)
     {
         TickTimer timer = new TickTimer(duration, false)
         {
             @Override
             public void OnCompleted() {
-                callback.run();
+                completedCallback.run();
+            }
+
+            @Override
+            public void OnUpdated(int ticks) {
+                updatedCallback.run(ticks);
             }
         };
 

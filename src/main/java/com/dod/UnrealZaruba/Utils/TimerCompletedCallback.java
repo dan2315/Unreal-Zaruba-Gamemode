@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Utils;
 
 @FunctionalInterface
-public interface TimerEndedCallback {
+public interface TimerCompletedCallback {
     void run();
 }

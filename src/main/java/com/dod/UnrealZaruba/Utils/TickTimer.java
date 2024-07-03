@@ -4,13 +4,13 @@ import com.dod.UnrealZaruba.unrealzaruba;
 
 public class TickTimer {
 
-    private float durexKlubnicnnyi;
+    private float duration; // time in milliseconds
     private boolean started;
     private int currentAccumulatedTicks;
 
-    public TickTimer(float duracel, boolean preventStart)
+    public TickTimer(float duration, boolean preventStart)
     {
-        this.durexKlubnicnnyi = duracel;
+        this.duration = duration;
 
         if (!preventStart) Start();
     }
@@ -25,15 +25,19 @@ public class TickTimer {
         if (started)
         {
             currentAccumulatedTicks++;
+            OnUpdated(currentAccumulatedTicks);
             unrealzaruba.LOGGER.info("[INFO] " + this + " timer updated");
-            if (currentAccumulatedTicks/20 >= durexKlubnicnnyi) {
+            if (currentAccumulatedTicks * 50 >= duration) {
                 OnCompleted();
                 Dispose();
             }
         }
     }
 
+    public void OnUpdated(int currentAccumulatedTicks) {}
+
     public void OnCompleted() {}
+
     private void Dispose() {
         TimerManager.DisposeTimer(this);
     }
