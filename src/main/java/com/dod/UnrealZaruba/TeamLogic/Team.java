@@ -78,6 +78,11 @@ public class Team {
         
     }
 
+    public BlockPos GetSpawn()
+    {
+        return spawn;
+    }
+
     public void GiveKit(MinecraftServer server) {
         for (UUID playerId : members) {
             ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);
