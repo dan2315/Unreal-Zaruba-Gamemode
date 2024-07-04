@@ -50,7 +50,7 @@ public class PlayerRespawnEventHandler {
                     },
                     ticks -> {
                         if (ticks % 20 != 0) return;
-                        TitleMessage.sendTitle(player, String.valueOf(duration - ticks / 20));
+                        TitleMessage.sendTitle(player, "§4" + String.valueOf(duration - ticks / 20));
                     });
         }
     }

@@ -21,17 +21,17 @@ public class SoundHandler {
         level.playSound(null, pos, sound, category, volume, pitch);
     }
 
-    @Mod.EventBusSubscriber(modid = "unrealzaruba")
-    public static class OnPlayerLoginEventHandler {
-
-        @SubscribeEvent
-        public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-            if (event.getPlayer() instanceof ServerPlayer) {
-                ServerPlayer player = (ServerPlayer) event.getPlayer();
-//                playSound(player, ModSounds.HORN_DIRE, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
-                  playSoundToPlayer(player, ModSounds.HORN_DIRE.get(), 0.2F, 1.0F);
-                  player.sendMessage(new TextComponent("Sound Test Passed"), player.getUUID());
-            }
-        }
-    }
+//    @Mod.EventBusSubscriber(modid = "unrealzaruba")
+//    public static class OnPlayerLoginEventHandler {
+//
+//        @SubscribeEvent
+//        public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+//            if (event.getPlayer() instanceof ServerPlayer) {
+//                ServerPlayer player = (ServerPlayer) event.getPlayer();
+////                playSound(player, ModSounds.HORN_DIRE, player.position(), SoundSource.PLAYERS, 1.0F, 1.0F);
+//                  playSoundToPlayer(player, ModSounds.HORN_DIRE.get(), 0.2F, 1.0F);
+//                  player.sendMessage(new TextComponent("Sound Test Passed"), player.getUUID());
+//            }
+//        }
+//    }
 }

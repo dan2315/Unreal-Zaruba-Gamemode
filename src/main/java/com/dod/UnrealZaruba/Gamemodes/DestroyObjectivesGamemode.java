@@ -12,6 +12,12 @@ import com.dod.UnrealZaruba.Utils.Utils;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.minecraft.world.scores.Objective;
+
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -26,6 +32,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.dod.UnrealZaruba.Utils.Utils.formatTime;
 
 public class DestroyObjectivesGamemode extends BaseGamemode {
     int until_time = 11;
@@ -61,6 +69,9 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
         ServerPlayer player = context.getSource().getPlayerOrException();
+        MinecraftServer server = context.getSource().getServer();
+        Scoreboard scoreboard = server.getScoreboard();
+        Objective objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
         BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
         BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
@@ -69,19 +80,30 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 SoundSource.BLOCKS, 5.0F, 1.0F);
 
         int timerDuration = 10;
+        int gameDuration = 33 * 60;
         TimerManager.Create(timerDuration * 1000
                 ,() -> {
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
                         var team = TeamManager.GetPlayersTeam(player);
                         TitleMessage.showTitle(serverPlayer, currentGamemode.startGameTexts.get(team.Color()).GetTitle(),
                                 currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
+                        TimerManager.Create(gameDuration * 1000,
+                                () -> {
+
+                                }, ticks -> {
+//                                    gameDuration - (ticks) / 20
+//                                    ScoreboardManager.UpdateScoreboardTimer(scoreboard, objective, gameDuration - (ticks) / 20);
+                                    if (ticks % 20 != 0) return;
+                                    ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective, (gameDuration - (ticks / 20)) / 60);
+                                    ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective, ((gameDuration - (ticks / 20)) % 60));
+                                });
                     }
                 },
                 ticks -> {
                     if (ticks % 20 != 0) return;
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, new TextComponent(String.valueOf(timerDuration - ticks / 20)),
-                                new TextComponent(""));
+                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры"),
+                                new TextComponent(String.valueOf( timerDuration - ticks / 20)));
                     }
                 });
         return 1;
