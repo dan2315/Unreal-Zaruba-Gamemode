@@ -25,6 +25,7 @@ public class TickTimer {
         if (started)
         {
             currentAccumulatedTicks++;
+
             OnUpdated(currentAccumulatedTicks);
             unrealzaruba.LOGGER.info("[INFO] " + this + " timer updated");
             if (currentAccumulatedTicks * 50 >= duration) {
@@ -40,5 +41,9 @@ public class TickTimer {
 
     private void Dispose() {
         TimerManager.DisposeTimer(this);
+    }
+
+    public boolean shouldBeRemoved() {
+        return currentAccumulatedTicks * 50 >= duration;
     }
 }

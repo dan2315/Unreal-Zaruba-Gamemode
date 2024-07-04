@@ -16,13 +16,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-
 public class TeamManager {
 
     HashMap<TeamColor, Team> teams = new HashMap<>();
 
-    public void AddTeam(TeamColor teamColor)
-    {
+    public void AddTeam(TeamColor teamColor) {
         teams.put(teamColor, new Team(null, teamColor));
     }
 
@@ -39,15 +37,14 @@ public class TeamManager {
 
     public Team GetPlayersTeam(Player player) {
         for (Team team : teams.values()) {
-            if (team.members.contains(player.getUUID())){
+            if (team.members.contains(player.getUUID())) {
                 return teams.get(team.color);
             }
         }
         return null;
     }
 
-    public Team Get(TeamColor color)
-    {
+    public Team Get(TeamColor color) {
         return teams.get(color);
     }
 
@@ -60,7 +57,6 @@ public class TeamManager {
         }
         return true;
     }
-
 
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
         Team targetTeam = teams.get(dyeColor);
@@ -78,8 +74,9 @@ public class TeamManager {
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendMessage(
-                new TextComponent("Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"),
-                player.getUUID());
+                    new TextComponent(
+                            "Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"),
+                    player.getUUID());
             return;
         }
 
@@ -105,13 +102,21 @@ public class TeamManager {
         for (Team team : teams.values()) {
             for (UUID playerId : team.members) {
                 var player = playerList.getPlayer(playerId);
-                if (player != null) player.setGameMode(gameType);
+                if (player != null)
+                    player.setGameMode(gameType);
             }
         }
     }
 
     public void teleportToSpawn(ServerPlayer serverPlayer) {
-        BlockPos Spawn = GetPlayersTeam(serverPlayer).spawn;
+        Team team = GetPlayersTeam(serverPlayer);
+        if (team == null){
+            serverPlayer.sendMessage(new TextComponent("Вы не присоединены ни к одной команде"),
+                serverPlayer.getUUID());
+            return;
+        }
+        
+        BlockPos Spawn = team.spawn;
         serverPlayer.teleportTo(Spawn.getX(), Spawn.getY(), Spawn.getZ());
     }
 }

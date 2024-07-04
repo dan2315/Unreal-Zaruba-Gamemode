@@ -68,16 +68,19 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
 
-        TickTimer tickTimer = TimerManager.Create(10000
+        int timerDuration = 10;
+        TimerManager.Create(timerDuration * 1000
                 ,() -> {
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+                        var team = TeamManager.GetPlayersTeam(player);
                         TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
-                                new TextComponent("Рассаживайтесь по технике и едьте крушить оппонентов"));
+                                currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
                     }
                 },
                 ticks -> {
+                    if (ticks % 20 != 0) return;
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, new TextComponent(String.valueOf(ticks / 20)),
+                        TitleMessage.showTitle(serverPlayer, new TextComponent(String.valueOf(timerDuration - ticks / 20)),
                                 new TextComponent(""));
                     }
                 });

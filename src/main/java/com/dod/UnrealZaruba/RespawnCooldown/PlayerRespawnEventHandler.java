@@ -44,7 +44,7 @@ public class PlayerRespawnEventHandler {
             player.setGameMode(GameType.SPECTATOR);
             player.teleportTo(deathX, deathY, deathZ);
 
-            TickTimer tickTimer = TimerManager.Create(10000
+            TimerManager.Create(10000
                     ,() -> {
                         ServerPlayer serverPlayer = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(player.getUUID());
                         if (serverPlayer != null) {
@@ -53,6 +53,7 @@ public class PlayerRespawnEventHandler {
                         }
                     },
                     ticks -> {
+                        if (ticks % 20 != 0) return;
                         TitleMessage.sendTitle(player, String.valueOf(ticks / 20));
                     });
         }

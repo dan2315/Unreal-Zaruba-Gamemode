@@ -80,8 +80,8 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent event) {
-        unrealzaruba.LOGGER.info("HELLO from server tick");
         TimerManager.UpdateAll();
+        unrealzaruba.LOGGER.info("[ABOBA] ServerTicked");
     }
 
     @SubscribeEvent
