@@ -41,6 +41,7 @@ public class ItemKits {
                 "cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
                 1);
         redTeamKit.put("cgm:basic_bullet", 600);
+        redTeamKit.put("combatgear:parachuteclosed_chestplate", 1);
 
 
 
@@ -73,6 +74,8 @@ public class ItemKits {
                 "cgm:heavy_rifle{AmmoCount:4, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:long_scope\", Count:1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
                 1);
         blueTeamKit.put("cgm:advanced_bullet", 12);
+
+
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
