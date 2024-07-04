@@ -35,11 +35,14 @@ public class ItemKits {
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 40);
         redTeamKit.put("minecraft:golden_carrot", 64);
-        redTeamKit.put("cgm:grenade", 8);
-        redTeamKit.put("cgm:stun_grenade", 8);
-        redTeamKit.put("cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}", 1);
-        redTeamKit.put("cgm:basic_bullet", 300);
-        
+        redTeamKit.put("cgm:grenade", 12);
+        redTeamKit.put("cgm:stun_grenade", 12);
+        redTeamKit.put(
+                "cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
+                1);
+        redTeamKit.put("cgm:basic_bullet", 600);
+
+
 
 
         blueTeamKit = new HashMap<>();
@@ -62,15 +65,19 @@ public class ItemKits {
         blueTeamKit.put("minecraft:golden_carrot", 64);
         blueTeamKit.put("cgm:grenade", 8);
         blueTeamKit.put("cgm:stun_grenade", 8);
-        blueTeamKit.put("cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}", 1);
-        blueTeamKit.put("cgm:basic_bullet", 300);
+        blueTeamKit.put(
+                "cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
+                1);
+        blueTeamKit.put("cgm:basic_bullet", 450);
+        blueTeamKit.put(
+                "cgm:heavy_rifle{AmmoCount:4, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:long_scope\", Count:1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
+                1);
+        blueTeamKit.put("cgm:advanced_bullet", 12);
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
         TeamKits.put(TeamColor.BLUE, blueTeamKit);
     }
-
-
 
     public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, Team team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {

@@ -73,7 +73,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 ,() -> {
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
                         var team = TeamManager.GetPlayersTeam(player);
-                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6 Игра началась, в бой!"),
+                        TitleMessage.showTitle(serverPlayer, currentGamemode.startGameTexts.get(team.Color()).GetTitle(),
                                 currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
                     }
                 },

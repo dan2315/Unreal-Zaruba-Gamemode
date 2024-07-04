@@ -3,11 +3,9 @@ package com.dod.UnrealZaruba.RespawnCooldown;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 
-import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -16,9 +14,6 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Bus.FORGE)
 public class PlayerRespawnEventHandler {
