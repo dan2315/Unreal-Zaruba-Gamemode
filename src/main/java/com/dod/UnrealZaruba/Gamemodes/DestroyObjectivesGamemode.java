@@ -66,8 +66,6 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
         DestroyObjectivesGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
         ServerPlayer player = context.getSource().getPlayerOrException();
         MinecraftServer server = context.getSource().getServer();
         Scoreboard scoreboard = server.getScoreboard();

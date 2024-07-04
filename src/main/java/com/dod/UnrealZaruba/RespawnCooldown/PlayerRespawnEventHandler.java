@@ -44,7 +44,7 @@ public class PlayerRespawnEventHandler {
                     ,() -> {
                         ServerPlayer serverPlayer = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(player.getUUID());
                         if (serverPlayer != null) {
-                            serverPlayer.setGameMode(GameType.SURVIVAL);
+                            serverPlayer.setGameMode(GameType.ADVENTURE);
                             DestroyObjectivesGamemode.TeamManager.teleportToSpawn(serverPlayer);
                         }
                     },
