@@ -63,6 +63,12 @@ public class Utils {
         }
     }
 
+    public static String formatTime(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
     public static void ClearInventoryAllPlayerExcludeOP(PlayerList playerList, GameType gameType) {
         for (ServerPlayer player : playerList.getPlayers()) {
 
