@@ -73,15 +73,16 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-//        MesilovoGamemode.setupScoreboard(event.getServer());
+        // MesilovoGamemode.setupScoreboard(event.getServer());
         ScoreboardManager.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
     }
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent event) {
-        TimerManager.UpdateAll();
-        unrealzaruba.LOGGER.info("[ABOBA] ServerTicked");
+        if (event.phase == ServerTickEvent.Phase.START) {
+            TimerManager.UpdateAll();
+        }
     }
 
     @SubscribeEvent
