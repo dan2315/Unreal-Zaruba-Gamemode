@@ -2,7 +2,6 @@ package com.dod.UnrealZaruba.Utils;
 
 import java.util.ArrayList;
 
-import com.dod.UnrealZaruba.unrealzaruba;
 
 public class TimerManager {
     static ArrayList<TickTimer> activeTimers = new ArrayList<TickTimer>();

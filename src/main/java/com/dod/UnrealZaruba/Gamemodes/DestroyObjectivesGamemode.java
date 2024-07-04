@@ -85,14 +85,13 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 ,() -> {
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
                         var team = TeamManager.GetPlayersTeam(player);
+                        if (team == null) return;
                         TitleMessage.showTitle(serverPlayer, currentGamemode.startGameTexts.get(team.Color()).GetTitle(),
                                 currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
                         TimerManager.Create(gameDuration * 1000,
                                 () -> {
 
                                 }, ticks -> {
-//                                    gameDuration - (ticks) / 20
-//                                    ScoreboardManager.UpdateScoreboardTimer(scoreboard, objective, gameDuration - (ticks) / 20);
                                     if (ticks % 20 != 0) return;
                                     ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective, (gameDuration - (ticks / 20)) / 60);
                                     ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective, ((gameDuration - (ticks / 20)) % 60));
