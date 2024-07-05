@@ -99,8 +99,8 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 ticks -> {
                     if (ticks % 20 != 0) return;
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры"),
-                                new TextComponent(String.valueOf( timerDuration - ticks / 20)));
+                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры§r"),
+                                new TextComponent("▌§l " + String.valueOf(timerDuration - ticks / 20) + " §r▌"));
                     }
                 });
         return 1;

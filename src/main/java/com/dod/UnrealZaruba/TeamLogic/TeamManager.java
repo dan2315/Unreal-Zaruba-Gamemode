@@ -117,6 +117,9 @@ public class TeamManager {
         }
         
         BlockPos Spawn = team.spawn;
-        serverPlayer.teleportTo(Spawn.getX(), Spawn.getY(), Spawn.getZ());
+        double x = Spawn.getX() + 0.5d;
+        double y = Spawn.getY() + 0.1d;
+        double z = Spawn.getZ() + 0.5d;
+        serverPlayer.teleportTo(x, y, z);
     }
 }

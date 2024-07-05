@@ -74,7 +74,7 @@ public class unrealzaruba {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         // MesilovoGamemode.setupScoreboard(event.getServer());
-        ScoreboardManager.setupScoreboard(event.getServer());
+//        ScoreboardManager.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
     }
 

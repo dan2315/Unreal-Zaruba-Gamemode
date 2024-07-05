@@ -21,7 +21,7 @@ public class SpawnBlock extends Block {
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        DestroyObjectivesGamemode.TeamManager.SetSpawn(teamColor, pos.offset(0, 1, 0));
+        DestroyObjectivesGamemode.TeamManager.SetSpawn(teamColor, pos);
         saveBlockPos(pos);
         unrealzaruba.LOGGER.info("SAVED BLOCKPOS{}", Spawn);
     }
