@@ -15,6 +15,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.PlayerTeam;
 
 public class TeamManager {
 
@@ -85,6 +91,21 @@ public class TeamManager {
         }
 
         teams.get(dyeColor).Assign(player);
+    }
+
+    public void setupTeams(MinecraftServer server) {
+        Scoreboard scoreboard = server.getScoreboard();
+        createTeam(scoreboard, "RED", new TextComponent("Red Team"));
+        createTeam(scoreboard, "BLUE", new TextComponent("Blue Team"));
+    }
+
+    public void createTeam(Scoreboard scoreboard, String teamName, Component displayName) {
+        PlayerTeam team = scoreboard.getPlayerTeam(teamName);
+        
+        if (team == null) {
+            team = scoreboard.addPlayerTeam(teamName);
+            team.setDisplayName(displayName);
+        }
     }
 
     public void GiveKit(MinecraftServer server) {

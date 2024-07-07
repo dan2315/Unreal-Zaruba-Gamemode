@@ -53,6 +53,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public int StartPreparation(CommandContext<CommandSourceStack> context) {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
 
+
         gameStage = GameStage.Preparation;
 
         return 1;
@@ -66,10 +67,12 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
         DestroyObjectivesGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
 
+
         ServerPlayer player = context.getSource().getPlayerOrException();
         MinecraftServer server = context.getSource().getServer();
         Scoreboard scoreboard = server.getScoreboard();
         Objective objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
+        ScoreboardManager.setupScoreboard(server);
         BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
         BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
