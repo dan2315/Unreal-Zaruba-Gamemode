@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjective;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
@@ -41,8 +43,9 @@ public class Team {
                     true);
             // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
             Utils.setSpawnPoint(player, spawn);
-            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+//            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             player.getInventory().clearContent();
+            BaseGamemode.TeamManager.teleportToSpawn(player);
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             DestroyObjectivesGamemode.TeamManager.GiveKitTo(server, player);
         }

@@ -27,7 +27,7 @@ public class TickTimer {
             currentAccumulatedTicks++;
 
             OnUpdated(currentAccumulatedTicks);
-            unrealzaruba.LOGGER.info("[INFO] " + this + " timer updated");
+//            unrealzaruba.LOGGER.info("[INFO] " + this + " timer updated");
             if (currentAccumulatedTicks * 50 >= duration) {
                 OnCompleted();
                 Dispose();

@@ -53,6 +53,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public int StartPreparation(CommandContext<CommandSourceStack> context) {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
 
+
         gameStage = GameStage.Preparation;
 
         return 1;
@@ -66,10 +67,12 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
         DestroyObjectivesGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
 
+
         ServerPlayer player = context.getSource().getPlayerOrException();
         MinecraftServer server = context.getSource().getServer();
         Scoreboard scoreboard = server.getScoreboard();
         Objective objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
+        ScoreboardManager.setupScoreboard(server);
         BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
         BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
@@ -99,8 +102,8 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 ticks -> {
                     if (ticks % 20 != 0) return;
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры"),
-                                new TextComponent(String.valueOf( timerDuration - ticks / 20)));
+                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры§r"),
+                                new TextComponent("▌§l " + String.valueOf(timerDuration - ticks / 20) + " §r▌"));
                     }
                 });
         return 1;
