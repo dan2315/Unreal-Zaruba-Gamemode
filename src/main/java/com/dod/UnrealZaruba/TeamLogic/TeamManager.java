@@ -72,6 +72,7 @@ public class TeamManager {
     }
 
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
+        if (IsInTeam(player)) return;
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendMessage(
                     new TextComponent(

@@ -43,6 +43,8 @@ public class unrealzaruba {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
+        
+        TeamColorArgument.RegisterArgument();
 
         ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -95,7 +97,6 @@ public class unrealzaruba {
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             LOGGER.info("COMMANDS Registered");
-            TeamColorArgument.RegisterArgument();
             CommandRegistration.onCommandRegister(event);
         }
     }

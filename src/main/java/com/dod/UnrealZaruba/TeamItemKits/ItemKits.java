@@ -35,6 +35,7 @@ public class ItemKits {
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 40);
         redTeamKit.put("minecraft:golden_carrot", 64);
+        redTeamKit.put("minecraft:flint_and_steel", 1);
         redTeamKit.put("cgm:grenade", 12);
         redTeamKit.put("cgm:stun_grenade", 12);
         redTeamKit.put(
@@ -73,7 +74,7 @@ public class ItemKits {
         blueTeamKit.put(
                 "cgm:heavy_rifle{AmmoCount:4, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:long_scope\", Count:1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
                 1);
-        blueTeamKit.put("cgm:advanced_bullet", 12);
+        blueTeamKit.put("cgm:advanced_bullet", 32);
 
 
 
