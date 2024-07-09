@@ -8,9 +8,10 @@ import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TimerManager;
-import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
 
 import com.mojang.logging.LogUtils;
+
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,6 +29,8 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import java.util.stream.Collectors;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("unrealzaruba")
@@ -90,6 +93,10 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
+        // VS Test Code
+        // var item = ValkyrienSkiesMod.INSTANCE.getTEST_CHAIR().asItem();
+        // event.getPlayer().getInventory().add(new ItemStack(item));
+
     }
 
     @Mod.EventBusSubscriber
