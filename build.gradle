@@ -102,19 +102,13 @@ repositories {
         }
         maven { 
             url = 'https://libraries.minecraft.net/' 
-            }
+        }
         maven {
              url = 'https://repo.maven.apache.org/maven2/' 
-             }
+        }
         maven {
             name = "Valkyrien Skies Internal"
-            url = project.vs_maven_url ?: 'https://maven.valkyrienskies.org'
-            if (project.vs_maven_username && project.vs_maven_password) {
-                credentials {
-                    username = project.vs_maven_username
-                    password = project.vs_maven_password
-                }
-            }
+            url = 'https://maven.valkyrienskies.org'
         }
 }
 
@@ -125,13 +119,13 @@ dependencies {
     implementation("org.joml:joml:1.10.4") { transitive = false }
     implementation("org.joml:joml-primitives:1.10.0") { transitive = false }
 
-    implementation("org.valkyrienskies:valkyrienskies-118-forge:$vs2_version") { transitive = false }
-    implementation("org.valkyrienskies:valkyrienskies-118-common:$vs2_version") { transitive = false }
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-forge:$vs2_version") { transitive = false }
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-common:$vs2_version") { transitive = false }
 
-    implementation("org.valkyrienskies.core:api:$vs_core_version")
-    implementation("org.valkyrienskies.core:api-game:$vs_core_version")
-    implementation("org.valkyrienskies.core:util:$vs_core_version")
-    implementation("org.valkyrienskies.core:impl:$vs_core_version")
+    implementation fg.deobf("org.valkyrienskies.core:api:$vs_core_version")
+    implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
+    implementation fg.deobf("org.valkyrienskies.core:util:$vs_core_version")
+    implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
 }
 
 jar {
