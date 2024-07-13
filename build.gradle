@@ -106,6 +106,10 @@ repositories {
         maven {
              url = 'https://repo.maven.apache.org/maven2/' 
         }
+        maven {
+            name = "Valkyrien Skies Internal"
+            url = 'https://maven.valkyrienskies.org'
+        }
         maven { // Create Forge and Registrate Forge
             url = "https://maven.tterrag.com/"
             content {
@@ -113,11 +117,6 @@ repositories {
                 includeGroup("com.simibubi.create")
             }
         }
-        maven {
-            name = "Valkyrien Skies Internal"
-            url = 'https://maven.valkyrienskies.org'
-        }
-    
 }
 
 dependencies {
@@ -136,9 +135,9 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
 
     // Create and its dependencies
-    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    modImplementation("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    modImplementation("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
+    // implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    // implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 }
 
 jar {
