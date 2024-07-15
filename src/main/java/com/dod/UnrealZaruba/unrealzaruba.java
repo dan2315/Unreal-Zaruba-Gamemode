@@ -11,7 +11,6 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;

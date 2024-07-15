@@ -27,7 +27,6 @@ public class ModItems {
             () -> new Item(new Item.Properties().tab(CreativeTabs.MAIN_TAB)) {
                 @Override
                 public InteractionResult useOn(UseOnContext useContext) {
-                    unrealzaruba.LOGGER.debug("ASDSADASDASDASDASDASDADASDSAD");
                     Level level = useContext.getLevel();
                     if ((level instanceof ServerLevel) == false) return InteractionResult.FAIL;
                     BlockPos blockPos = useContext.getClickedPos();

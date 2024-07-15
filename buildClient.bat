@@ -1,6 +1,6 @@
 @echo off
 REM Call gradlew build
-call ./gradlew build
+call ./gradlew clean build
 
 REM Check if build was successful
 if %errorlevel% neq 0 (
