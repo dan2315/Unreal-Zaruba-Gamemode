@@ -1,0 +1,19 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven {
+            name = "ParchmentMC"
+            url = "https://maven.parchmentmc.org"
+        }
+        // maven {
+        //     name = 'Architectury'
+        //     url = 'https://maven.architectury.dev'
+        // }
+        // maven() {
+        //     name = "Fabric"
+        //     url = "https://maven.fabricmc.net/"
+        // }
+    }
+}

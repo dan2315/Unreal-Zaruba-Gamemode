@@ -1,8 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
-import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.Aaaaaaaa.StartGameText;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
@@ -15,25 +13,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Scoreboard;
-import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraft.world.scores.Objective;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.GameType;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 
-import javax.security.auth.login.CredentialException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.dod.UnrealZaruba.Utils.Utils.formatTime;
 
 public class DestroyObjectivesGamemode extends BaseGamemode {
     int until_time = 11;

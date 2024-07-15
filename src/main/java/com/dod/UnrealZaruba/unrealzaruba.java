@@ -28,7 +28,6 @@ import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 import java.util.stream.Collectors;
 
@@ -94,9 +93,6 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
-        
-        var item = ValkyrienSkiesMod.INSTANCE.getTEST_CHAIR().asItem();
-        event.getPlayer().getInventory().add(new ItemStack(item));
     }
 
     @Mod.EventBusSubscriber

@@ -4,20 +4,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
     }
 }
 plugins {
+    id 'net.minecraftforge.gradle' version '6.+'
     id 'eclipse'
+    // id "architectury-plugin" version "3.4.146"
+    // id "dev.architectury.loom" version "1.3.355"
     id 'maven-publish'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 
     id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
     id "com.modrinth.minotaur" version "2.4.5" apply false
 
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
-apply plugin: 'net.minecraftforge.gradle'
-
 
 version = '0.1'
 group = 'com.dod.unrealzaruba' 
@@ -28,7 +30,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'parchment', version: '2022.08.07-1.18.2'
 
     runs {
         client {
@@ -92,6 +94,9 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 repositories {
+        maven { 
+            url = 'https://libraries.minecraft.net/' 
+        }
         maven {
             name = "ParchmentMC"
             url = "https://maven.parchmentmc.org"
@@ -100,9 +105,6 @@ repositories {
             name = "Modrinth"
             url = "https://api.modrinth.com/maven"
         }
-        maven { 
-            url = 'https://libraries.minecraft.net/' 
-        }
         maven {
              url = 'https://repo.maven.apache.org/maven2/' 
         }
@@ -110,7 +112,7 @@ repositories {
             name = "Valkyrien Skies Internal"
             url = 'https://maven.valkyrienskies.org'
         }
-        maven { // Create Forge and Registrate Forge
+        maven {
             url = "https://maven.tterrag.com/"
             content {
                 includeGroup("com.tterrag.registrate")
@@ -136,8 +138,8 @@ dependencies {
 
     // Create and its dependencies
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    // implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    // implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 }
 
 jar {
