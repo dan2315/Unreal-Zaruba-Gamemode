@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.TeamLogic.Team;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,7 +83,7 @@ public class ItemKits {
         TeamKits.put(TeamColor.BLUE, blueTeamKit);
     }
 
-    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, Team team) {
+    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());

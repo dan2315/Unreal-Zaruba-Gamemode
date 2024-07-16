@@ -7,6 +7,7 @@ import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -62,6 +63,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         Scoreboard scoreboard = server.getScoreboard();
         Objective objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
         ScoreboardManager.setupScoreboard(server);
+        TeamU.createTeam(server);
         BlockPos SpawnRed = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
         BlockPos SpawnBlue = DestroyObjectivesGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),

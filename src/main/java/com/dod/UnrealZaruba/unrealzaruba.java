@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TimerManager;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import com.mojang.logging.LogUtils;
 
@@ -79,6 +80,7 @@ public class unrealzaruba {
         // Do something when the server starts
         // MesilovoGamemode.setupScoreboard(event.getServer());
 //        ScoreboardManager.setupScoreboard(event.getServer());
+        TeamU.createTeam(event.getServer());
         LOGGER.info("HELLO from server starting");
     }
 

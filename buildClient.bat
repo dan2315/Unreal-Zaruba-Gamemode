@@ -10,7 +10,7 @@ if %errorlevel% neq 0 (
 
 REM Define source and destination paths
 set "SOURCE_PATH=.\build\libs\unrealzaruba-0.1.jar"
-set "DEST_PATH=X:\Games\mc_modpacks\Instances\ModTesting\mods"
+set "DEST_PATH=D:\multiMC\instances\runClient\.minecraft\mods"
 
 REM Check if the source file exists
 if not exist "%SOURCE_PATH%" (

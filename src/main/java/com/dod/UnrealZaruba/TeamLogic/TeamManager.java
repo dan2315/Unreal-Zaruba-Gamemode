@@ -13,17 +13,17 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.server.ServerLifecycleHooks;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.PlayerTeam;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class TeamManager {
 
-    HashMap<TeamColor, Team> teams = new HashMap<>();
+    HashMap<TeamColor, TeamU> teams = new HashMap<>();
+
+//    HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
 
     public void AddTeam(TeamColor teamColor) {
-        teams.put(teamColor, new Team(null, teamColor));
+        teams.put(teamColor, new TeamU(null, teamColor));
     }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -31,14 +31,14 @@ public class TeamManager {
     }
 
     public boolean IsInTeam(Player player) {
-        for (Team team : teams.values()) {
+        for (TeamU team : teams.values()) {
             return team.members.contains(player.getUUID());
         }
         return false;
     }
 
-    public Team GetPlayersTeam(Player player) {
-        for (Team team : teams.values()) {
+    public TeamU GetPlayersTeam(Player player) {
+        for (TeamU team : teams.values()) {
             if (team.members.contains(player.getUUID())) {
                 return teams.get(team.color);
             }
@@ -46,12 +46,12 @@ public class TeamManager {
         return null;
     }
 
-    public Team Get(TeamColor color) {
+    public TeamU Get(TeamColor color) {
         return teams.get(color);
     }
 
     public boolean DeleteBarriersAtSpawn() {
-        for (Team team : teams.values()) {
+        for (TeamU team : teams.values()) {
             if (team.spawn == null) {
                 return false;
             }
@@ -61,12 +61,12 @@ public class TeamManager {
     }
 
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
-        Team targetTeam = teams.get(dyeColor);
+        TeamU targetTeam = teams.get(dyeColor);
         int targetTeamCount = targetTeam.MembersCount();
 
         int maxOtherTeamsCount = teams.values().stream()
                 .filter(team -> !team.equals(targetTeam))
-                .mapToInt(Team::MembersCount)
+                .mapToInt(TeamU::MembersCount)
                 .max()
                 .orElse(0);
 
@@ -74,7 +74,7 @@ public class TeamManager {
     }
 
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
-        if (IsInTeam(player)) return;
+//        if (IsInTeam(player)) return;
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendMessage(
                     new TextComponent(
@@ -83,30 +83,15 @@ public class TeamManager {
             return;
         }
 
-        for (Team team : teams.values()) {
+        for (TeamU team : teams.values()) {
             team.TryRemove(player);
         }
 
         teams.get(dyeColor).Assign(player);
     }
 
-    public void setupTeams(MinecraftServer server) {
-        Scoreboard scoreboard = server.getScoreboard();
-        createTeam(scoreboard, "RED", new TextComponent("Red Team"));
-        createTeam(scoreboard, "BLUE", new TextComponent("Blue Team"));
-    }
-
-    public void createTeam(Scoreboard scoreboard, String teamName, Component displayName) {
-        PlayerTeam team = scoreboard.getPlayerTeam(teamName);
-        
-        if (team == null) {
-            team = scoreboard.addPlayerTeam(teamName);
-            team.setDisplayName(displayName);
-        }
-    }
-
     public void GiveKit(MinecraftServer server) {
-        for (Team team : teams.values()) {
+        for (TeamU team : teams.values()) {
             team.GiveKit(server);
         }
     }
@@ -117,7 +102,7 @@ public class TeamManager {
 
     public void ChangeGameModeOfAllParticipants(GameType gameType) {
         var playerList = ServerLifecycleHooks.getCurrentServer().getPlayerList();
-        for (Team team : teams.values()) {
+        for (TeamU team : teams.values()) {
             for (UUID playerId : team.members) {
                 var player = playerList.getPlayer(playerId);
                 if (player != null)
@@ -127,7 +112,7 @@ public class TeamManager {
     }
 
     public void teleportToSpawn(ServerPlayer serverPlayer) {
-        Team team = GetPlayersTeam(serverPlayer);
+        TeamU team = GetPlayersTeam(serverPlayer);
         if (team == null){
             serverPlayer.sendMessage(new TextComponent("Вы не присоединены ни к одной команде"),
                 serverPlayer.getUUID());
@@ -136,8 +121,8 @@ public class TeamManager {
         
         BlockPos Spawn = team.spawn;
         double x = Spawn.getX() + 0.5d;
-        double y = Spawn.getY() + 0.1d;
+        double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
-        serverPlayer.teleportTo(x, y, z);
+        serverPlayer.teleportTo(x, y ,z);
     }
 }
