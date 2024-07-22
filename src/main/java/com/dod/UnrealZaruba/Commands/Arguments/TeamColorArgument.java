@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.Commands.Arguments;
 
+import javax.annotation.Nonnull;
+
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -45,18 +47,18 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
     public static class Serializer implements ArgumentSerializer<TeamColorArgument> {
         @Override
-        public void serializeToNetwork(TeamColorArgument argument, FriendlyByteBuf buffer) {
+        public void serializeToNetwork(@Nonnull TeamColorArgument argument,@Nonnull FriendlyByteBuf buffer) {
             buffer.writeInt(argument.getColor().ordinal());
         }
 
         @Override
-        public TeamColorArgument deserializeFromNetwork(FriendlyByteBuf buffer) {
+        public TeamColorArgument deserializeFromNetwork(@Nonnull FriendlyByteBuf buffer) {
             int ordinal = buffer.readInt();
             return new TeamColorArgument(TeamColor.values()[ordinal]);
         }
 
         @Override
-        public void serializeToJson(TeamColorArgument argument, JsonObject buffer) {
+        public void serializeToJson(@Nonnull TeamColorArgument argument,@Nonnull JsonObject buffer) {
             buffer.addProperty(PropertyName, argument.getColor().name());
         }
 

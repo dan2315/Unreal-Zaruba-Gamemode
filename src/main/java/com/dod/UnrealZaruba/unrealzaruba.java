@@ -9,6 +9,7 @@ import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TimerManager;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import com.mojang.logging.LogUtils;
 
@@ -76,6 +77,7 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("HELLO from server starting");
+        TeamU.createTeam(event.getServer());
         new DestroyObjectivesGamemode();
     }
 

@@ -5,18 +5,13 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.List;
-import java.util.ArrayList;
-
-import org.apache.logging.log4j.core.config.builder.api.Component;
-
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
-import com.dod.UnrealZaruba.TeamLogic.Team;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -219,7 +214,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         TextComponent wonText = new TextComponent("Можешь сказать оппоненту \'Сори, что трахнул\'");
         TextComponent loseText = new TextComponent("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {
-            Team team = TeamManager.GetPlayersTeam(player);
+            TeamU team = TeamManager.GetPlayersTeam(player);
             if (team == null) continue;
             if (team.Color() == wonTeam) {
                 TitleMessage.showTitle(player, titleText, wonText);
