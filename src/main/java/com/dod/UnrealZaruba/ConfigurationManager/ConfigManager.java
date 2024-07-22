@@ -1,26 +1,51 @@
-// package com.dod.UnrealZaruba.ConfigurationManager;
+package com.dod.UnrealZaruba.ConfigurationManager;
 
-// import net.minecraftforge.fml.config.ModConfig;
-// import java.io.File;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-// public class ConfigManager {
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
-//     private static ModConfig config;
+public class ConfigManager {
+    final static String directoryPath = "unrealzaruba";
+    public final static String Objectives = directoryPath + '\\' + "destructibleObjectives.json";
+    public final static String Teams = directoryPath + '\\' + "teams.json";
 
-//     public static void init(File file) {
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(DestructibleObjective.class, new DObjectiveDeserializer()).setPrettyPrinting()
+            .create();
 
-//         config = 
+    public static <T> void saveConfig(String filePath, T config) throws IOException {
+        CreateDirectoryIfNotExist(filePath);
 
-//         try {
-//             config.load();
-//             // Define configuration fields
-//             boolean mySetting = config.getBoolean("mySetting", Configuration.CATEGORY_GENERAL, true, "This is a description of my setting.");
-//         } catch (Exception e) {
-//             // Log the exception
-//         } finally {
-//             if (config.hasChanged()) {
-//                 config.save();
-//             }
-//         }
-//     }
-// }
+        try (FileWriter writer = new FileWriter(filePath)) {
+            gson.toJson(config, writer);
+        }
+    }
+
+    public static <T> T loadConfig(String filePath, Class<T> configClass) throws IOException {
+        try (FileReader reader = new FileReader(filePath)) {
+            return gson.fromJson(reader, configClass);
+        }
+    }
+
+    public static <T> void createDefaultConfig(String filePath, T defaultConfig) throws IOException {
+        CreateDirectoryIfNotExist(filePath);
+        File file = new File(filePath);
+        if (!file.exists()) {
+            saveConfig(filePath, defaultConfig);
+        }
+    }
+
+    private static void CreateDirectoryIfNotExist(String filePath) {
+        File file = new File(filePath);
+        File directory = file.getParentFile();
+
+        if (directory != null && !directory.exists()) {
+            directory.mkdirs();
+        }
+    }
+}

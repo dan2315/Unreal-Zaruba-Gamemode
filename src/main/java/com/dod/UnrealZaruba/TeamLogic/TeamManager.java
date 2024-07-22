@@ -1,9 +1,14 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.valkyrienskies.core.impl.shadow.nu;
+
+import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 
@@ -22,8 +27,19 @@ public class TeamManager {
 
     HashMap<TeamColor, Team> teams = new HashMap<>();
 
-    public void AddTeam(TeamColor teamColor) {
-        teams.put(teamColor, new Team(null, teamColor));
+    public TeamManager() {
+        var teamData = Load();
+        if (teamData != null) {
+            for (var data : teamData.teamSpawns.entrySet()) {
+                AddTeam(data.getKey(), data.getValue());
+                unrealzaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
+            }
+        }
+    }
+
+    public void AddTeam(TeamColor teamColor, BlockPos spawn) {
+        if (teams.containsKey(teamColor)) teams.remove(teamColor);
+        teams.put(teamColor, new Team(spawn, teamColor));
     }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -74,7 +90,6 @@ public class TeamManager {
     }
 
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
-        if (IsInTeam(player)) return;
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendMessage(
                     new TextComponent(
@@ -105,9 +120,9 @@ public class TeamManager {
         }
     }
 
-    public void GiveKit(MinecraftServer server) {
+    public void GiveKit() {
         for (Team team : teams.values()) {
-            team.GiveKit(server);
+            team.GiveKit();
         }
     }
 
@@ -140,4 +155,29 @@ public class TeamManager {
         double z = Spawn.getZ() + 0.5d;
         serverPlayer.teleportTo(x, y, z);
     }
+
+    public void Save() {
+        TeamData data = new TeamData(); 
+        data.teamSpawns = new HashMap<>();
+        for (var entry : teams.entrySet()) {
+            data.teamSpawns.put(entry.getKey(), entry.getValue().spawn);
+        }
+        try {
+            ConfigManager.saveConfig(ConfigManager.Teams, data);
+            unrealzaruba.LOGGER.warn("[Во, бля] Сохранил конфиг для TeamManager");
+        } catch (IOException e) {
+            unrealzaruba.LOGGER.warn("[Ай, бля] Unable to create config for TeamManager");
+        }
+    } 
+
+    public TeamData Load() {
+        try {
+            var loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
+            unrealzaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager");
+            return loadedData;
+        } catch (IOException e) {
+            unrealzaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
+            return null;
+        }
+    } 
 }

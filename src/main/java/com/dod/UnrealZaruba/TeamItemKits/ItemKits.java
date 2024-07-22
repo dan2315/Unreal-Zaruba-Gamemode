@@ -12,12 +12,20 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ItemKits {
-    public static final HashMap<String, Integer> blueTeamKit;
     public static final HashMap<String, Integer> redTeamKit;
+    public static final HashMap<String, Integer> redTeamPreparationKit;
+    public static final HashMap<String, Integer> blueTeamKit;
+    public static final HashMap<String, Integer> blueTeamPreparationKit;
 
     public static final HashMap<TeamColor, HashMap<String, Integer>> TeamKits;
 
     static {
+        redTeamPreparationKit = new HashMap<>();
+        redTeamPreparationKit.put("combatgear:altynup_helmet", 1);
+        redTeamPreparationKit.put("combatgear:terro_chestplate", 1);
+        redTeamPreparationKit.put("combatgear:modernsand_leggings", 1);
+        redTeamPreparationKit.put("combatgear:modernsand_boots", 1);
+
         redTeamKit = new HashMap<>();
         // redTeamKit.put("tacz:modern_kinetic_gun{GunId:\"tacz:ak47\",
         // GunFireMod:\"AUTO\"}", 1);
@@ -45,7 +53,11 @@ public class ItemKits {
         redTeamKit.put("combatgear:parachuteclosed_chestplate", 1);
 
 
-
+        blueTeamPreparationKit = new HashMap<>();
+        blueTeamPreparationKit.put("combatgear:gign_helmet", 1);
+        blueTeamPreparationKit.put("combatgear:gign_chestplate", 1);
+        blueTeamPreparationKit.put("combatgear:gign_leggings", 1);
+        blueTeamPreparationKit.put("combatgear:gign_boots", 1);
 
         blueTeamKit = new HashMap<>();
         // blueTeamKit.put("tacz:modern_kinetic_gun{GunId:\"tacz:m4a1\",

@@ -4,6 +4,7 @@ import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
@@ -11,6 +12,7 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
@@ -34,7 +37,6 @@ import java.util.stream.Collectors;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("unrealzaruba")
 public class unrealzaruba {
-    // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
     TimerManager timerManager = new TimerManager();
@@ -50,17 +52,16 @@ public class unrealzaruba {
 
         ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
-        DestroyObjectivesGamemode.initialize();
+
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
-        // Some example code to dispatch IMC to another mod
         InterModComms.sendTo("examplemod", "helloworld", () -> {
             LOGGER.info("Hello world from the MDK");
             return "Hello world";
@@ -68,18 +69,14 @@ public class unrealzaruba {
     }
 
     private void processIMC(final InterModProcessEvent event) {
-        // Some example code to receive and process InterModComms from other mods
         LOGGER.info("Got IMC {}",
                 event.getIMCStream().map(m -> m.messageSupplier().get()).collect(Collectors.toList()));
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        // MesilovoGamemode.setupScoreboard(event.getServer());
-//        ScoreboardManager.setupScoreboard(event.getServer());
         LOGGER.info("HELLO from server starting");
+        new DestroyObjectivesGamemode();
     }
 
     @SubscribeEvent
@@ -91,7 +88,15 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (Minecraft.getInstance().getSingleplayerServer() != null) return;
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
+    }
+
+    @SubscribeEvent
+    public void onServerStopped(ServerStoppedEvent event) {
+        unrealzaruba.LOGGER.info("Server has stopped. Finalizing...");
+        DestructibleObjectivesHandler.Save();
+        BaseGamemode.currentGamemode.TeamManager.Save();
     }
 
     @Mod.EventBusSubscriber

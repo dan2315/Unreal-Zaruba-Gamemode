@@ -98,10 +98,6 @@ repositories {
             url = 'https://libraries.minecraft.net/' 
         }
         maven {
-            name = "ParchmentMC"
-            url = "https://maven.parchmentmc.org"
-        }
-        maven {
             name = "Modrinth"
             url = "https://api.modrinth.com/maven"
         }
@@ -112,6 +108,11 @@ repositories {
             name = "Valkyrien Skies Internal"
             url = 'https://maven.valkyrienskies.org'
         }
+        maven {
+            name = "Create Big Cannons"
+            url = "https://maven.realrobotix.me/createbigcannons"
+        }
+        
         maven {
             url = "https://maven.tterrag.com/"
             content {
@@ -124,10 +125,12 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.2.21'
 
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
     implementation('org.spongepowered:mixin:0.8.5')
     implementation("org.joml:joml:1.10.4")
     implementation("org.joml:joml-primitives:1.10.0")
 
+    
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-forge:$vs2_version") { transitive = false }
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-common:$vs2_version") { transitive = false }
 
@@ -140,6 +143,9 @@ dependencies {
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+
+    implementation "com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-2697705"
+    implementation "com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-2697705"
 }
 
 jar {

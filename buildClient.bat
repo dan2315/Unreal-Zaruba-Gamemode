@@ -4,6 +4,7 @@ call ./gradlew clean build
 
 REM Check if build was successful
 if %errorlevel% neq 0 (
+    color 4F
     echo Build failed. Exiting.
     exit /b %errorlevel%
 )
@@ -14,6 +15,7 @@ set "DEST_PATH=X:\Games\mc_modpacks\Instances\ModTesting\mods"
 
 REM Check if the source file exists
 if not exist "%SOURCE_PATH%" (
+    color 4F
     echo Source file not found: %SOURCE_PATH%
     exit /b 1
 )
@@ -23,9 +25,9 @@ move /Y "%SOURCE_PATH%" "%DEST_PATH%"
 
 REM Check if move was successful
 if %errorlevel% neq 0 (
+    color 4F
     echo Failed to move the file.
     exit /b %errorlevel%
 )
 
 echo Build and deploy completed successfully.
-pause

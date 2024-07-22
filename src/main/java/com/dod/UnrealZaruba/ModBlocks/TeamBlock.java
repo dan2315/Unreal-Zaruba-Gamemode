@@ -2,6 +2,7 @@ package com.dod.UnrealZaruba.ModBlocks;
 
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ public class TeamBlock extends Block {
         if (!world.isClientSide && entity instanceof Player) {
             ServerPlayer player = (ServerPlayer) entity;
             if (player.isCrouching()) {
-                DestroyObjectivesGamemode.TeamManager.AssignToTeam(teamColor, player);
+                BaseGamemode.currentGamemode.TeamManager.AssignToTeam(teamColor, player);
             }
         }
     }

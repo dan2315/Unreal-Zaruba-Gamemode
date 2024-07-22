@@ -6,11 +6,9 @@ import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjective;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
-import com.dod.UnrealZaruba.Utils.Utils;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -23,13 +21,15 @@ public class Team {
     public BlockPos spawn;
     List<UUID> members = new ArrayList<>();
     TeamColor color;
-    private List<IObjective> objectives;
+    private List<GameObjective> objectives;
+    MinecraftServer server;
 
     public TeamColor Color() {return color;}
 
     public Team(BlockPos spawn, TeamColor color) {
         this.spawn = spawn;
         this.color = color;
+        server = ServerLifecycleHooks.getCurrentServer();
     }
 
     public void Assign(ServerPlayer player) {
@@ -41,13 +41,11 @@ public class Team {
                     new TextComponent("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
                             .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
-            // player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
-            Utils.setSpawnPoint(player, spawn);
-//            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+            player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
+            // Utils.setSpawnPoint(player, spawn);
             player.getInventory().clearContent();
-            BaseGamemode.TeamManager.teleportToSpawn(player);
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            DestroyObjectivesGamemode.TeamManager.GiveKitTo(server, player);
+            BaseGamemode.currentGamemode.TeamManager.GiveKitTo(server, player);
         }
     }
 
@@ -65,11 +63,11 @@ public class Team {
         spawn = pos;
     }
 
-    public void addObjective(IObjective objective) {
+    public void addObjective(GameObjective objective) {
         objectives.add(objective);
     }
 
-    public List<IObjective> getObjectives() {
+    public List<GameObjective> getObjectives() {
         return objectives;
     }
 
@@ -86,7 +84,16 @@ public class Team {
         return spawn;
     }
 
-    public void GiveKit(MinecraftServer server) {
+    public void TeleportToSpawn() 
+    {
+        for (UUID playerId : members) {
+            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
+            if (player == null) return;
+            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+        }
+    }
+
+    public void GiveKit() {
         for (UUID playerId : members) {
             ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);
         }

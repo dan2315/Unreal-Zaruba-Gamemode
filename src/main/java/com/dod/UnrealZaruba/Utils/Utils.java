@@ -16,15 +16,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class Utils {
-        public static void setSpawnPoint(ServerPlayer player, BlockPos pos) {
+    public static void setSpawnPoint(ServerPlayer player, BlockPos pos) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
             CommandSourceStack commandSourceStack = server.createCommandSourceStack();
             String command = String.format("/spawnpoint %s %d %d %d", player.getName().getString(),
-             pos.getX(), pos.getY(), pos.getZ());
+                    pos.getX(), pos.getY(), pos.getZ());
             server.getCommands().performCommand(commandSourceStack, command);
         }
     }
+
+
 
     public static void deleteBarriers(BlockPos pos, int chunkRadius) {
         ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
