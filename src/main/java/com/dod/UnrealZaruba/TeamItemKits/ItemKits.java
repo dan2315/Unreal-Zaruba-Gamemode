@@ -13,18 +13,19 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ItemKits {
     public static final HashMap<String, Integer> redTeamKit;
-    public static final HashMap<String, Integer> redTeamPreparationKit;
+    public static final HashMap<String, String> redTeamArmorKit;
     public static final HashMap<String, Integer> blueTeamKit;
-    public static final HashMap<String, Integer> blueTeamPreparationKit;
+    public static final HashMap<String, String> blueTeamArmorKit;
 
     public static final HashMap<TeamColor, HashMap<String, Integer>> TeamKits;
+    public static final HashMap<TeamColor, HashMap<String, String>> TeamArmorKits;
 
     static {
-        redTeamPreparationKit = new HashMap<>();
-        redTeamPreparationKit.put("combatgear:altynup_helmet", 1);
-        redTeamPreparationKit.put("combatgear:terro_chestplate", 1);
-        redTeamPreparationKit.put("combatgear:modernsand_leggings", 1);
-        redTeamPreparationKit.put("combatgear:modernsand_boots", 1);
+        redTeamArmorKit = new HashMap<>();
+        redTeamArmorKit.put("uz_armor:armor_r_helmet", "head");
+        redTeamArmorKit.put("uz_armor:armor_r_chestplate", "chest");
+        redTeamArmorKit.put("uz_armor:armor_r_leggings", "legs");
+        redTeamArmorKit.put("uz_armor:armor_r_boots", "feet");
 
         redTeamKit = new HashMap<>();
         // redTeamKit.put("tacz:modern_kinetic_gun{GunId:\"tacz:ak47\",
@@ -34,10 +35,6 @@ public class ItemKits {
         // 1);
         // redTeamKit.put("tacz:attachment{AttachmentId:\"tacz:muzzle_silence_phantom_s1\"}",
         // 1);
-        redTeamKit.put("combatgear:altynup_helmet", 1);
-        redTeamKit.put("combatgear:terro_chestplate", 1);
-        redTeamKit.put("combatgear:modernsand_leggings", 1);
-        redTeamKit.put("combatgear:modernsand_boots", 1);
         redTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
@@ -53,11 +50,11 @@ public class ItemKits {
         redTeamKit.put("combatgear:parachuteclosed_chestplate", 1);
 
 
-        blueTeamPreparationKit = new HashMap<>();
-        blueTeamPreparationKit.put("combatgear:gign_helmet", 1);
-        blueTeamPreparationKit.put("combatgear:gign_chestplate", 1);
-        blueTeamPreparationKit.put("combatgear:gign_leggings", 1);
-        blueTeamPreparationKit.put("combatgear:gign_boots", 1);
+        blueTeamArmorKit = new HashMap<>();
+        blueTeamArmorKit.put("uz_armor:armor_b_helmet",  "head");
+        blueTeamArmorKit.put("uz_armor:armor_b_chestplate", "chest");
+        blueTeamArmorKit.put("uz_armor:armor_b_leggings",  "legs");
+        blueTeamArmorKit.put("uz_armor:armor_b_boots",  "feet");
 
         blueTeamKit = new HashMap<>();
         // blueTeamKit.put("tacz:modern_kinetic_gun{GunId:\"tacz:m4a1\",
@@ -68,10 +65,6 @@ public class ItemKits {
         // 1);
         // blueTeamKit.put("tacz:attachment{AttachmentId:\"tacz:muzzle_brake_cthulhu\"}",
         // 1);
-        blueTeamKit.put("combatgear:gign_helmet", 1);
-        blueTeamKit.put("combatgear:gign_chestplate", 1);
-        blueTeamKit.put("combatgear:gign_leggings", 1);
-        blueTeamKit.put("combatgear:gign_boots", 1);
         blueTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         // blueTeamKit.put("tacz:ammo{AmmoId:\"tacz:556x45\"}", 99);
         // blueTeamKit.put("tacz:ammo{AmmoId:\"tacz:556x45\"}", 99);
@@ -93,12 +86,21 @@ public class ItemKits {
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
         TeamKits.put(TeamColor.BLUE, blueTeamKit);
+        TeamArmorKits = new HashMap<>();
+        TeamArmorKits.put(TeamColor.RED, redTeamArmorKit);
+        TeamArmorKits.put(TeamColor.BLUE, blueTeamArmorKit);
     }
 
     public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
+        }
+    }
+
+    public static void GiveArmorKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
+        for (Map.Entry<String, String> itemElement : ItemKits.TeamArmorKits.get(team.Color()).entrySet()) {
+            CommandPresets.executeEquipArmorCommandSilent(server, serverPlayer.getName().getString(), itemElement.getValue(), itemElement.getKey());
         }
     }
 }

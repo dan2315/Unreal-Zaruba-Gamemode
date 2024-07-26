@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
+
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
@@ -11,21 +12,18 @@ import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class TeamManager {
 
     HashMap<TeamColor, TeamU> teams = new HashMap<>();
-
-//    HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
+    HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
 
     public TeamManager() {
         var teamData = Load();
@@ -56,10 +54,22 @@ public class TeamManager {
     public TeamU GetPlayersTeam(Player player) {
         for (TeamU team : teams.values()) {
             if (team.members.contains(player.getUUID())) {
-                return teams.get(team.color);
+                return teams.get(team.Color());
             }
         }
         return null;
+    }
+
+    public TeamU GetPlayersOppositeTeam(Player player) {
+        TeamColor color = GetPlayersTeam(player).Color();
+        switch (color) {
+            case RED:
+                return teams.get(TeamColor.BLUE);
+            case BLUE:
+                return teams.get(TeamColor.RED);
+            default:
+                return teams.get(TeamColor.UNDEFINED);
+        }
     }
 
     public TeamU Get(TeamColor color) {
@@ -68,15 +78,16 @@ public class TeamManager {
 
     public boolean DeleteBarriersAtSpawn() {
         for (TeamU team : teams.values()) {
-            if (team.spawn == null) {
+            if (team.Spawn() == null) {
                 return false;
             }
-            Utils.deleteBarriers(team.spawn, 1);
+            Utils.deleteBarriers(team.Spawn(), 1);
         }
         return true;
     }
 
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
+        
         TeamU targetTeam = teams.get(dyeColor);
         int targetTeamCount = targetTeam.MembersCount();
 
@@ -86,7 +97,7 @@ public class TeamManager {
                 .max()
                 .orElse(0);
 
-        return targetTeamCount <= maxOtherTeamsCount + 1;
+        return targetTeamCount <= maxOtherTeamsCount;
     }
 
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
@@ -105,29 +116,20 @@ public class TeamManager {
         teams.get(dyeColor).Assign(player);
     }
 
-    public void setupTeams(MinecraftServer server) {
-        Scoreboard scoreboard = server.getScoreboard();
-        createTeam(scoreboard, "RED", new TextComponent("Red Team"));
-        createTeam(scoreboard, "BLUE", new TextComponent("Blue Team"));
-    }
-
-    public void createTeam(Scoreboard scoreboard, String teamName, Component displayName) {
-        PlayerTeam team = scoreboard.getPlayerTeam(teamName);
-        
-        if (team == null) {
-            team = scoreboard.addPlayerTeam(teamName);
-            team.setDisplayName(displayName);
-        }
-    }
-
     public void GiveKit() {
         for (TeamU team : teams.values()) {
             team.GiveKit();
         }
     }
 
+    public void GiveArmorKitTo(MinecraftServer server, ServerPlayer player) {
+        ItemKits.GiveArmorKit(server, player, GetPlayersTeam(player));
+    }
+
     public void GiveKitTo(MinecraftServer server, ServerPlayer player) {
-        ItemKits.GiveKit(server, player, GetPlayersTeam(player));
+        TeamU team = GetPlayersTeam(player);
+        if (team == null) return;
+        ItemKits.GiveKit(server, player, team);
     }
 
     public void ChangeGameModeOfAllParticipants(GameType gameType) {
@@ -149,7 +151,7 @@ public class TeamManager {
             return;
         }
         
-        BlockPos Spawn = team.spawn;
+        BlockPos Spawn = team.Spawn();
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
@@ -160,7 +162,7 @@ public class TeamManager {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();
         for (var entry : teams.entrySet()) {
-            data.teamSpawns.put(entry.getKey(), entry.getValue().spawn);
+            data.teamSpawns.put(entry.getKey(), entry.getValue().Spawn());
         }
         try {
             ConfigManager.saveConfig(ConfigManager.Teams, data);

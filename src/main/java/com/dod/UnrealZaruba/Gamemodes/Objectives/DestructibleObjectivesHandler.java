@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
 
-
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 
@@ -26,8 +25,9 @@ import net.minecraftforge.fml.common.Mod;
 public class DestructibleObjectivesHandler {
     public static final Map<DestructibleObjective, ServerBossEvent> destructibleObjectives = new HashMap<>();
     private static final Map<DestructibleObjective, Set<UUID>> playersWithBossBar = new HashMap<>();
-    private static float PROGRESSBAR_ACTIVATION_DISTANCE = 5000f;
-    private static final int UpdateFrequency = 10; //ticks
+    private static float PROGRESSBAR_ACTIVATION_DISTANCE = 10000f;
+    private static final int BossbarUpdateFrequency = 20; //ticks
+    private static final int ObjectiveUpdateFrequency = 20; //ticks
     private static int serverTickCounter = 0;
     private static final Map<UUID, Integer> playerTickCounters = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class DestructibleObjectivesHandler {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == ServerTickEvent.Phase.START) {
             serverTickCounter++;
-            if (serverTickCounter % UpdateFrequency != 0) return; 
+            if (serverTickCounter % ObjectiveUpdateFrequency != 0) return; 
             UpdateObjectives(event);
         }
     }
@@ -51,17 +51,12 @@ public class DestructibleObjectivesHandler {
         UUID id = event.player.getUUID();
         playerTickCounters.putIfAbsent(id, 0);
         playerTickCounters.put(id, playerTickCounters.get(id) + 1);
-        if (playerTickCounters.get(id) % UpdateFrequency != 0) return;
+        if (playerTickCounters.get(id) % BossbarUpdateFrequency != 0) return;
 
         UpdatePlayersWithBossBar(event);
     }
 
     private static void UpdateObjectives(TickEvent.ServerTickEvent event) {
-        // Level level = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-        // if (!(level instanceof ServerLevel)) {
-        //     return;
-        // }
-
         for (var objective : destructibleObjectives.keySet()) {
             float progress = objective.Update();
             updateBossBar(objective, progress);

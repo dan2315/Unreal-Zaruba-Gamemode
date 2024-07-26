@@ -18,17 +18,20 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.Team.Visibility;
 
 public class TeamU {
-    public BlockPos spawn;
+    private BlockPos spawn;
     List<UUID> members = new ArrayList<>();
-    TeamColor color;
+    private TeamColor color;
     private List<GameObjective> objectives;
     MinecraftServer server;
+
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
 
     public TeamColor Color() {return color;}
+    public BlockPos Spawn() {return spawn;}
 
     public TeamU(BlockPos spawn, TeamColor color) {
         this.spawn = spawn;
@@ -36,7 +39,7 @@ public class TeamU {
         server = ServerLifecycleHooks.getCurrentServer();
     }
 
-    public static void createTeam(MinecraftServer server) {
+    public static void SetupMinecraftTeams(MinecraftServer server) {
         Scoreboard scoreboard = server.getScoreboard();
 
         // Create Red Team
@@ -46,6 +49,8 @@ public class TeamU {
         }
         redTeam.setColor(ChatFormatting.RED);
         redTeam.setDisplayName(new TextComponent("Red Team"));
+        redTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+        redTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
 
         // Create Blue Team
         blueTeam = scoreboard.getPlayerTeam("BLUE");
@@ -54,6 +59,8 @@ public class TeamU {
         }
         blueTeam.setColor(ChatFormatting.BLUE);
         blueTeam.setDisplayName(new TextComponent("Blue Team"));
+        blueTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+        blueTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
     }
 
     public void Assign(ServerPlayer player) {
@@ -72,7 +79,7 @@ public class TeamU {
                 if (BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(player).color == TeamColor.BLUE) {
                     scoreboard.addPlayerToTeam(player.getName().getString(), blueTeam);
                 } else {
-                    System.out.println("PIZDA RYLU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    System.out.println("[PIZDA RYLU] ");
                 }
             } else {
                 System.out.println("XUINUA");
@@ -85,7 +92,7 @@ public class TeamU {
             // Utils.setSpawnPoint(player, spawn);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            BaseGamemode.currentGamemode.TeamManager.GiveKitTo(server, player);
+            BaseGamemode.currentGamemode.TeamManager.GiveArmorKitTo(server, player);
         }
     }
 

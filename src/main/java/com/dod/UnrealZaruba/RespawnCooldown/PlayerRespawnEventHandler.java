@@ -5,6 +5,9 @@ import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
 import com.dod.UnrealZaruba.Utils.TimerManager;
+
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -35,11 +38,14 @@ public class PlayerRespawnEventHandler{
 
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (BaseGamemode.currentGamemode.gameStage == GameStage.Preparation || BaseGamemode.currentGamemode.gameStage == GameStage.Battle){
+        if (BaseGamemode.currentGamemode.gameStage != GameStage.Preparation){
             if (event.getPlayer() instanceof ServerPlayer) {
                 ServerPlayer player = (ServerPlayer) event.getPlayer();
-                player.setGameMode(GameType.SPECTATOR);
-                player.teleportTo(deathX, deathY, deathZ);
+                ServerLevel serverWorld = player.getLevel();
+                serverWorld.getServer().execute(() -> {
+                    player.teleportTo(deathX, deathY, deathZ);
+                    player.setGameMode(GameType.SPECTATOR);
+                });
 
                 var duration = 10;
                 TimerManager.Create(duration * 1000

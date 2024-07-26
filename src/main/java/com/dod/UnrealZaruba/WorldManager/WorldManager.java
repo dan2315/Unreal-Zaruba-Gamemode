@@ -14,17 +14,22 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import net.minecraft.server.MinecraftServer;
+import java.nio.file.Path;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.nio.file.Paths;
+import java.io.FileInputStream;
 
 public class WorldManager {
-    public static String pathToMapTemplate = "";
-    public static String pathToRoot = "";
+    public static String archivePath = "world_copy.zip";
+    public static String worldPath = "";
 
     public static String temporaryMapName = "FlatLand";
     private static List<ServerPlayer> playersToReturn = new ArrayList<>();
     private static boolean reloading = false;
     private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public static void ReloadMap(MinecraftServer server) {
+    public static void ReloadMap(MinecraftServer server) {        
         if (!server.isDedicatedServer()) {
             server.getCommands().performCommand(server.createCommandSourceStack(), "say This is a singleplayer world. Map reloading is not supported.");
             return;
@@ -49,13 +54,12 @@ public class WorldManager {
     }
 
     private static void reloadMapFromTemplate(MinecraftServer server) {
-        File templateFolder = new File(pathToMapTemplate);
-        File destinationFolder = new File(pathToRoot);
+        File destinationFolder = new File(worldPath);
 
         deleteFolder(destinationFolder);
 
         try {
-            copyFolder(templateFolder, destinationFolder);
+            unzipArchive(archivePath, worldPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,17 +79,27 @@ public class WorldManager {
         folder.delete();
     }
 
-    private static void copyFolder(File source, File destination) throws IOException {
-        if (source.isDirectory()) {
-            if (!destination.exists()) {
-                destination.mkdir();
+    private static void unzipArchive(String zipFilePath, String destDir) throws IOException {
+        Path destDirPath = Paths.get(destDir);
+        if (!Files.exists(destDirPath)) {
+            Files.createDirectories(destDirPath);
+        }
+
+        try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            ZipEntry entry = zipIn.getNextEntry();
+            while (entry != null) {
+                Path filePath = destDirPath.resolve(entry.getName());
+                if (!entry.isDirectory()) {
+                    // If the entry is a file, extracts it
+                    Files.createDirectories(filePath.getParent());
+                    Files.copy(zipIn, filePath, StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    // If the entry is a directory, make the directory
+                    Files.createDirectories(filePath);
+                }
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
             }
-            String[] children = source.list();
-            for (String child : children) {
-                copyFolder(new File(source, child), new File(destination, child));
-            }
-        } else {
-            Files.copy(source.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

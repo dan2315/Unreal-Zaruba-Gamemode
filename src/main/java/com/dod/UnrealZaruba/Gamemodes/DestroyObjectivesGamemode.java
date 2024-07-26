@@ -5,6 +5,8 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
@@ -32,9 +34,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.entity.player.Player;
 
 public class DestroyObjectivesGamemode extends BaseGamemode {
-    private static final int COMMANDER_VOTING_DURATION_TICKS = 3 * 60; // 3 minutes in seconds
-    private static final int PREPARATION_DURATION_TICKS = 8 * 60; // 8 minutes in seconds
-    private static final int GAME_DURATION_TICKS = 50 * 60; // 50 minutes in seconds
+    private static final int COMMANDER_VOTING_DURATION_TICKS = 1 * 60; // 2 minutes in seconds
+    private static final int PREPARATION_DURATION_TICKS = 1 * 60; // 8 minutes in seconds
+    private static final int GAME_DURATION_TICKS = 1 * 60; // 50 minutes in seconds
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     Scoreboard scoreboard;
@@ -60,6 +62,10 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public int StartBattle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MinecraftServer server = context.getSource().getServer();
         ScoreboardManager.setupScoreboard(server, 999);
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            unrealzaruba.LOGGER.warn(player.getName().toString());
+            BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(player);
+        }
         return StartVotingForCommander(context);
     }
 
@@ -67,7 +73,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         gameStage = GameStage.CommanderVoting;
 
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-            TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира команды"),
+            TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
                     new TextComponent("Это сложно, но попробуйте выделить одного командира"));
         }
 
@@ -92,15 +98,13 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
 
     public int StartPreparation(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
-        gameStage = GameStage.BattlePreparation;
+        gameStage = GameStage.StrategyTime;
 
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
             TitleMessage.showTitle(serverPlayer, new TextComponent("§6Стадия подготовки"),
                     new TextComponent("Обсудите стратегию со своей командой"));
+            TeamManager.GiveKitTo(context.getSource().getServer(), serverPlayer);
         }
-
-        TeamManager.Get(TeamColor.RED).TeleportToSpawn();
-        TeamManager.Get(TeamColor.BLUE).TeleportToSpawn();
 
         TimerManager.Create(PREPARATION_DURATION_TICKS * 1000,
                 () -> {
@@ -147,7 +151,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                         currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
                 TimerManager.Create(GAME_DURATION_TICKS * 1000,
                         () -> {
-                            CompleteGame(context.getSource().getServer(), TeamColor.RED);
+                            CompleteGame(context.getSource().getServer(), TeamColor.BLUE);
 
                         }, ticks -> {
                             if (ticks % 20 != 0)
@@ -176,7 +180,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         if (server == null)
             return;
 
-        if (!BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer)) {
+        if (gameStage == GameStage.Preparation) {
             BlockPos spawn = server.overworld().getSharedSpawnPos();
             Utils.setSpawnPoint(serverPlayer, new BlockPos(spawn.getX(), spawn.getY(), spawn.getZ()));
             serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
@@ -187,6 +191,8 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         } else if (gameStage == GameStage.Battle) {
             if (!BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer)) {
                 serverPlayer.setGameMode(GameType.SPECTATOR);
+                var spawn = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.BLUE).Spawn();
+                serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             }
         }
     }

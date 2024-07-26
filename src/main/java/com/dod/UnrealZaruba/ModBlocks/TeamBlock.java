@@ -30,9 +30,4 @@ public class TeamBlock extends Block {
             }
         }
     }
-
-    // @Override
-    // public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-    // }
-
 }

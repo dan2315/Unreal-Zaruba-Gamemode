@@ -4,6 +4,7 @@ import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
+import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
@@ -13,7 +14,6 @@ import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,6 +30,8 @@ import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.server.ServerLifecycleHooks;
+
 import org.slf4j.Logger;
 
 import java.util.stream.Collectors;
@@ -77,8 +79,9 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("HELLO from server starting");
-        TeamU.createTeam(event.getServer());
+        TeamU.SetupMinecraftTeams(event.getServer());
         new DestroyObjectivesGamemode();
+        ScoreboardManager.clearScoreboard(event.getServer());
     }
 
     @SubscribeEvent
@@ -90,7 +93,7 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (Minecraft.getInstance().getSingleplayerServer() != null) return;
+        if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
         BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
     }
 
