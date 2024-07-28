@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -35,6 +36,10 @@ public class TeamU {
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
     public BlockVolume BaseVolume() {return baseVolume;}
+
+    public void SetVolume(BlockVolume blockVolume) {
+        baseVolume = blockVolume;
+    }
 
     public TeamU(BlockPos spawn, TeamColor color, BlockVolume baseVolume) {
         this.spawn = spawn;

@@ -17,7 +17,7 @@ public class BlockVolume {
     private final BlockPos center;
     private transient int blockAmount;
     
-    private ServerLevel world;
+    private transient ServerLevel world;
 
     public int GetBlockAmount() {
         return blockAmount;
@@ -77,6 +77,7 @@ public class BlockVolume {
             for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
                 for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
                     BlockPos position = new BlockPos(x, y, z);
+                    unrealzaruba.LOGGER.warn("[Во, бля]" + String.valueOf(position));
                     event.accept(position);
                 }
             }

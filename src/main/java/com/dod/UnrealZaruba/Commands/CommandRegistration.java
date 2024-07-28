@@ -5,6 +5,8 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.Utils.BarrierRemovalTask;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
@@ -18,6 +20,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -84,11 +87,69 @@ public class CommandRegistration {
                                     return 1;
                                 }))));
 
+        dispatcher.register(Commands.literal("setteambase")
+                .requires(cs -> cs.hasPermission(3))
+                .then(Commands.argument("name", TeamColorArgument.color())
+                        .then(Commands.argument("x1", IntegerArgumentType.integer())
+                                .then(Commands.argument("y1", IntegerArgumentType.integer())
+                                        .then(Commands.argument("z1", IntegerArgumentType.integer())
+                                                .then(Commands.argument("x2", IntegerArgumentType.integer())
+                                                        .then(Commands.argument("y2", IntegerArgumentType.integer())
+                                                                .then(Commands
+                                                                        .argument("z2", IntegerArgumentType.integer())
+                                                                        .executes(context -> {
+                                                                            TeamColor Team = TeamColorArgument.getColor(context, "name");
+                                                                            int x1 = IntegerArgumentType
+                                                                                    .getInteger(context, "x1");
+                                                                            int y1 = IntegerArgumentType
+                                                                                    .getInteger(context, "y1");
+                                                                            int z1 = IntegerArgumentType
+                                                                                    .getInteger(context, "z1");
+                                                                            int x2 = IntegerArgumentType
+                                                                                    .getInteger(context, "x2");
+                                                                            int y2 = IntegerArgumentType
+                                                                                    .getInteger(context, "y2");
+                                                                            int z2 = IntegerArgumentType
+                                                                                    .getInteger(context, "z2");
+
+                                                                            BlockVolume volume = new BlockVolume(
+                                                                                    new BlockPos(x1, y1, z1),
+                                                                                    new BlockPos(x2, y2, z2), false);
+
+                                                                            BaseGamemode.currentGamemode.TeamManager.Get(Team).SetVolume(volume);
+
+                                                                            context.getSource()
+                                                                                    .sendSuccess(new TextComponent(
+                                                                                                    "Created team base" + Team),
+                                                                                            true);
+                                                                            return 1;
+                                                                        })))))))));
+
+        dispatcher.register(Commands.literal("removebarriers")
+                .then(Commands.argument("x1", IntegerArgumentType.integer())
+                        .then(Commands.argument("y1", IntegerArgumentType.integer())
+                                .then(Commands.argument("z1", IntegerArgumentType.integer())
+                                        .then(Commands.argument("x2", IntegerArgumentType.integer())
+                                                .then(Commands.argument("y2", IntegerArgumentType.integer())
+                                                        .then(Commands.argument("z2", IntegerArgumentType.integer())
+                                                                .executes(context -> {
+                                                                    int x1 = IntegerArgumentType.getInteger(context, "x1");
+                                                                    int y1 = IntegerArgumentType.getInteger(context, "y1");
+                                                                    int z1 = IntegerArgumentType.getInteger(context, "z1");
+                                                                    int x2 = IntegerArgumentType.getInteger(context, "x2");
+                                                                    int y2 = IntegerArgumentType.getInteger(context, "y2");
+                                                                    int z2 = IntegerArgumentType.getInteger(context, "z2");
+                                                                    ServerLevel world = context.getSource().getLevel();
+                                                                    BarrierRemovalTask.removeBarriersAsync(world, new BlockPos(x1, y1, z1), new BlockPos(x2, y2, z2));
+                                                                    return 1;
+                                                                }))))))));
+
         dispatcher.register(Commands.literal("startbattle")
                 .requires(cs -> cs.hasPermission(3))
                 .executes(context -> BaseGamemode.currentGamemode.StartBattle(context)));
 
         dispatcher.register(Commands.literal("crtobj")
+                .requires(cs -> cs.hasPermission(3))
                 .then(Commands.argument("name", StringArgumentType.string())
                         .then(Commands.argument("x1", IntegerArgumentType.integer())
                                 .then(Commands.argument("y1", IntegerArgumentType.integer())
