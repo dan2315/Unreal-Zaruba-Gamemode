@@ -35,19 +35,18 @@ public class ItemKits {
         // 1);
         // redTeamKit.put("tacz:attachment{AttachmentId:\"tacz:muzzle_silence_phantom_s1\"}",
         // 1);
-        redTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 99);
         // redTeamKit.put("tacz:ammo{AmmoId:\"tacz:762x39\"}", 40);
+        redTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         redTeamKit.put("minecraft:golden_carrot", 64);
-        redTeamKit.put("minecraft:flint_and_steel", 1);
-        redTeamKit.put("cgm:grenade", 12);
-        redTeamKit.put("cgm:stun_grenade", 12);
+        redTeamKit.put("cgm:grenade", 8);
+        redTeamKit.put("cgm:stun_grenade", 8);
         redTeamKit.put(
-                "cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
-                1);
-        redTeamKit.put("cgm:basic_bullet", 600);
-        redTeamKit.put("combatgear:parachuteclosed_chestplate", 1);
+            "nzgexpansion:heavy_assault_rifle{AmmoCount:30, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:solid_stock\", Count:1b}, Under_Barrel:{id:\"cgmspecialised_grip\", Count:1b}}}",
+            1
+        );
+        redTeamKit.put("nzgexpansion:medium_bullet", 600);
 
 
         blueTeamArmorKit = new HashMap<>();
@@ -65,23 +64,17 @@ public class ItemKits {
         // 1);
         // blueTeamKit.put("tacz:attachment{AttachmentId:\"tacz:muzzle_brake_cthulhu\"}",
         // 1);
-        blueTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         // blueTeamKit.put("tacz:ammo{AmmoId:\"tacz:556x45\"}", 99);
         // blueTeamKit.put("tacz:ammo{AmmoId:\"tacz:556x45\"}", 99);
         // blueTeamKit.put("tacz:ammo{AmmoId:\"tacz:556x45\"}", 40);
+        blueTeamKit.put("walkietalkie:netherite_walkietalkie", 1);
         blueTeamKit.put("minecraft:golden_carrot", 64);
         blueTeamKit.put("cgm:grenade", 8);
         blueTeamKit.put("cgm:stun_grenade", 8);
         blueTeamKit.put(
-                "cgm:assault_rifle{AmmoCount:40, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:short_scope\", Count:1b}, Stock:{id:\"cgm:tactical_stock\", Count: 1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
+                "nzgexpansion:battle_rifle{AmmoCount:20, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:carbine_stock\", Count:1b}}}",
                 1);
-        blueTeamKit.put("cgm:basic_bullet", 450);
-        blueTeamKit.put(
-                "cgm:heavy_rifle{AmmoCount:4, Attachments: {Barrel: {id:\"cgm:silencer\", Count:1b}, Scope:{id:\"cgm:long_scope\", Count:1b}, Under_Barrel:{id:\"cgm:specialised_grip\", Count: 1b}}}",
-                1);
-        blueTeamKit.put("cgm:advanced_bullet", 32);
-
-
+        blueTeamKit.put("nzgexpansion:medium_bullet", 600);
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);

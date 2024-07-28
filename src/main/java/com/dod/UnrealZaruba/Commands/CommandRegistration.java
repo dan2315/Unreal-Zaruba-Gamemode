@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
+import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -55,65 +56,92 @@ public class CommandRegistration {
     public static void onCommandRegister(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
-        //АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а она будет тупо убивать
+        // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
+        // она будет тупо убивать
 
         dispatcher.register(Commands.literal("getwool")
                 .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
+
+        dispatcher.register(Commands.literal("setprefix")
+                .then(Commands.argument("player", StringArgumentType.string())
+                        .then(Commands.argument("prefix", StringArgumentType.string())
+                                .executes(context -> {
+                                    String playerName = StringArgumentType.getString(context, "player");
+                                    String prefix = StringArgumentType.getString(context, "prefix");
+
+                                    ServerPlayer player = context.getSource().getServer().getPlayerList()
+                                            .getPlayerByName(playerName);
+                                    if (player != null) {
+                                        Utils.SetPrefixTo(player, prefix);
+                                        context.getSource().sendSuccess(
+                                                new TextComponent("Set prefix for " + playerName + " to " + prefix),
+                                                true);
+                                    } else {
+                                        context.getSource()
+                                                .sendFailure(new TextComponent("Player " + playerName + " not found."));
+                                    }
+
+                                    return 1;
+                                }))));
 
         dispatcher.register(Commands.literal("startbattle")
                 .requires(cs -> cs.hasPermission(3))
                 .executes(context -> BaseGamemode.currentGamemode.StartBattle(context)));
 
-
         dispatcher.register(Commands.literal("crtobj")
-            .then(Commands.argument("name", StringArgumentType.string())
-            .then(Commands.argument("x1", IntegerArgumentType.integer())
-            .then(Commands.argument("y1", IntegerArgumentType.integer())
-            .then(Commands.argument("z1", IntegerArgumentType.integer())
-            .then(Commands.argument("x2", IntegerArgumentType.integer())
-            .then(Commands.argument("y2", IntegerArgumentType.integer())
-            .then(Commands.argument("z2", IntegerArgumentType.integer())
-            .executes(context -> {
-                String name = StringArgumentType.getString(context, "name");
-                int x1 = IntegerArgumentType.getInteger(context, "x1");
-                int y1 = IntegerArgumentType.getInteger(context, "y1");
-                int z1 = IntegerArgumentType.getInteger(context, "z1");
-                int x2 = IntegerArgumentType.getInteger(context, "x2");
-                int y2 = IntegerArgumentType.getInteger(context, "y2");
-                int z2 = IntegerArgumentType.getInteger(context, "z2");
+                .then(Commands.argument("name", StringArgumentType.string())
+                        .then(Commands.argument("x1", IntegerArgumentType.integer())
+                                .then(Commands.argument("y1", IntegerArgumentType.integer())
+                                        .then(Commands.argument("z1", IntegerArgumentType.integer())
+                                                .then(Commands.argument("x2", IntegerArgumentType.integer())
+                                                        .then(Commands.argument("y2", IntegerArgumentType.integer())
+                                                                .then(Commands
+                                                                        .argument("z2", IntegerArgumentType.integer())
+                                                                        .executes(context -> {
+                                                                            String name = StringArgumentType
+                                                                                    .getString(context, "name");
+                                                                            int x1 = IntegerArgumentType
+                                                                                    .getInteger(context, "x1");
+                                                                            int y1 = IntegerArgumentType
+                                                                                    .getInteger(context, "y1");
+                                                                            int z1 = IntegerArgumentType
+                                                                                    .getInteger(context, "z1");
+                                                                            int x2 = IntegerArgumentType
+                                                                                    .getInteger(context, "x2");
+                                                                            int y2 = IntegerArgumentType
+                                                                                    .getInteger(context, "y2");
+                                                                            int z2 = IntegerArgumentType
+                                                                                    .getInteger(context, "z2");
 
-                BlockPos pos1 = new BlockPos(
-                    Math.min(x1, x2),
-                    Math.min(y1, y2),
-                    Math.min(z1, z2)
-                );
-                BlockPos pos2 = new BlockPos(
-                    Math.max(x1, x2),
-                    Math.max(y1, y2),
-                    Math.max(z1, z2)
-                );
-                
-                BlockVolume volume = new BlockVolume(pos1, pos2);
-                
-                DestructibleObjective objective = new DestructibleObjective(volume, name);
-                DestructibleObjectivesHandler.Add(objective);
+                                                                            BlockVolume volume = new BlockVolume(
+                                                                                    new BlockPos(x1, y1, z1),
+                                                                                    new BlockPos(x2, y2, z2), true);
+                                                                        
 
-                context.getSource().sendSuccess(new TextComponent("Created objective: " + objective), true);
-                return 1;
-            })))))))));
+                                                                            DestructibleObjective objective = new DestructibleObjective(
+                                                                                    volume, name);
+                                                                            DestructibleObjectivesHandler
+                                                                                    .Add(objective);
 
-                //Pray to Dod this code works
-                //Бермудский треугольник, не раскоменчивать
-                //Ошибка происходит после  .requires(cs -> cs.hasPermission(3))
+                                                                            context.getSource()
+                                                                                    .sendSuccess(new TextComponent(
+                                                                                            "Created objective: "
+                                                                                                    + objective),
+                                                                                            true);
+                                                                            return 1;
+                                                                        })))))))));
+
+        // Pray to Dod this code works
+        // Бермудский треугольник, не раскоменчивать
+        // Ошибка происходит после .requires(cs -> cs.hasPermission(3))
         // dispatcher.register(Commands.literal("setteamspawn")
-        //         .requires(cs -> cs.hasPermission(3))
-        //         .then(Commands.argument("team_color", TeamColorArgument.color())
-        //                 .executes(CommandRegistration::SetTeamSpawn)
-        //                 .then(Commands.argument("x", IntegerArgumentType.integer())
-        //                         .then(Commands.argument("y", IntegerArgumentType.integer())
-        //                                 .then(Commands.argument("z", IntegerArgumentType.integer())
-        //                                         .executes(CommandRegistration::SetTeamSpawnTo))))));
-
+        // .requires(cs -> cs.hasPermission(3))
+        // .then(Commands.argument("team_color", TeamColorArgument.color())
+        // .executes(CommandRegistration::SetTeamSpawn)
+        // .then(Commands.argument("x", IntegerArgumentType.integer())
+        // .then(Commands.argument("y", IntegerArgumentType.integer())
+        // .then(Commands.argument("z", IntegerArgumentType.integer())
+        // .executes(CommandRegistration::SetTeamSpawnTo))))));
 
     }
 
@@ -156,7 +184,6 @@ public class CommandRegistration {
         }
 
         player.sendMessage(new TextComponent("Нашёл тебя"), player.getUUID());
-
 
         DyeColor[] colors = DyeColor.values(); // Get all wool colors.
         for (DyeColor color : colors) {

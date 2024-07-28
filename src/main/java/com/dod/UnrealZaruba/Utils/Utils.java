@@ -1,14 +1,15 @@
 package com.dod.UnrealZaruba.Utils;
 
 import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -27,33 +28,21 @@ public class Utils {
     }
 
 
-
-    public static void deleteBarriers(BlockPos pos, int chunkRadius) {
+    public static void deleteBarriers(BlockVolume volume) {
         ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-        if (world == null){
+        if (world == null) {
             unrealzaruba.LOGGER.warn("[Ай, бля] World not found");
             return;
         }
-
-        for (int x = -chunkRadius; x <= chunkRadius; x++) {
-            for (int z = -chunkRadius; z <= chunkRadius; z++) {
-                int chunkX = new ChunkPos(pos).x + x;
-                int chunkZ = new ChunkPos(pos).z + z;
-                if (world.hasChunk(chunkX, chunkZ)) {
-                    for (int bx = 0; bx < 16; bx++) {
-                        for (int bz = 0; bz < 16; bz++) {
-                            for (int by = world.getMinBuildHeight(); by < world.getMaxBuildHeight(); by++) {
-                                BlockPos blockPos = new BlockPos((chunkX << 4) + bx, by, (chunkZ << 4) + bz);
-                                BlockState blockState = world.getBlockState(blockPos);
-                                if (blockState.getBlock() == Blocks.BARRIER) {
-                                    world.removeBlock(blockPos, false);
-                                }
-                            }
-                        }
-                    }
-                }
+        
+        unrealzaruba.LOGGER.warn("[Во, бля] Удаляю барьеры " + volume.GetCenter());
+        
+        volume.ForEachBlock(pos -> {
+            BlockState blockState = world.getBlockState(pos);
+            if (blockState.getBlock() == Blocks.BARRIER) {
+                world.removeBlock(pos, false);
             }
-        }
+        });
     }
 
     public static void SetGamemodeAllExcludeOP(PlayerList playerList, GameType gameType) {
@@ -76,5 +65,9 @@ public class Utils {
 
             player.getInventory().clearContent();
         }
+    }
+
+    public static void SetPrefixTo(ServerPlayer player, String prefix) {
+        player.setCustomName(new TextComponent("[" + prefix + "] " + player.getName().toString()));
     }
 }

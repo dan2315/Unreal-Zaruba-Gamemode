@@ -4,7 +4,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class CreativeTabs {
-    public static final CreativeModeTab MAIN_TAB = new CreativeModeTab("Unreal Zalupa") {
+    public static final CreativeModeTab MAIN_TAB = new CreativeModeTab("Unreal Zaruba") {
 
         @Override
         public ItemStack makeIcon() {

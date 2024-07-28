@@ -10,6 +10,7 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
+import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -24,20 +25,29 @@ public class TeamManager {
 
     HashMap<TeamColor, TeamU> teams = new HashMap<>();
     HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
+    HashMap<TeamColor, BlockVolume> bases = new HashMap<>();
+    
 
     public TeamManager() {
+        bases.put(TeamColor.RED, new BlockVolume(new BlockPos(-1009, 65, 496), new BlockPos(-902, 92, 388), false));
+        bases.put(TeamColor.BLUE, new BlockVolume(new BlockPos(999, 65, -485), new BlockPos(893, 97, -353), false));
+        
+
+        // bases.put(TeamColor.RED, new BlockVolume(new BlockPos(49, 71, -147), new BlockPos(52, 74, -150)));
+        // bases.put(TeamColor.BLUE, new BlockVolume(new BlockPos(53, 71, -147), new BlockPos(56, 74, -150)));
+
         var teamData = Load();
         if (teamData != null) {
             for (var data : teamData.teamSpawns.entrySet()) {
-                AddTeam(data.getKey(), data.getValue());
+                AddTeam(data.getKey(), data.getValue(), bases.get(data.getKey()));
                 unrealzaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
             }
         }
     }
 
-    public void AddTeam(TeamColor teamColor, BlockPos spawn) {
+    public void AddTeam(TeamColor teamColor, BlockPos spawn, BlockVolume baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamU(spawn, teamColor));
+        teams.put(teamColor, new TeamU(spawn, teamColor, baseVolume));
     }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -81,14 +91,17 @@ public class TeamManager {
             if (team.Spawn() == null) {
                 return false;
             }
-            Utils.deleteBarriers(team.Spawn(), 1);
+            Utils.deleteBarriers(team.BaseVolume());
         }
         return true;
     }
 
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
-        
         TeamU targetTeam = teams.get(dyeColor);
+        if (targetTeam == null) {
+            unrealzaruba.LOGGER.warn("Команда [" + dyeColor.toString() + "] не проиницилизирована");
+            return false;
+        }
         int targetTeamCount = targetTeam.MembersCount();
 
         int maxOtherTeamsCount = teams.values().stream()

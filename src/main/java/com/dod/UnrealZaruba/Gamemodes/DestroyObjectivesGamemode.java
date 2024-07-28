@@ -34,9 +34,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.entity.player.Player;
 
 public class DestroyObjectivesGamemode extends BaseGamemode {
-    private static final int COMMANDER_VOTING_DURATION_TICKS = 1 * 60; // 2 minutes in seconds
-    private static final int PREPARATION_DURATION_TICKS = 1 * 60; // 8 minutes in seconds
-    private static final int GAME_DURATION_TICKS = 1 * 60; // 50 minutes in seconds
+    private static final int COMMANDER_VOTING_DURATION_TICKS = 10; // 2 minutes in seconds
+    private static final int PREPARATION_DURATION_TICKS = 10; // 8 minutes in seconds
+    private static final int GAME_DURATION_TICKS = 10; // 50 minutes in seconds
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     Scoreboard scoreboard;
@@ -128,14 +128,11 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         gameStage = GameStage.Battle;
 
-        var success = BaseGamemode.currentGamemode.TeamManager.DeleteBarriersAtSpawn();
-        if (!success)
-            context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
-            BaseGamemode.currentGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
+        BaseGamemode.currentGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
 
         ServerPlayer player = context.getSource().getPlayerOrException();
-        BlockPos SpawnRed = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.RED).GetSpawn();
-        BlockPos SpawnBlue = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.BLUE).GetSpawn();
+        BlockPos SpawnRed = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.RED).Spawn();
+        BlockPos SpawnBlue = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.BLUE).Spawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(),
@@ -146,22 +143,28 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
                 var team = TeamManager.GetPlayersTeam(player);
                 if (team == null)
-                    return;
+                    continue;
                 TitleMessage.showTitle(serverPlayer, currentGamemode.startGameTexts.get(team.Color()).GetTitle(),
                         currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
-                TimerManager.Create(GAME_DURATION_TICKS * 1000,
-                        () -> {
-                            CompleteGame(context.getSource().getServer(), TeamColor.BLUE);
-
-                        }, ticks -> {
-                            if (ticks % 20 != 0)
-                                return;
-                            ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective,
-                                    (GAME_DURATION_TICKS - (ticks / 20)) / 60);
-                            ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective,
-                                    ((GAME_DURATION_TICKS - (ticks / 20)) % 60));
-                        });
             }
+
+            var success = BaseGamemode.currentGamemode.TeamManager.DeleteBarriersAtSpawn();
+
+            if (!success)
+                context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
+
+            TimerManager.Create(GAME_DURATION_TICKS * 1000,
+                    () -> {
+                        CompleteGame(context.getSource().getServer(), TeamColor.BLUE);
+
+                    }, ticks -> {
+                        if (ticks % 20 != 0)
+                            return;
+                        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective,
+                                (GAME_DURATION_TICKS - (ticks / 20)) / 60);
+                        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective,
+                                ((GAME_DURATION_TICKS - (ticks / 20)) % 60));
+                    });
         },
                 ticks -> {
                     if (ticks % 20 != 0)
@@ -198,9 +201,11 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     }
 
     public void CheckObjectives() {
-        if (objectives == null) return;
+        if (objectives == null)
+            return;
         for (int i = 0; i < objectives.length; i++) {
-            if (objectives[i].IsCompleted() == false) return;
+            if (objectives[i].IsCompleted() == false)
+                return;
         }
         CompleteGame(ServerLifecycleHooks.getCurrentServer(), TeamColor.RED);
     }
@@ -216,16 +221,17 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
         String colorCode = TeamColor.getColorCodeForTeam(wonTeam);
-        TextComponent titleText = new TextComponent("Команда " + colorCode + wonTeam.toString() + ChatFormatting.RESET + " победила");
+        TextComponent titleText = new TextComponent(
+                "Команда " + colorCode + wonTeam.toString() + ChatFormatting.RESET + " победила");
         TextComponent wonText = new TextComponent("Можешь сказать оппоненту \'Сори, что трахнул\'");
         TextComponent loseText = new TextComponent("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {
             TeamU team = TeamManager.GetPlayersTeam(player);
-            if (team == null) continue;
+            if (team == null)
+                continue;
             if (team.Color() == wonTeam) {
                 TitleMessage.showTitle(player, titleText, wonText);
-            }
-            else {
+            } else {
                 TitleMessage.showTitle(player, titleText, loseText);
             }
         }

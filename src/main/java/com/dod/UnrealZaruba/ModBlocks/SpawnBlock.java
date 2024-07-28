@@ -21,7 +21,7 @@ public class SpawnBlock extends Block {
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        BaseGamemode.currentGamemode.TeamManager.AddTeam(teamColor, pos);
+        BaseGamemode.currentGamemode.TeamManager.AddTeam(teamColor, pos, null);
         saveBlockPos(pos);
     }
 

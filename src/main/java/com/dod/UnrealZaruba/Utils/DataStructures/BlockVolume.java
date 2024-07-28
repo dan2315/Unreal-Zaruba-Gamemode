@@ -15,8 +15,10 @@ public class BlockVolume {
     private final BlockPos minPos;
     private final BlockPos maxPos;
     private final BlockPos center;
-    private final int blockAmount;
+    private transient int blockAmount;
     
+    private ServerLevel world;
+
     public int GetBlockAmount() {
         return blockAmount;
     }
@@ -25,10 +27,18 @@ public class BlockVolume {
         return center;
     }
 
-    public BlockVolume(BlockPos minPos, BlockPos maxPos) {
-        this.minPos = minPos;
-        this.maxPos = maxPos;
-        this.blockAmount = countBlocksInside();
+    public BlockVolume(BlockPos pos1, BlockPos pos2, boolean countBlocks) {
+        this.minPos = new BlockPos(
+                Math.min(pos1.getX(), pos2.getX()),
+                Math.min(pos1.getY(), pos2.getY()),
+                Math.min(pos1.getZ(), pos2.getZ()));
+        this.maxPos = new BlockPos(
+                Math.max(pos1.getX(), pos2.getX()),
+                Math.max(pos1.getY(), pos2.getY()),
+                Math.max(pos1.getZ(), pos2.getZ()));
+
+        world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
+        if (countBlocks) this.blockAmount = countBlocksInside();
 
         center = new BlockPos(
                 minPos.getX() + (maxPos.getX() - minPos.getX())/ 2,
@@ -47,7 +57,6 @@ public class BlockVolume {
         for (int x = minPos.getX(); x < maxPos.getX(); x++) {
             for (int y = minPos.getY(); y < maxPos.getY(); y++) {
                 for (int z = minPos.getZ(); z < maxPos.getZ(); z++) {
-                    ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
                     if (world == null){
                         unrealzaruba.LOGGER.warn("[Ай, бля] World not found");
                         return 0;

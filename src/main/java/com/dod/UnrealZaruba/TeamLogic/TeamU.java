@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -22,6 +23,7 @@ import net.minecraft.world.scores.Team.Visibility;
 
 public class TeamU {
     private BlockPos spawn;
+    private BlockVolume baseVolume;
     List<UUID> members = new ArrayList<>();
     private TeamColor color;
     private List<GameObjective> objectives;
@@ -32,10 +34,12 @@ public class TeamU {
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
+    public BlockVolume BaseVolume() {return baseVolume;}
 
-    public TeamU(BlockPos spawn, TeamColor color) {
+    public TeamU(BlockPos spawn, TeamColor color, BlockVolume baseVolume) {
         this.spawn = spawn;
         this.color = color;
+        this.baseVolume = baseVolume;
         server = ServerLifecycleHooks.getCurrentServer();
     }
 
@@ -124,11 +128,6 @@ public class TeamU {
 
     public void ProcessLose() {
         
-    }
-
-    public BlockPos GetSpawn()
-    {
-        return spawn;
     }
 
     public void TeleportToSpawn() 
