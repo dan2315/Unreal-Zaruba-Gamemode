@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
 
 
 import com.dod.UnrealZaruba.unrealzaruba;
@@ -20,35 +21,32 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.Team;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import oshi.util.tuples.Pair;
 
 public class TeamManager {
 
     HashMap<TeamColor, TeamU> teams = new HashMap<>();
     HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
-//    HashMap<TeamColor, BlockVolume> bases = new HashMap<>();
     
 
     public TeamManager() {
-//        bases.put(TeamColor.RED, new BlockVolume(new BlockPos(-1009, 65, 496), new BlockPos(-902, 92, 388), false));
-//        bases.put(TeamColor.BLUE, new BlockVolume(new BlockPos(999, 65, -485), new BlockPos(893, 97, -353), false));
-        // bases.put(TeamColor.RED, new BlockVolume(new BlockPos(49, 71, -147), new BlockPos(52, 74, -150)));
-        // bases.put(TeamColor.BLUE, new BlockVolume(new BlockPos(53, 71, -147), new BlockPos(56, 74, -150)));
-
         var teamData = Load();
         if (teamData != null) {
             for (var data : teamData.teamSpawns.entrySet()) {
-                AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().blockVolume);
+                AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
                 unrealzaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
             }
         }
     }
 
-    public void AddTeam(TeamColor teamColor, BlockPos spawn, BlockVolume baseVolume) {
+    public void AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
         teams.put(teamColor, new TeamU(spawn, teamColor, baseVolume));
+    }
+
+    public void AddTeam(TeamColor teamColor, BlockPos spawn) {
+        if (teams.containsKey(teamColor)) teams.remove(teamColor);
+        teams.put(teamColor, new TeamU(spawn, teamColor));
     }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -93,7 +91,12 @@ public class TeamManager {
                 return false;
             }
             unrealzaruba.LOGGER.warn("[Во, бля] Во бля");
-            Utils.deleteBarriers(team.BaseVolume());
+
+            List<BlockVolume> barriers = team.BarrierVolumes();
+            if (barriers == null) return false;
+            for (BlockVolume volume : barriers) {
+                Utils.deleteBarriers(volume);
+            }
         }
         return true;
     }
@@ -177,7 +180,8 @@ public class TeamManager {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();
         for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
-            data.teamSpawns.put(team.getKey(), new TeamEntry(team.getValue().Spawn(), team.getValue().BaseVolume()));
+
+            data.teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().Spawn(), team.getValue().BarrierVolumes()));
         }
         try {
             ConfigManager.saveConfig(ConfigManager.Teams, data);
@@ -189,7 +193,7 @@ public class TeamManager {
 
     public TeamData Load() {
         try {
-            var loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
+            TeamData loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
             unrealzaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager");
             return loadedData;
         } catch (IOException e) {

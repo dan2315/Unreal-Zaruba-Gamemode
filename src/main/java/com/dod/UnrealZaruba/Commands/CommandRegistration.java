@@ -116,11 +116,11 @@ public class CommandRegistration {
                                                                                     new BlockPos(x1, y1, z1),
                                                                                     new BlockPos(x2, y2, z2), false);
 
-                                                                            BaseGamemode.currentGamemode.TeamManager.Get(Team).SetVolume(volume);
+                                                                            BaseGamemode.currentGamemode.TeamManager.Get(Team).AddBarrierVolume(volume);
 
                                                                             context.getSource()
                                                                                     .sendSuccess(new TextComponent(
-                                                                                                    "Created team base" + Team),
+                                                                                                    "Created team base " + Team),
                                                                                             true);
                                                                             return 1;
                                                                         })))))))));

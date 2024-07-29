@@ -2,9 +2,6 @@ package com.dod.UnrealZaruba.Utils;
 
 import java.util.ArrayList;
 
-import com.dod.UnrealZaruba.unrealzaruba;
-
-
 public class TimerManager {
     static ArrayList<TickTimer> activeTimers = new ArrayList<TickTimer>();
 
@@ -36,6 +33,5 @@ public class TimerManager {
 
     public static void DisposeTimer(TickTimer timer) {
         activeTimers.remove(timer);
-        timer = null;
     }
 }

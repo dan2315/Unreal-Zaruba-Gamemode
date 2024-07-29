@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -24,10 +23,9 @@ import net.minecraft.world.scores.Team.Visibility;
 
 public class TeamU {
     private BlockPos spawn;
-    private BlockVolume baseVolume;
+    private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     List<UUID> members = new ArrayList<>();
     private TeamColor color;
-    private List<GameObjective> objectives;
     MinecraftServer server;
 
     public static PlayerTeam redTeam;
@@ -35,17 +33,24 @@ public class TeamU {
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
-    public BlockVolume BaseVolume() {return baseVolume;}
-
-    public void SetVolume(BlockVolume blockVolume) {
-        baseVolume = blockVolume;
-    }
-
-    public TeamU(BlockPos spawn, TeamColor color, BlockVolume baseVolume) {
+    public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
+    
+    public TeamU(BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
         this.spawn = spawn;
         this.color = color;
-        this.baseVolume = baseVolume;
+        this.barrierVolumes = barrierVolumes;
         server = ServerLifecycleHooks.getCurrentServer();
+    }
+
+    public TeamU(BlockPos spawn, TeamColor color) {
+        this.spawn = spawn;
+        this.color = color;
+        server = ServerLifecycleHooks.getCurrentServer();
+    }
+    
+    public void AddBarrierVolume(BlockVolume barrierVolume) {
+        if (barrierVolumes == null) barrierVolumes = new ArrayList<BlockVolume>();
+        barrierVolumes.add(barrierVolume);
     }
 
     public static void SetupMinecraftTeams(MinecraftServer server) {
@@ -117,14 +122,6 @@ public class TeamU {
 
     public void SetSpawn(BlockPos pos) {
         spawn = pos;
-    }
-
-    public void addObjective(GameObjective objective) {
-        objectives.add(objective);
-    }
-
-    public List<GameObjective> getObjectives() {
-        return objectives;
     }
 
     public void ProcessWin() {
