@@ -28,7 +28,6 @@ public class TimerManager {
         for (int i = 0; i < activeTimers.size(); i++) {
             activeTimers.get(i).Update();
         }
-
     }
 
     public static void DisposeTimer(TickTimer timer) {

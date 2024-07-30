@@ -26,8 +26,8 @@ public class DestructibleObjectivesHandler {
     public static final Map<DestructibleObjective, ServerBossEvent> destructibleObjectives = new HashMap<>();
     private static final Map<DestructibleObjective, Set<UUID>> playersWithBossBar = new HashMap<>();
     private static float PROGRESSBAR_ACTIVATION_DISTANCE = 10000f;
-    private static final int BossbarUpdateFrequency = 20; //ticks
-    private static final int ObjectiveUpdateFrequency = 20; //ticks
+    private static final int BossbarUpdateFrequency = 40; //ticks
+    private static final int ObjectiveUpdateFrequency = 40; //ticks
     private static int serverTickCounter = 0;
     private static final Map<UUID, Integer> playerTickCounters = new HashMap<>();
 

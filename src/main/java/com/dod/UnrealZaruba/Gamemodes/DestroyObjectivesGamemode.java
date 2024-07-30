@@ -33,10 +33,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.entity.player.Player;
 
+
 public class DestroyObjectivesGamemode extends BaseGamemode {
-    private static final int COMMANDER_VOTING_DURATION_TICKS = 10; // 2 minutes in seconds
-    private static final int PREPARATION_DURATION_TICKS = 10; // 8 minutes in seconds
-    private static final int GAME_DURATION_TICKS = 10; // 50 minutes in seconds
+    private static final int COMMANDER_VOTING_DURATION_TICKS = 3 * 60; // 3 minutes in seconds
+    private static final int PREPARATION_DURATION_TICKS = 7 * 60; // 7 minutes in seconds
+    private static final int GAME_DURATION_TICKS = 50 * 60; // 50 minutes in seconds
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     Scoreboard scoreboard;
@@ -185,7 +186,6 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
 
         if (gameStage == GameStage.Preparation) {
             BlockPos spawn = server.overworld().getSharedSpawnPos();
-            Utils.setSpawnPoint(serverPlayer, new BlockPos(spawn.getX(), spawn.getY(), spawn.getZ()));
             serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
         }
 

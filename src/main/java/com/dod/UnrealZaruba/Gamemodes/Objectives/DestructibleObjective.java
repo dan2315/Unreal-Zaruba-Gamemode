@@ -3,7 +3,6 @@ package com.dod.UnrealZaruba.Gamemodes.Objectives;
 import java.util.List;
 import java.util.Set;
 
-import org.valkyrienskies.core.impl.chunk_tracking.c;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class DestructibleObjective extends GameObjective {
     BlockVolume volume;
+    int blockAmount;
     int remainingBlockAmount;
     String name;
     float requiredDegreeOfDestruction = 0.1f;
@@ -35,23 +35,27 @@ public class DestructibleObjective extends GameObjective {
     public DestructibleObjective(BlockVolume volume, String name) {
         this.volume = volume;
         this.name = name;
-        this.remainingBlockAmount = volume.GetBlockAmount();
         this.world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
         this.trackedBlocks = InitializeTrackedBlocks(volume);
     }
-
+    
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
+        unrealzaruba.LOGGER.info("Начал прогружать: " + name);
         Set<BlockPos> solidBlocks = new HashSet<>();
-
+        
         volume.ForEachBlock(pos -> {
             if (world.getBlockState(pos).getBlock() != Blocks.AIR) {
                 solidBlocks.add(pos);
+                this.blockAmount++;
             }
         });
+        
+        this.remainingBlockAmount = blockAmount;
 
+        unrealzaruba.LOGGER.info("Цель инициализирована: " + name);
         return solidBlocks;
     }
-
+    
     public float Update() {
         if (isCompleted) return 0; 
         if (trackedBlocks == null) return 0;
@@ -107,6 +111,6 @@ public class DestructibleObjective extends GameObjective {
     }
 
     private float GetProgress() {
-        return ((float) (remainingBlockAmount)) / volume.GetBlockAmount();
+        return ((float) (remainingBlockAmount)) / blockAmount;
     }
 }

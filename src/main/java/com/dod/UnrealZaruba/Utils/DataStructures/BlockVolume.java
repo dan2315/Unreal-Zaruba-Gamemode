@@ -2,26 +2,13 @@ package com.dod.UnrealZaruba.Utils.DataStructures;
 
 import java.util.function.Consumer;
 
-import com.dod.UnrealZaruba.unrealzaruba;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class BlockVolume {
     private final BlockPos minPos;
     private final BlockPos maxPos;
     private final BlockPos center;
-    private transient int blockAmount;
-    
-    private transient ServerLevel world;
-
-    public int GetBlockAmount() {
-        return blockAmount;
-    }
 
     public BlockPos GetCenter() {
         return center;
@@ -37,9 +24,6 @@ public class BlockVolume {
                 Math.max(pos1.getY(), pos2.getY()),
                 Math.max(pos1.getZ(), pos2.getZ()));
 
-        world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-        if (countBlocks) this.blockAmount = countBlocksInside();
-
         center = new BlockPos(
                 minPos.getX() + (maxPos.getX() - minPos.getX())/ 2,
                 minPos.getY(),
@@ -52,32 +36,11 @@ public class BlockVolume {
                pos.getZ() >= minPos.getZ() && pos.getZ() <= maxPos.getZ();
     }
 
-    public int countBlocksInside() {
-        int count = 0;
-        for (int x = minPos.getX(); x < maxPos.getX(); x++) {
-            for (int y = minPos.getY(); y < maxPos.getY(); y++) {
-                for (int z = minPos.getZ(); z < maxPos.getZ(); z++) {
-                    if (world == null){
-                        unrealzaruba.LOGGER.warn("[Ай, бля] World not found");
-                        return 0;
-                    }
-                    BlockPos position = new BlockPos(x, y, z);
-                    BlockState blockState = world.getBlockState(position);
-                    if (blockState.getBlock() != Blocks.AIR) {
-                        count++;   
-                    }
-                }
-            }
-        }
-        return count;
-    }
-
     public void ForEachBlock(Consumer<BlockPos> event) {
         for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
             for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
                 for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
                     BlockPos position = new BlockPos(x, y, z);
-                    unrealzaruba.LOGGER.warn("[Во, бля]" + String.valueOf(position));
                     event.accept(position);
                 }
             }

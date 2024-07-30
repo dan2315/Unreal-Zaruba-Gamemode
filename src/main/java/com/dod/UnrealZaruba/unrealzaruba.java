@@ -6,7 +6,8 @@ import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
-import com.dod.UnrealZaruba.ModBlocks.TeamAssignBlocks;
+import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TimerManager;
@@ -54,7 +55,8 @@ public class unrealzaruba {
         TeamColorArgument.RegisterArgument();
 
         ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TeamAssignBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
 
     }
 
