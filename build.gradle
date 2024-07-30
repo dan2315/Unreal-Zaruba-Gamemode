@@ -116,8 +116,8 @@ repositories {
             url = 'https://maven.valkyrienskies.org'
         }
         maven {
-            name = "Create Big Cannons"
-            url = "https://maven.realrobotix.me/createbigcannons"
+            name "realrobotixCreatebigcannons"
+            url "https://maven.realrobotix.me/createbigcannons"
         }
         maven { url = 'https://files.minecraftforge.net/maven' }
         
@@ -154,10 +154,10 @@ dependencies {
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
     implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
+    // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-371e22a")
+    // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-371e22a")
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-2697705")
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-2697705")
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-fc18b32")
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-fc18b32")
 }
 
 jar {

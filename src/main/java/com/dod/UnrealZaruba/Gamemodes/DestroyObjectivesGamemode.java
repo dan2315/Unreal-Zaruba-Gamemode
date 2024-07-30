@@ -16,7 +16,7 @@ import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+// import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -31,6 +31,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 
 
@@ -56,6 +58,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 "§9 Игра началась, в бой!",
                 "Продержитесь 50 минут"));
 
+        ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         objectives = DestructibleObjectivesHandler.Load();
     }
 
@@ -130,6 +133,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         gameStage = GameStage.Battle;
 
         BaseGamemode.currentGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
+        ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.NORMAL, true);
 
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos SpawnRed = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.RED).Spawn();
@@ -187,14 +191,13 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         if (gameStage == GameStage.Preparation) {
             BlockPos spawn = server.overworld().getSharedSpawnPos();
             serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-        }
-
-        if (gameStage == GameStage.Preparation) {
+            server.overworld();
+            serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
             serverPlayer.setGameMode(GameType.ADVENTURE);
-        } else if (gameStage == GameStage.Battle) {
+        } else if (gameStage != GameStage.Preparation) {
             if (!BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer)) {
                 serverPlayer.setGameMode(GameType.SPECTATOR);
-                var spawn = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.BLUE).Spawn();
+                var spawn = server.overworld().getSharedSpawnPos();
                 serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
             }
         }
@@ -216,7 +219,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
-        WorldManager.ReloadMap(server);
+        // WorldManager.ReloadMap(server);
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
