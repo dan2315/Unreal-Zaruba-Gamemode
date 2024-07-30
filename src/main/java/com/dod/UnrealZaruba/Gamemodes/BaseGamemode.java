@@ -18,7 +18,7 @@ public abstract class BaseGamemode {
     public GameStage gameStage = GameStage.Preparation;
     public HashMap<TeamColor, StartGameText> startGameTexts = new HashMap<>();
 
-    public abstract void ProcessNewPlayer(Player player);
+    public abstract void HandleNewPlayer(Player player);
     public abstract void CheckObjectives();
     public abstract int StartBattle (CommandContext<CommandSourceStack> context) throws CommandSyntaxException;
 }

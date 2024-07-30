@@ -16,7 +16,8 @@ import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
-// import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.UnrealZaruba.Utils.NBT;
+
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -182,9 +183,13 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         return 1;
     }
 
-    public void ProcessNewPlayer(Player player) {
+    public void HandleNewPlayer(Player player) {
         ServerPlayer serverPlayer = (ServerPlayer) player;
         MinecraftServer server = serverPlayer.getServer();
+
+        var isInTeam = BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer);
+        var isDead = NBT.readEntityTag(serverPlayer, "isPlayerDead");
+
         if (server == null)
             return;
 
@@ -194,8 +199,13 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             server.overworld();
             serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
             serverPlayer.setGameMode(GameType.ADVENTURE);
-        } else if (gameStage != GameStage.Preparation) {
-            if (!BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer)) {
+        } else {
+            if (isInTeam) {
+                if (isDead == 1) {
+                    BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
+                    serverPlayer.setGameMode(GameType.ADVENTURE);
+                }
+            } else {
                 serverPlayer.setGameMode(GameType.SPECTATOR);
                 var spawn = server.overworld().getSharedSpawnPos();
                 serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
@@ -206,8 +216,8 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public void CheckObjectives() {
         if (objectives == null)
             return;
-        for (int i = 0; i < objectives.length; i++) {
-            if (objectives[i].IsCompleted() == false)
+        for (GameObjective gameObjective : objectives) {
+            if (!gameObjective.IsCompleted())
                 return;
         }
         CompleteGame(ServerLifecycleHooks.getCurrentServer(), TeamColor.RED);
