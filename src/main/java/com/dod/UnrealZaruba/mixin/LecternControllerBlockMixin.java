@@ -1,6 +1,5 @@
 package com.dod.UnrealZaruba.mixin;
 
-import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.simibubi.create.content.redstone.link.controller.LecternControllerBlock;
 
