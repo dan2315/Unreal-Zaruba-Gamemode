@@ -17,6 +17,8 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -96,11 +98,16 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
-        BaseGamemode.currentGamemode.HandleNewPlayer(event.getPlayer());
+        BaseGamemode.currentGamemode.HandleConnectedPlayer(event.getPlayer());
     }
 
     @SubscribeEvent
     public void onServerStopped(ServerStoppedEvent event) {
+        Scoreboard scoreboard = event.getServer().getScoreboard();
+
+        scoreboard.removePlayerTeam(TeamU.redTeam);
+        scoreboard.removePlayerTeam(TeamU.blueTeam);
+
         unrealzaruba.LOGGER.info("Server has stopped. Finalizing...");
         DestructibleObjectivesHandler.Save();
         BaseGamemode.currentGamemode.TeamManager.Save();
