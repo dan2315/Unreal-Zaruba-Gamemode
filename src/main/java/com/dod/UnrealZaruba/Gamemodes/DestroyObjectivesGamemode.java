@@ -194,23 +194,33 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             return;
 
         if (gameStage == GameStage.Preparation) {
-            BlockPos spawn = server.overworld().getSharedSpawnPos();
-            serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-            server.overworld();
-            serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
-            serverPlayer.setGameMode(GameType.ADVENTURE);
+            ReturnToSpawn(serverPlayer, server);
         } else {
             if (isInTeam) {
-                if (isDead == 1) {
-                    BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
-                    serverPlayer.setGameMode(GameType.ADVENTURE);
-                }
+                if (isDead == 1) ReturnToTeamSpawn(serverPlayer);
             } else {
-                serverPlayer.setGameMode(GameType.SPECTATOR);
-                var spawn = server.overworld().getSharedSpawnPos();
-                serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+                MakePlayerSpectator(serverPlayer, server);
             }
         }
+    }
+
+    private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
+        BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
+        serverPlayer.setGameMode(GameType.ADVENTURE);
+    }
+
+    private void MakePlayerSpectator(ServerPlayer serverPlayer, MinecraftServer server) {
+        serverPlayer.setGameMode(GameType.SPECTATOR);
+        var spawn = server.overworld().getSharedSpawnPos();
+        serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+    }
+
+    private void ReturnToSpawn(ServerPlayer serverPlayer, MinecraftServer server) {
+        BlockPos spawn = server.overworld().getSharedSpawnPos();
+        serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+        server.overworld();
+        serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
+        serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 
     public void CheckObjectives() {

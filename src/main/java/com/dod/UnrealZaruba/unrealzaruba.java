@@ -96,7 +96,7 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
-        BaseGamemode.currentGamemode.ProcessNewPlayer(event.getPlayer());
+        BaseGamemode.currentGamemode.HandleNewPlayer(event.getPlayer());
     }
 
     @SubscribeEvent

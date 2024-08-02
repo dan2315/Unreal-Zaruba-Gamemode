@@ -7,9 +7,11 @@ import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.BarrierRemovalTask;
+import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -31,241 +33,338 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandRegistration {
-    private static final Map<DyeColor, Item> itemMap = new HashMap<>();
+        private static final Map<DyeColor, Item> itemMap = new HashMap<>();
 
-    static {
-        initializeItemMap();
-    }
+        static {
+                initializeItemMap();
+        }
 
-    private static void initializeItemMap() {
-        itemMap.put(DyeColor.WHITE, Items.WHITE_WOOL);
-        itemMap.put(DyeColor.ORANGE, Items.ORANGE_WOOL);
-        itemMap.put(DyeColor.MAGENTA, Items.MAGENTA_WOOL);
-        itemMap.put(DyeColor.LIGHT_BLUE, Items.LIGHT_BLUE_WOOL);
-        itemMap.put(DyeColor.YELLOW, Items.YELLOW_WOOL);
-        itemMap.put(DyeColor.LIME, Items.LIME_WOOL);
-        itemMap.put(DyeColor.PINK, Items.PINK_WOOL);
-        itemMap.put(DyeColor.GRAY, Items.GRAY_WOOL);
-        itemMap.put(DyeColor.LIGHT_GRAY, Items.LIGHT_GRAY_WOOL);
-        itemMap.put(DyeColor.CYAN, Items.CYAN_WOOL);
-        itemMap.put(DyeColor.PURPLE, Items.PURPLE_WOOL);
-        itemMap.put(DyeColor.BLUE, Items.BLUE_WOOL);
-        itemMap.put(DyeColor.BROWN, Items.BROWN_WOOL);
-        itemMap.put(DyeColor.GREEN, Items.GREEN_WOOL);
-        itemMap.put(DyeColor.RED, Items.RED_WOOL);
-        itemMap.put(DyeColor.BLACK, Items.BLACK_WOOL);
-    }
+        private static void initializeItemMap() {
+                itemMap.put(DyeColor.WHITE, Items.WHITE_WOOL);
+                itemMap.put(DyeColor.ORANGE, Items.ORANGE_WOOL);
+                itemMap.put(DyeColor.MAGENTA, Items.MAGENTA_WOOL);
+                itemMap.put(DyeColor.LIGHT_BLUE, Items.LIGHT_BLUE_WOOL);
+                itemMap.put(DyeColor.YELLOW, Items.YELLOW_WOOL);
+                itemMap.put(DyeColor.LIME, Items.LIME_WOOL);
+                itemMap.put(DyeColor.PINK, Items.PINK_WOOL);
+                itemMap.put(DyeColor.GRAY, Items.GRAY_WOOL);
+                itemMap.put(DyeColor.LIGHT_GRAY, Items.LIGHT_GRAY_WOOL);
+                itemMap.put(DyeColor.CYAN, Items.CYAN_WOOL);
+                itemMap.put(DyeColor.PURPLE, Items.PURPLE_WOOL);
+                itemMap.put(DyeColor.BLUE, Items.BLUE_WOOL);
+                itemMap.put(DyeColor.BROWN, Items.BROWN_WOOL);
+                itemMap.put(DyeColor.GREEN, Items.GREEN_WOOL);
+                itemMap.put(DyeColor.RED, Items.RED_WOOL);
+                itemMap.put(DyeColor.BLACK, Items.BLACK_WOOL);
+        }
 
-    public static void onCommandRegister(RegisterCommandsEvent event) {
-        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+        public static void onCommandRegister(RegisterCommandsEvent event) {
+                CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
-        // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
-        // она будет тупо убивать
+                // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
+                // она будет тупо убивать
 
-        dispatcher.register(Commands.literal("getwool")
-                .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
+                dispatcher.register(Commands.literal("getwool")
+                                .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
 
-        dispatcher.register(Commands.literal("setprefix")
-                .then(Commands.argument("player", StringArgumentType.string())
-                        .then(Commands.argument("prefix", StringArgumentType.string())
-                                .executes(context -> {
-                                    String playerName = StringArgumentType.getString(context, "player");
-                                    String prefix = StringArgumentType.getString(context, "prefix");
-
-                                    ServerPlayer player = context.getSource().getServer().getPlayerList()
-                                            .getPlayerByName(playerName);
-                                    if (player != null) {
-                                        Utils.SetPrefixTo(player, prefix);
-                                        context.getSource().sendSuccess(
-                                                new TextComponent("Set prefix for " + playerName + " to " + prefix),
-                                                true);
-                                    } else {
-                                        context.getSource()
-                                                .sendFailure(new TextComponent("Player " + playerName + " not found."));
-                                    }
-
-                                    return 1;
-                                }))));
-
-        dispatcher.register(Commands.literal("setteambase")
-                .requires(cs -> cs.hasPermission(3))
-                .then(Commands.argument("name", TeamColorArgument.color())
-                        .then(Commands.argument("x1", IntegerArgumentType.integer())
-                                .then(Commands.argument("y1", IntegerArgumentType.integer())
-                                        .then(Commands.argument("z1", IntegerArgumentType.integer())
-                                                .then(Commands.argument("x2", IntegerArgumentType.integer())
-                                                        .then(Commands.argument("y2", IntegerArgumentType.integer())
-                                                                .then(Commands
-                                                                        .argument("z2", IntegerArgumentType.integer())
-                                                                        .executes(context -> {
-                                                                            TeamColor Team = TeamColorArgument.getColor(context, "name");
-                                                                            int x1 = IntegerArgumentType
-                                                                                    .getInteger(context, "x1");
-                                                                            int y1 = IntegerArgumentType
-                                                                                    .getInteger(context, "y1");
-                                                                            int z1 = IntegerArgumentType
-                                                                                    .getInteger(context, "z1");
-                                                                            int x2 = IntegerArgumentType
-                                                                                    .getInteger(context, "x2");
-                                                                            int y2 = IntegerArgumentType
-                                                                                    .getInteger(context, "y2");
-                                                                            int z2 = IntegerArgumentType
-                                                                                    .getInteger(context, "z2");
-
-                                                                            BlockVolume volume = new BlockVolume(
-                                                                                    new BlockPos(x1, y1, z1),
-                                                                                    new BlockPos(x2, y2, z2), false);
-
-                                                                            BaseGamemode.currentGamemode.TeamManager.Get(Team).AddBarrierVolume(volume);
-
-                                                                            context.getSource()
-                                                                                    .sendSuccess(new TextComponent(
-                                                                                                    "Created team base " + Team),
-                                                                                            true);
-                                                                            return 1;
-                                                                        })))))))));
-
-        dispatcher.register(Commands.literal("removebarriers")
-                .then(Commands.argument("x1", IntegerArgumentType.integer())
-                        .then(Commands.argument("y1", IntegerArgumentType.integer())
-                                .then(Commands.argument("z1", IntegerArgumentType.integer())
-                                        .then(Commands.argument("x2", IntegerArgumentType.integer())
-                                                .then(Commands.argument("y2", IntegerArgumentType.integer())
-                                                        .then(Commands.argument("z2", IntegerArgumentType.integer())
+                dispatcher.register(Commands.literal("setprefix")
+                                .then(Commands.argument("player", StringArgumentType.string())
+                                                .then(Commands.argument("prefix", StringArgumentType.string())
                                                                 .executes(context -> {
-                                                                    int x1 = IntegerArgumentType.getInteger(context, "x1");
-                                                                    int y1 = IntegerArgumentType.getInteger(context, "y1");
-                                                                    int z1 = IntegerArgumentType.getInteger(context, "z1");
-                                                                    int x2 = IntegerArgumentType.getInteger(context, "x2");
-                                                                    int y2 = IntegerArgumentType.getInteger(context, "y2");
-                                                                    int z2 = IntegerArgumentType.getInteger(context, "z2");
-                                                                    ServerLevel world = context.getSource().getLevel();
-                                                                    BarrierRemovalTask.removeBarriersAsync(world, new BlockPos(x1, y1, z1), new BlockPos(x2, y2, z2));
-                                                                    return 1;
-                                                                }))))))));
+                                                                        String playerName = StringArgumentType
+                                                                                        .getString(context, "player");
+                                                                        String prefix = StringArgumentType
+                                                                                        .getString(context, "prefix");
 
-        dispatcher.register(Commands.literal("startbattle")
-                .requires(cs -> cs.hasPermission(3))
-                .executes(context -> BaseGamemode.currentGamemode.StartBattle(context)));
+                                                                        ServerPlayer player = context.getSource()
+                                                                                        .getServer().getPlayerList()
+                                                                                        .getPlayerByName(playerName);
+                                                                        if (player != null) {
+                                                                                Utils.SetPrefixTo(player, prefix);
+                                                                                context.getSource().sendSuccess(
+                                                                                                new TextComponent(
+                                                                                                                "Set prefix for "
+                                                                                                                                + playerName
+                                                                                                                                + " to "
+                                                                                                                                + prefix),
+                                                                                                true);
+                                                                        } else {
+                                                                                context.getSource()
+                                                                                                .sendFailure(new TextComponent(
+                                                                                                                "Player " + playerName
+                                                                                                                                + " not found."));
+                                                                        }
 
-        dispatcher.register(Commands.literal("crtobj")
-                .requires(cs -> cs.hasPermission(3))
-                .then(Commands.argument("name", StringArgumentType.string())
-                        .then(Commands.argument("x1", IntegerArgumentType.integer())
-                                .then(Commands.argument("y1", IntegerArgumentType.integer())
-                                        .then(Commands.argument("z1", IntegerArgumentType.integer())
-                                                .then(Commands.argument("x2", IntegerArgumentType.integer())
-                                                        .then(Commands.argument("y2", IntegerArgumentType.integer())
-                                                                .then(Commands
-                                                                        .argument("z2", IntegerArgumentType.integer())
-                                                                        .executes(context -> {
-                                                                            String name = StringArgumentType
-                                                                                    .getString(context, "name");
-                                                                            int x1 = IntegerArgumentType
-                                                                                    .getInteger(context, "x1");
-                                                                            int y1 = IntegerArgumentType
-                                                                                    .getInteger(context, "y1");
-                                                                            int z1 = IntegerArgumentType
-                                                                                    .getInteger(context, "z1");
-                                                                            int x2 = IntegerArgumentType
-                                                                                    .getInteger(context, "x2");
-                                                                            int y2 = IntegerArgumentType
-                                                                                    .getInteger(context, "y2");
-                                                                            int z2 = IntegerArgumentType
-                                                                                    .getInteger(context, "z2");
+                                                                        return 1;
+                                                                }))));
 
-                                                                            BlockVolume volume = new BlockVolume(
-                                                                                    new BlockPos(x1, y1, z1),
-                                                                                    new BlockPos(x2, y2, z2), true);
-                                                                        
+                dispatcher.register(Commands.literal("dolinkssafe")
+                                .then(Commands.argument("isSafe", BoolArgumentType.bool())
+                                                .executes(context -> {
+                                                        Boolean isSafe = BoolArgumentType
+                                                                        .getBool(context, "isSafe");
 
-                                                                            DestructibleObjective objective = new DestructibleObjective(
-                                                                                    volume, name);
-                                                                            DestructibleObjectivesHandler
-                                                                                    .Add(objective);
+                                                        Gamerules.DO_LINKS_SAFE = isSafe;
 
-                                                                            context.getSource()
-                                                                                    .sendSuccess(new TextComponent(
-                                                                                            "Created objective: "
-                                                                                                    + objective),
-                                                                                            true);
-                                                                            return 1;
-                                                                        })))))))));
+                                                        return 1;
+                                                })));
 
-        // Pray to Dod this code works
-        // Бермудский треугольник, не раскоменчивать
-        // Ошибка происходит после .requires(cs -> cs.hasPermission(3))
-        // dispatcher.register(Commands.literal("setteamspawn")
-        // .requires(cs -> cs.hasPermission(3))
-        // .then(Commands.argument("team_color", TeamColorArgument.color())
-        // .executes(CommandRegistration::SetTeamSpawn)
-        // .then(Commands.argument("x", IntegerArgumentType.integer())
-        // .then(Commands.argument("y", IntegerArgumentType.integer())
-        // .then(Commands.argument("z", IntegerArgumentType.integer())
-        // .executes(CommandRegistration::SetTeamSpawnTo))))));
+                dispatcher.register(Commands.literal("setteambase")
+                                .requires(cs -> cs.hasPermission(3))
+                                .then(Commands.argument("name", TeamColorArgument.color())
+                                                .then(Commands.argument("x1", IntegerArgumentType.integer())
+                                                                .then(Commands.argument("y1",
+                                                                                IntegerArgumentType.integer())
+                                                                                .then(Commands.argument("z1",
+                                                                                                IntegerArgumentType
+                                                                                                                .integer())
+                                                                                                .then(Commands.argument(
+                                                                                                                "x2",
+                                                                                                                IntegerArgumentType
+                                                                                                                                .integer())
+                                                                                                                .then(Commands.argument(
+                                                                                                                                "y2",
+                                                                                                                                IntegerArgumentType
+                                                                                                                                                .integer())
+                                                                                                                                .then(Commands
+                                                                                                                                                .argument("z2", IntegerArgumentType
+                                                                                                                                                                .integer())
+                                                                                                                                                .executes(context -> {
+                                                                                                                                                        TeamColor Team = TeamColorArgument
+                                                                                                                                                                        .getColor(context,
+                                                                                                                                                                                        "name");
+                                                                                                                                                        int x1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "x1");
+                                                                                                                                                        int y1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "y1");
+                                                                                                                                                        int z1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "z1");
+                                                                                                                                                        int x2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "x2");
+                                                                                                                                                        int y2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "y2");
+                                                                                                                                                        int z2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "z2");
 
-    }
+                                                                                                                                                        BlockVolume volume = new BlockVolume(
+                                                                                                                                                                        new BlockPos(x1, y1,
+                                                                                                                                                                                        z1),
+                                                                                                                                                                        new BlockPos(x2, y2,
+                                                                                                                                                                                        z2),
+                                                                                                                                                                        false);
 
-    private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        int x = IntegerArgumentType.getInteger(context, "x");
-        int y = IntegerArgumentType.getInteger(context, "y");
-        int z = IntegerArgumentType.getInteger(context, "z");
-        BlockPos position = new BlockPos(x, y, z);
-        TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
+                                                                                                                                                        BaseGamemode.currentGamemode.TeamManager
+                                                                                                                                                                        .Get(Team)
+                                                                                                                                                                        .AddBarrierVolume(
+                                                                                                                                                                                        volume);
 
-        BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(
-                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
-                true);
-        return 0;
-    }
+                                                                                                                                                        context.getSource()
+                                                                                                                                                                        .sendSuccess(new TextComponent(
+                                                                                                                                                                                        "Created team base "
+                                                                                                                                                                                                        + Team),
+                                                                                                                                                                                        true);
+                                                                                                                                                        return 1;
+                                                                                                                                                })))))))));
 
-    private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        BlockPos position = new BlockPos(player.position());
-        TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
+                dispatcher.register(Commands.literal("removebarriers")
+                                .then(Commands.argument("x1", IntegerArgumentType.integer())
+                                                .then(Commands.argument("y1", IntegerArgumentType.integer())
+                                                                .then(Commands.argument("z1",
+                                                                                IntegerArgumentType.integer())
+                                                                                .then(Commands.argument("x2",
+                                                                                                IntegerArgumentType
+                                                                                                                .integer())
+                                                                                                .then(Commands.argument(
+                                                                                                                "y2",
+                                                                                                                IntegerArgumentType
+                                                                                                                                .integer())
+                                                                                                                .then(Commands.argument(
+                                                                                                                                "z2",
+                                                                                                                                IntegerArgumentType
+                                                                                                                                                .integer())
+                                                                                                                                .executes(context -> {
+                                                                                                                                        int x1 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "x1");
+                                                                                                                                        int y1 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "y1");
+                                                                                                                                        int z1 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "z1");
+                                                                                                                                        int x2 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "x2");
+                                                                                                                                        int y2 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "y2");
+                                                                                                                                        int z2 = IntegerArgumentType
+                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                        "z2");
+                                                                                                                                        ServerLevel world = context
+                                                                                                                                                        .getSource()
+                                                                                                                                                        .getLevel();
+                                                                                                                                        BarrierRemovalTask
+                                                                                                                                                        .removeBarriersAsync(
+                                                                                                                                                                        world,
+                                                                                                                                                                        new BlockPos(x1, y1,
+                                                                                                                                                                                        z1),
+                                                                                                                                                                        new BlockPos(x2, y2,
+                                                                                                                                                                                        z2));
+                                                                                                                                        return 1;
+                                                                                                                                }))))))));
 
-        BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(
-                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в " + position),
-                true);
-        return 0;
-    }
+                dispatcher.register(Commands.literal("startbattle")
+                                .requires(cs -> cs.hasPermission(3))
+                                .executes(context -> BaseGamemode.currentGamemode.StartBattle(context)));
 
-    private static int giveColoredWool(CommandContext<CommandSourceStack> context) {
+                dispatcher.register(Commands.literal("crtobj")
+                                .requires(cs -> cs.hasPermission(3))
+                                .then(Commands.argument("name", StringArgumentType.string())
+                                                .then(Commands.argument("x1", IntegerArgumentType.integer())
+                                                                .then(Commands.argument("y1",
+                                                                                IntegerArgumentType.integer())
+                                                                                .then(Commands.argument("z1",
+                                                                                                IntegerArgumentType
+                                                                                                                .integer())
+                                                                                                .then(Commands.argument(
+                                                                                                                "x2",
+                                                                                                                IntegerArgumentType
+                                                                                                                                .integer())
+                                                                                                                .then(Commands.argument(
+                                                                                                                                "y2",
+                                                                                                                                IntegerArgumentType
+                                                                                                                                                .integer())
+                                                                                                                                .then(Commands
+                                                                                                                                                .argument("z2", IntegerArgumentType
+                                                                                                                                                                .integer())
+                                                                                                                                                .executes(context -> {
+                                                                                                                                                        String name = StringArgumentType
+                                                                                                                                                                        .getString(context,
+                                                                                                                                                                                        "name");
+                                                                                                                                                        int x1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "x1");
+                                                                                                                                                        int y1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "y1");
+                                                                                                                                                        int z1 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "z1");
+                                                                                                                                                        int x2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "x2");
+                                                                                                                                                        int y2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "y2");
+                                                                                                                                                        int z2 = IntegerArgumentType
+                                                                                                                                                                        .getInteger(context,
+                                                                                                                                                                                        "z2");
 
-        CommandSourceStack source = context.getSource();
-        ServerPlayer player;
+                                                                                                                                                        BlockVolume volume = new BlockVolume(
+                                                                                                                                                                        new BlockPos(x1, y1,
+                                                                                                                                                                                        z1),
+                                                                                                                                                                        new BlockPos(x2, y2,
+                                                                                                                                                                                        z2),
+                                                                                                                                                                        true);
 
-        try {
-            player = source.getPlayerOrException();
-        } catch (CommandSyntaxException e) {
-            source.sendFailure(new TextComponent("This command can only be run by a player."));
-            return 0;
+                                                                                                                                                        DestructibleObjective objective = new DestructibleObjective(
+                                                                                                                                                                        volume,
+                                                                                                                                                                        name);
+                                                                                                                                                        DestructibleObjectivesHandler
+                                                                                                                                                                        .Add(objective);
+
+                                                                                                                                                        context.getSource()
+                                                                                                                                                                        .sendSuccess(new TextComponent(
+                                                                                                                                                                                        "Created objective: "
+                                                                                                                                                                                                        + objective),
+                                                                                                                                                                                        true);
+                                                                                                                                                        return 1;
+                                                                                                                                                })))))))));
+
+                // Pray to Dod this code works
+                // Бермудский треугольник, не раскоменчивать
+                // Ошибка происходит после .requires(cs -> cs.hasPermission(3))
+                // dispatcher.register(Commands.literal("setteamspawn")
+                // .requires(cs -> cs.hasPermission(3))
+                // .then(Commands.argument("team_color", TeamColorArgument.color())
+                // .executes(CommandRegistration::SetTeamSpawn)
+                // .then(Commands.argument("x", IntegerArgumentType.integer())
+                // .then(Commands.argument("y", IntegerArgumentType.integer())
+                // .then(Commands.argument("z", IntegerArgumentType.integer())
+                // .executes(CommandRegistration::SetTeamSpawnTo))))));
+
         }
 
-        player.sendMessage(new TextComponent("Нашёл тебя"), player.getUUID());
+        private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+                int x = IntegerArgumentType.getInteger(context, "x");
+                int y = IntegerArgumentType.getInteger(context, "y");
+                int z = IntegerArgumentType.getInteger(context, "z");
+                BlockPos position = new BlockPos(x, y, z);
+                TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
 
-        DyeColor[] colors = DyeColor.values(); // Get all wool colors.
-        for (DyeColor color : colors) {
-            player.sendMessage(new TextComponent("Даю цвет" + color), player.getUUID());
-
-            String woolName = player.getName().getString() + " " + color.getName();
-            ItemStack itemStack = new ItemStack((itemMap.get(color)), 1);
-
-            if (!itemStack.hasTag()) {
-                itemStack.setTag(new CompoundTag());
-            }
-            CompoundTag nbtData = itemStack.getTag();
-            nbtData.putString("Owner", player.getName().getString());
-
-            itemStack.setTag(nbtData);
-
-            itemStack.setHoverName(new TextComponent(woolName));
-            player.getInventory().add(itemStack);
+                BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
+                context.getSource().sendSuccess(
+                                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
+                                                + position),
+                                true);
+                return 0;
         }
-        source.sendSuccess(new TextComponent("Given all colored wool to " + player.getName().getString()), true);
-        return 1;
-    }
+
+        private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+                ServerPlayer player = context.getSource().getPlayerOrException();
+                BlockPos position = new BlockPos(player.position());
+                TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
+
+                BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
+                context.getSource().sendSuccess(
+                                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
+                                                + position),
+                                true);
+                return 0;
+        }
+
+        private static int giveColoredWool(CommandContext<CommandSourceStack> context) {
+
+                CommandSourceStack source = context.getSource();
+                ServerPlayer player;
+
+                try {
+                        player = source.getPlayerOrException();
+                } catch (CommandSyntaxException e) {
+                        source.sendFailure(new TextComponent("This command can only be run by a player."));
+                        return 0;
+                }
+
+                player.sendMessage(new TextComponent("Нашёл тебя"), player.getUUID());
+
+                DyeColor[] colors = DyeColor.values(); // Get all wool colors.
+                for (DyeColor color : colors) {
+                        player.sendMessage(new TextComponent("Даю цвет" + color), player.getUUID());
+
+                        String woolName = player.getName().getString() + " " + color.getName();
+                        ItemStack itemStack = new ItemStack((itemMap.get(color)), 1);
+
+                        if (!itemStack.hasTag()) {
+                                itemStack.setTag(new CompoundTag());
+                        }
+                        CompoundTag nbtData = itemStack.getTag();
+                        nbtData.putString("Owner", player.getName().getString());
+
+                        itemStack.setTag(nbtData);
+
+                        itemStack.setHoverName(new TextComponent(woolName));
+                        player.getInventory().add(itemStack);
+                }
+                source.sendSuccess(new TextComponent("Given all colored wool to " + player.getName().getString()),
+                                true);
+                return 1;
+        }
 
 }
