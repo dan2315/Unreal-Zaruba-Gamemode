@@ -10,11 +10,16 @@ import com.simibubi.create.content.redstone.link.LinkHandler;
 
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-@Mixin(LinkHandler.class)
+
+@Mixin(
+        value = {LinkHandler.class},
+        remap = false
+)
 public abstract class LinkHandlerMixin {
     
-    @Inject(method = "onBlockActivated", at = @At("HEAD"), cancellable = true)
-    public static void beforeOnBlockActivated(PlayerInteractEvent.RightClickBlock event, CallbackInfo ci) {
+    @Inject(method = "onBlockActivated",at = @At("HEAD"), cancellable = true)
+    private static void beforeOnBlockActivated(PlayerInteractEvent.RightClickBlock event, CallbackInfo ci)
+    {
         if (Gamerules.DO_LINKS_SAFE && !event.getPlayer().mayBuild()) {
             ci.cancel();
         }
