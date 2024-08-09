@@ -33,6 +33,7 @@ public class TeamU {
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
+    public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
     
     public TeamU(BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {

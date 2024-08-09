@@ -26,3 +26,6 @@ forge*changelog.txt
 
 #.bat
 buildClient.bat
+buildServer.bat
+*.lnk
+.prettierrc

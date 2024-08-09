@@ -11,10 +11,7 @@ import com.simibubi.create.content.redstone.link.LinkHandler;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 
-@Mixin(
-        value = {LinkHandler.class},
-        remap = false
-)
+@Mixin(value = LinkHandler.class , remap = false)
 public abstract class LinkHandlerMixin {
     
     @Inject(method = "onBlockActivated",at = @At("HEAD"), cancellable = true)
