@@ -2,12 +2,6 @@ package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
-import com.dod.UnrealZaruba.DiscordIntegration.CallbackServer;
-import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
@@ -15,7 +9,6 @@ import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Utils.TextClickEvent;
 import com.dod.UnrealZaruba.Utils.TimerManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import com.mojang.logging.LogUtils;
 
@@ -27,20 +20,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
-import java.util.UUID;
 
 import org.slf4j.Logger;
 
@@ -56,7 +40,6 @@ public class unrealzaruba {
 
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
-    TimerManager timerManager = new TimerManager();
 
     public unrealzaruba() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -71,59 +54,5 @@ public class unrealzaruba {
          (msg, buf) -> LoginPacket.encode(msg, buf),
          (msg) -> LoginPacket.decode(msg),
          (msg, ctx) -> LoginPacket.handle(msg, ctx));
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        CallbackServer.StartServer();
-        TeamU.SetupMinecraftTeams(event.getServer());
-        new DestroyObjectivesGamemode();
-        ScoreboardManager.clearScoreboard(event.getServer());
-    }
-
-    @SubscribeEvent
-    public void onServerTick(ServerTickEvent event) {
-        if (event.phase == ServerTickEvent.Phase.START) {
-            TimerManager.UpdateAll();
-        }
-    }
-
-    @SubscribeEvent
-    public void onServerStopped(ServerStoppedEvent event) {
-        Scoreboard scoreboard = event.getServer().getScoreboard();
-
-        scoreboard.removePlayerTeam(TeamU.redTeam);
-        scoreboard.removePlayerTeam(TeamU.blueTeam);
-
-        unrealzaruba.LOGGER.info("Server has stopped. Finalizing...");
-        DestructibleObjectivesHandler.Save();
-        BaseGamemode.currentGamemode.TeamManager.Save();
-        CallbackServer.StopServer();
-    }
-
-
-    @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
-        BaseGamemode.currentGamemode.HandleConnectedPlayer(event.getPlayer());
-        ServerPlayer player = (ServerPlayer) event.getPlayer();
-        String state = UUID.randomUUID().toString(); // Unique state to prevent CSRF
-        DiscordAuth.unresolvedRequests.add(state);
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state ,player.getUUID(), player.getName().getString()));
-    }
-
-    @SubscribeEvent
-    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
-        CallbackServer.DeauthorizeUser(event.getPlayer().getUUID());
-    }
-
-    @Mod.EventBusSubscriber
-    public static class CommandRegistryEvent {
-        @SubscribeEvent
-        public static void onRegisterCommands(RegisterCommandsEvent event) {
-            LOGGER.info("COMMANDS Registered");
-            CommandRegistration.onCommandRegister(event);
-        }
     }
 }

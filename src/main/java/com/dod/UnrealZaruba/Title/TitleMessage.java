@@ -30,7 +30,11 @@ public class TitleMessage {
     }
 
     public static void showTitle(ServerPlayer player, TextComponent title, TextComponent subtitle) {
-        player.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7));
+        showTitle(player, title, subtitle, 60);
+    }
+
+    public static void showTitle(ServerPlayer player, TextComponent title, TextComponent subtitle, int tickduration) {
+        player.connection.send(new ClientboundSetTitlesAnimationPacket(10, tickduration, 10));
         player.connection.send(new ClientboundSetTitleTextPacket(title));
         player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
     }
