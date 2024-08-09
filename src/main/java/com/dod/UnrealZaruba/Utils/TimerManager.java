@@ -6,22 +6,27 @@ public class TimerManager {
     static ArrayList<TickTimer> activeTimers = new ArrayList<TickTimer>();
 
     public static TickTimer Create(int duration, TimerCompletedCallback completedCallback,
+            TimerUpdatedCallback updatedCallback, boolean preventStart) {
+                TickTimer timer = new TickTimer(duration, preventStart) {
+                    @Override
+                    public void OnCompleted() {
+                        completedCallback.run();
+                    }
+        
+                    @Override
+                    public void OnUpdated(int ticks) {
+                        updatedCallback.run(ticks);
+                    }
+                };
+        
+                activeTimers.add(timer);
+        
+                return timer;
+            }
+
+    public static TickTimer Create(int duration, TimerCompletedCallback completedCallback,
             TimerUpdatedCallback updatedCallback) {
-        TickTimer timer = new TickTimer(duration, false) {
-            @Override
-            public void OnCompleted() {
-                completedCallback.run();
-            }
-
-            @Override
-            public void OnUpdated(int ticks) {
-                updatedCallback.run(ticks);
-            }
-        };
-
-        activeTimers.add(timer);
-
-        return timer;
+                return Create(duration, completedCallback, updatedCallback, false);
     }
 
     public static void UpdateAll() {
@@ -30,7 +35,10 @@ public class TimerManager {
         }
     }
 
-    public static void DisposeTimer(TickTimer timer) {
+    public static void DisposeTimer(TickTimer timer, boolean complete) {
         activeTimers.remove(timer);
+        if (complete) {
+            timer.OnCompleted();
+        }
     }
 }

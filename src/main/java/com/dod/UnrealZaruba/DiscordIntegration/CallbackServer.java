@@ -2,10 +2,14 @@ package com.dod.UnrealZaruba.DiscordIntegration;
 
 import com.sun.net.httpserver.HttpServer;
 
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
@@ -58,7 +62,6 @@ public class CallbackServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                // Read the request body
                 var playerList = ServerLifecycleHooks.getCurrentServer().getPlayerList();
                 InputStream inputStream = exchange.getRequestBody();
                 String requestBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -81,7 +84,12 @@ public class CallbackServer {
                 boolean isAuthenticated = Boolean.parseBoolean(params.get("authenticated"));
 
                 if (uuid != null) {
+                    UUID playerUUID = UUID.fromString(uuid);
                     SetPlayerAuthorized(uuid, isAuthenticated);
+                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                    ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
+                    TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
+                    server.sendMessage(new TextComponent("Авторизация прошла успешно"), playerUUID);
 
                     // Send a response
                     String response = String.format("Auth status for player [%s] set to [%b]", playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);

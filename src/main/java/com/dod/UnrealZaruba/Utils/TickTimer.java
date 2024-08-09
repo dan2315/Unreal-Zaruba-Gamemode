@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.Utils;
 
+import com.dod.UnrealZaruba.unrealzaruba;
 
 public class TickTimer {
 
@@ -38,6 +39,10 @@ public class TickTimer {
     public void OnCompleted() {}
 
     private void Dispose() {
-        TimerManager.DisposeTimer(this);
+        TimerManager.DisposeTimer(this, false);
+    }
+
+    public void Dispose(boolean complete) {
+        TimerManager.DisposeTimer(this, complete);
     }
 }

@@ -11,7 +11,7 @@ import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
-import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -20,10 +20,11 @@ import java.util.HashMap;
 
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -43,8 +44,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-@Mod.EventBusSubscriber
-public class MinecraftEvents {
+@Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+public class ServerEvents {
 
     private static Map<UUID, GameType> playerOriginalGamemodeMap = new HashMap<UUID, GameType>();
 
@@ -81,12 +82,27 @@ public class MinecraftEvents {
         if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
             return;
 
-        if (event.getEntity() instanceof ServerPlayer player) {
-            playerOriginalGamemodeMap.put(player.getUUID(), player.gameMode.getGameModeForPlayer());
-        }
+        ServerPlayer player = (ServerPlayer) event.getPlayer();
+        playerOriginalGamemodeMap.put(player.getUUID(), player.gameMode.getGameModeForPlayer());
+
+        TickTimer[] timer = new TickTimer[1];
+        timer[0] = TimerManager.Create(30 * 60 * 20, () -> {
+            if (!CallbackServer.isPlayerAuthorized(player.getUUID())) {
+                unrealzaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
+                player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы"));
+            }
+        }, 
+        ticks -> {
+            if (ticks % 100 == 0) {
+                if (!CallbackServer.isPlayerAuthorized(player.getUUID())) {
+                    player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"), player.getUUID());
+                } else {
+                    timer[0].Dispose(false);
+                }
+            }
+        });
 
         BaseGamemode.currentGamemode.HandleConnectedPlayer(event.getPlayer());
-        ServerPlayer player = (ServerPlayer) event.getPlayer();
         String state = UUID.randomUUID().toString(); // Unique state to prevent CSRF
         DiscordAuth.unresolvedRequests.add(state);
         unrealzaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
@@ -129,15 +145,6 @@ public class MinecraftEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerUseItem(PlayerInteractEvent.RightClickItem event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!CallbackServer.isPlayerAuthorized(player.getUUID())) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to use items!"), player.getUUID());
-            }
-        }
-    }
 
     @SubscribeEvent
     public static void onPlayerBreakBlock(PlayerEvent.BreakSpeed event) {
@@ -176,9 +183,8 @@ public class MinecraftEvents {
             if (!CallbackServer.isPlayerAuthorized(playerUUID)) {
                 Vec3 prevPos = player.position();
                 player.teleportTo(prevPos.x, prevPos.y, prevPos.z);
-                player.setDeltaMovement(Vec3.ZERO); // Set velocity to zero to prevent further movement
-                player.fallDistance = 0.0f; // Reset fall distance to prevent fall damage
-                // No message here as requested
+                player.setDeltaMovement(Vec3.ZERO);
+                player.fallDistance = 0.0f;
             }
         }
     }
@@ -199,24 +205,6 @@ public class MinecraftEvents {
                 event.setCanceled(true);
                 player.sendMessage(new TextComponent("You are not authorized to place blocks!"), player.getUUID());
             }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (!CallbackServer.isPlayerAuthorized(event.getPlayer().getUUID())) {
-            event.setCanceled(true);
-            event.getPlayer().sendMessage(new TextComponent("You are not authorized to interact with blocks!"),
-                    event.getPlayer().getUUID());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (!CallbackServer.isPlayerAuthorized(event.getPlayer().getUUID())) {
-            event.setCanceled(true);
-            event.getPlayer().sendMessage(new TextComponent("You are not authorized to interact with entities!"),
-                    event.getPlayer().getUUID());
         }
     }
 
