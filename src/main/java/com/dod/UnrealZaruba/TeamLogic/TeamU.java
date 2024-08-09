@@ -161,15 +161,6 @@ public class TeamU {
         }
     }
 
-    public void RespawnPlayer(boolean tentChosen) {
-        if (tentChosen) {
-            TeleportToTent();
-        }
-        else {
-            TeleportToSpawn();
-        }
-    }
-
     public void GiveKit() {
         for (UUID playerId : members) {
             ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);

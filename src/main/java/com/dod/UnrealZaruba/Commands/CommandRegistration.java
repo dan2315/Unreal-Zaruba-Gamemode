@@ -163,7 +163,7 @@ public class CommandRegistration {
                                 PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), false);
                                 TitleMessage.sendSubtitle(serverPlayer, new TextComponent("Выбранная точка: База"));
                                 SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.SELECT1.get(), 1.0f, 1.0f);
-
+                                
                                 return 1;
                             }));
 

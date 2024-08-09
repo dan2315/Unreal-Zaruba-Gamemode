@@ -1,39 +1,20 @@
 package com.dod.UnrealZaruba.ModItems;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.unrealzaruba;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
-import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+
 
 public class HandTent extends Item {
 
@@ -42,15 +23,13 @@ public class HandTent extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public InteractionResult useOn(@Nonnull UseOnContext context) {
         unrealzaruba.LOGGER.info("Начало");
         if (!context.getLevel().isClientSide) {
-            if (!(TeamU.tent_Spawns.get(context.getClickedPos()) == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(context.getPlayer()).color)) {
-                unrealzaruba.LOGGER.info("Щелкнуло!");
-                ServerLevel serverLevel = (ServerLevel) context.getLevel();
-                placeCustomStructure(serverLevel, context.getClickedPos(), Objects.requireNonNull(context.getPlayer()));
-                return InteractionResult.SUCCESS;
-            }
+            unrealzaruba.LOGGER.info("Щелкнуло!");
+            ServerLevel serverLevel = (ServerLevel) context.getLevel();
+            placeCustomStructure(serverLevel, context.getClickedPos(), Objects.requireNonNull(context.getPlayer()));
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
 

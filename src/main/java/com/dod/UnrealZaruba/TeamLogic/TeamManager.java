@@ -217,6 +217,14 @@ public class TeamManager {
         serverPlayer.sendMessage(new TextComponent("Щелкнуло!"), serverPlayer.getUUID());
     }
 
+    public void RespawnPlayer(ServerPlayer player, boolean tentChosen) {
+        if (tentChosen) {
+            teleportToTent(player);
+        } else {
+            teleportToSpawn(player);
+        }
+    }
+
     public void Save() {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();
