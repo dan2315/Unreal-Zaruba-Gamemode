@@ -33,9 +33,9 @@ public class ModBlocks {
             .sound(SoundType.WOOD)
             .noOcclusion(), DyeColor.WHITE, false));
     public static final RegistryObject<Block> TENT_MAIN_BLOCK_BLUE = ModBlocks.BLOCKS.register("tent_main_block",
-            () -> new TentMainBlockBlue());
+            () -> new TentMainBlock(TeamColor.BLUE));
     public static final RegistryObject<Block> TENT_MAIN_BLOCK_RED = ModBlocks.BLOCKS.register("tent_main_block",
-            () -> new TentMainBlockRed());
+            () -> new TentMainBlock(TeamColor.RED));
 
 
     public static void register(IEventBus eventBus) {

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.valkyrienskies.core.impl.shadow.vo;
+
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
@@ -156,6 +158,15 @@ public class TeamU {
             ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player == null) return;
             player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+        }
+    }
+
+    public void RespawnPlayer(boolean tentChosen) {
+        if (tentChosen) {
+            TeleportToTent();
+        }
+        else {
+            TeleportToSpawn();
         }
     }
 
