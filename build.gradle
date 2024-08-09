@@ -22,7 +22,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-version = '0.1'
+version = '0.2'
 group = 'com.dod.unrealzaruba' 
 archivesBaseName = 'unrealzaruba'
 
@@ -202,4 +202,13 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+
+task buildClient(type: Exec) {
+    commandLine 'cmd', '/c', 'buildClient.bat', archivesBaseName + "-" + version + ".jar"
+}
+
+task buildServer(type: Exec) {
+    commandLine 'cmd', '/c', 'buildServer.bat', archivesBaseName + "-" + version + ".jar"
 }

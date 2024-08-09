@@ -79,10 +79,6 @@ public class DestructibleObjectivesHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
-        event.getAffectedBlocks();
-    }
 
     private static boolean isPlayerNearTarget(ServerPlayer player, BlockPos pos) {
         double distance = player.blockPosition().distSqr(pos);
