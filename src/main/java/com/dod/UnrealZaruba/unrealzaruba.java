@@ -20,10 +20,9 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -86,6 +85,11 @@ public class unrealzaruba {
 
     @SubscribeEvent
     public void onServerStopped(ServerStoppedEvent event) {
+        Scoreboard scoreboard = event.getServer().getScoreboard();
+
+        scoreboard.removePlayerTeam(TeamU.redTeam);
+        scoreboard.removePlayerTeam(TeamU.blueTeam);
+
         unrealzaruba.LOGGER.info("Server has stopped. Finalizing...");
         DestructibleObjectivesHandler.Save();
         BaseGamemode.currentGamemode.TeamManager.Save();
@@ -96,7 +100,7 @@ public class unrealzaruba {
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (! ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) return;
-        BaseGamemode.currentGamemode.HandleNewPlayer(event.getPlayer());
+        BaseGamemode.currentGamemode.HandleConnectedPlayer(event.getPlayer());
         ServerPlayer player = (ServerPlayer) event.getPlayer();
         String state = UUID.randomUUID().toString(); // Unique state to prevent CSRF
         DiscordAuth.unresolvedRequests.add(state);

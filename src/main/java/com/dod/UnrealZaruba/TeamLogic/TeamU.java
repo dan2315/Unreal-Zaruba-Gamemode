@@ -111,6 +111,12 @@ public class TeamU {
         }
     }
 
+//    public void ClearTeams(MinecraftServer server) {
+//        Scoreboard scoreboard = server.getScoreboard();
+//
+//
+//    }
+
     public void TryRemove(ServerPlayer player) {
         if (members.contains(player.getUUID())) {
             members.remove(player.getUUID());

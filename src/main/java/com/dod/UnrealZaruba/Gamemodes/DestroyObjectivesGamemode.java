@@ -184,7 +184,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         return 1;
     }
 
-    public void HandleNewPlayer(Player player) {
+    public void HandleConnectedPlayer(Player player) {
         ServerPlayer serverPlayer = (ServerPlayer) player;
         MinecraftServer server = serverPlayer.getServer();
 
@@ -198,12 +198,17 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
             ReturnToSpawn(serverPlayer, server);
         } else {
             if (isInTeam) {
-                if (isDead == 1) ReturnToTeamSpawn(serverPlayer);
+                if (isDead == 1) {
+                    ReturnToTeamSpawn(serverPlayer);
+                } else {
+                    serverPlayer.setGameMode(GameType.ADVENTURE);
+                }
             } else {
                 MakePlayerSpectator(serverPlayer, server);
             }
         }
     }
+
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
         BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
