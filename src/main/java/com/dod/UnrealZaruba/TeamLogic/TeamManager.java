@@ -71,7 +71,11 @@ public class TeamManager {
 
     public TeamU GetPlayersOppositeTeam(Player player) {
         TeamColor color = GetPlayersTeam(player).Color();
-        switch (color) {
+        return GetOppositeTeamTo(color);
+    }
+
+    public TeamU GetOppositeTeamTo(TeamColor teamColor) {
+        switch (teamColor) {
             case RED:
                 return teams.get(TeamColor.BLUE);
             case BLUE:

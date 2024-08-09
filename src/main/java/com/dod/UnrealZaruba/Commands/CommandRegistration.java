@@ -1,11 +1,11 @@
 package com.dod.UnrealZaruba.Commands;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
+import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.BarrierRemovalTask;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
@@ -29,8 +29,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 public class CommandRegistration {
         private static final Map<DyeColor, Item> itemMap = new HashMap<>();
@@ -61,8 +66,25 @@ public class CommandRegistration {
         public static void onCommandRegister(RegisterCommandsEvent event) {
                 CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
-                // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
-                // она будет тупо убивать
+                dispatcher.register(Commands.literal("testlb")
+                                .requires(cs -> cs.hasPermission(3)).executes(context -> {
+                                        List<UUID> won = new ArrayList<UUID>();
+                                        List<UUID> lost = new ArrayList<UUID>();
+                                        List<ServerPlayer> players = ServerLifecycleHooks.getCurrentServer()
+                                                        .getPlayerList().getPlayers();
+
+                                        for (int i = 0; i < players.size(); i++) {
+                                                if (i % 2 == 0) {
+                                                        won.add(players.get(i).getUUID());
+                                                } else {
+                                                        lost.add(players.get(i).getUUID());
+                                                }
+                                        }
+
+                                        LeaderboardReqs.UpdatePlayerRanking(won, lost);
+
+                                        return 1;
+                                }));
 
                 dispatcher.register(Commands.literal("getwool")
                                 .requires(cs -> cs.hasPermission(0)).executes(context -> giveColoredWool(context)));
@@ -172,53 +194,53 @@ public class CommandRegistration {
                                                                                                                                                         return 1;
                                                                                                                                                 })))))))));
 
-                dispatcher.register(Commands.literal("removebarriers")
-                                .then(Commands.argument("x1", IntegerArgumentType.integer())
-                                                .then(Commands.argument("y1", IntegerArgumentType.integer())
-                                                                .then(Commands.argument("z1",
-                                                                                IntegerArgumentType.integer())
-                                                                                .then(Commands.argument("x2",
+                dispatcher.register(Commands.literal("removebarriers").then(Commands
+                                .argument("x1", IntegerArgumentType.integer())
+                                .then(Commands.argument("y1", IntegerArgumentType.integer())
+                                                .then(Commands.argument("z1",
+                                                                IntegerArgumentType.integer())
+                                                                .then(Commands.argument("x2",
+                                                                                IntegerArgumentType
+                                                                                                .integer())
+                                                                                .then(Commands.argument(
+                                                                                                "y2",
                                                                                                 IntegerArgumentType
                                                                                                                 .integer())
                                                                                                 .then(Commands.argument(
-                                                                                                                "y2",
+                                                                                                                "z2",
                                                                                                                 IntegerArgumentType
                                                                                                                                 .integer())
-                                                                                                                .then(Commands.argument(
-                                                                                                                                "z2",
-                                                                                                                                IntegerArgumentType
-                                                                                                                                                .integer())
-                                                                                                                                .executes(context -> {
-                                                                                                                                        int x1 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "x1");
-                                                                                                                                        int y1 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "y1");
-                                                                                                                                        int z1 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "z1");
-                                                                                                                                        int x2 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "x2");
-                                                                                                                                        int y2 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "y2");
-                                                                                                                                        int z2 = IntegerArgumentType
-                                                                                                                                                        .getInteger(context,
-                                                                                                                                                                        "z2");
-                                                                                                                                        ServerLevel world = context
-                                                                                                                                                        .getSource()
-                                                                                                                                                        .getLevel();
-                                                                                                                                        BarrierRemovalTask
-                                                                                                                                                        .removeBarriersAsync(
-                                                                                                                                                                        world,
-                                                                                                                                                                        new BlockPos(x1, y1,
-                                                                                                                                                                                        z1),
-                                                                                                                                                                        new BlockPos(x2, y2,
-                                                                                                                                                                                        z2));
-                                                                                                                                        return 1;
-                                                                                                                                }))))))));
+                                                                                                                .executes(context -> {
+                                                                                                                        int x1 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "x1");
+                                                                                                                        int y1 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "y1");
+                                                                                                                        int z1 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "z1");
+                                                                                                                        int x2 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "x2");
+                                                                                                                        int y2 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "y2");
+                                                                                                                        int z2 = IntegerArgumentType
+                                                                                                                                        .getInteger(context,
+                                                                                                                                                        "z2");
+                                                                                                                        ServerLevel world = context
+                                                                                                                                        .getSource()
+                                                                                                                                        .getLevel();
+                                                                                                                        BarrierRemovalTask
+                                                                                                                                        .removeBarriersAsync(
+                                                                                                                                                        world,
+                                                                                                                                                        new BlockPos(x1, y1,
+                                                                                                                                                                        z1),
+                                                                                                                                                        new BlockPos(x2, y2,
+                                                                                                                                                                        z2));
+                                                                                                                        return 1;
+                                                                                                                }))))))));
 
                 dispatcher.register(Commands.literal("startbattle")
                                 .requires(cs -> cs.hasPermission(3))

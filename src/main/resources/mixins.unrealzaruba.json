@@ -8,8 +8,7 @@
     "mixins": [
       "LecternControllerBlockMixin",
       "RedstoneLinkBlockMixin",
-      "LinkHandlerMixin",
-      "LecternControllerBlockEntityMixin"
+      "LinkHandlerMixin"
     ],
     "client": [],
     "injectors": {

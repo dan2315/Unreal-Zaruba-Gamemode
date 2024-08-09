@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
@@ -236,6 +237,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
         scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS);
+        LeaderboardReqs.UpdatePlayerRanking(TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {

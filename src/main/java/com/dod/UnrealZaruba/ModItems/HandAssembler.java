@@ -2,18 +2,14 @@ package com.dod.UnrealZaruba.ModItems;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
 import org.joml.Vector3dc;
 import org.joml.Vector3i;
-import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.world.ShipWorld;
 import org.valkyrienskies.core.util.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
-import org.valkyrienskies.mod.common.world.ChunkManagement;
 
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.ContraptionManager.ContraptionManager;
@@ -31,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class HandAssembler extends Item {
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 
     public HandAssembler(Properties p_41383_) {
@@ -51,7 +46,6 @@ public class HandAssembler extends Item {
         denseBlockPosSet.add(new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
         ServerShip createdShip = ShipAssemblyKt.createNewShipWithBlocks(blockPos, denseBlockPosSet,
                 (ServerLevel) useContext.getLevel());
-
         
         int shipChunkX = createdShip.getChunkClaim().getXMiddle();
         int shipChunkZ = createdShip.getChunkClaim().getZMiddle();
