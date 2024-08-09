@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.List;
 
 
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
@@ -14,12 +15,16 @@ import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -27,6 +32,8 @@ public class TeamManager {
 
     HashMap<TeamColor, TeamU> teams = new HashMap<>();
     HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
+
+    public HashMap<TeamColor, StructureTemplate> tent_templates = new HashMap<>();
     
 
     public TeamManager() {
@@ -34,6 +41,13 @@ public class TeamManager {
         if (teamData != null) {
             for (var data : teamData.teamSpawns.entrySet()) {
                 AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
+                StructureManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
+
+                StructureTemplate template_red = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "red_tent"));
+                StructureTemplate template_blue = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
+
+                tent_templates.put(TeamColor.RED, template_red);
+                tent_templates.put(TeamColor.BLUE, template_blue);
                 unrealzaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
             }
         }
@@ -178,6 +192,29 @@ public class TeamManager {
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
         serverPlayer.teleportTo(x, y ,z);
+    }
+
+    public void teleportToTent(ServerPlayer serverPlayer) {
+        TeamU team = GetPlayersTeam(serverPlayer);
+        if (team == null) {
+            serverPlayer.sendMessage(new TextComponent("Вы не присоединены ни к одной команде"),
+                    serverPlayer.getUUID());
+            return;
+        }
+
+        // TODO позже дописать хуйню
+        BlockPos Spawn = null;
+//        for (Map.Entry<BlockPos, TeamColor> entry : TeamU.tent_Spawns.entrySet()) {
+//            if (entry.getValue() == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).color) {
+//                Spawn = entry.getKey();
+//                break;
+//            }
+//        }
+        double x = Spawn.getX() + 0.5d;
+        double y = Spawn.getY() + 1.1d;
+        double z = Spawn.getZ() + 0.5d;
+        serverPlayer.teleportTo(x, y, z);
+        serverPlayer.sendMessage(new TextComponent("Щелкнуло!"), serverPlayer.getUUID());
     }
 
     public void Save() {

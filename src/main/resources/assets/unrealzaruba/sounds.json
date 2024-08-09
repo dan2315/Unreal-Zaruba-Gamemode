@@ -10,5 +10,35 @@
     "sounds": [
       "unrealzaruba:horn_radiant"
     ]
+  },
+  "death": {
+    "subtitles": "sounds.unrealzaruba.death",
+    "sounds": [
+      "unrealzaruba:death"
+    ]
+  },
+  "respawn": {
+    "subtitles": "sounds.unrealzaruba.respawn",
+    "sounds": [
+      "unrealzaruba:respawn"
+    ]
+  },
+  "respawn2": {
+    "subtitles": "sounds.unrealzaruba.respawn2",
+    "sounds": [
+      "unrealzaruba:respawn2"
+    ]
+  },
+  "select1": {
+    "subtitles": "sounds.unrealzaruba.select1",
+    "sounds": [
+      "unrealzaruba:select1"
+    ]
+  },
+  "select2": {
+    "subtitles": "sounds.unrealzaruba.select2",
+    "sounds": [
+      "unrealzaruba:select2"
+    ]
   }
 }

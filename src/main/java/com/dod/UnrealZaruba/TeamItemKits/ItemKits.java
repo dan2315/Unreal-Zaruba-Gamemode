@@ -2,6 +2,12 @@ package com.dod.UnrealZaruba.TeamItemKits;
 
 import java.util.HashMap;
 
+import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
@@ -47,6 +53,7 @@ public class ItemKits {
             1
         );
         redTeamKit.put("nzgexpansion:medium_bullet", 600);
+        redTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
 
         blueTeamArmorKit = new HashMap<>();
@@ -75,6 +82,7 @@ public class ItemKits {
                 "nzgexpansion:battle_rifle{AmmoCount:20, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:carbine_stock\", Count:1b}}}",
                 1);
         blueTeamKit.put("nzgexpansion:medium_bullet", 600);
+        blueTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
@@ -96,4 +104,12 @@ public class ItemKits {
             CommandPresets.executeEquipArmorCommandSilent(server, serverPlayer.getName().getString(), itemElement.getValue(), itemElement.getKey());
         }
     }
+
+//    public static void GiveSpecItem(MinecraftServer server, ServerPlayer serverPlayer, ItemStack item) {
+//        ListTag canDestroy = new ListTag();
+//        canDestroy.add(StringTag.valueOf(ModBlocks.TENT_MAIN_BLOCK.toString()));
+//        item.add
+//        item.addTagElement("CanDestroy", canDestroy);
+//        serverPlayer.getInventory().add(item);
+//    }
 }

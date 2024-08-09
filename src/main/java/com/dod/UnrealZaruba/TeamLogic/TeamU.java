@@ -1,12 +1,14 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
@@ -15,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -23,10 +26,14 @@ import net.minecraft.world.scores.Team.Visibility;
 
 public class TeamU {
     private BlockPos spawn;
+    public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     List<UUID> members = new ArrayList<>();
-    private TeamColor color;
+    public TeamColor color;
     MinecraftServer server;
+
+//    public static HashMap<TeamColor, BlockPos> tent_Spawns = new HashMap<>();
+    public Tent active_tent;
 
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
@@ -52,6 +59,10 @@ public class TeamU {
     public void AddBarrierVolume(BlockVolume barrierVolume) {
         if (barrierVolumes == null) barrierVolumes = new ArrayList<BlockVolume>();
         barrierVolumes.add(barrierVolume);
+    }
+
+    public void setActiveTent(Tent active_tent) {
+        this.active_tent = active_tent;
     }
 
     public static void SetupMinecraftTeams(MinecraftServer server) {

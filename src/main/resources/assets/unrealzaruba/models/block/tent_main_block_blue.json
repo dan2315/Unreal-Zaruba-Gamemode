@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "unrealzaruba:block/tent_main_block_blue"
+  }
+}
