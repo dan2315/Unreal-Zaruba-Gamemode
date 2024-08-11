@@ -3,6 +3,7 @@ package com.dod.UnrealZaruba.RespawnCooldown;
 import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
+import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
@@ -35,13 +36,12 @@ public class PlayerRespawnEventHandler {
 
     @SubscribeEvent
     public void OnPlayerDeath(LivingDeathEvent event) {
-        if (!(event.getEntityLiving() instanceof ServerPlayer))
+        if (!(event.getEntityLiving() instanceof ServerPlayer serverPlayer))
             return;
         
-        
-        ServerPlayer serverPlayer = (ServerPlayer) event.getEntity();
         BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level);
         TeamManager teamManager = ((TeamGamemode)gamemode).GetTeamManager();
+
         NBT.addEntityTag(serverPlayer, "isPlayerDead", 1);
         DeadPlayers.put(serverPlayer.getUUID(), false);
         SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.DEATH.get(), 1.0f, 1.0f);
@@ -56,9 +56,10 @@ public class PlayerRespawnEventHandler {
         serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
         TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться на базе", "/tpToTeamSpawn");
         serverPlayer.sendMessage(new TextComponent(""), serverPlayer.getUUID());
-        TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
-        serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
-
+        if (!(teamManager.GetPlayersTeam(serverPlayer).active_tent == null)) {
+            TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
+            serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
+        }
 
         if (gamemode.gameStage != GameStage.Preparation) {
             if (serverPlayer instanceof ServerPlayer) {
@@ -72,11 +73,8 @@ public class PlayerRespawnEventHandler {
                 TimerManager.Create(duration * 1000, () -> {
                     serverPlayer.setGameMode(GameType.ADVENTURE);
                     NBT.addEntityTag(serverPlayer, "isPlayerDead", 0);
-                    if (!DeadPlayers.get(serverPlayer.getUUID())) {
-                        teamManager.teleportToSpawn(serverPlayer);
-                    } else {
-                        teamManager.teleportToTent(serverPlayer); // TODO ДОДЕЛАТЬ ТПХУ
-                    }
+                    teamManager.RespawnPlayer(player, DeadPlayers.get(serverPlayer.getUUID()));
+
                     SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
                 },
                         ticks -> {

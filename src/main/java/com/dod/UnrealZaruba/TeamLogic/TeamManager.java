@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.List;
 
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
@@ -15,7 +14,6 @@ import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -202,15 +200,7 @@ public class TeamManager {
             return;
         }
 
-        // TODO позже дописать хуйню
-        // Ну как, дописал?
-        BlockPos Spawn = null;
-//        for (Map.Entry<BlockPos, TeamColor> entry : TeamU.tent_Spawns.entrySet()) {
-//            if (entry.getValue() == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).color) {
-//                Spawn = entry.getKey();
-//                break;
-//            }
-//        }
+        BlockPos Spawn = team.active_tent.spawn_point;
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
@@ -219,8 +209,12 @@ public class TeamManager {
     }
 
     public void RespawnPlayer(ServerPlayer player, boolean tentChosen) {
-        if (tentChosen) {
-            teleportToTent(player);
+        if (!(GetPlayersTeam(player).active_tent == null)) {
+            if (tentChosen) {
+                teleportToTent(player);
+            } else {
+                teleportToSpawn(player);
+            }
         } else {
             teleportToSpawn(player);
         }

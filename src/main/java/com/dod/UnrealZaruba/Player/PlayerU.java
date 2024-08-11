@@ -20,7 +20,7 @@ public class PlayerU  {
     private BaseGamemode gamemode;
 
     public BaseGamemode Gamemode() { return gamemode; } 
-    public <T extends BaseGamemode> T GetGamemode(Class<T> clazz) { 
+    public <T extends BaseGamemode> T Gamemode(Class<T> clazz) { 
         if (clazz.isInstance(gamemode)) {
             return clazz.cast(gamemode);
         } else {
