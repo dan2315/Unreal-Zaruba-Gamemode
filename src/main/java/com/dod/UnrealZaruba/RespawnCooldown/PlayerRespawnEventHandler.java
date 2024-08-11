@@ -40,6 +40,8 @@ public class PlayerRespawnEventHandler {
             return;
         
         BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level);
+        
+        if (gamemode.gameStage == GameStage.Preparation) return;
         TeamManager teamManager = ((TeamGamemode)gamemode).GetTeamManager();
 
         NBT.addEntityTag(serverPlayer, "isPlayerDead", 1);
