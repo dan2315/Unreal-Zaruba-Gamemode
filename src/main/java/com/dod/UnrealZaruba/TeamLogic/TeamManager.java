@@ -202,14 +202,7 @@ public class TeamManager {
             return;
         }
 
-        // TODO позже дописать хуйню
-        BlockPos Spawn = null;
-//        for (Map.Entry<BlockPos, TeamColor> entry : TeamU.tent_Spawns.entrySet()) {
-//            if (entry.getValue() == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).color) {
-//                Spawn = entry.getKey();
-//                break;
-//            }
-//        }
+        BlockPos Spawn = team.active_tent.spawn_point;
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
@@ -218,8 +211,12 @@ public class TeamManager {
     }
 
     public void RespawnPlayer(ServerPlayer player, boolean tentChosen) {
-        if (tentChosen) {
-            teleportToTent(player);
+        if (!(BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(player).active_tent == null)) {
+            if (tentChosen) {
+                teleportToTent(player);
+            } else {
+                teleportToSpawn(player);
+            }
         } else {
             teleportToSpawn(player);
         }

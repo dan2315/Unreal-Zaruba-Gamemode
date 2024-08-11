@@ -51,9 +51,10 @@ public class PlayerRespawnEventHandler {
         serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
         TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться на базе", "/tpToTeamSpawn");
         serverPlayer.sendMessage(new TextComponent(""), serverPlayer.getUUID());
-        TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
-        serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
-
+        if (!(BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).active_tent == null)) {
+            TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
+            serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
+        }
 
         if (BaseGamemode.currentGamemode.gameStage != GameStage.Preparation) {
             if (serverPlayer instanceof ServerPlayer) {
@@ -67,13 +68,9 @@ public class PlayerRespawnEventHandler {
                 TimerManager.Create(duration * 1000, () -> {
                     serverPlayer.setGameMode(GameType.ADVENTURE);
                     NBT.addEntityTag(serverPlayer, "isPlayerDead", 0);
-                    if (!DeadPlayers.get(serverPlayer.getUUID())) {
-                        BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
-                    } else {
-                        BaseGamemode.currentGamemode.TeamManager.teleportToTent(serverPlayer); // TODO ДОДЕЛАТЬ ТПХУ
-                    }
+                    BaseGamemode.currentGamemode.TeamManager.RespawnPlayer(player, DeadPlayers.get(serverPlayer.getUUID()));
+
                     SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
-//                    BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
                 },
                         ticks -> {
                             if (ticks % 20 != 0)
