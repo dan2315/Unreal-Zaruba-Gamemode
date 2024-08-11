@@ -28,18 +28,20 @@ public class HandTent extends Item {
 
     @Override
     public InteractionResult useOn(@Nonnull UseOnContext context) {
-        if (context.getPlayer() instanceof ServerPlayer serverPlayer) {
+        if (!context.getLevel().isClientSide) {
+            Player player = context.getPlayer();
 
             unrealzaruba.LOGGER.info("Начало");
-            TeamGamemode gamemode = PlayerU.Get(serverPlayer.getUUID()).Gamemode(TeamGamemode.class);
-            if (!(gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent == null)) {
+            TeamGamemode gamemode = PlayerU.Get(player.getUUID()).Gamemode(TeamGamemode.class);
+            unrealzaruba.LOGGER.warn("Позиция существующей палатки" + gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent.spawn_point.toShortString());
+            if (gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent != null) {
                 ServerLevel serverLevel = (ServerLevel) context.getLevel();
                 placeCustomStructure(serverLevel, context.getClickedPos(), context.getPlayer());
                 return InteractionResult.CONSUME;
             } else {
-                serverPlayer.sendMessage(
+                player.sendMessage(
                         new TextComponent("Вы не можете установить вторую палатку, когда первая все еще существует"),
-                        serverPlayer.getUUID());
+                        player.getUUID());
             }
             return InteractionResult.PASS;
         }
