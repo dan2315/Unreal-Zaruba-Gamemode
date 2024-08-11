@@ -11,7 +11,7 @@
     "LinkHandlerMixin",
     "mayUseItemAtMixin",
     "RedstoneLinkBlockMixin",
-    "ExplosionMixin"
+    "MixinExplosionMixin"
   ],
   "client": [],
   "injectors": {
