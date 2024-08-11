@@ -336,9 +336,9 @@ public class CommandRegistration {
                 String response, SoundEvent sound) throws CommandSyntaxException {
                 ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
 
-                PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), true);
-                TitleMessage.sendSubtitle(serverPlayer, new TextComponent("Выбранная точка: Палатка"));
-                SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.SELECT2.get(), 1.0f, 1.0f);
+                PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), tentChosen);
+                TitleMessage.sendSubtitle(serverPlayer, new TextComponent(response));
+                SoundHandler.playSoundToPlayer(serverPlayer, sound, 1.0f, 1.0f);
 
                 return 1;
         }

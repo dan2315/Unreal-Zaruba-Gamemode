@@ -10,7 +10,8 @@
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
     "mayUseItemAtMixin",
-    "RedstoneLinkBlockMixin"
+    "RedstoneLinkBlockMixin",
+    "ExplosionMixin"
   ],
   "client": [],
   "injectors": {

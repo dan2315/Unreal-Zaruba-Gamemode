@@ -11,7 +11,6 @@ import com.dod.UnrealZaruba.unrealzaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -33,8 +32,7 @@ public class HandTent extends Item {
 
             unrealzaruba.LOGGER.info("Начало");
             TeamGamemode gamemode = PlayerU.Get(player.getUUID()).Gamemode(TeamGamemode.class);
-            unrealzaruba.LOGGER.warn("Позиция существующей палатки" + gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent.spawn_point.toShortString());
-            if (gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent != null) {
+            if (gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent == null) {
                 ServerLevel serverLevel = (ServerLevel) context.getLevel();
                 placeCustomStructure(serverLevel, context.getClickedPos(), context.getPlayer());
                 return InteractionResult.CONSUME;
