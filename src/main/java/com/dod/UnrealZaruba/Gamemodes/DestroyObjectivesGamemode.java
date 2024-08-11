@@ -38,7 +38,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 
 
-public class DestroyObjectivesGamemode extends BaseGamemode {
+public class DestroyObjectivesGamemode extends TeamGamemode {
     private static final int COMMANDER_VOTING_DURATION_TICKS = 3 * 60; // 3 minutes in seconds
     private static final int PREPARATION_DURATION_TICKS = 7 * 60; // 7 minutes in seconds
     private static final int GAME_DURATION_TICKS = 50 * 60; // 50 minutes in seconds
@@ -53,24 +53,24 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
         objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
-        currentGamemode.startGameTexts.put(TeamColor.RED, new StartGameText(
+        startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",
                 "Необходимо уничтожить 3 цели"));
-        currentGamemode.startGameTexts.put(TeamColor.BLUE, new StartGameText(
+        startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
                 "Продержитесь 50 минут"));
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
-        objectives = DestructibleObjectivesHandler.Load();
+        objectives = DestructibleObjectivesHandler.Load(this);
     }
 
     @Override
-    public int StartBattle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MinecraftServer server = context.getSource().getServer();
         ScoreboardManager.setupScoreboard(server, 999);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             unrealzaruba.LOGGER.warn(player.getName().toString());
-            BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(player);
+            TeamManager.teleportToSpawn(player);
         }
         return StartVotingForCommander(context);
     }
@@ -115,7 +115,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         TimerManager.Create(PREPARATION_DURATION_TICKS * 1000,
                 () -> {
                     try {
-                        StartGame(context);
+                        StartBattle(context);
                     } catch (Exception e) {
                         context.getSource().sendFailure(new TextComponent(e.getMessage()));
                     }
@@ -131,15 +131,15 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         return 1;
     }
 
-    public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int StartBattle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         gameStage = GameStage.Battle;
 
-        BaseGamemode.currentGamemode.TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
+        TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.NORMAL, true);
 
         ServerPlayer player = context.getSource().getPlayerOrException();
-        BlockPos SpawnRed = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.RED).Spawn();
-        BlockPos SpawnBlue = BaseGamemode.currentGamemode.TeamManager.Get(TeamColor.BLUE).Spawn();
+        BlockPos SpawnRed = TeamManager.Get(TeamColor.RED).Spawn();
+        BlockPos SpawnBlue = TeamManager.Get(TeamColor.BLUE).Spawn();
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
         SoundHandler.playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(),
@@ -151,11 +151,11 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
                 var team = TeamManager.GetPlayersTeam(player);
                 if (team == null)
                     continue;
-                TitleMessage.showTitle(serverPlayer, currentGamemode.startGameTexts.get(team.Color()).GetTitle(),
-                        currentGamemode.startGameTexts.get(team.Color()).GetSubtitle());
+                TitleMessage.showTitle(serverPlayer, startGameTexts.get(team.Color()).GetTitle(),
+                        startGameTexts.get(team.Color()).GetSubtitle());
             }
 
-            var success = BaseGamemode.currentGamemode.TeamManager.DeleteBarriersAtSpawn();
+            var success = TeamManager.DeleteBarriersAtSpawn();
 
             if (!success)
                 context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
@@ -188,7 +188,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
         ServerPlayer serverPlayer = (ServerPlayer) player;
         MinecraftServer server = serverPlayer.getServer();
 
-        var isInTeam = BaseGamemode.currentGamemode.TeamManager.IsInTeam(serverPlayer);
+        var isInTeam = TeamManager.IsInTeam(serverPlayer);
         var isDead = NBT.readEntityTag(serverPlayer, "isPlayerDead");
 
         if (server == null)
@@ -211,7 +211,7 @@ public class DestroyObjectivesGamemode extends BaseGamemode {
 
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
-        BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
+        TeamManager.teleportToSpawn(serverPlayer);
         serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 

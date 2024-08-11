@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba.ModBlocks;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.unrealzaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -21,7 +23,11 @@ public class SpawnBlock extends Block {
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        BaseGamemode.currentGamemode.TeamManager.AddTeam(teamColor, pos, null);
+        try {
+            ((TeamGamemode)GamemodeManager.Get(level)).GetTeamManager().AddTeam(teamColor, pos, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         saveBlockPos(pos);
     }
 

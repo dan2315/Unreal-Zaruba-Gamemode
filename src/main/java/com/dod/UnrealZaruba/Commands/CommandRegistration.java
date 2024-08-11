@@ -3,19 +3,16 @@ package com.dod.UnrealZaruba.Commands;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
+import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
-import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.dod.UnrealZaruba.Utils.BarrierRemovalTask;
 import com.dod.UnrealZaruba.Utils.Gamerules;
-import com.dod.UnrealZaruba.Utils.TextClickEvent;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
@@ -30,8 +27,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -96,15 +93,14 @@ public class CommandRegistration {
                 // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
                 // она будет тупо убивать
                 dispatcher.register(Commands.literal("getRPG")
-                        .executes(context -> kill_pashalka(context)));
-
+                                .executes(context -> kill_pashalka(context)));
 
                 dispatcher.register(Commands.literal("getwool")
                                 .requires(cs -> cs.hasPermission(3))
-                        .executes(context -> giveColoredWool(context)));
+                                .executes(context -> giveColoredWool(context)));
 
                 dispatcher.register(Commands.literal("setprefix")
-                        .requires(cs -> cs.hasPermission(3))
+                                .requires(cs -> cs.hasPermission(3))
                                 .then(Commands.argument("player", StringArgumentType.string())
                                                 .then(Commands.argument("prefix", StringArgumentType.string())
                                                                 .executes(context -> {
@@ -136,7 +132,7 @@ public class CommandRegistration {
                                                                 }))));
 
                 dispatcher.register(Commands.literal("dolinkssafe")
-                        .requires(cs -> cs.hasPermission(3))
+                                .requires(cs -> cs.hasPermission(3))
                                 .then(Commands.argument("isSafe", BoolArgumentType.bool())
                                                 .executes(context -> {
                                                         Boolean isSafe = BoolArgumentType
@@ -147,45 +143,24 @@ public class CommandRegistration {
                                                         return 1;
                                                 })));
 
-            dispatcher.register(Commands.literal("sendtestmessage")
-                    .requires(cs -> cs.hasPermission(3))
+                dispatcher.register(Commands.literal("sendtestmessage")
+                                .requires(cs -> cs.hasPermission(3))
                                 .executes(context -> {
-                                    ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-                                    serverPlayer.sendMessage(new TextComponent("Пока что так скоро будет"), serverPlayer.getUUID());
-                                    return 1;
+                                        ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
+                                        serverPlayer.sendMessage(new TextComponent("Пока что так скоро будет"),
+                                                        serverPlayer.getUUID());
+                                        return 1;
                                 }));
 
-            dispatcher.register(Commands.literal("tpToTeamSpawn")
-                    .requires(cs -> cs.hasPermission(3))
-                            .executes(context -> {
-                                ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-                                TeamColor teamColor = BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).Color();
-                                PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), false);
-                                TitleMessage.sendSubtitle(serverPlayer, new TextComponent("Выбранная точка: База"));
-                                SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.SELECT1.get(), 1.0f, 1.0f);
-                                
-                                return 1;
-                            }));
+                dispatcher.register(Commands.literal("tpToTeamSpawn")
+                                .requires(cs -> cs.hasPermission(3))
+                                .executes(context -> ChooseRespawnPoint(context, false, "Выбранная точка: База",
+                                                ModSounds.SELECT1.get())));
 
-            dispatcher.register(Commands.literal("tpToTeamTent")
-                    .requires(cs -> cs.hasPermission(3))
-                            .executes(context -> {
-                                ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-                                TeamColor teamColor = BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).Color();
-                                PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), true);
-                                TitleMessage.sendSubtitle(serverPlayer, new TextComponent("Выбранная точка: Палатка"));
-                                SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.SELECT2.get(), 1.0f, 1.0f);
-
-                                return 1;
-                            }));
-
-//            dispatcher.register(Commands.literal("givemagicitem")
-//                    .requires(cs -> cs.hasPermission(3))
-//                    .executes(context -> {
-//                        ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-////                        ItemKits.GiveSpecItem(context.getSource().getServer(), serverPlayer, Items.IRON_PICKAXE.getDefaultInstance());
-//                        return 1;
-//                    }));
+                dispatcher.register(Commands.literal("tpToTeamTent")
+                                .requires(cs -> cs.hasPermission(3))
+                                .executes(context -> ChooseRespawnPoint(context, true, "Выбранная точка: Палатка",
+                                                ModSounds.SELECT2.get())));
 
                 dispatcher.register(Commands.literal("setteambase")
                                 .requires(cs -> cs.hasPermission(3))
@@ -236,8 +211,14 @@ public class CommandRegistration {
                                                                                                                                                                         new BlockPos(x2, y2,
                                                                                                                                                                                         z2),
                                                                                                                                                                         false);
+                                                                                                                                                        TeamManager teamManager = ((TeamGamemode) (PlayerU
+                                                                                                                                                                        .Get(context.getSource()
+                                                                                                                                                                                        .getPlayerOrException()
+                                                                                                                                                                                        .getUUID())
+                                                                                                                                                                        .Gamemode()))
+                                                                                                                                                                        .GetTeamManager();
 
-                                                                                                                                                        BaseGamemode.currentGamemode.TeamManager
+                                                                                                                                                        teamManager
                                                                                                                                                                         .Get(Team)
                                                                                                                                                                         .AddBarrierVolume(
                                                                                                                                                                                         volume);
@@ -250,10 +231,10 @@ public class CommandRegistration {
                                                                                                                                                         return 1;
                                                                                                                                                 })))))))));
 
-
                 dispatcher.register(Commands.literal("startbattle")
                                 .requires(cs -> cs.hasPermission(3))
-                                .executes(context -> BaseGamemode.currentGamemode.StartBattle(context)));
+                                .executes(context -> PlayerU.Get(context.getSource().getPlayerOrException().getUUID())
+                                                .Gamemode().StartGame(context)));
 
                 dispatcher.register(Commands.literal("crtobj")
                                 .requires(cs -> cs.hasPermission(3))
@@ -339,8 +320,11 @@ public class CommandRegistration {
                 int z = IntegerArgumentType.getInteger(context, "z");
                 BlockPos position = new BlockPos(x, y, z);
                 TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
-
-                BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
+                TeamManager teamManager = ((TeamGamemode) (PlayerU
+                                .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
+                                .GetTeamManager();
+                
+                teamManager.SetSpawn(color, position);
                 context.getSource().sendSuccess(
                                 new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
                                                 + position),
@@ -348,19 +332,33 @@ public class CommandRegistration {
                 return 0;
         }
 
-        private static int kill_pashalka(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
+        private static int ChooseRespawnPoint(CommandContext<CommandSourceStack> context, boolean tentChosen,
+                String response, SoundEvent sound) throws CommandSyntaxException {
+                ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
 
-            serverPlayer.kill();
-            return 1;
+                PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), true);
+                TitleMessage.sendSubtitle(serverPlayer, new TextComponent("Выбранная точка: Палатка"));
+                SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.SELECT2.get(), 1.0f, 1.0f);
+
+                return 1;
+        }
+
+        private static int kill_pashalka(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+                ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
+
+                serverPlayer.kill();
+                return 1;
         }
 
         private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
                 ServerPlayer player = context.getSource().getPlayerOrException();
                 BlockPos position = new BlockPos(player.position());
                 TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
+                TeamManager teamManager = ((TeamGamemode) (PlayerU
+                                .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
+                                .GetTeamManager();
 
-                BaseGamemode.currentGamemode.TeamManager.SetSpawn(color, position);
+                teamManager.SetSpawn(color, position);
                 context.getSource().sendSuccess(
                                 new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
                                                 + position),

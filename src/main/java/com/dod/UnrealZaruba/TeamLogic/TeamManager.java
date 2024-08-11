@@ -55,12 +55,12 @@ public class TeamManager {
 
     public void AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamU(spawn, teamColor, baseVolume));
+        teams.put(teamColor, new TeamU(this ,spawn, teamColor, baseVolume));
     }
 
     public void AddTeam(TeamColor teamColor, BlockPos spawn) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamU(spawn, teamColor));
+        teams.put(teamColor, new TeamU(this, spawn, teamColor));
     }
 
     public void SetSpawn(TeamColor color, BlockPos spawn) {
@@ -77,7 +77,7 @@ public class TeamManager {
     public TeamU GetPlayersTeam(Player player) {
         for (TeamU team : teams.values()) {
             if (team.members.contains(player.getUUID())) {
-                return teams.get(team.Color());
+                return team;
             }
         }
         return null;
@@ -203,6 +203,7 @@ public class TeamManager {
         }
 
         // TODO позже дописать хуйню
+        // Ну как, дописал?
         BlockPos Spawn = null;
 //        for (Map.Entry<BlockPos, TeamColor> entry : TeamU.tent_Spawns.entrySet()) {
 //            if (entry.getValue() == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(serverPlayer).color) {

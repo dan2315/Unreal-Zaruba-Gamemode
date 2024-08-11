@@ -31,6 +31,7 @@ public class DestructibleObjective extends GameObjective {
     transient Boolean isCompleted = false; 
     transient Set<BlockPos>  trackedBlocks;
     transient ServerLevel world;
+    transient BaseGamemode containingGamemode;
 
     public DestructibleObjective(BlockVolume volume, String name) {
         this.volume = volume;
@@ -54,6 +55,10 @@ public class DestructibleObjective extends GameObjective {
 
         unrealzaruba.LOGGER.info("Цель инициализирована: " + name);
         return solidBlocks;
+    }
+
+    public void SetContainingGamemode(BaseGamemode containingGamemode) {
+        this.containingGamemode = containingGamemode;
     }
     
     public float Update() {
@@ -88,7 +93,7 @@ public class DestructibleObjective extends GameObjective {
    
     public void Complete() {
         isCompleted = true;
-        BaseGamemode.currentGamemode.CheckObjectives();
+        containingGamemode.CheckObjectives();
 
         String border = "==================================";
         String paddedName = String.format("||           %s был уничтожен           ", name);

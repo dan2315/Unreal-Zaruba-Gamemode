@@ -2,6 +2,9 @@ package com.dod.UnrealZaruba.ModBlocks;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
+import com.dod.UnrealZaruba.Player.PlayerU;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -27,14 +30,15 @@ public class TentMainBlock extends Block {
 
    @Override
    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
-        BaseGamemode.currentGamemode.TeamManager.Get(teamColor).setActiveTent(null);
+        
+        ((TeamGamemode)GamemodeManager.Get(level)).GetTeamManager().Get(teamColor).setActiveTent(null);
        super.onBlockExploded(state, level, pos, explosion);
    }
    // 6 -1
 
    @Override
    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        BaseGamemode.currentGamemode.TeamManager.Get(teamColor).setActiveTent(null);
+        PlayerU.Get(player.getUUID()).GetGamemode(TeamGamemode.class).GetTeamManager().Get(teamColor).setActiveTent(null);
 //        for (Map.Entry<TeamColor, BlockPos> entry : TeamU.tent_Spawns.entrySet()) {
 //            if (entry.getKey() == BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(player).color) {
 //                TeamU.tent_Spawns.remove(pos);

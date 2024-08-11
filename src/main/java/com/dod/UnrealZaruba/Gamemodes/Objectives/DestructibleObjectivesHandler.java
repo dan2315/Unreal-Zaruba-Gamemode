@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.dod.UnrealZaruba.unrealzaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -18,7 +19,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = unrealzaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -113,7 +113,7 @@ public class DestructibleObjectivesHandler {
         }
     }
 
-    public static DestructibleObjective[] Load() {
+    public static DestructibleObjective[] Load(BaseGamemode containingGamemode) {
         DestructibleObjective[] loadedObjectives;
         try {
             loadedObjectives = ConfigManager.loadConfig(ConfigManager.Objectives, DestructibleObjective[].class);
@@ -121,6 +121,7 @@ public class DestructibleObjectivesHandler {
             Clear();
             for (DestructibleObjective objective : loadedObjectives) {
                 DestructibleObjectivesHandler.Add(objective);
+                objective.SetContainingGamemode(containingGamemode);
                 unrealzaruba.LOGGER.info("[Во, бля] " + objective.name);
             }
             unrealzaruba.LOGGER.info("[Во, бля] Загрузил конфиг для DestructibleObjectivesHandler");

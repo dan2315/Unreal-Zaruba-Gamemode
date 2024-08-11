@@ -9,6 +9,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -17,14 +18,11 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
 
 public class CallbackServer {
     private static HttpServer server;
-    private static final Set<UUID> authorizedPlayers = new HashSet<UUID>();
 
     public static void StartServer() {
         try {
@@ -47,14 +45,6 @@ public class CallbackServer {
             server.stop(3); // Delay of 1 second before stopping
             unrealzaruba.LOGGER.info("HTTP server stopped");
         }
-    }
-
-    public static Boolean isPlayerAuthorized(UUID uuid) {
-        return authorizedPlayers.contains(uuid);
-    }
-
-    public static void DeauthorizeUser(UUID uuid) {
-        authorizedPlayers.remove(uuid);
     }
 
     // Handler for processing /notifyAuthStatus POST requests
@@ -85,7 +75,7 @@ public class CallbackServer {
 
                 if (uuid != null) {
                     UUID playerUUID = UUID.fromString(uuid);
-                    SetPlayerAuthorized(uuid, isAuthenticated);
+                    PlayerU.Get(playerUUID).SetAuthorized(isAuthenticated);
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
                     TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
@@ -107,11 +97,6 @@ public class CallbackServer {
             }
         }
 
-        // Example method to notify a player
-        private void SetPlayerAuthorized(String uuid, boolean isAuthenticated) {
-            unrealzaruba.LOGGER.info("User with " + uuid + " " + (isAuthenticated ? "Krasava" : "Pidor"));
-            authorizedPlayers.add(UUID.fromString(uuid));
-        }
 
         // Parse JSON formatted body to map
         private Map<String, String> parseJsonBody(String jsonBody) {

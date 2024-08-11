@@ -1,15 +1,11 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.valkyrienskies.core.impl.shadow.vo;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -19,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -33,8 +28,8 @@ public class TeamU {
     List<UUID> members = new ArrayList<>();
     public TeamColor color;
     MinecraftServer server;
+    TeamManager batya;
 
-//    public static HashMap<TeamColor, BlockPos> tent_Spawns = new HashMap<>();
     public Tent active_tent;
 
     public static PlayerTeam redTeam;
@@ -45,14 +40,16 @@ public class TeamU {
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
     
-    public TeamU(BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
+    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
+        this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
         this.barrierVolumes = barrierVolumes;
         server = ServerLifecycleHooks.getCurrentServer();
     }
 
-    public TeamU(BlockPos spawn, TeamColor color) {
+    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color) {
+        this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
         server = ServerLifecycleHooks.getCurrentServer();
@@ -101,10 +98,10 @@ public class TeamU {
         } else {
             members.add(player.getUUID());
             if (team == null) {
-                if (BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(player).color == TeamColor.RED) {
+                if (color == TeamColor.RED) {
                     scoreboard.addPlayerToTeam(player.getName().getString(), redTeam);
                 }
-                if (BaseGamemode.currentGamemode.TeamManager.GetPlayersTeam(player).color == TeamColor.BLUE) {
+                if (color == TeamColor.BLUE) {
                     scoreboard.addPlayerToTeam(player.getName().getString(), blueTeam);
                 } else {
                     System.out.println("[PIZDA RYLU] ");
@@ -120,15 +117,9 @@ public class TeamU {
             // Utils.setSpawnPoint(player, spawn);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            BaseGamemode.currentGamemode.TeamManager.GiveArmorKitTo(server, player);
+            batya.GiveArmorKitTo(server, player);
         }
     }
-
-//    public void ClearTeams(MinecraftServer server) {
-//        Scoreboard scoreboard = server.getScoreboard();
-//
-//
-//    }
 
     public void TryRemove(ServerPlayer player) {
         if (members.contains(player.getUUID())) {

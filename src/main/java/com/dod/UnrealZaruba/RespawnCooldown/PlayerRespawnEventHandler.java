@@ -1,8 +1,11 @@
 package com.dod.UnrealZaruba.RespawnCooldown;
 
 import com.dod.UnrealZaruba.Gamemodes.GameStage;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
+import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
@@ -11,11 +14,9 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 
 import com.dod.UnrealZaruba.Utils.NBT;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
@@ -36,7 +37,11 @@ public class PlayerRespawnEventHandler {
     public void OnPlayerDeath(LivingDeathEvent event) {
         if (!(event.getEntityLiving() instanceof ServerPlayer))
             return;
+        
+        
         ServerPlayer serverPlayer = (ServerPlayer) event.getEntity();
+        BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level);
+        TeamManager teamManager = ((TeamGamemode)gamemode).GetTeamManager();
         NBT.addEntityTag(serverPlayer, "isPlayerDead", 1);
         DeadPlayers.put(serverPlayer.getUUID(), false);
         SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.DEATH.get(), 1.0f, 1.0f);
@@ -55,7 +60,7 @@ public class PlayerRespawnEventHandler {
         serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
 
 
-        if (BaseGamemode.currentGamemode.gameStage != GameStage.Preparation) {
+        if (gamemode.gameStage != GameStage.Preparation) {
             if (serverPlayer instanceof ServerPlayer) {
                 ServerPlayer player = (ServerPlayer) serverPlayer;
                 ServerLevel serverWorld = player.getLevel();
@@ -68,12 +73,11 @@ public class PlayerRespawnEventHandler {
                     serverPlayer.setGameMode(GameType.ADVENTURE);
                     NBT.addEntityTag(serverPlayer, "isPlayerDead", 0);
                     if (!DeadPlayers.get(serverPlayer.getUUID())) {
-                        BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
+                        teamManager.teleportToSpawn(serverPlayer);
                     } else {
-                        BaseGamemode.currentGamemode.TeamManager.teleportToTent(serverPlayer); // TODO ДОДЕЛАТЬ ТПХУ
+                        teamManager.teleportToTent(serverPlayer); // TODO ДОДЕЛАТЬ ТПХУ
                     }
                     SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
-//                    BaseGamemode.currentGamemode.TeamManager.teleportToSpawn(serverPlayer);
                 },
                         ticks -> {
                             if (ticks % 20 != 0)
