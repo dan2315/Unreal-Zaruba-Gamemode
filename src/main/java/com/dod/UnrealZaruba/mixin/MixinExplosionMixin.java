@@ -52,7 +52,6 @@ public abstract class MixinExplosionMixin {
 
     @Inject(method = "doExplodeForce", at = @At("HEAD"), cancellable = true)
     private void replaceDoExplodeForce(CallbackInfo ci) {
-        unrealzaruba.LOGGER.warn("Да, я жоски");
         final Vector3d originPos = new Vector3d(this.x, this.y, this.z);
         final BlockPos explodePos = new BlockPos(originPos.x(), originPos.y(), originPos.z());
         final int radius = (int) Math.ceil(this.radius);

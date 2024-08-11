@@ -11,9 +11,11 @@ import com.dod.UnrealZaruba.unrealzaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 
@@ -25,25 +27,31 @@ public class HandTent extends Item {
         super(properties);
     }
 
+
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        // TODO Auto-generated method stub
+        return super.onItemUseFirst(stack, context);
+    }
+
     @Override
     public InteractionResult useOn(@Nonnull UseOnContext context) {
         if (!context.getLevel().isClientSide) {
             Player player = context.getPlayer();
-
-            unrealzaruba.LOGGER.info("Начало");
+            
             TeamGamemode gamemode = PlayerU.Get(player.getUUID()).Gamemode(TeamGamemode.class);
             if (gamemode.GetTeamManager().GetPlayersTeam(context.getPlayer()).active_tent == null) {
                 ServerLevel serverLevel = (ServerLevel) context.getLevel();
                 placeCustomStructure(serverLevel, context.getClickedPos(), context.getPlayer());
-                return InteractionResult.CONSUME;
+                return InteractionResult.SUCCESS;
             } else {
                 player.sendMessage(
                         new TextComponent("Вы не можете установить вторую палатку, когда первая все еще существует"),
                         player.getUUID());
             }
-            return InteractionResult.PASS;
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.FAIL;
+        return InteractionResult.SUCCESS;
     }
 
     /**
