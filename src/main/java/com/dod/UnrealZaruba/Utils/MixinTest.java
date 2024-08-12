@@ -1,12 +1,12 @@
 package com.dod.UnrealZaruba.Utils;
 
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 
 import net.minecraftforge.event.server.ServerStartingEvent;
 
 public class MixinTest {
     public void aboba(ServerStartingEvent event) {
-        unrealzaruba.LOGGER.info("Я ебу Али бабу");
+        UnrealZaruba.LOGGER.info("Я ебу Али бабу");
     }
 }

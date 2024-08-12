@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
@@ -34,7 +34,7 @@ public class CallbackServer {
             server.setExecutor(null); // Use default executor
             server.start();
 
-            unrealzaruba.LOGGER.info("HTTP server started on port 8001");
+            UnrealZaruba.LOGGER.info("HTTP server started on port 8001");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,7 +43,7 @@ public class CallbackServer {
     public static void StopServer() {
         if (server != null) {
             server.stop(3); // Delay of 1 second before stopping
-            unrealzaruba.LOGGER.info("HTTP server stopped");
+            UnrealZaruba.LOGGER.info("HTTP server stopped");
         }
     }
 
@@ -63,12 +63,12 @@ public class CallbackServer {
                 String state = params.get("state");
                 if (!DiscordAuth.unresolvedRequests.contains(state)) {
                     String response = String.format("Dolbayob: [%s] | POPYTKA VZLOMA, ЫАЫАЫАЫАЫАЫА", playerList.getPlayer(UUID.fromString(uuid)));
-                    unrealzaruba.LOGGER.info(response);
+                    UnrealZaruba.LOGGER.info(response);
                     return;
                 }
                 else {
                     DiscordAuth.unresolvedRequests.remove(state);
-                    unrealzaruba.LOGGER.info("Unresolved requests remaining: " + DiscordAuth.unresolvedRequests.size());
+                    UnrealZaruba.LOGGER.info("Unresolved requests remaining: " + DiscordAuth.unresolvedRequests.size());
                 }
 
                 boolean isAuthenticated = Boolean.parseBoolean(params.get("authenticated"));
@@ -84,7 +84,7 @@ public class CallbackServer {
                     // Send a response
                     String response = String.format("Auth status for player [%s] set to [%b]", playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);
                     exchange.sendResponseHeaders(200, response.length());
-                    unrealzaruba.LOGGER.info(response);
+                    UnrealZaruba.LOGGER.info(response);
                 } else {
                     // Send a bad request response
                     String response = "Invalid request: UUID is missing.";

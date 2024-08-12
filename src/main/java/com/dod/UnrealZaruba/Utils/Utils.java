@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Utils;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -31,11 +31,11 @@ public class Utils {
     public static void deleteBarriers(BlockVolume volume) {
         ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
         if (world == null) {
-            unrealzaruba.LOGGER.warn("[Ай, бля] World not found");
+            UnrealZaruba.LOGGER.warn("[Ай, бля] World not found");
             return;
         }
         
-        unrealzaruba.LOGGER.warn("[Во, бля] Удаляю барьеры " + volume.GetCenter());
+        UnrealZaruba.LOGGER.warn("[Во, бля] Удаляю барьеры " + volume.GetCenter());
         
         volume.ForEachBlock(pos -> {
             BlockState blockState = world.getBlockState(pos);

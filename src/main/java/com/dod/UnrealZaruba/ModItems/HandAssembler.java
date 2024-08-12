@@ -11,7 +11,7 @@ import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.util.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ContraptionManager.ContraptionManager;
 import com.ibm.icu.text.DecimalFormat;
 
@@ -52,9 +52,9 @@ public class HandAssembler extends Item {
 
         DecimalFormat df = new DecimalFormat("#");
         Vector3dc shipPos = createdShip.getTransform().getPositionInShip();
-        unrealzaruba.LOGGER.warn("Position In Ship X " + df.format(createdShip.getTransform().getPositionInShip().x()));
-        unrealzaruba.LOGGER.warn("Position In Ship Y " + df.format(createdShip.getTransform().getPositionInShip().y()));
-        unrealzaruba.LOGGER.warn("Position In Ship Z " + df.format(createdShip.getTransform().getPositionInShip().z()));
+        UnrealZaruba.LOGGER.warn("Position In Ship X " + df.format(createdShip.getTransform().getPositionInShip().x()));
+        UnrealZaruba.LOGGER.warn("Position In Ship Y " + df.format(createdShip.getTransform().getPositionInShip().y()));
+        UnrealZaruba.LOGGER.warn("Position In Ship Z " + df.format(createdShip.getTransform().getPositionInShip().z()));
         
         createdShip.setStatic(true);
         BlockState blockState = Blocks.STONE.defaultBlockState();

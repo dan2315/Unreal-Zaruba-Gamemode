@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
@@ -21,7 +21,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = unrealzaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DestructibleObjectivesHandler {
     public static final Map<DestructibleObjective, ServerBossEvent> destructibleObjectives = new HashMap<>();
     private static final Map<DestructibleObjective, Set<UUID>> playersWithBossBar = new HashMap<>();
@@ -102,13 +102,13 @@ public class DestructibleObjectivesHandler {
     public static void Save() {
         DestructibleObjective[] objectivesArray = destructibleObjectives.keySet().toArray(new DestructibleObjective[destructibleObjectives.size()]);
         for (DestructibleObjective objective : objectivesArray) {
-            unrealzaruba.LOGGER.info(objective.name);
+            UnrealZaruba.LOGGER.info(objective.name);
         }
         try {
             ConfigManager.saveConfig(ConfigManager.Objectives, objectivesArray);
-            unrealzaruba.LOGGER.info("[Во, бля] Сделал конфиг");
+            UnrealZaruba.LOGGER.info("[Во, бля] Сделал конфиг");
         } catch (IOException e) {
-            unrealzaruba.LOGGER.warn("[Ай, бля] Unable to create Config file for DestructibleObjectivesHandler");
+            UnrealZaruba.LOGGER.warn("[Ай, бля] Unable to create Config file for DestructibleObjectivesHandler");
             e.printStackTrace();
         }
     }
@@ -122,12 +122,12 @@ public class DestructibleObjectivesHandler {
             for (DestructibleObjective objective : loadedObjectives) {
                 DestructibleObjectivesHandler.Add(objective);
                 objective.SetContainingGamemode(containingGamemode);
-                unrealzaruba.LOGGER.info("[Во, бля] " + objective.name);
+                UnrealZaruba.LOGGER.info("[Во, бля] " + objective.name);
             }
-            unrealzaruba.LOGGER.info("[Во, бля] Загрузил конфиг для DestructibleObjectivesHandler");
+            UnrealZaruba.LOGGER.info("[Во, бля] Загрузил конфиг для DestructibleObjectivesHandler");
             return loadedObjectives;
         } catch (IOException e) {
-            unrealzaruba.LOGGER.warn("[Ай, бля] Config file for DestructibleObjectivesHandler was not found");
+            UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for DestructibleObjectivesHandler was not found");
             e.printStackTrace();
         }
         return null;

@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;

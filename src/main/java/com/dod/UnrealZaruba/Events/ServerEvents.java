@@ -1,8 +1,12 @@
 package com.dod.UnrealZaruba.Events;
 
 import java.util.UUID;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.DiscordIntegration.CallbackServer;
 import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
@@ -17,11 +21,13 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
@@ -45,7 +51,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-@Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+@Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE)
+// @Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
 public class ServerEvents {
 
     private static TeamGamemode gamemode;
@@ -59,6 +66,20 @@ public class ServerEvents {
         teamManager = gamemode.GetTeamManager();
         ScoreboardManager.clearScoreboard(event.getServer());
         GamemodeManager.StartGame(event.getServer().overworld(), gamemode);
+
+
+        Path worldPath = Paths.get(event.getServer().getServerDirectory().toString(), "saves", "gamemode_world");
+
+        try (ServerLevel level = WorldManager.LoadWorld(event.getServer(), worldPath)) 
+        {
+            if (level != null) {
+                UnrealZaruba.LOGGER.warn("Custom world loaded successfully!");
+            } else {
+                UnrealZaruba.LOGGER.error("Failed to load the custom world.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @SubscribeEvent
@@ -75,7 +96,7 @@ public class ServerEvents {
         scoreboard.removePlayerTeam(TeamU.redTeam);
         scoreboard.removePlayerTeam(TeamU.blueTeam);
 
-        unrealzaruba.LOGGER.info("Server has stopped. Finalizing...");
+        UnrealZaruba.LOGGER.info("Server has stopped. Finalizing...");
         DestructibleObjectivesHandler.Save();
         gamemode.GetTeamManager().Save();
         CallbackServer.StopServer();
@@ -93,7 +114,7 @@ public class ServerEvents {
         TickTimer[] timer = new TickTimer[1];
         timer[0] = TimerManager.Create(30 * 60 * 20, () -> {
             if (playeru.IsAuthorized()) {
-                unrealzaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
+                UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
                 player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [30 sec]"));
             }
         }, 
@@ -110,7 +131,7 @@ public class ServerEvents {
         gamemode.HandleConnectedPlayer(event.getPlayer());
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
-        unrealzaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+        UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                 new LoginPacket(state, player.getUUID(), player.getName().getString()));
 
     }
@@ -125,7 +146,7 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        unrealzaruba.LOGGER.info("COMMANDS Registered");
+        UnrealZaruba.LOGGER.info("COMMANDS Registered");
         CommandRegistration.onCommandRegister(event);
     }
 

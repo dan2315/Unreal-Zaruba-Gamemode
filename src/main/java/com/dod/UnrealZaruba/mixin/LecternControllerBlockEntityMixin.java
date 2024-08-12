@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.mixin;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.simibubi.create.content.redstone.link.controller.LecternControllerBlockEntity;
 
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +19,7 @@ public abstract class LecternControllerBlockEntityMixin {
         try {
             Field controllerField = LecternControllerBlockEntity.class.getDeclaredField("controller");
             if (controllerField.get(this) == null) {
-                unrealzaruba.LOGGER.warn("[Во, бля] миксин был");
+                UnrealZaruba.LOGGER.warn("[Во, бля] миксин был");
                 ci.cancel(); // TODO: Вместо отмены, сделать выброс пустого контроллера (для режимов, где важны ресурсы)
             }
         } catch (Exception e) {

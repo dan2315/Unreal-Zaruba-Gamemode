@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.ModBlocks;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 
 import net.minecraft.world.item.DyeColor;
@@ -15,7 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModBlocks {
 
-    public static final DeferredRegister <Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, unrealzaruba.MOD_ID);
+    public static final DeferredRegister <Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, UnrealZaruba.MOD_ID);
 
     public static final RegistryObject<Block> RED_BLOCK = ModBlocks.BLOCKS.register("red_block",
             () -> new TeamBlock(TeamColor.RED,  Block.Properties.of(Material.WOOL)));

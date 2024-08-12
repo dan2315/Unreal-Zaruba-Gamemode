@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Utils;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 
 public class TickTimer {
 

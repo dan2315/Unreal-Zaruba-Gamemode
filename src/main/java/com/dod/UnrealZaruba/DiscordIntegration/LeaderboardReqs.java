@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -26,7 +26,7 @@ public class LeaderboardReqs {
                 
                 PlayerUpdates playerUpdates = new PlayerUpdates(playersWhoWon, playersWhoLost);
                 String jsonInputString = jsonConverter.toJson(playerUpdates);
-                unrealzaruba.LOGGER.warn("JSON to send:" + jsonInputString);
+                UnrealZaruba.LOGGER.warn("JSON to send:" + jsonInputString);
 
                 HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(DiscordAuth.backendEndpoint + "/leaderboard/update"))

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -41,7 +41,7 @@ public class DestructibleObjective extends GameObjective {
     }
     
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
-        unrealzaruba.LOGGER.info("Начал прогружать: " + name);
+        UnrealZaruba.LOGGER.info("Начал прогружать: " + name);
         Set<BlockPos> solidBlocks = new HashSet<>();
         
         volume.ForEachBlock(pos -> {
@@ -53,7 +53,7 @@ public class DestructibleObjective extends GameObjective {
         
         this.remainingBlockAmount = blockAmount;
 
-        unrealzaruba.LOGGER.info("Цель инициализирована: " + name);
+        UnrealZaruba.LOGGER.info("Цель инициализирована: " + name);
         return solidBlocks;
     }
 

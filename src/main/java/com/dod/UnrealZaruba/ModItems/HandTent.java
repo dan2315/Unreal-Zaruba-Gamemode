@@ -7,7 +7,7 @@ import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -65,7 +65,7 @@ public class HandTent extends Item {
      * @param player
      */
     public void placeCustomStructure(ServerLevel world, BlockPos clickPos, Player player) {
-        unrealzaruba.LOGGER.info("[Ох, бля] Читаю NBT");
+        UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
         BaseGamemode gamemode = GamemodeManager.Get(world);
         TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
 
@@ -77,11 +77,11 @@ public class HandTent extends Item {
         Tent tent = new Tent(center);
         player_team.setActiveTent(tent);
 
-        unrealzaruba.LOGGER.info("[Ох, бля] Начинаю ставить");
+        UnrealZaruba.LOGGER.info("[Ох, бля] Начинаю ставить");
 
         teamManager.tent_templates.get(player_team.color).placeInWorld(world, buildPoint, buildPoint,
                 new StructurePlaceSettings(), world.random, 2);
 
-        unrealzaruba.LOGGER.info("[Ох, бля] Поставил ёпта");
+        UnrealZaruba.LOGGER.info("[Ох, бля] Поставил ёпта");
     }
 }

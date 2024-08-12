@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.List;
 
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
@@ -46,7 +46,7 @@ public class TeamManager {
 
                 tent_templates.put(TeamColor.RED, template_red);
                 tent_templates.put(TeamColor.BLUE, template_blue);
-                unrealzaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
+                UnrealZaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
             }
         }
     }
@@ -106,7 +106,7 @@ public class TeamManager {
             if (team.Spawn() == null) {
                 return false;
             }
-            unrealzaruba.LOGGER.warn("[Во, бля] Во бля");
+            UnrealZaruba.LOGGER.warn("[Во, бля] Во бля");
 
             List<BlockVolume> barriers = team.BarrierVolumes();
             if (barriers == null) return false;
@@ -120,7 +120,7 @@ public class TeamManager {
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
         TeamU targetTeam = teams.get(dyeColor);
         if (targetTeam == null) {
-            unrealzaruba.LOGGER.warn("Команда [" + dyeColor.toString() + "] не проиницилизирована");
+            UnrealZaruba.LOGGER.warn("Команда [" + dyeColor.toString() + "] не проиницилизирована");
             return false;
         }
         int targetTeamCount = targetTeam.MembersCount();
@@ -229,19 +229,19 @@ public class TeamManager {
         }
         try {
             ConfigManager.saveConfig(ConfigManager.Teams, data);
-            unrealzaruba.LOGGER.warn("[Во, бля] Сохранил конфиг для TeamManager");
+            UnrealZaruba.LOGGER.warn("[Во, бля] Сохранил конфиг для TeamManager");
         } catch (IOException e) {
-            unrealzaruba.LOGGER.warn("[Ай, бля] Unable to create config for TeamManager");
+            UnrealZaruba.LOGGER.warn("[Ай, бля] Unable to create config for TeamManager");
         }
     } 
 
     public TeamData Load() {
         try {
             TeamData loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
-            unrealzaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager");
+            UnrealZaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager");
             return loadedData;
         } catch (IOException e) {
-            unrealzaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
+            UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
             return null;
         }
     } 

@@ -4,7 +4,7 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -32,7 +32,7 @@ public class SpawnBlock extends Block {
     }
 
     private void saveBlockPos(BlockPos pos) {
-        unrealzaruba.LOGGER.info("Writing BlockPos");
+        UnrealZaruba.LOGGER.info("Writing BlockPos");
         Spawn = pos;
     }
 }

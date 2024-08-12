@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.ModItems;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 
 import net.minecraft.world.item.BlockItem;
@@ -15,7 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS,
-            unrealzaruba.MOD_ID);
+            UnrealZaruba.MOD_ID);
 
     public static final RegistryObject<Item> TENT = ModItems.ITEMS.register("tent",
             () -> new HandTent(new Item.Properties().rarity(Rarity.EPIC).tab(CreativeTabs.MAIN_TAB)));

@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
@@ -69,7 +69,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         MinecraftServer server = context.getSource().getServer();
         ScoreboardManager.setupScoreboard(server, 999);
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            unrealzaruba.LOGGER.warn(player.getName().toString());
+            UnrealZaruba.LOGGER.warn(player.getName().toString());
             TeamManager.teleportToSpawn(player);
         }
         return StartVotingForCommander(context);

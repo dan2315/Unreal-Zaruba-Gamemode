@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.ContraptionManager;
 
-import com.dod.UnrealZaruba.unrealzaruba;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.foundation.utility.NBTHelper;
@@ -37,7 +37,7 @@ public class ContraptionManager {
 
     public static void loadSchematicToWorld(ServerLevel world, BlockPos origin, CompoundTag schematic) {
         if (schematic == null) {
-            unrealzaruba.LOGGER.warn("Failed to read schematic file.");
+            UnrealZaruba.LOGGER.warn("Failed to read schematic file.");
             return;
         }
 
