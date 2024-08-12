@@ -24,9 +24,10 @@ import java.util.UUID;
 public class CallbackServer {
     private static HttpServer server;
 
-    public static void StartServer() {
+    public static void StartServer(MinecraftServer minecraftServer) {
         try {
-            server = HttpServer.create(new InetSocketAddress(8001), 0);
+            
+            server = HttpServer.create(new InetSocketAddress(minecraftServer.getPort() + 228), 0);
 
             // Define a context for handling /notifyAuthStatus POST requests
             server.createContext("/notifyAuthStatus", new NotifyAuthStatusHandler());

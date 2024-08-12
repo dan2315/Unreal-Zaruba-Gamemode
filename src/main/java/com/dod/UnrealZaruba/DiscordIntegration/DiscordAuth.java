@@ -10,9 +10,13 @@ public class DiscordAuth {
     public static Set<String> unresolvedRequests = new HashSet<String>();
     public static String backendEndpoint = "http://34.34.44.237:3000";
 
-    public static void OpenAuthPage(String state, UUID playerUuid, String minecraft_username) {
+    public static void OpenAuthPage(String state, UUID playerUuid, String minecraft_username, Integer port) {
             try {
-                String authUrl = backendEndpoint + "/auth?state=" + state + "&player_uuid=" + playerUuid + "&minecraft_username=" + minecraft_username;
+                String authUrl = backendEndpoint 
+                + "/auth?state=" + state 
+                + "&player_uuid=" + playerUuid 
+                + "&minecraft_username=" + minecraft_username
+                + "&port=" + port;
                 openURL(authUrl);
             } catch (Exception e) {
                 e.printStackTrace();
