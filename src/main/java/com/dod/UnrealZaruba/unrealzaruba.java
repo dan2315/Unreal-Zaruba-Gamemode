@@ -8,11 +8,9 @@ import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,10 +24,10 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class UnrealZaruba {
     public static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-        new ResourceLocation("unrealzaruba", "main"),
-        () -> PROTOCOL_VERSION,
-        PROTOCOL_VERSION::equals,
-        PROTOCOL_VERSION::equals
+            new ResourceLocation("unrealzaruba", "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
     );
 
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -45,19 +43,19 @@ public class UnrealZaruba {
         ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         CHANNEL.registerMessage(0 ,LoginPacket.class,
-         (msg, buf) -> LoginPacket.encode(msg, buf),
-         (msg) -> LoginPacket.decode(msg),
-         (msg, ctx) -> LoginPacket.handle(msg, ctx));
+                (msg, buf) -> LoginPacket.encode(msg, buf),
+                (msg) -> LoginPacket.decode(msg),
+                (msg, ctx) -> LoginPacket.handle(msg, ctx));
     }
 
 
-    public static void CommonSetup(FMLCommonSetupEvent event) {
-        @SuppressWarnings("unchecked")
-        Registry<DimensionType> dimensionTypeRegistry = (Registry<DimensionType>) Registry.REGISTRY.get(Registry.DIMENSION_TYPE_REGISTRY);
-        if (dimensionTypeRegistry == null) {
-            throw new IllegalStateException("DimensionType registry not found!");
-        }
-        WorldManager.SetupDimensionType(dimensionTypeRegistry);
-    }
+    // public static void CommonSetup(FMLCommonSetupEvent event) {
+    //     @SuppressWarnings("unchecked")
+    //     Registry<DimensionType> dimensionTypeRegistry = (Registry<DimensionType>) Registry.REGISTRY.get(Registry.DIMENSION_TYPE_REGISTRY);
+    //     if (dimensionTypeRegistry == null) {
+    //         throw new IllegalStateException("DimensionType registry not found!");
+    //     }
+    //     WorldManager.SetupDimensionType(dimensionTypeRegistry);
+    // }
 
 }
