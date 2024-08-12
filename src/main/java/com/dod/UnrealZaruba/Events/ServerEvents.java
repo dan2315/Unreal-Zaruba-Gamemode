@@ -51,8 +51,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-@Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE)
-// @Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+@Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
 public class ServerEvents {
 
     private static TeamGamemode gamemode;
@@ -60,7 +59,7 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        CallbackServer.StartServer();
+        CallbackServer.StartServer(event.getServer());
         TeamU.SetupMinecraftTeams(event.getServer());
         gamemode = new DestroyObjectivesGamemode();
         teamManager = gamemode.GetTeamManager();
@@ -132,7 +131,7 @@ public class ServerEvents {
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
         UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new LoginPacket(state, player.getUUID(), player.getName().getString()));
+                new LoginPacket(state, player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
 
     }
 
