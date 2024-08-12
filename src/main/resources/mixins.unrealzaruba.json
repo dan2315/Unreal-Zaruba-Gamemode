@@ -6,12 +6,12 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "mixins.unrealzaruba.refmap.json",
   "mixins": [
+    "ItemStackMixin",
     "LecternControllerBlockEntityMixin",
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
-    "RedstoneLinkBlockMixin",
     "MixinExplosionMixin",
-    "ItemStackMixin"
+    "RedstoneLinkBlockMixin",
   ],
   "client": [],
   "injectors": {
