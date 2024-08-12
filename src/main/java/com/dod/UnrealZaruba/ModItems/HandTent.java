@@ -7,6 +7,7 @@ import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.mixin.StructureTemplateMixin;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -24,6 +25,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.Palette;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 
 import java.util.List;
 
@@ -123,10 +126,13 @@ public class HandTent extends Item {
         StructurePlaceSettings settings = new StructurePlaceSettings();
 
         UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
-//        List<StructureTemplate.StructureBlockInfo> blocks = template.
-//        UnrealZaruba.LOGGER.info("[Ох, бля] Number of blocks to place:" + blocks.size());
+        StructureTemplateMixin structureMixined = (StructureTemplateMixin) (Object) template;
+        List<StructureTemplate.Palette> palettes = structureMixined.GetPalletes();
+        List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
 
-        // Iterate over the blocks and place them in the world
+        var blocks = StructureTemplate.processBlockInfos(world, buildPoint, buildPoint, settings, blockInfos, template);
+        
+
         for (StructureTemplate.StructureBlockInfo blockInfo : blocks) {
             BlockPos blockPos = blockInfo.pos; // Position of the block relative to the structure's origin
             BlockState blockState = blockInfo.state; // The block state to place
