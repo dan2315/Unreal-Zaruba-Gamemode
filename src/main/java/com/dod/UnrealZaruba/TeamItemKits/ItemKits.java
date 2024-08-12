@@ -53,7 +53,7 @@ public class ItemKits {
             1
         );
         redTeamKit.put("nzgexpansion:medium_bullet", 600);
-        redTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
+        redTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block_blue\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
 
         blueTeamArmorKit = new HashMap<>();
@@ -82,7 +82,7 @@ public class ItemKits {
                 "nzgexpansion:battle_rifle{AmmoCount:20, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:carbine_stock\", Count:1b}}}",
                 1);
         blueTeamKit.put("nzgexpansion:medium_bullet", 600);
-        blueTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
+        blueTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block_red\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
