@@ -12,7 +12,6 @@ import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -51,13 +50,13 @@ public class UnrealZaruba {
     }
 
 
-    public static void CommonSetup(FMLCommonSetupEvent event) {
-        @SuppressWarnings("unchecked")
-        Registry<DimensionType> dimensionTypeRegistry = (Registry<DimensionType>) Registry.REGISTRY.get(Registry.DIMENSION_TYPE_REGISTRY);
-        if (dimensionTypeRegistry == null) {
-            throw new IllegalStateException("DimensionType registry not found!");
-        }
-        WorldManager.SetupDimensionType(dimensionTypeRegistry);
-    }
+    // public static void CommonSetup(FMLCommonSetupEvent event) {
+    //     @SuppressWarnings("unchecked")
+    //     Registry<DimensionType> dimensionTypeRegistry = (Registry<DimensionType>) Registry.REGISTRY.get(Registry.DIMENSION_TYPE_REGISTRY);
+    //     if (dimensionTypeRegistry == null) {
+    //         throw new IllegalStateException("DimensionType registry not found!");
+    //     }
+    //     WorldManager.SetupDimensionType(dimensionTypeRegistry);
+    // }
 
 }
