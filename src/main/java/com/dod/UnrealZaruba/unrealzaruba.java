@@ -8,7 +8,6 @@ import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.Registry;
@@ -25,10 +24,10 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class UnrealZaruba {
     public static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-        new ResourceLocation("unrealzaruba", "main"),
-        () -> PROTOCOL_VERSION,
-        PROTOCOL_VERSION::equals,
-        PROTOCOL_VERSION::equals
+            new ResourceLocation("unrealzaruba", "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
     );
 
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -44,9 +43,9 @@ public class UnrealZaruba {
         ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         CHANNEL.registerMessage(0 ,LoginPacket.class,
-         (msg, buf) -> LoginPacket.encode(msg, buf),
-         (msg) -> LoginPacket.decode(msg),
-         (msg, ctx) -> LoginPacket.handle(msg, ctx));
+                (msg, buf) -> LoginPacket.encode(msg, buf),
+                (msg) -> LoginPacket.decode(msg),
+                (msg, ctx) -> LoginPacket.handle(msg, ctx));
     }
 
 

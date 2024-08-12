@@ -21,7 +21,6 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 
@@ -67,18 +66,18 @@ public class ServerEvents {
         GamemodeManager.StartGame(event.getServer().overworld(), gamemode);
 
 
-        Path worldPath = Paths.get(event.getServer().getServerDirectory().toString(), "saves", "gamemode_world");
-
-        try (ServerLevel level = WorldManager.LoadWorld(event.getServer(), worldPath)) 
-        {
-            if (level != null) {
-                UnrealZaruba.LOGGER.warn("Custom world loaded successfully!");
-            } else {
-                UnrealZaruba.LOGGER.error("Failed to load the custom world.");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Path worldPath = Paths.get(event.getServer().getServerDirectory().toString(), "saves", "gamemode_world");
+//
+//        try (ServerLevel level = WorldManager.LoadWorld(event.getServer(), worldPath))
+//        {
+//            if (level != null) {
+//                UnrealZaruba.LOGGER.warn("Custom world loaded successfully!");
+//            } else {
+//                UnrealZaruba.LOGGER.error("Failed to load the custom world.");
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @SubscribeEvent
@@ -269,7 +268,7 @@ public class ServerEvents {
                     new TextComponent("§4" + event.getPlayer().getName().getString()+ "§r" + ":" + event.getMessage()), memberUUID);
             }
         }
-    }   
+    }
 
     @SubscribeEvent
     public static void onPlayerSleep(PlayerSleepInBedEvent event) {
@@ -291,7 +290,7 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingDamage(LivingDamageEvent event) {    
+    public static void onLivingDamage(LivingDamageEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!PlayerU.Get(player.getUUID()).IsAuthorized()) {
                 event.setCanceled(true);
