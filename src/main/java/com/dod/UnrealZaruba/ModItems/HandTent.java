@@ -7,6 +7,7 @@ import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.mixin.StructureTemplateAccessor;
 import com.dod.UnrealZaruba.mixin.StructureTemplateMixin;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
@@ -126,8 +127,7 @@ public class HandTent extends Item {
         StructurePlaceSettings settings = new StructurePlaceSettings();
 
         UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
-        StructureTemplateMixin structureMixined = (StructureTemplateMixin) (Object) template;
-        List<StructureTemplate.Palette> palettes = structureMixined.GetPalletes();
+        List<StructureTemplate.Palette> palettes = ((StructureTemplateAccessor) template).getPalettes();
         List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
 
         var blocks = StructureTemplate.processBlockInfos(world, buildPoint, buildPoint, settings, blockInfos, template);
