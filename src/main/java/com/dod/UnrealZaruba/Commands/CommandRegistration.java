@@ -15,6 +15,7 @@ import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -90,8 +91,14 @@ public class CommandRegistration {
 
                                         return 1;
                                 }));
-                // АХАХХАХ, прикиньте сделать команду get_RPG, написать в чат не писать её, а
-                // она будет тупо убивать
+
+                                
+                dispatcher.register(Commands.literal("tptodim")
+                                .executes(context -> {
+                                        SimpleWorldManager.teleportPlayerToDimension(context.getSource().getPlayerOrException(), SimpleWorldManager.GAME_DIMENSION_1);
+                                        return 1;
+                                }));
+
                 dispatcher.register(Commands.literal("getRPG")
                                 .executes(context -> kill_pashalka(context)));
 

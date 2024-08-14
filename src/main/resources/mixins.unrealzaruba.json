@@ -11,7 +11,8 @@
     "LinkHandlerMixin",
     "RedstoneLinkBlockMixin",
     "MixinExplosionMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "StructureTemplateMixin"
   ],
   "client": [],
   "injectors": {

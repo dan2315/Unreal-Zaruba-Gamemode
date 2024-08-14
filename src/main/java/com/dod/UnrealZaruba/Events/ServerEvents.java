@@ -21,6 +21,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
+import com.dod.UnrealZaruba.WorldManager.DynamicWorldManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 
@@ -65,19 +66,6 @@ public class ServerEvents {
         ScoreboardManager.clearScoreboard(event.getServer());
         GamemodeManager.StartGame(event.getServer().overworld(), gamemode);
 
-
-//        Path worldPath = Paths.get(event.getServer().getServerDirectory().toString(), "saves", "gamemode_world");
-//
-//        try (ServerLevel level = WorldManager.LoadWorld(event.getServer(), worldPath))
-//        {
-//            if (level != null) {
-//                UnrealZaruba.LOGGER.warn("Custom world loaded successfully!");
-//            } else {
-//                UnrealZaruba.LOGGER.error("Failed to load the custom world.");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @SubscribeEvent

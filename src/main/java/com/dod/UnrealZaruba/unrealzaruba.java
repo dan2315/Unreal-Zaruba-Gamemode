@@ -8,11 +8,16 @@ import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
+import com.dod.UnrealZaruba.WorldManager.DynamicWorldManager;
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -45,14 +50,9 @@ public class UnrealZaruba {
                 (msg, ctx) -> LoginPacket.handle(msg, ctx));
     }
 
-
-    // public static void CommonSetup(FMLCommonSetupEvent event) {
-    //     @SuppressWarnings("unchecked")
-    //     Registry<DimensionType> dimensionTypeRegistry = (Registry<DimensionType>) Registry.REGISTRY.get(Registry.DIMENSION_TYPE_REGISTRY);
-    //     if (dimensionTypeRegistry == null) {
-    //         throw new IllegalStateException("DimensionType registry not found!");
-    //     }
-    //     WorldManager.SetupDimensionType(dimensionTypeRegistry);
-    // }
+    @SubscribeEvent
+    public static void CommonSetup(FMLCommonSetupEvent event) {
+        LOGGER.warn("[INFO] COMMON SETUP STAGE");
+    }
 
 }

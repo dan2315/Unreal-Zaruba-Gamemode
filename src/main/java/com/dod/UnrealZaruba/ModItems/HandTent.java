@@ -7,7 +7,6 @@ import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
-import com.dod.UnrealZaruba.mixin.StructureTemplateAccessor;
 import com.dod.UnrealZaruba.mixin.StructureTemplateMixin;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
@@ -20,15 +19,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.Palette;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
-
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class HandTent extends Item {
@@ -127,7 +123,17 @@ public class HandTent extends Item {
         StructurePlaceSettings settings = new StructurePlaceSettings();
 
         UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
-        List<StructureTemplate.Palette> palettes = ((StructureTemplateAccessor) template).getPalettes();
+
+
+        List<StructureTemplate.Palette> palettes = null;
+        try {
+            Field palettesField = StructureTemplate.class.getDeclaredField("f_74482_");
+            palettesField.setAccessible(true);
+            palettes = (List<StructureTemplate.Palette>) palettesField.get(template);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        } 
+
         List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
 
         var blocks = StructureTemplate.processBlockInfos(world, buildPoint, buildPoint, settings, blockInfos, template);
