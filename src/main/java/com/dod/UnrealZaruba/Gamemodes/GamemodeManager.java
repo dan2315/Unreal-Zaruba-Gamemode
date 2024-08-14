@@ -14,4 +14,13 @@ public class GamemodeManager {
     public static BaseGamemode Get(Level level) {
         return worldToGamemode.get(level);
     }
+
+    public static <T extends BaseGamemode> T Get(Level level, Class<T> gamemodeClass) {
+        BaseGamemode gamemode = worldToGamemode.get(level);
+        if (gamemodeClass.isInstance(gamemode)) {
+            return gamemodeClass.cast(gamemode);
+        } else {
+            return null;
+        }
+    }
 }
