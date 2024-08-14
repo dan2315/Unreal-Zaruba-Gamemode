@@ -7,7 +7,6 @@ import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerU;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
-import com.dod.UnrealZaruba.mixin.StructureTemplateMixin;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -87,70 +86,36 @@ public class HandTent extends Item {
      * @param clickPos
      * @param player
      */
-//    public void placeCustomStructure(ServerLevel world, BlockPos clickPos, Player player) {
-//        UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
-//        BaseGamemode gamemode = GamemodeManager.Get(world);
-//        TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
-//
-//        TeamU player_team = teamManager.GetPlayersTeam(player);
-//
-//        BlockPos center = clickPos;
-//        BlockPos buildPoint = clickPos.offset(-4, -2, -4);
-//
-//        Tent tent = new Tent(center);
-//        player_team.setActiveTent(tent);
-//
-//        UnrealZaruba.LOGGER.info("[Ох, бля] Начинаю ставить");
-//
-//        teamManager.tent_templates.get(player_team.color).placeInWorld(world, buildPoint, buildPoint,
-//                new StructurePlaceSettings(), world.random, 2);
-//
-//        UnrealZaruba.LOGGER.info("[Ох, бля] Поставил ёпта");
-//    }
-
-    public void placeCustomStructure(ServerLevel world, BlockPos pos, Player player) {
+    public void placeCustomStructure(ServerLevel world, BlockPos clickPos, Player player) {
+        UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
         BaseGamemode gamemode = GamemodeManager.Get(world);
         TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
+
         TeamU player_team = teamManager.GetPlayersTeam(player);
 
-        BlockPos center = pos;
-        BlockPos buildPoint = pos.offset(-4, -2, -4);
+        BlockPos center = clickPos;
+        BlockPos buildPoint = clickPos.offset(-4, -2, -4);
 
         Tent tent = new Tent(center);
         player_team.setActiveTent(tent);
 
-        StructureTemplate template = teamManager.tent_templates.get(player_team.color);
-        StructurePlaceSettings settings = new StructurePlaceSettings();
-
-        UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
+        UnrealZaruba.LOGGER.info("[Ох, бля] Начинаю ставить");
 
 
-        List<StructureTemplate.Palette> palettes = null;
-        try {
-            Field palettesField = StructureTemplate.class.getDeclaredField("f_74482_");
-            palettesField.setAccessible(true);
-            palettes = (List<StructureTemplate.Palette>) palettesField.get(template);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
-        } 
+        //TODO: Вот тут рабочий вариант поблочного выставления, но нужно сетапить копикаты и правильно считать позицию
+        // List<StructureTemplate.Palette> palettes = null;
+        // try {
+        //     Field palettesField = StructureTemplate.class.getDeclaredField("f_74482_");
+        //     palettesField.setAccessible(true);
+        //     palettes = (List<StructureTemplate.Palette>) palettesField.get(template);
+        // } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+        //     e.printStackTrace();
+        // } 
 
-        List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
+        // List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
+        teamManager.tent_templates.get(player_team.color).placeInWorld(world, buildPoint, buildPoint,
+                new StructurePlaceSettings(), world.random, 2);
 
-        var blocks = StructureTemplate.processBlockInfos(world, buildPoint, buildPoint, settings, blockInfos, template);
-        
-
-        for (StructureTemplate.StructureBlockInfo blockInfo : blocks) {
-            BlockPos blockPos = blockInfo.pos; // Position of the block relative to the structure's origin
-            BlockState blockState = blockInfo.state; // The block state to place
-
-            // Calculate the absolute position in the world
-            BlockPos absolutePos = pos.offset(blockPos);
-
-
-            // Place the block in the world
-            world.setBlock(absolutePos, blockState, 3); // 3 = Block update flags
-            UnrealZaruba.LOGGER.info("[Ох, бля] Placing block:" + blockState.getBlock().getName().getString() + " at " + absolutePos);
-        }
         UnrealZaruba.LOGGER.info("[Ох, бля] Поставил ёпта");
     }
 }
