@@ -4,7 +4,7 @@ import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
-import com.dod.UnrealZaruba.Player.PlayerU;
+import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.UnrealZaruba;
@@ -19,12 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
-import java.lang.reflect.Field;
-import java.util.List;
 
 public class HandTent extends Item {
 
@@ -59,7 +54,7 @@ public class HandTent extends Item {
         // This will be called after the 5-second duration
         if (!world.isClientSide) {
             if (livingEntity instanceof Player player) {
-                TeamGamemode gamemode = PlayerU.Get(player.getUUID()).Gamemode(TeamGamemode.class);
+                TeamGamemode gamemode = PlayerContext.Get(player.getUUID()).Gamemode(TeamGamemode.class);
                 if (gamemode.GetTeamManager().GetPlayersTeam(player).active_tent == null) {
                     ServerLevel serverLevel = (ServerLevel) world;
                     placeCustomStructure(serverLevel, new BlockPos(player.position()), player);

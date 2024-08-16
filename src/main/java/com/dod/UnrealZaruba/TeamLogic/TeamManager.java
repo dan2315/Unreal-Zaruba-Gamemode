@@ -29,10 +29,13 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public class TeamManager {
 
     HashMap<TeamColor, TeamU> teams = new HashMap<>();
-    HashMap<TeamColor, PlayerTeam> scoreboard_team_color = new HashMap<>();
 
     public HashMap<TeamColor, StructureTemplate> tent_templates = new HashMap<>();
-    
+
+    public HashMap<TeamColor, TeamU> GetTeams() {
+        return teams;
+    }
+
 
     public TeamManager() {
         var teamData = Load();
@@ -50,6 +53,7 @@ public class TeamManager {
             }
         }
     }
+
 
     public void AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);

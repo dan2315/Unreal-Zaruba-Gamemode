@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.Utils.TimerManager;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +80,14 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public int StartVotingForCommander(CommandContext<CommandSourceStack> context) {
         gameStage = GameStage.CommanderVoting;
 
+        HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
+
+
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+
             TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
                     new TextComponent("Это сложно, но попробуйте выделить одного командира"));
         }
@@ -86,6 +95,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
                 () -> {
                     try {
+                        for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
+                            Player most_voted_player = team.getValue().MostVoted();
+                            team.getValue().setCommander(context.getSource().getServer(), most_voted_player);
+                        }
                         StartPreparation(context);
                     } catch (Exception e) {
                         context.getSource().sendFailure(new TextComponent(e.getMessage()));
@@ -159,6 +172,12 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
             if (!success)
                 context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
+
+            HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
+
+            for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
+                team.getValue().SetupVotes(context.getSource().getServer());
+            }
 
             TimerManager.Create(GAME_DURATION_TICKS * 1000,
                     () -> {
