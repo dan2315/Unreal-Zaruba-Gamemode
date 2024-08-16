@@ -16,8 +16,14 @@ public class PlayerU  {
     private boolean authorized;
     private GameType originalGameType;
     private PlayerStatus status;
+    private boolean previouslyOpped;
 
     private BaseGamemode gamemode;
+
+
+    public boolean PreviouslyOpped() {
+        return previouslyOpped;
+    }
 
     public BaseGamemode Gamemode() { return gamemode; } 
     public <T extends BaseGamemode> T Gamemode(Class<T> clazz) { 
@@ -55,6 +61,10 @@ public class PlayerU  {
     
     public static void Deauthorize(UUID id) {
         playerUlist.remove(id);
+    }
+
+    public void SetPreviouslyOpped() {
+        previouslyOpped = true;
     }
 }
 

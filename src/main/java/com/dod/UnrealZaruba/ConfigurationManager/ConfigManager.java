@@ -13,6 +13,7 @@ public class ConfigManager {
     final static String directoryPath = "unrealzaruba";
     public final static String Objectives = directoryPath + File.pathSeparator + "destructibleObjectives.json";
     public final static String Teams = directoryPath + File.pathSeparator + "teams.json";
+    public final static String Tokens = directoryPath + File.pathSeparator + "tokens.json";
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(DestructibleObjective.class, new DObjectiveDeserializer()).setPrettyPrinting()

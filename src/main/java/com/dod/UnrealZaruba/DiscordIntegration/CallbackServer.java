@@ -76,9 +76,13 @@ public class CallbackServer {
 
                 if (uuid != null) {
                     UUID playerUUID = UUID.fromString(uuid);
-                    PlayerU.Get(playerUUID).SetAuthorized(isAuthenticated);
+                    var playerContext = PlayerU.Get(playerUUID);
+                    playerContext.SetAuthorized(isAuthenticated);
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
+                    if (playerContext.PreviouslyOpped() && player != null) {
+                        server.getPlayerList().op(player.getGameProfile());
+                    }
                     TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
                     server.sendMessage(new TextComponent("Авторизация прошла успешно"), playerUUID);
 

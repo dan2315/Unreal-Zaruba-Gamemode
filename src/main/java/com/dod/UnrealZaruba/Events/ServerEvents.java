@@ -1,15 +1,14 @@
 package com.dod.UnrealZaruba.Events;
 
+import java.io.ObjectInputFilter.Config;
 import java.util.UUID;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.DiscordIntegration.CallbackServer;
 import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
+import com.dod.UnrealZaruba.DiscordIntegration.Tokens;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
@@ -21,13 +20,11 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
-import com.dod.UnrealZaruba.WorldManager.DynamicWorldManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
@@ -90,23 +87,28 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (!server.isDedicatedServer())
             return;
 
         ServerPlayer player = (ServerPlayer) event.getPlayer();
-        PlayerU playeru = PlayerU.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
-        playeru.SetGamemode(gamemode);
+        PlayerU playerContext = PlayerU.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
+        playerContext.SetGamemode(gamemode);
+        if (server.getPlayerList().isOp(player.getGameProfile())) {
+            playerContext.SetPreviouslyOpped();
+            server.getPlayerList().deop(player.getGameProfile());
+        }
 
         TickTimer[] timer = new TickTimer[1];
         timer[0] = TimerManager.Create(30 * 60 * 20, () -> {
-            if (playeru.IsAuthorized()) {
+            if (playerContext.IsAuthorized()) {
                 UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
                 player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [30 sec]"));
             }
         }, 
         ticks -> {
             if (ticks % 100 == 0) {
-                if (playeru.IsAuthorized()) {
+                if (playerContext.IsAuthorized()) {
                     player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"), player.getUUID());
                 } else {
                     timer[0].Dispose(false);
@@ -117,6 +119,10 @@ public class ServerEvents {
         gamemode.HandleConnectedPlayer(event.getPlayer());
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
+
+        Tokens tokens = ConfigManager.loadConfig(ConfigManager.Tokens, Tokens.class);
+        DiscordAuth.CheckAuthTokens(player.getUUID(), event.getPlayer().getServer().getPort(), state, state);
+
         UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                 new LoginPacket(state, player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
 
