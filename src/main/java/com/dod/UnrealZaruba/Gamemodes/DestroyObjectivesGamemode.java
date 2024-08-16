@@ -175,11 +175,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
             HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
 
-            TeamU teamRed = teams.get(TeamColor.RED);
-            TeamU teamBlue = teams.get(TeamColor.BLUE);
-
-            teamRed.SetupVotes(context.getSource().getServer());
-            teamBlue.SetupVotes(context.getSource().getServer());
+            for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
+                team.getValue().SetupVotes(context.getSource().getServer());
+            }
 
             TimerManager.Create(GAME_DURATION_TICKS * 1000,
                     () -> {
