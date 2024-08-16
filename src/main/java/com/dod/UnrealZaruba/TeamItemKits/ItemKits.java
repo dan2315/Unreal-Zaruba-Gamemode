@@ -105,6 +105,10 @@ public class ItemKits {
         }
     }
 
+    public static void GiveItem(MinecraftServer server, ServerPlayer serverPlayer, String item) {
+        CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(), item);
+    }
+
 //    public static void GiveSpecItem(MinecraftServer server, ServerPlayer serverPlayer, ItemStack item) {
 //        ListTag canDestroy = new ListTag();
 //        canDestroy.add(StringTag.valueOf(ModBlocks.TENT_MAIN_BLOCK.toString()));

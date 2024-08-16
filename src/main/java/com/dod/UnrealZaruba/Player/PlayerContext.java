@@ -9,9 +9,9 @@ import java.util.HashMap;
 
 import net.minecraft.world.level.GameType;
 
-public class PlayerU  {
+public class PlayerContext {
 
-    public static HashMap<UUID, PlayerU> playerUlist = new HashMap<>();
+    public static HashMap<UUID, PlayerContext> playerUlist = new HashMap<>();
     private UUID id;
     private boolean authorized;
     private GameType originalGameType;
@@ -28,8 +28,8 @@ public class PlayerU  {
         }
     }
     
-    public static PlayerU Instantiate(UUID id, GameType gameType) {
-        PlayerU playerU = new PlayerU();
+    public static PlayerContext Instantiate(UUID id, GameType gameType) {
+        PlayerContext playerU = new PlayerContext();
         playerU.id = id;
         playerU.originalGameType = gameType;
 
@@ -37,7 +37,7 @@ public class PlayerU  {
         return playerU;
     }
 
-    public static PlayerU Get(UUID id) {
+    public static PlayerContext Get(UUID id) {
         return playerUlist.get(id);
     }
 

@@ -9,7 +9,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Player.PlayerU;
+import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -76,7 +76,7 @@ public class CallbackServer {
 
                 if (uuid != null) {
                     UUID playerUUID = UUID.fromString(uuid);
-                    PlayerU.Get(playerUUID).SetAuthorized(isAuthenticated);
+                    PlayerContext.Get(playerUUID).SetAuthorized(isAuthenticated);
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
                     TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");

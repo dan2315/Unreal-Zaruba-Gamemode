@@ -1,8 +1,6 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
@@ -15,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -31,6 +30,9 @@ public class TeamU {
     TeamManager batya;
 
     public Tent active_tent;
+
+    public HashMap<Player, Integer> votes = new HashMap<>();
+    public HashSet<Player> has_voted = new HashSet<>();
 
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
@@ -62,6 +64,59 @@ public class TeamU {
 
     public void setActiveTent(Tent active_tent) {
         this.active_tent = active_tent;
+    }
+
+    public void SetupVotes(MinecraftServer server) {
+        List<ServerPlayer> playerList = server.getPlayerList().getPlayers();
+
+        for (Player player : playerList) {
+            votes.put(player, 0);
+        }
+    }
+
+    public void GiveVote(Player player) {
+        if (!this.has_voted.contains(player)) {
+            this.votes.put(player, votes.get(player) + 1);
+            this.has_voted.add(player);
+        } else {
+            player.sendMessage(new TextComponent("Ты не можешь проголосовать дважды"), player.getUUID());
+        }
+    }
+
+    public Player MostVoted() {
+        Integer most_votes = 0;
+        Player most_voted_player = null;
+
+        for (Map.Entry<Player, Integer> entry : this.votes.entrySet()) {
+            if (entry.getValue() > most_votes) {
+                most_votes = entry.getValue();
+                most_voted_player = entry.getKey();
+            }
+        }
+        return most_voted_player;
+    }
+
+    public void setCommander(MinecraftServer server, Player player) {
+        HashMap<TeamColor, TeamU> teams = this.batya.teams;
+
+
+        if (player instanceof ServerPlayer serverPlayer) { // TODO Впихать в файл конфига для команд
+            if (batya.GetPlayersTeam(serverPlayer).color == TeamColor.RED) {
+                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
+                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
+                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
+            } else {
+                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
+                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
+            }
+            SendMessageToTeam(server, "Командиром команды становится" + player.getName().getString());
+        }
+    }
+
+    public void SendMessageToTeam(MinecraftServer server, String message) {
+        this.members.forEach(element -> {
+            server.getPlayerList().getPlayer(element).sendMessage(new TextComponent(message), element);
+        });
     }
 
     public static void SetupMinecraftTeams(MinecraftServer server) {
