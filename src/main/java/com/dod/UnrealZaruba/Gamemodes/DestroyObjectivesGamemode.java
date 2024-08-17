@@ -95,9 +95,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
                 () -> {
                     try {
-                        for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
-                            Player most_voted_player = team.getValue().MostVoted();
-                            team.getValue().setCommander(context.getSource().getServer(), most_voted_player);
+                        for (Map.Entry<TeamColor, TeamU> teamEntry : teams.entrySet()) {
+                            Player most_voted_player = context.getSource().getServer().getPlayerList().getPlayer(teamEntry.getValue().MostVoted());
+                            teamEntry.getValue().setCommander(context.getSource().getServer(), most_voted_player);
                         }
                         StartPreparation(context);
                     } catch (Exception e) {
@@ -173,11 +173,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             if (!success)
                 context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
 
-            HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
-
-            for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
-                team.getValue().SetupVotes(context.getSource().getServer());
-            }
 
             TimerManager.Create(GAME_DURATION_TICKS * 1000,
                     () -> {

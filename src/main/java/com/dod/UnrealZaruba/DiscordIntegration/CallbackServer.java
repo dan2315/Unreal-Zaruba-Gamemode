@@ -9,6 +9,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
@@ -62,6 +63,8 @@ public class CallbackServer {
 
                 String uuid = params.get("uuid");
                 String state = params.get("state");
+                String token = params.get("state");
+                String refreshToken = params.get("state");
                 if (!DiscordAuth.unresolvedRequests.contains(state)) {
                     String response = String.format("Dolbayob: [%s] | POPYTKA VZLOMA, ЫАЫАЫАЫАЫАЫА", playerList.getPlayer(UUID.fromString(uuid)));
                     UnrealZaruba.LOGGER.info(response);
@@ -85,6 +88,7 @@ public class CallbackServer {
                     }
                     TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
                     server.sendMessage(new TextComponent("Авторизация прошла успешно"), playerUUID);
+                    ConfigManager.saveConfig(ConfigManager.Tokens, new Tokens(token, refreshToken));
 
                     // Send a response
                     String response = String.format("Auth status for player [%s] set to [%b]", playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);

@@ -1,7 +1,6 @@
 package com.dod.UnrealZaruba.DiscordIntegration;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -11,7 +10,9 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -51,16 +52,24 @@ public class DiscordAuth {
         }
     }
 
-    public static void CheckAuthTokens(UUID playerUUID, Integer port, String token, String refreshTokens) {
+    public static boolean CheckAuthTokens(UUID playerUUID, Integer port) {
+        Tokens tokens = null;
+        try {
+            tokens = ConfigManager.loadConfig(ConfigManager.Tokens, Tokens.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
         HttpClient client = HttpClient.newHttpClient();
 
         String queryParams;
         try {
-            queryParams = String.format("player_uuid=%s&port=%s&token=%s&refreshTokens=%s",
+            queryParams = String.format("player_uuid=%s&port=%s&token=%s&refreshToken=%s",
                     URLEncoder.encode(playerUUID.toString(), StandardCharsets.UTF_8.toString()),
                     URLEncoder.encode(port.toString(), StandardCharsets.UTF_8.toString()),
-                    URLEncoder.encode(token.toString(), StandardCharsets.UTF_8.toString()),
-                    URLEncoder.encode(refreshTokens.toString(), StandardCharsets.UTF_8.toString()));
+                    URLEncoder.encode(tokens.token.toString(), StandardCharsets.UTF_8.toString()),
+                    URLEncoder.encode(tokens.refreshToken.toString(), StandardCharsets.UTF_8.toString()));
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(DiscordAuth.backendEndpoint + "/check_tokens?" + queryParams))
@@ -72,10 +81,15 @@ public class DiscordAuth {
 
             System.out.println("Response Code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
-
             
+            JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+            boolean verified = jsonObject.get("verified").getAsBoolean();
+            return verified;
+
         } catch (URISyntaxException | IOException | InterruptedException e) {
             e.printStackTrace();
+            return false;
         }
+        
     }
 }

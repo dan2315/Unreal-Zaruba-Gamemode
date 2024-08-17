@@ -22,7 +22,6 @@ import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -92,7 +91,8 @@ public class ServerEvents {
             return;
 
         ServerPlayer player = (ServerPlayer) event.getPlayer();
-        PlayerContext playerContext = PlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
+        PlayerContext playerContext = PlayerContext.Instantiate(player.getUUID(),
+                player.gameMode.getGameModeForPlayer());
         playerContext.SetGamemode(gamemode);
         if (server.getPlayerList().isOp(player.getGameProfile())) {
             playerContext.SetPreviouslyOpped();
@@ -105,41 +105,39 @@ public class ServerEvents {
                 UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
                 player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [30 sec]"));
             }
-        }, 
-        ticks -> {
-            if (ticks % 100 == 0) {
-                if (playerContext.IsAuthorized()) {
-                    player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"), player.getUUID());
-                } else {
-                    timer[0].Dispose(false);
-                }
-            }
-        });
+        },
+                ticks -> {
+                    if (ticks % 100 == 0) {
+                        if (playerContext.IsAuthorized()) {
+                            player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"),
+                                    player.getUUID());
+                        } else {
+                            timer[0].Dispose(false);
+                        }
+                    }
+                });
 
         gamemode.HandleConnectedPlayer(event.getPlayer());
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
 
-        try {
-            Tokens tokens = ConfigManager.loadConfig(ConfigManager.Tokens, Tokens.class);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        boolean tokenCheck = DiscordAuth.CheckAuthTokens(player.getUUID(), event.getPlayer().getServer().getPort());
+
+        if (!tokenCheck) {
+
+            UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
+                    player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
         }
-        DiscordAuth.CheckAuthTokens(player.getUUID(), event.getPlayer().getServer().getPort(), state, state);
-
-        UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new LoginPacket(state, player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
 
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
-            return;
+    // @SubscribeEvent
+    // public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+    // if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
+    // return;
 
-        PlayerContext.Deauthorize(event.getPlayer().getUUID());
-    }
+    // PlayerContext.Deauthorize(event.getPlayer().getUUID());
+    // }
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
@@ -166,7 +164,6 @@ public class ServerEvents {
             }
         }
     }
-
 
     @SubscribeEvent
     public static void onPlayerBreakBlock(PlayerEvent.BreakSpeed event) {
@@ -262,9 +259,12 @@ public class ServerEvents {
         if (teamU != null) {
             for (var memberUUID : teamU.Members()) {
                 ServerPlayer player = server.getPlayerList().getPlayer(memberUUID);
-                if (player == null) continue;
+                if (player == null)
+                    continue;
                 player.sendMessage(
-                    new TextComponent("§4" + event.getPlayer().getName().getString()+ "§r" + ":" + event.getMessage()), memberUUID);
+                        new TextComponent(
+                                "§4" + event.getPlayer().getName().getString() + "§r" + ":" + event.getMessage()),
+                        memberUUID);
             }
         }
     }

@@ -11,18 +11,28 @@ import net.minecraft.world.level.GameType;
 
 public class PlayerContext {
 
-    public static HashMap<UUID, PlayerContext> playerUlist = new HashMap<>();
+    public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
     private UUID id;
     private boolean authorized;
     private GameType originalGameType;
     private PlayerStatus status;
     private boolean previouslyOpped;
+    private int voteCount;
+    private boolean isVoted;
 
     private BaseGamemode gamemode;
 
 
+    public UUID UUID () {
+        return id;
+    }
+
     public boolean PreviouslyOpped() {
         return previouslyOpped;
+    }
+
+    public int Votes() {
+        return voteCount;
     }
 
     public BaseGamemode Gamemode() { return gamemode; } 
@@ -35,16 +45,18 @@ public class PlayerContext {
     }
     
     public static PlayerContext Instantiate(UUID id, GameType gameType) {
+        if (playerContextMap.containsKey(id)) return playerContextMap.get(id);
+
         PlayerContext playerU = new PlayerContext();
         playerU.id = id;
         playerU.originalGameType = gameType;
 
-        playerUlist.put(id, playerU);
+        playerContextMap.put(id, playerU);
         return playerU;
     }
 
     public static PlayerContext Get(UUID id) {
-        return playerUlist.get(id);
+        return playerContextMap.get(id);
     }
 
     public void SetGamemode(BaseGamemode gamemode) {
@@ -60,11 +72,23 @@ public class PlayerContext {
     }
     
     public static void Deauthorize(UUID id) {
-        playerUlist.remove(id);
+        playerContextMap.remove(id);
     }
 
     public void SetPreviouslyOpped() {
         previouslyOpped = true;
+    }
+
+    public boolean AlreadyVoted() {
+        return isVoted;
+    }
+
+    public void AddVote() {
+        voteCount += 1;
+    }
+
+    public void SetVoted() {
+        isVoted = true;
     }
 }
 

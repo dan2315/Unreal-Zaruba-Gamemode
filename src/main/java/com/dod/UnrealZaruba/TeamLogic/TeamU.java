@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
+import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
@@ -31,8 +32,6 @@ public class TeamU {
 
     public Tent active_tent;
 
-    public HashMap<Player, Integer> votes = new HashMap<>();
-    public HashSet<Player> has_voted = new HashSet<>();
 
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
@@ -66,31 +65,21 @@ public class TeamU {
         this.active_tent = active_tent;
     }
 
-    public void SetupVotes(MinecraftServer server) {
-        List<ServerPlayer> playerList = server.getPlayerList().getPlayers();
 
-        for (Player player : playerList) {
-            votes.put(player, 0);
-        }
+    public void GiveVote(Player player ,PlayerContext playerContext) {
+
+        playerContext.AddVote();
     }
 
-    public void GiveVote(Player player) {
-        if (!this.has_voted.contains(player)) {
-            this.votes.put(player, votes.get(player) + 1);
-            this.has_voted.add(player);
-        } else {
-            player.sendMessage(new TextComponent("Ты не можешь проголосовать дважды"), player.getUUID());
-        }
-    }
-
-    public Player MostVoted() {
+    public UUID MostVoted() {
         Integer most_votes = 0;
-        Player most_voted_player = null;
+        UUID most_voted_player = null;
 
-        for (Map.Entry<Player, Integer> entry : this.votes.entrySet()) {
-            if (entry.getValue() > most_votes) {
-                most_votes = entry.getValue();
-                most_voted_player = entry.getKey();
+        for (var member : members) {
+            int votes = PlayerContext.Get(member).Votes();
+            if (votes > most_votes) {
+                most_votes = votes;
+                most_voted_player = member;
             }
         }
         return most_voted_player;
@@ -109,7 +98,7 @@ public class TeamU {
                 ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
                 ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
             }
-            SendMessageToTeam(server, "Командиром команды становится" + player.getName().getString());
+            SendMessageToTeam(server, "Командиром команды становится: " + player.getName().getString());
         }
     }
 

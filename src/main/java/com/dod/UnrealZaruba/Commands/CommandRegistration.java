@@ -93,10 +93,11 @@ public class CommandRegistration {
                                         return 1;
                                 }));
 
-
                 dispatcher.register(Commands.literal("tptodim")
                                 .executes(context -> {
-                                        SimpleWorldManager.teleportPlayerToDimension(context.getSource().getPlayerOrException(), SimpleWorldManager.GAME_DIMENSION_1);
+                                        SimpleWorldManager.teleportPlayerToDimension(
+                                                        context.getSource().getPlayerOrException(),
+                                                        SimpleWorldManager.GAME_DIMENSION_1);
                                         return 1;
                                 }));
 
@@ -170,13 +171,13 @@ public class CommandRegistration {
                                 .executes(context -> ChooseRespawnPoint(context, true, "Выбранная точка: Палатка",
                                                 ModSounds.SELECT2.get())));
 
-            dispatcher.register(Commands.literal("vote")
-                            .then(Commands.argument("playerr", EntityArgument.player())
-                                        .executes(context -> {
-                                            context.getSource().sendSuccess(new TextComponent("Хуй"), false);
-                                            voteForPlayer(context, EntityArgument.getPlayer(context, "playerr"));
-                                            return 1;
-                                        })));
+                dispatcher.register(Commands.literal("vote")
+                                .then(Commands.argument("playerr", EntityArgument.player())
+                                                .executes(context -> {
+                                                        voteForPlayer(context,
+                                                                        EntityArgument.getPlayer(context, "playerr"));
+                                                        return 1;
+                                                })));
 
                 dispatcher.register(Commands.literal("setteambase")
                                 .requires(cs -> cs.hasPermission(3))
@@ -185,17 +186,23 @@ public class CommandRegistration {
                                                                 .then(Commands.argument("y1",
                                                                                 IntegerArgumentType.integer())
                                                                                 .then(Commands.argument("z1",
-                                                                                                IntegerArgumentType.integer())
+                                                                                                IntegerArgumentType
+                                                                                                                .integer())
                                                                                                 .then(Commands.argument(
                                                                                                                 "x2",
-                                                                                                                IntegerArgumentType.integer())
+                                                                                                                IntegerArgumentType
+                                                                                                                                .integer())
                                                                                                                 .then(Commands.argument(
                                                                                                                                 "y2",
-                                                                                                                                IntegerArgumentType.integer())
+                                                                                                                                IntegerArgumentType
+                                                                                                                                                .integer())
                                                                                                                                 .then(Commands
-                                                                                                                                                .argument("z2", IntegerArgumentType.integer())
+                                                                                                                                                .argument("z2", IntegerArgumentType
+                                                                                                                                                                .integer())
                                                                                                                                                 .executes(context -> {
-                                                                                                                                                        TeamColor Team = TeamColorArgument.getColor(context, "name");
+                                                                                                                                                        TeamColor Team = TeamColorArgument
+                                                                                                                                                                        .getColor(context,
+                                                                                                                                                                                        "name");
                                                                                                                                                         int x1 = IntegerArgumentType
                                                                                                                                                                         .getInteger(context,
                                                                                                                                                                                         "x1");
@@ -243,7 +250,8 @@ public class CommandRegistration {
 
                 dispatcher.register(Commands.literal("startbattle")
                                 .requires(cs -> cs.hasPermission(3))
-                                .executes(context -> PlayerContext.Get(context.getSource().getPlayerOrException().getUUID())
+                                .executes(context -> PlayerContext
+                                                .Get(context.getSource().getPlayerOrException().getUUID())
                                                 .Gamemode().StartGame(context)));
 
                 dispatcher.register(Commands.literal("crtobj")
@@ -324,41 +332,59 @@ public class CommandRegistration {
 
         }
 
-    private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player) throws CommandSyntaxException {
-        UnrealZaruba.LOGGER.warn("Пагна");
-        TeamManager teamManager = ((TeamGamemode) (PlayerContext
-            .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
-            .GetTeamManager();
-        UnrealZaruba.LOGGER.warn("Челн");
+        private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player)
+                        throws CommandSyntaxException {
+                UnrealZaruba.LOGGER.warn("Пагна");
+                TeamManager teamManager = ((TeamGamemode) (PlayerContext
+                                .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
+                                .GetTeamManager();
+                UnrealZaruba.LOGGER.warn("Челн");
 
-        TeamU teamU = teamManager.GetPlayersTeam(player);
+                TeamU teamU = teamManager.GetPlayersTeam(player);
 
-        if (teamManager.GetPlayersTeam(context.getSource().getPlayerOrException()).color == TeamColor.UNDEFINED) {
-            UnrealZaruba.LOGGER.warn("Сосал?");
-            return 0;
-        }
-
-        TeamColor playerInvoker = teamManager.GetPlayersTeam(context.getSource().getPlayerOrException()).color;
-        TeamColor playerVoted = teamManager.GetPlayersTeam(player).color;
-
-        if (PlayerContext.Get(player.getUUID()).Gamemode().gameStage == GameStage.CommanderVoting) { // Сейчас стадия голосования?
-            if (playerInvoker == playerVoted) { // Удостоверяюсь что игрок голосует за союзника
-                if (context.getSource().getPlayerOrException() != player) { // Сам ли за себя голосуешь?
-                    player.sendMessage(new TextComponent("При собянине было лучше"), player.getUUID());
-                    teamU.GiveVote(player);
-                } else {
-                    player.sendMessage(new TextComponent("Ты мне блять за себя поголосуй"), player.getUUID());
+                if (teamManager.GetPlayersTeam(
+                                context.getSource().getPlayerOrException()).color == TeamColor.UNDEFINED) {
+                        UnrealZaruba.LOGGER.warn("Сосал?");
+                        return 0;
                 }
-            } else {
-                player.sendMessage(new TextComponent("Нахуй ты за противника голосуешь"), player.getUUID());
-            }
-        } else {
-            player.sendMessage(new TextComponent("Еще рано или уже поздно"), player.getUUID());
-        }
-        return 1;
-    }
 
-    private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+                Player invokerPlayer = context.getSource().getPlayerOrException();
+                TeamColor playerInvokerColor = teamManager.GetPlayersTeam(context.getSource().getPlayerOrException()).color;
+                TeamColor playerVotedColor = teamManager.GetPlayersTeam(player).color;
+                PlayerContext invokerContext = PlayerContext.Get(context.getSource().getPlayerOrException().getUUID());
+                PlayerContext votedPlayerContext = PlayerContext.Get(player.getUUID());
+
+                if (PlayerContext.Get(player.getUUID()).Gamemode().gameStage == GameStage.CommanderVoting) { // Сейчас
+                                                                                                             // стадия
+                                                                                                             // голосования?
+                        if (playerInvokerColor == playerVotedColor) { // Удостоверяюсь что игрок голосует за союзника
+                                if (context.getSource().getPlayerOrException() != player) { // Сам ли за себя голосуешь?
+                                        if (invokerContext.AlreadyVoted()) {
+                                                player.sendMessage(
+                                                                new TextComponent("Ты не можешь проголосовать дважды"),
+                                                                player.getUUID());
+                                                return 0;
+                                        }
+                                        invokerPlayer.sendMessage(
+                                                        new TextComponent("Голос отправлен, ожидайте!"),
+                                                        player.getUUID());
+                                        teamU.GiveVote(player, votedPlayerContext);
+                                        invokerContext.SetVoted();
+                                } else {
+                                        invokerPlayer.sendMessage(new TextComponent("Ты мне блять за себя поголосуй"),
+                                        invokerPlayer.getUUID());
+                                }
+                        } else {
+                                invokerPlayer.sendMessage(new TextComponent("Нахуй ты за противника голосуешь"),
+                                invokerPlayer.getUUID());
+                        }
+                } else {
+                        invokerPlayer.sendMessage(new TextComponent("Еще рано или уже поздно"), invokerPlayer.getUUID());
+                }
+                return 1;
+        }
+
+        private static int SetTeamSpawnTo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
                 int x = IntegerArgumentType.getInteger(context, "x");
                 int y = IntegerArgumentType.getInteger(context, "y");
                 int z = IntegerArgumentType.getInteger(context, "z");
@@ -367,7 +393,7 @@ public class CommandRegistration {
                 TeamManager teamManager = ((TeamGamemode) (PlayerContext
                                 .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
                                 .GetTeamManager();
-                
+
                 teamManager.SetSpawn(color, position);
                 context.getSource().sendSuccess(
                                 new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
@@ -377,7 +403,7 @@ public class CommandRegistration {
         }
 
         private static int ChooseRespawnPoint(CommandContext<CommandSourceStack> context, boolean tentChosen,
-                String response, SoundEvent sound) throws CommandSyntaxException {
+                        String response, SoundEvent sound) throws CommandSyntaxException {
                 ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
 
                 PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), tentChosen);
