@@ -6,14 +6,12 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
+import com.dod.UnrealZaruba.NetworkPackets.SaveTokensPacket;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.dod.UnrealZaruba.WorldManager.DynamicWorldManager;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -48,6 +46,11 @@ public class UnrealZaruba {
                 (msg, buf) -> LoginPacket.encode(msg, buf),
                 (msg) -> LoginPacket.decode(msg),
                 (msg, ctx) -> LoginPacket.handle(msg, ctx));
+
+        CHANNEL.registerMessage(1 , SaveTokensPacket.class,
+                (msg, buf) -> SaveTokensPacket.encode(msg, buf),
+                (msg) -> SaveTokensPacket.decode(msg),
+                (msg, ctx) -> SaveTokensPacket.handle(msg, ctx));
     }
 
     @SubscribeEvent

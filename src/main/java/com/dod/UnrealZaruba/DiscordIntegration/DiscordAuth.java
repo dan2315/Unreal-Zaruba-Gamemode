@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -52,7 +53,7 @@ public class DiscordAuth {
         }
     }
 
-    public static boolean CheckAuthTokens(UUID playerUUID, Integer port) {
+    public static boolean CheckAuthTokens(String state ,UUID playerUUID, Integer port) {
         Tokens tokens = null;
         try {
             tokens = ConfigManager.loadConfig(ConfigManager.Tokens, Tokens.class);
@@ -61,28 +62,32 @@ public class DiscordAuth {
             return false;
         }
 
+        UnrealZaruba.LOGGER.warn("Tokens " + tokens.token + " " + tokens.refreshToken);
         HttpClient client = HttpClient.newHttpClient();
 
         String queryParams;
         try {
-            queryParams = String.format("player_uuid=%s&port=%s&token=%s&refreshToken=%s",
+            queryParams = String.format("state=%s&player_uuid=%s&port=%s&token=%s&refreshToken=%s",
+                    URLEncoder.encode(state, StandardCharsets.UTF_8.toString()),
                     URLEncoder.encode(playerUUID.toString(), StandardCharsets.UTF_8.toString()),
                     URLEncoder.encode(port.toString(), StandardCharsets.UTF_8.toString()),
                     URLEncoder.encode(tokens.token.toString(), StandardCharsets.UTF_8.toString()),
                     URLEncoder.encode(tokens.refreshToken.toString(), StandardCharsets.UTF_8.toString()));
 
+            UnrealZaruba.LOGGER.warn("Before request");
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(DiscordAuth.backendEndpoint + "/check_tokens?" + queryParams))
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .GET()
                     .build();
+            UnrealZaruba.LOGGER.warn("After request");
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Response Code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
             
             JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+            UnrealZaruba.LOGGER.warn("Got response: " + jsonObject);
             boolean verified = jsonObject.get("verified").getAsBoolean();
             return verified;
 

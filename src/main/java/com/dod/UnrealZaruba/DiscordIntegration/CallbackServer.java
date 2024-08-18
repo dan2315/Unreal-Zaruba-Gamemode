@@ -5,11 +5,12 @@ import com.sun.net.httpserver.HttpServer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.NetworkPackets.SaveTokensPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.sun.net.httpserver.HttpExchange;
@@ -36,7 +37,7 @@ public class CallbackServer {
             server.setExecutor(null); // Use default executor
             server.start();
 
-            UnrealZaruba.LOGGER.info("HTTP server started on port 8001");
+            UnrealZaruba.LOGGER.info("HTTP server started on port " + minecraftServer.getPort() + 228);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,8 +64,9 @@ public class CallbackServer {
 
                 String uuid = params.get("uuid");
                 String state = params.get("state");
-                String token = params.get("state");
-                String refreshToken = params.get("state");
+                String token = params.get("token");
+                String refreshToken = params.get("refreshToken");
+                
                 if (!DiscordAuth.unresolvedRequests.contains(state)) {
                     String response = String.format("Dolbayob: [%s] | POPYTKA VZLOMA, ЫАЫАЫАЫАЫАЫА", playerList.getPlayer(UUID.fromString(uuid)));
                     UnrealZaruba.LOGGER.info(response);
@@ -88,9 +90,9 @@ public class CallbackServer {
                     }
                     TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
                     server.sendMessage(new TextComponent("Авторизация прошла успешно"), playerUUID);
-                    ConfigManager.saveConfig(ConfigManager.Tokens, new Tokens(token, refreshToken));
+                    
+                    UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SaveTokensPacket(token, refreshToken));
 
-                    // Send a response
                     String response = String.format("Auth status for player [%s] set to [%b]", playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);
                     exchange.sendResponseHeaders(200, response.length());
                     UnrealZaruba.LOGGER.info(response);

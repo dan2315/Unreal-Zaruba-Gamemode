@@ -100,15 +100,15 @@ public class ServerEvents {
         }
 
         TickTimer[] timer = new TickTimer[1];
-        timer[0] = TimerManager.Create(30 * 60 * 20, () -> {
-            if (playerContext.IsAuthorized()) {
+        timer[0] = TimerManager.Create(60 * 60 * 20, () -> {
+            if (!playerContext.IsAuthorized()) {
                 UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
-                player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [30 sec]"));
+                player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [60 sec]"));
             }
         },
                 ticks -> {
                     if (ticks % 100 == 0) {
-                        if (playerContext.IsAuthorized()) {
+                        if (!playerContext.IsAuthorized()) {
                             player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"),
                                     player.getUUID());
                         } else {
@@ -121,13 +121,8 @@ public class ServerEvents {
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
 
-        boolean tokenCheck = DiscordAuth.CheckAuthTokens(player.getUUID(), event.getPlayer().getServer().getPort());
-
-        if (!tokenCheck) {
-
-            UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
-                    player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
-        }
+        UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
+                player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
 
     }
 

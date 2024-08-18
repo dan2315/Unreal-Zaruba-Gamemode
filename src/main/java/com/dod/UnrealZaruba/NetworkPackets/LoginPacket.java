@@ -2,13 +2,14 @@ package com.dod.UnrealZaruba.NetworkPackets;
 
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class LoginPacket {
 
@@ -63,10 +64,19 @@ public class LoginPacket {
         ctx.get().setPacketHandled(true);
     }
 
-    public static class ClientPacketHandler { 
+    public static class ClientPacketHandler {
         public static void handleLoginPacket(LoginPacket msg) {
             Minecraft.getInstance().execute(() -> {
-                DiscordAuth.OpenAuthPage(msg.getState(), msg.getUuid(), msg.getMinecraftUsername(), msg.getPort());
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(() -> {
+                    boolean verified = DiscordAuth.CheckAuthTokens(msg.getState(), msg.getUuid(), msg.getPort());
+
+                    if (!verified) {
+                        DiscordAuth.OpenAuthPage(msg.getState(), msg.getUuid(), msg.getMinecraftUsername(),
+                                msg.getPort());
+                    }
+                });
+
             });
         }
     }
