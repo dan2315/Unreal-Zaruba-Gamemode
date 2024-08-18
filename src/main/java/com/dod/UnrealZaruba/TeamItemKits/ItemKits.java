@@ -2,12 +2,6 @@ package com.dod.UnrealZaruba.TeamItemKits;
 
 import java.util.HashMap;
 
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
@@ -19,11 +13,14 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ItemKits {
     public static final HashMap<String, Integer> redTeamKit;
+    public static final HashMap<String, Integer> redTeamCommanderKit;
     public static final HashMap<String, String> redTeamArmorKit;
     public static final HashMap<String, Integer> blueTeamKit;
+    public static final HashMap<String, Integer> blueTeamCommanderKit;
     public static final HashMap<String, String> blueTeamArmorKit;
 
     public static final HashMap<TeamColor, HashMap<String, Integer>> TeamKits;
+    public static final HashMap<TeamColor, HashMap<String, Integer>> CommanderKits;
     public static final HashMap<TeamColor, HashMap<String, String>> TeamArmorKits;
 
     static {
@@ -52,9 +49,16 @@ public class ItemKits {
             "nzgexpansion:heavy_assault_rifle{AmmoCount:30, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:solid_stock\", Count:1b}, Under_Barrel:{id:\"cgmspecialised_grip\", Count:1b}}}",
             1
         );
-        redTeamKit.put("nzgexpansion:medium_bullet", 600);
+        redTeamKit.put("nzgexpansion:medium_bullet", 300);
         redTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block_blue\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
+        redTeamCommanderKit = new HashMap<>();
+        redTeamCommanderKit.put("unrealzaruba:tent" , 3);
+        redTeamCommanderKit.put("cgm:bazooka", 5);
+        redTeamCommanderKit.put("cgm:missile", 40);
+
+        blueTeamCommanderKit = new HashMap<>();
+        blueTeamCommanderKit.put("unrealzaruba:tent", 1);
 
         blueTeamArmorKit = new HashMap<>();
         blueTeamArmorKit.put("uz_armor:armor_b_helmet",  "head");
@@ -81,18 +85,30 @@ public class ItemKits {
         blueTeamKit.put(
                 "nzgexpansion:battle_rifle{AmmoCount:20, Attachments:{Barrel:{id:\"nzgexpansion:extended_barrel\", Count:1b}, Stock:{id:\"nzgexpansion:carbine_stock\", Count:1b}}}",
                 1);
-        blueTeamKit.put("nzgexpansion:medium_bullet", 600);
+        blueTeamKit.put("nzgexpansion:medium_bullet", 300);
         blueTeamKit.put("minecraft:stone_hoe{CanDestroy:[\"unrealzaruba:tent_main_block_red\"], display:{Name:'{\"text\":\"Ломотык\"}',Lore:['{\"text\":\"Для уничтожения временных спавнов. НЫЫЫЫЫЫЫЫЫАААААААААААААААА\",\"color\":\"#ffa600\"}']}}", 1);
 
         TeamKits = new HashMap<>();
         TeamKits.put(TeamColor.RED, redTeamKit);
         TeamKits.put(TeamColor.BLUE, blueTeamKit);
+
+        CommanderKits = new HashMap<>();
+        CommanderKits.put(TeamColor.RED, redTeamCommanderKit);
+        CommanderKits.put(TeamColor.BLUE, blueTeamCommanderKit);
+
         TeamArmorKits = new HashMap<>();
         TeamArmorKits.put(TeamColor.RED, redTeamArmorKit);
         TeamArmorKits.put(TeamColor.BLUE, blueTeamArmorKit);
     }
 
     public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
+        for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
+            CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
+                    itemElement.getKey() + " " + itemElement.getValue());
+        }
+    }
+
+    public static void GiveCommanderKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
