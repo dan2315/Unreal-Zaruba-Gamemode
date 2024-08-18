@@ -90,14 +90,7 @@ public class TeamU {
 
 
         if (player instanceof ServerPlayer serverPlayer) { // TODO Впихать в файл конфига для команд
-            if (batya.GetPlayersTeam(serverPlayer).color == TeamColor.RED) {
-                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
-                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
-                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
-            } else {
-                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
-                ItemKits.GiveItem(server, serverPlayer, "unrealzaruba:tent");
-            }
+            ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
             SendMessageToTeam(server, "Командиром команды становится: " + player.getName().getString());
         }
     }
