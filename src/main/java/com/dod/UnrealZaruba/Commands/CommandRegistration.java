@@ -335,11 +335,9 @@ public class CommandRegistration {
 
         private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player)
                         throws CommandSyntaxException {
-                UnrealZaruba.LOGGER.warn("Пагна");
                 TeamManager teamManager = ((TeamGamemode) (PlayerContext
                                 .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
                                 .GetTeamManager();
-                UnrealZaruba.LOGGER.warn("Челн");
 
                 TeamU teamU = teamManager.GetPlayersTeam(player);
 
