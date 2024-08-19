@@ -126,13 +126,13 @@ public class ServerEvents {
 
     }
 
-    // @SubscribeEvent
-    // public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-    // if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
-    // return;
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
+            return;
 
-    // PlayerContext.Deauthorize(event.getPlayer().getUUID());
-    // }
+        PlayerContext.Deauthorize(event.getPlayer().getUUID());
+    }
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
