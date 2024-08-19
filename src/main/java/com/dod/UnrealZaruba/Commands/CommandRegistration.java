@@ -172,6 +172,7 @@ public class CommandRegistration {
                                                 ModSounds.SELECT2.get())));
 
                 dispatcher.register(Commands.literal("vote")
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(0))
                                 .then(Commands.argument("playerr", EntityArgument.player())
                                                 .executes(context -> {
                                                         voteForPlayer(context,
