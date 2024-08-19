@@ -63,30 +63,27 @@ public class PlayerRespawnEventHandler {
         }
 
         if (gamemode.gameStage != GameStage.Preparation) {
-            if (serverPlayer instanceof ServerPlayer) {
-                ServerPlayer player = (ServerPlayer) serverPlayer;
-                ServerLevel serverWorld = player.getLevel();
+                ServerLevel serverWorld = serverPlayer.getLevel();
                 serverWorld.getServer().execute(() -> {
-                    player.setGameMode(GameType.SPECTATOR);
+                    serverPlayer.setGameMode(GameType.SPECTATOR);
                 });
 
                 var duration = 10;
                 TimerManager.Create(duration * 1000, () -> {
                     serverPlayer.setGameMode(GameType.ADVENTURE);
                     NBT.addEntityTag(serverPlayer, "isPlayerDead", 0);
-                    teamManager.RespawnPlayer(player, DeadPlayers.get(serverPlayer.getUUID()));
+                    teamManager.RespawnPlayer(serverPlayer, DeadPlayers.get(serverPlayer.getUUID()));
 
                     SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
                 },
                         ticks -> {
                             if (ticks % 20 != 0)
                                 return;
-                            TitleMessage.sendTitle(player, "§4" + String.valueOf(duration - ticks / 20));
+                            TitleMessage.sendTitle(serverPlayer, "§4" + String.valueOf(duration - ticks / 20));
                         });
             }
+            serverPlayer.setHealth(20.0F);
+            event.setCanceled(true);
         }
 
-        serverPlayer.setHealth(20.0F);
-        event.setCanceled(true);
     }
-}

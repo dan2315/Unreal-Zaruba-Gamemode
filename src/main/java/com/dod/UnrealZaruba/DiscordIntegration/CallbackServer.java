@@ -28,7 +28,7 @@ public class CallbackServer {
 
     public static void StartServer(MinecraftServer minecraftServer) {
         try {
-            
+
             server = HttpServer.create(new InetSocketAddress(minecraftServer.getPort() + 228), 0);
 
             // Define a context for handling /notifyAuthStatus POST requests
@@ -55,6 +55,7 @@ public class CallbackServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                UnrealZaruba.LOGGER.warn("[INFO] Got notify request");
                 var playerList = ServerLifecycleHooks.getCurrentServer().getPlayerList();
                 InputStream inputStream = exchange.getRequestBody();
                 String requestBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -66,13 +67,13 @@ public class CallbackServer {
                 String state = params.get("state");
                 String token = params.get("token");
                 String refreshToken = params.get("refreshToken");
-                
+
                 if (!DiscordAuth.unresolvedRequests.contains(state)) {
-                    String response = String.format("Dolbayob: [%s] | POPYTKA VZLOMA, ЫАЫАЫАЫАЫАЫА", playerList.getPlayer(UUID.fromString(uuid)));
+                    String response = String.format("Dolbayob: [%s] | POPYTKA VZLOMA, ЫАЫАЫАЫАЫАЫА",
+                            playerList.getPlayer(UUID.fromString(uuid)));
                     UnrealZaruba.LOGGER.info(response);
                     return;
-                }
-                else {
+                } else {
                     DiscordAuth.unresolvedRequests.remove(state);
                     UnrealZaruba.LOGGER.info("Unresolved requests remaining: " + DiscordAuth.unresolvedRequests.size());
                 }
@@ -85,17 +86,19 @@ public class CallbackServer {
                     playerContext.SetAuthorized(isAuthenticated);
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
-                    if (playerContext.PreviouslyOpped() && player != null) {
-                        server.getPlayerList().op(player.getGameProfile());
-                    }
-                    TitleMessage.sendTitle(player, "Добро пожаловать, §2§r!");
-                    server.sendMessage(new TextComponent("Авторизация прошла успешно"), playerUUID);
-                    
-                    UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SaveTokensPacket(token, refreshToken));
 
-                    String response = String.format("Auth status for player [%s] set to [%b]", playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);
+                    UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                            new SaveTokensPacket(token, refreshToken));
+
+                    String response = String.format("Auth status for player [%s] set to [%b]",
+                            playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);
                     exchange.sendResponseHeaders(200, response.length());
                     UnrealZaruba.LOGGER.info(response);
+
+                    if (playerContext.PreviouslyOpped() && player != null)
+                    {
+                        server.getPlayerList().op(player.getGameProfile());
+                    }
                 } else {
                     // Send a bad request response
                     String response = "Invalid request: UUID is missing.";
@@ -106,8 +109,8 @@ public class CallbackServer {
                 // Send a method not allowed response
                 exchange.sendResponseHeaders(405, -1); // 405 Method Not Allowed
             }
-        }
 
+        }
 
         // Parse JSON formatted body to map
         private Map<String, String> parseJsonBody(String jsonBody) {
@@ -124,6 +127,5 @@ public class CallbackServer {
             return map;
         }
 
-        
     }
 }
