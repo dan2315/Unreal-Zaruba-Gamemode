@@ -361,14 +361,14 @@ public class CommandRegistration {
                         if (playerInvokerColor == playerVotedColor) { // Удостоверяюсь что игрок голосует за союзника
                                 if (context.getSource().getPlayerOrException() != player) { // Сам ли за себя голосуешь?
                                         if (invokerContext.AlreadyVoted()) {
-                                                player.sendMessage(
+                                                invokerPlayer.sendMessage(
                                                                 new TextComponent("Ты не можешь проголосовать дважды"),
-                                                                player.getUUID());
+                                                                invokerPlayer.getUUID());
                                                 return 0;
                                         }
                                         invokerPlayer.sendMessage(
-                                                        new TextComponent("Голос отправлен, ожидайте!"),
-                                                        player.getUUID());
+                                                        new TextComponent("Голос отправлен за "+ player.getName().toString() +", ожидайте!"),
+                                                        invokerPlayer.getUUID());
                                         teamU.GiveVote(player, votedPlayerContext);
                                         invokerContext.SetVoted();
                                 } else {
