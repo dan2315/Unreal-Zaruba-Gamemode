@@ -54,10 +54,10 @@ public class PlayerRespawnEventHandler {
             TitleMessage.sendActionbar(serverPlayer, new TextComponent("§c ☠ Вас убил " + killer_player.getName().getString() + " ☠"));
         }
 
-        serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
-        TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться на базе", "/tpToTeamSpawn");
-        serverPlayer.sendMessage(new TextComponent(""), serverPlayer.getUUID());
         if (!(teamManager.GetPlayersTeam(serverPlayer).active_tent == null)) {
+            serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
+            TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться на базе", "/tpToTeamSpawn");
+            serverPlayer.sendMessage(new TextComponent(""), serverPlayer.getUUID());
             TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
             serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
         }

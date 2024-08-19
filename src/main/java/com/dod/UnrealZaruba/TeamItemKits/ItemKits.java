@@ -109,7 +109,7 @@ public class ItemKits {
     }
 
     public static void GiveCommanderKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
-        for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
+        for (Map.Entry<String, Integer> itemElement : ItemKits.CommanderKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
         }
