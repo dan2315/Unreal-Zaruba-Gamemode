@@ -208,7 +208,6 @@ public class TeamManager {
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
         serverPlayer.teleportTo(x, y, z);
-        serverPlayer.sendMessage(new TextComponent("Щелкнуло!"), serverPlayer.getUUID());
     }
 
     public void RespawnPlayer(ServerPlayer player, boolean tentChosen) {
