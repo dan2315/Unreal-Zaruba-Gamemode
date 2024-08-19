@@ -29,3 +29,4 @@ buildClient.bat
 buildServer.bat
 *.lnk
 .prettierrc
+downloads

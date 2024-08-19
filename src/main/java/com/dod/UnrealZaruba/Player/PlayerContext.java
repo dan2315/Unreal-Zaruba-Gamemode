@@ -72,7 +72,7 @@ public class PlayerContext {
     }
     
     public static void Deauthorize(UUID id) {
-        playerContextMap.remove(id);
+        playerContextMap.get(id).authorized = false;
     }
 
     public void SetPreviouslyOpped() {
