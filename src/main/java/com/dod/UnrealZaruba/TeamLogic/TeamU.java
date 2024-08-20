@@ -2,12 +2,13 @@ package com.dod.UnrealZaruba.TeamLogic;
 
 import java.util.*;
 
-
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.ibm.icu.impl.Pair;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -25,11 +26,11 @@ public class TeamU {
     private BlockPos spawn;
     public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
+    private UUID commander;
     List<UUID> members = new ArrayList<>();
     public TeamColor color;
     MinecraftServer server;
     TeamManager batya;
-
     public Tent active_tent;
 
 
@@ -38,6 +39,7 @@ public class TeamU {
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
+    public UUID Commander() {return commander;}
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
     
@@ -71,33 +73,35 @@ public class TeamU {
         playerContext.AddVote();
     }
 
-    public UUID MostVoted() {
-        Integer most_votes = 0;
-        UUID most_voted_player = null;
+    public List<UUID> VoteList() {
 
-        for (var member : members) {
-            int votes = PlayerContext.Get(member).Votes();
-            if (votes > most_votes) {
-                most_votes = votes;
-                most_voted_player = member;
+        Collections.sort(members, new Comparator<UUID>() {
+            @Override
+            public int compare(UUID o1, UUID o2) {
+                int votes1 = PlayerContext.Get(o1).Votes();
+                int votes2 = PlayerContext.Get(o2).Votes();
+                return Integer.compare(votes2, votes1); // Descending order
             }
-        }
-        return most_voted_player;
+        });
+
+        return members;
     }
 
     public void setCommander(MinecraftServer server, Player player) {
-        HashMap<TeamColor, TeamU> teams = this.batya.teams;
 
-
-        if (player instanceof ServerPlayer serverPlayer) { // TODO Впихать в файл конфига для команд
+        if (player instanceof ServerPlayer serverPlayer) {
             ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
-            SendMessageToTeam(server, "Командиром команды становится: " + player.getName().getString());
+            commander = serverPlayer.getUUID();
         }
+
     }
 
-    public void SendMessageToTeam(MinecraftServer server, String message) {
+    public void SendMessage(MinecraftServer server, String message) {
         this.members.forEach(element -> {
-            server.getPlayerList().getPlayer(element).sendMessage(new TextComponent(message), element);
+            ServerPlayer player = server.getPlayerList().getPlayer(element);
+            if (player != null) {
+                player.sendMessage(new TextComponent(message), element);
+            }
         });
     }
 

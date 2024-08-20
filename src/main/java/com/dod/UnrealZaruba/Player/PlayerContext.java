@@ -12,6 +12,7 @@ import net.minecraft.world.level.GameType;
 public class PlayerContext {
 
     public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
+    
     private UUID id;
     private boolean authorized;
     private GameType originalGameType;

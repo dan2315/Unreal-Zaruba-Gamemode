@@ -14,6 +14,7 @@ import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
@@ -79,6 +80,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public int StartVotingForCommander(CommandContext<CommandSourceStack> context) {
         gameStage = GameStage.CommanderVoting;
+        MinecraftServer server = context.getSource().getServer();
 
         HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
 
@@ -89,15 +91,27 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
 
             TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
-                    new TextComponent("Это сложно, но попробуйте выделить одного командира"));
+                    new TextComponent("Для того, чтобы проголосовать используй: §6/vote <игрок>"));
         }
 
         TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
                 () -> {
                     try {
                         for (Map.Entry<TeamColor, TeamU> teamEntry : teams.entrySet()) {
-                            Player most_voted_player = context.getSource().getServer().getPlayerList().getPlayer(teamEntry.getValue().MostVoted());
+                            TeamU team = teamEntry.getValue();
+                            Player most_voted_player = server.getPlayerList().getPlayer(team.VoteList().get(0));
+                            TextComponent message = new TextComponent(
+                                "===========================\nТоп 5 голосования:\n");
+                            for (int i = 0; i < 5; i++) {
+                                ServerPlayer topPlayer = server.getPlayerList().getPlayer(team.VoteList().get(i));
+                                if (topPlayer != null) {
+                                    Integer voteCount = PlayerContext.Get(topPlayer.getUUID()).Votes();
+                                    message.append(i + 1 +". " + topPlayer.getName().getString() + ": " + voteCount);
+                                }
+                            }
+                            message.append("===========================");
                             teamEntry.getValue().setCommander(context.getSource().getServer(), most_voted_player);
+                            team.SendMessage(server, null);
                         }
                         StartPreparation(context);
                     } catch (Exception e) {
@@ -119,9 +133,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
         gameStage = GameStage.StrategyTime;
 
+
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
             TitleMessage.showTitle(serverPlayer, new TextComponent("§6Стадия подготовки"),
-                    new TextComponent("Обсудите стратегию со своей командой"));
+                    new TextComponent("Коммандиром стал " + TeamManager.GetPlayersTeam(serverPlayer)));
             TeamManager.GiveKitTo(context.getSource().getServer(), serverPlayer);
         }
 
