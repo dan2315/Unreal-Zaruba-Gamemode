@@ -15,6 +15,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -335,51 +336,7 @@ public class CommandRegistration {
 
         private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player)
                         throws CommandSyntaxException {
-                TeamManager teamManager = ((TeamGamemode) (PlayerContext
-                                .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
-                                .GetTeamManager();
-
-                TeamU teamU = teamManager.GetPlayersTeam(player);
-
-                if (teamManager.GetPlayersTeam(
-                                context.getSource().getPlayerOrException()).color == TeamColor.UNDEFINED) {
-                        UnrealZaruba.LOGGER.warn("Сосал?");
-                        return 0;
-                }
-
-                Player invokerPlayer = context.getSource().getPlayerOrException();
-                TeamColor playerInvokerColor = teamManager.GetPlayersTeam(context.getSource().getPlayerOrException()).color;
-                TeamColor playerVotedColor = teamManager.GetPlayersTeam(player).color;
-                PlayerContext invokerContext = PlayerContext.Get(context.getSource().getPlayerOrException().getUUID());
-                PlayerContext votedPlayerContext = PlayerContext.Get(player.getUUID());
-
-                if (PlayerContext.Get(player.getUUID()).Gamemode().gameStage == GameStage.CommanderVoting) { // Сейчас
-                                                                                                             // стадия
-                                                                                                             // голосования?
-                        if (playerInvokerColor == playerVotedColor) { // Удостоверяюсь что игрок голосует за союзника
-                                if (context.getSource().getPlayerOrException() != player) { // Сам ли за себя голосуешь?
-                                        if (invokerContext.AlreadyVoted()) {
-                                                invokerPlayer.sendMessage(
-                                                                new TextComponent("Ты не можешь проголосовать дважды"),
-                                                                invokerPlayer.getUUID());
-                                                return 0;
-                                        }
-                                        invokerPlayer.sendMessage(
-                                                        new TextComponent("Голос отправлен за "+ player.getName().toString() +", ожидайте!"),
-                                                        invokerPlayer.getUUID());
-                                        teamU.GiveVote(player, votedPlayerContext);
-                                        invokerContext.SetVoted();
-                                } else {
-                                        invokerPlayer.sendMessage(new TextComponent("Ты мне блять за себя поголосуй"),
-                                        invokerPlayer.getUUID());
-                                }
-                        } else {
-                                invokerPlayer.sendMessage(new TextComponent("Нахуй ты за противника голосуешь"),
-                                invokerPlayer.getUUID());
-                        }
-                } else {
-                        invokerPlayer.sendMessage(new TextComponent("Еще рано или уже поздно"), invokerPlayer.getUUID());
-                }
+                CommanderSystem.ProcessCommanderVote(context.getSource().getPlayerOrException().getUUID(), player.getUUID());
                 return 1;
         }
 

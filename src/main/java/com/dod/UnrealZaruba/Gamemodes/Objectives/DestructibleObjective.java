@@ -6,14 +6,19 @@ import java.util.Set;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
+import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -76,6 +81,17 @@ public class DestructibleObjective extends GameObjective {
                 toRemove.add(pos);
                 counter++;
             }
+        }
+
+        if (counter > 0) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (containingGamemode instanceof TeamGamemode teamGamemode) {
+                teamGamemode.GetTeamManager().GetTeams().get(TeamColor.RED).SendMessage(server, 
+                "Ваша §l§4команда§r атакует точку §b" + name + "§r. Гойда!");
+                teamGamemode.GetTeamManager().GetTeams().get(TeamColor.BLUE).SendMessage(server, 
+                "Ваша точка §b" + name + "§r атакована §l§4противниками§r");
+            }
+            
         }
 
         trackedBlocks.removeAll(toRemove);

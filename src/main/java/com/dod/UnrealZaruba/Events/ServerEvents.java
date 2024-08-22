@@ -57,7 +57,7 @@ public class ServerEvents {
     public static void onServerStarting(ServerStartingEvent event) {
         CallbackServer.StartServer(event.getServer());
         TeamU.SetupMinecraftTeams(event.getServer());
-        gamemode = new DestroyObjectivesGamemode();
+        gamemode = new DestroyObjectivesGamemode(event.getServer());
         teamManager = gamemode.GetTeamManager();
         ScoreboardManager.clearScoreboard(event.getServer());
         GamemodeManager.StartGame(event.getServer().overworld(), gamemode);
@@ -107,9 +107,9 @@ public class ServerEvents {
             }
         },
                 ticks -> {
-                    if (ticks % 100 == 0) {
+                    if (ticks % 100 == 0 && ticks >= 100) {
                         if (!playerContext.IsAuthorized()) {
-                            player.sendMessage(new TextComponent("Не авторизован, войди в систему через дискорд"),
+                            player.sendMessage(new TextComponent("Не авторизован. Чтобы войти, используй открывшийся браузер, после этого, токены для авторизации сохраняться на компьютер"),
                                     player.getUUID());
                         } else {
                             timer[0].Dispose(false);

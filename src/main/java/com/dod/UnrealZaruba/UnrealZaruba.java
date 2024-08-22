@@ -6,7 +6,9 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
+import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.NetworkPackets.SaveTokensPacket;
+import com.dod.UnrealZaruba.NetworkPackets.VotePlayerPacket;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.mojang.logging.LogUtils;
@@ -51,6 +53,16 @@ public class UnrealZaruba {
                 (msg, buf) -> SaveTokensPacket.encode(msg, buf),
                 (msg) -> SaveTokensPacket.decode(msg),
                 (msg, ctx) -> SaveTokensPacket.handle(msg, ctx));
+
+        CHANNEL.registerMessage(2 , OpenScreenPacket.class,
+                (msg, buf) -> OpenScreenPacket.encode(msg, buf),
+                (msg) -> OpenScreenPacket.decode(msg),
+                (msg, ctx) -> OpenScreenPacket.handle(msg, ctx));
+
+        CHANNEL.registerMessage(3 , VotePlayerPacket.class,
+                (msg, buf) -> VotePlayerPacket.encode(msg, buf),
+                (msg) -> VotePlayerPacket.decode(msg),
+                (msg, ctx) -> VotePlayerPacket.handle(msg, ctx));
     }
 
     @SubscribeEvent

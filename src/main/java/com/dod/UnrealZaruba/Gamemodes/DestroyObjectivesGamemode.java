@@ -14,6 +14,7 @@ import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
@@ -29,6 +30,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -52,7 +54,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     GameObjective[] objectives;
 
-    public DestroyObjectivesGamemode() {
+    public DestroyObjectivesGamemode(MinecraftServer server) {
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
         objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
@@ -62,6 +64,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
                 "Продержитесь 50 минут"));
+        Utils.LoadChunksInArea(server.getLevel(Level.OVERWORLD), -1024, -512, 1024, 512);
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         objectives = DestructibleObjectivesHandler.Load(this);
@@ -84,25 +87,38 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
         HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
 
-
-        for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
-            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
-            serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
-
-            TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
-                    new TextComponent("Для того, чтобы проголосовать используй: §6/vote <игрок>"));
+        for (var team : teams.entrySet()) {
+            for (var player : team.getValue().Members()) {
+                var serverPlayer = server.getPlayerList().getPlayer(player);
+                if (serverPlayer == null) continue;
+                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
+    
+                TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
+                        new TextComponent("Для того, чтобы проголосовать используй: §6/vote <игрок>"));
+    
+                UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, team.getValue().Members()));
+            } 
         }
+
 
         TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
                 () -> {
                     try {
                         for (Map.Entry<TeamColor, TeamU> teamEntry : teams.entrySet()) {
                             TeamU team = teamEntry.getValue();
+                            if (team.VoteList().isEmpty()) {
+                                UnrealZaruba.LOGGER.warn("Vote list is empty");
+                                continue;
+                            }
+        
+                            
+                            int listSize = team.VoteList().size();
                             Player most_voted_player = server.getPlayerList().getPlayer(team.VoteList().get(0));
                             TextComponent message = new TextComponent(
                                 "===========================\nТоп 5 голосования:\n");
-                            for (int i = 0; i < 5; i++) {
+                            for (int i = 0; i < Math.min(5, listSize); i++) {
                                 ServerPlayer topPlayer = server.getPlayerList().getPlayer(team.VoteList().get(i));
                                 if (topPlayer != null) {
                                     Integer voteCount = PlayerContext.Get(topPlayer.getUUID()).Votes();
