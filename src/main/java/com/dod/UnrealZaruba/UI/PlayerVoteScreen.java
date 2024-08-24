@@ -65,7 +65,9 @@ public class PlayerVoteScreen extends Screen {
         for (Player player : players) {
             if (player.getName().getString().toLowerCase().contains(filter.toLowerCase())) {
                 if (teammates.contains(player.getUUID())) {
-                    this.playerList.children().add(new PlayerListEntry(player));
+                    if (!Minecraft.getInstance().player.getUUID().equals(player.getUUID())) {
+                        this.playerList.children().add(new PlayerListEntry(player));
+                    }
                 }
             }
         }
@@ -91,6 +93,11 @@ public class PlayerVoteScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
         return false;
     }
 

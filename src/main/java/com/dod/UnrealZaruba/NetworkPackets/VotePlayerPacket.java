@@ -7,7 +7,6 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -37,7 +36,7 @@ public class VotePlayerPacket {
             ServerPlayer serverPlayer = ctx.get().getSender();
             if (serverPlayer != null) {
                 UUID votedPlayerUUID = msg.getUuid();
-                UnrealZaruba.LOGGER.warn("Recieved message -> handle from " + serverPlayer.getName().getString());
+                UnrealZaruba.LOGGER.warn("Recieved message -> vote from " + serverPlayer.getName().getString());
                 CommanderSystem.ProcessCommanderVote(serverPlayer.getUUID(), votedPlayerUUID);
             }
         });

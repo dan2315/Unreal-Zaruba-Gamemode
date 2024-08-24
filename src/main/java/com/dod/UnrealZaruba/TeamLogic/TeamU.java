@@ -27,6 +27,7 @@ public class TeamU {
     public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     private UUID commander;
+    private String commanderName;
     List<UUID> members = new ArrayList<>();
     public TeamColor color;
     MinecraftServer server;
@@ -40,6 +41,7 @@ public class TeamU {
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
     public UUID Commander() {return commander;}
+    public String CommanderName() {return commanderName;}
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
     
@@ -92,6 +94,7 @@ public class TeamU {
         if (player instanceof ServerPlayer serverPlayer) {
             ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
             commander = serverPlayer.getUUID();
+            commanderName = serverPlayer.getDisplayName().getString();
         }
 
     }

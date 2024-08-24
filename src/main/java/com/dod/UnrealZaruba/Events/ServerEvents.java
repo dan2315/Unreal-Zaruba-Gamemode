@@ -99,20 +99,19 @@ public class ServerEvents {
             server.getPlayerList().deop(player.getGameProfile());
         }
 
-        TickTimer[] timer = new TickTimer[1];
-        timer[0] = TimerManager.Create(60 * 60 * 20, () -> {
+        
+        TimerManager.Create(60 * 1000, () -> {
             if (!playerContext.IsAuthorized()) {
                 UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
                 player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [60 sec]"));
             }
         },
                 ticks -> {
-                    if (ticks % 100 == 0 && ticks >= 100) {
+                    if (ticks % 100 == 0 && ticks >= 200) {
                         if (!playerContext.IsAuthorized()) {
-                            player.sendMessage(new TextComponent("Не авторизован. Чтобы войти, используй открывшийся браузер, после этого, токены для авторизации сохраняться на компьютер"),
+                            player.sendMessage(new TextComponent(
+                                    "Не авторизован. Чтобы войти, используй открывшийся браузер. После первого раза авторизация происходит по сохраненным токенам"),
                                     player.getUUID());
-                        } else {
-                            timer[0].Dispose(false);
                         }
                     }
                 });

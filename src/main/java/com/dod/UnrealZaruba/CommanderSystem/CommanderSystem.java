@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.CommanderSystem;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
@@ -19,11 +20,14 @@ public class CommanderSystem {
         ServerPlayer invokerPlayer = server.getPlayerList().getPlayer(invokerPlayerUUID);
         ServerPlayer targetPlayer = server.getPlayerList().getPlayer(targetPlayerUUID);
         
+        
         if (invokerPlayer == null) return;
         if (targetPlayer == null) {
             invokerPlayer.sendMessage(new TextComponent("Выбранный игрок не найден"), invokerPlayer.getUUID());
             return;
         }
+
+        UnrealZaruba.LOGGER.warn("Invoker :" + invokerPlayer.getUUID().toString() + "         Target: " + targetPlayer.getUUID().toString());
 
         PlayerContext invokerPlayerContext = PlayerContext.Get(invokerPlayerUUID);
         PlayerContext targetPlayerContext = PlayerContext.Get(targetPlayerUUID);
@@ -42,7 +46,7 @@ public class CommanderSystem {
             return;
         }
 
-        if (invokerPlayerUUID == targetPlayerUUID) { 
+        if (invokerPlayerUUID.equals(targetPlayerUUID)) {
             invokerPlayer.sendMessage(new TextComponent("Ты мне блять за себя поголосуй"), invokerPlayer.getUUID());
             return;
         }
@@ -52,7 +56,7 @@ public class CommanderSystem {
             return;
         }
 
-        invokerPlayer.sendMessage(new TextComponent("Голос отправлен за " + targetPlayer.getName().toString() + ", ожидайте!"), invokerPlayer.getUUID());
+        invokerPlayer.sendMessage(new TextComponent("Голос отправлен за " + targetPlayer.getName().getString() + ", ожидайте!"), invokerPlayer.getUUID());
         teamGamemode.GetTeamManager().GetPlayersTeam(targetPlayer).GiveVote(targetPlayer, targetPlayerContext);
         invokerPlayerContext.SetVoted();
     }

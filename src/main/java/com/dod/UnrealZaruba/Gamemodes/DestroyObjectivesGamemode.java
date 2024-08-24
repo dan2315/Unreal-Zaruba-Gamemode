@@ -91,12 +91,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             for (var player : team.getValue().Members()) {
                 var serverPlayer = server.getPlayerList().getPlayer(player);
                 if (serverPlayer == null) continue;
-                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
-                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
-                serverPlayer.sendMessage(new TextComponent("Для голосования используйте команду /vote <Игрок>"), serverPlayer.getUUID());
     
                 TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
-                        new TextComponent("Для того, чтобы проголосовать используй: §6/vote <игрок>"));
+                        new TextComponent("Для того, чтобы проголосовать используй"));
     
                 UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, team.getValue().Members()));
             } 
@@ -116,18 +113,18 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                             
                             int listSize = team.VoteList().size();
                             Player most_voted_player = server.getPlayerList().getPlayer(team.VoteList().get(0));
-                            TextComponent message = new TextComponent(
+                            StringBuilder message = new StringBuilder (
                                 "===========================\nТоп 5 голосования:\n");
                             for (int i = 0; i < Math.min(5, listSize); i++) {
                                 ServerPlayer topPlayer = server.getPlayerList().getPlayer(team.VoteList().get(i));
                                 if (topPlayer != null) {
                                     Integer voteCount = PlayerContext.Get(topPlayer.getUUID()).Votes();
-                                    message.append(i + 1 +". " + topPlayer.getName().getString() + ": " + voteCount);
+                                    message.append(i + 1 +". " + topPlayer.getName().getString() + ": " + voteCount + "\n");
                                 }
                             }
                             message.append("===========================");
                             teamEntry.getValue().setCommander(context.getSource().getServer(), most_voted_player);
-                            team.SendMessage(server, null);
+                            team.SendMessage(server, message.toString());
                         }
                         StartPreparation(context);
                     } catch (Exception e) {
@@ -149,10 +146,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
         gameStage = GameStage.StrategyTime;
 
-
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
             TitleMessage.showTitle(serverPlayer, new TextComponent("§6Стадия подготовки"),
-                    new TextComponent("Коммандиром стал " + TeamManager.GetPlayersTeam(serverPlayer)));
+                    new TextComponent("Коммандиром стал " +
+                            TeamManager.GetPlayersTeam(serverPlayer).CommanderName() + ", он определяет стратегию"));
             TeamManager.GiveKitTo(context.getSource().getServer(), serverPlayer);
         }
 
