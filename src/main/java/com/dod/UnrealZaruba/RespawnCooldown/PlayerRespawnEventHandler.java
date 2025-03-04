@@ -3,6 +3,9 @@ package com.dod.UnrealZaruba.RespawnCooldown;
 import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
+import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
+import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
@@ -23,43 +26,50 @@ import net.minecraft.world.level.GameType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = "unrealzaruba", bus = Bus.FORGE)
 public class PlayerRespawnEventHandler {
     public static final HashMap<UUID, Boolean> DeadPlayers = new HashMap<>(); // false = team spawn | true = team tent
 
+    public static void SelectTentFor(UUID playerID, boolean chosen) {
+        DeadPlayers.put(playerID, chosen);
+    } 
+
     @SubscribeEvent
     public void OnPlayerDeath(LivingDeathEvent event) {
+        if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer()) {
+            return;
+        }
+
         if (!(event.getEntityLiving() instanceof ServerPlayer serverPlayer))
             return;
         
         BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level);
         
-        if (gamemode.gameStage == GameStage.Preparation) return;
+        if (gamemode.gameStage == GameStage.Preparation) {
+            serverPlayer.setHealth(20.0F);
+            event.setCanceled(true);
+            return;
+        }
+
         TeamManager teamManager = ((TeamGamemode)gamemode).GetTeamManager();
 
         NBT.addEntityTag(serverPlayer, "isPlayerDead", 1);
         DeadPlayers.put(serverPlayer.getUUID(), false);
         SoundHandler.playSoundToPlayer(serverPlayer, ModSounds.DEATH.get(), 1.0f, 1.0f);
+        
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof Player) {
             Entity killer_entity = event.getSource().getEntity();
             ServerPlayer killer_player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(killer_entity.getUUID());
-
             TitleMessage.sendActionbar(killer_player, new TextComponent("§c ☠ Вы убили " + serverPlayer.getName().getString() + " ☠"));
             TitleMessage.sendActionbar(serverPlayer, new TextComponent("§c ☠ Вас убил " + killer_player.getName().getString() + " ☠"));
-        }
-
-        if (!(teamManager.GetPlayersTeam(serverPlayer).active_tent == null)) {
-            serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
-            TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться на базе", "/tpToTeamSpawn");
-            serverPlayer.sendMessage(new TextComponent(""), serverPlayer.getUUID());
-            TextClickEvent.sendClickableMessage(serverPlayer, "Возродиться в палатке", "/tpToTeamTent");
-            serverPlayer.sendMessage(new TextComponent("====================="), serverPlayer.getUUID());
         }
 
         if (gamemode.gameStage != GameStage.Preparation) {
@@ -68,7 +78,10 @@ public class PlayerRespawnEventHandler {
                     serverPlayer.setGameMode(GameType.SPECTATOR);
                 });
 
-                var duration = 10;
+                int duration = 10;
+                Map<String, Object> data = new HashMap<>();
+                data.put("tentExist", teamManager.GetPlayersTeam(serverPlayer).active_tent != null);
+                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(2, data));
                 TimerManager.Create(duration * 1000, () -> {
                     serverPlayer.setGameMode(GameType.ADVENTURE);
                     NBT.addEntityTag(serverPlayer, "isPlayerDead", 0);
@@ -79,7 +92,7 @@ public class PlayerRespawnEventHandler {
                         ticks -> {
                             if (ticks % 20 != 0)
                                 return;
-                            TitleMessage.sendTitle(serverPlayer, "§4" + String.valueOf(duration - ticks / 20));
+                            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new UpdateDeathTimerPacket(duration - ticks / 20));
                         });
             }
             serverPlayer.setHealth(20.0F);

@@ -55,7 +55,7 @@ public class ItemKits {
         redTeamCommanderKit = new HashMap<>();
         redTeamCommanderKit.put("unrealzaruba:tent" , 3);
         redTeamCommanderKit.put("cgm:bazooka", 5);
-        redTeamCommanderKit.put("cgm:missile", 40);
+        redTeamCommanderKit.put("cgm:missile", 80);
 
         blueTeamCommanderKit = new HashMap<>();
         blueTeamCommanderKit.put("unrealzaruba:tent", 1);

@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.ModItems;
 
+import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -13,8 +15,10 @@ import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ContraptionManager.ContraptionManager;
+import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
 import com.ibm.icu.text.DecimalFormat;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -61,7 +65,6 @@ public class HandAssembler extends Item {
         level.setBlock(new BlockPos(shipPos.x(), level.getMinBuildHeight(), shipPos.z()), blockState, 3);
 
         ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos(shipPos.x(), shipPos.y(), shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
-
 
         return InteractionResult.SUCCESS;
     };

@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.UI;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.VotePlayerPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -40,13 +41,22 @@ public class PlayerVoteScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.searchField = new EditBox(this.font, this.width / 2 - 100, 20, 200, 20, new TextComponent("Search"));
+        // Ensure there is enough space for the header and adjust other UI elements accordingly
+
+        int headerHeight = 20; // Height reserved for the header
+        int padding = 5;       // Space between elements
+
+        // Adjust the position of the search field to be below the header
+        this.searchField = new EditBox(this.font, this.width / 2 - 100, headerHeight + padding, 200, 20, new TextComponent("Search"));
         this.searchField.setResponder(this::onSearchTextChanged);
         this.addRenderableWidget(this.searchField);
 
-        this.playerList = new PlayerListWidget(this.minecraft, this.width, this.height, 50, this.height - 50, 24);
+        // Adjust the position of the player list to start below the search field
+        int playerListTop = headerHeight + padding * 2 + this.searchField.getHeight();
+        this.playerList = new PlayerListWidget(this.minecraft, this.width, this.height, playerListTop, this.height - 50, 24);
         this.addRenderableWidget(this.playerList);
 
+        // Position the vote button at the bottom of the screen
         this.voteButton = new Button(this.width / 2 - 50, this.height - 30, 100, 20, new TextComponent("Vote"),
                 button -> voteForSelectedPlayer());
         this.addRenderableWidget(this.voteButton);
@@ -76,7 +86,7 @@ public class PlayerVoteScreen extends Screen {
     private void voteForSelectedPlayer() {
         if (this.selectedPlayer != null) {
             UnrealZaruba.LOGGER.warn("Кликнул на проголосовать за " + selectedPlayer.getName().toString());
-            UnrealZaruba.CHANNEL.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
+            NetworkHandler.CHANNEL.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
             this.onClose();
         }
     }

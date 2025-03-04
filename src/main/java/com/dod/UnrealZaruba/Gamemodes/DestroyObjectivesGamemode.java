@@ -14,6 +14,7 @@ import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
@@ -95,7 +96,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
                         new TextComponent("Для того, чтобы проголосовать используй"));
     
-                UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, team.getValue().Members()));
+                Map<String, Object> data = new HashMap<>();
+                data.put("teammates", team.getValue().Members());
+                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, data));
             } 
         }
 
@@ -189,7 +192,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         int timerDuration = 10;
         TimerManager.Create(timerDuration * 1000, () -> {
             for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                var team = TeamManager.GetPlayersTeam(player);
+                var team = TeamManager.GetPlayersTeam(serverPlayer);
                 if (team == null)
                     continue;
                 TitleMessage.showTitle(serverPlayer, startGameTexts.get(team.Color()).GetTitle(),

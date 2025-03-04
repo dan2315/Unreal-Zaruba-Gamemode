@@ -4,7 +4,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class RacingGamemode extends BaseGamemode {
 
@@ -24,6 +26,12 @@ public class RacingGamemode extends BaseGamemode {
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'StartBattle'");
+    }
+
+    @Override
+    public void TeleportPlayersInGame(ResourceKey<Level> gameDimension) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'TeleportPlayersInGame'");
     }
 
     

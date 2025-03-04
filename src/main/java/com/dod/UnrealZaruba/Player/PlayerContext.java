@@ -14,7 +14,7 @@ public class PlayerContext {
     public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
     
     private UUID id;
-    private boolean authorized;
+    private boolean authorized = true;
     private GameType originalGameType;
     private PlayerStatus status;
     private boolean previouslyOpped;
@@ -34,6 +34,10 @@ public class PlayerContext {
 
     public int Votes() {
         return voteCount;
+    }
+
+    public PlayerStatus Status() {
+        return this.status;
     }
 
     public BaseGamemode Gamemode() { return gamemode; } 
@@ -78,6 +82,10 @@ public class PlayerContext {
 
     public void SetPreviouslyOpped() {
         previouslyOpped = true;
+    }
+
+    public void SetStatus(PlayerStatus status) {
+        this.status = status;
     }
 
     public boolean AlreadyVoted() {

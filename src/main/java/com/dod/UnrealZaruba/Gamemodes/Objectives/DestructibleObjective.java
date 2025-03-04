@@ -83,7 +83,7 @@ public class DestructibleObjective extends GameObjective {
             }
         }
 
-        if (counter > 0) {
+        if (counter >= 6) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (containingGamemode instanceof TeamGamemode teamGamemode) {
                 teamGamemode.GetTeamManager().GetTeams().get(TeamColor.RED).SendMessage(server, 
@@ -112,7 +112,7 @@ public class DestructibleObjective extends GameObjective {
         containingGamemode.CheckObjectives();
 
         String border = "==================================";
-        String paddedName = String.format("||           %s был уничтожен           ", name);
+        String paddedName = String.format("||           §b%s§r был уничтожен           ", name);
         String message = border + "\n" + paddedName + "\n" + border;
 
         for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {

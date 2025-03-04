@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
+import com.dod.UnrealZaruba.WorldManager.Lobby.Lobby;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class SimpleWorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION_1 = ResourceKey
@@ -48,7 +51,7 @@ public class SimpleWorldManager {
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
             .create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
-
+    public static final Lobby UnrealZarubaLobby = new Lobby(() -> new DestroyObjectivesGamemode(ServerLifecycleHooks.getCurrentServer()), 50, LOBBY_DIMENSION_1, GAME_DIMENSION_1);
 
 
 

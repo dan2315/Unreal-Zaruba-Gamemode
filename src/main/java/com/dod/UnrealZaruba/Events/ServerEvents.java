@@ -15,10 +15,10 @@ import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
-import com.dod.UnrealZaruba.Utils.TickTimer;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -102,15 +102,15 @@ public class ServerEvents {
         
         TimerManager.Create(60 * 1000, () -> {
             if (!playerContext.IsAuthorized()) {
-                UnrealZaruba.LOGGER.info("[INFOOO] Player disconected " + player.getName().getString());
+                UnrealZaruba.LOGGER.info("[INFO] Player disconected " + player.getName().getString());
                 player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [60 sec]"));
             }
         },
                 ticks -> {
-                    if (ticks % 100 == 0 && ticks >= 200) {
+                    if (ticks % 100 == 0 && ticks >= 400) {
                         if (!playerContext.IsAuthorized()) {
                             player.sendMessage(new TextComponent(
-                                    "Не авторизован. Чтобы войти, используй открывшийся браузер. После первого раза авторизация происходит по сохраненным токенам"),
+                                    "§4[SERVER]§r Не авторизован. Чтобы войти, используй открывшийся браузер. После первого раза авторизация происходит по сохраненным токенам"),
                                     player.getUUID());
                         }
                     }
@@ -120,7 +120,7 @@ public class ServerEvents {
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
 
-        UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
+        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
                 player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
 
     }

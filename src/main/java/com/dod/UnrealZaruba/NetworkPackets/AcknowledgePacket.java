@@ -8,16 +8,16 @@ import java.util.UUID;
 
 public class AcknowledgePacket {
     private final int packetId;
-    private final UUID reciever;
+    private final UUID recieverOrSender;
 
     public AcknowledgePacket(int packetId, UUID reciever) {
         this.packetId = packetId;
-        this.reciever = reciever;
+        this.recieverOrSender = reciever;
     }
 
     public static void encode(AcknowledgePacket msg, FriendlyByteBuf buf) {
         buf.writeInt(msg.packetId);
-        buf.writeUUID(msg.reciever);
+        buf.writeUUID(msg.recieverOrSender);
     }
 
     public static AcknowledgePacket decode(FriendlyByteBuf buf) {

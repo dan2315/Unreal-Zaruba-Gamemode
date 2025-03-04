@@ -167,7 +167,7 @@ dependencies {
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
-    implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
+    // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-371e22a")
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-371e22a")
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-2697705")

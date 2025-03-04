@@ -10,9 +10,11 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.SaveTokensPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.google.common.graph.Network;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
@@ -87,8 +89,10 @@ public class CallbackServer {
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                     ServerPlayer player = server.getPlayerList().getPlayer(playerUUID);
 
-                    UnrealZaruba.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                    // TODO: Сохранять только в случае, когда они рефрешатся (то есть в случаях tokens_valid на пересохранять)
+                    NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                             new SaveTokensPacket(token, refreshToken));
+                    player.sendMessage(new TextComponent("§4[SERVER]§r Ку, " + player.getName().getString() + ". Авторизация §a§lуспешна§r."), playerUUID);
 
                     String response = String.format("Auth status for player [%s] set to [%b]",
                             playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);
