@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes.GameText;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 public class StartGameText {
     public String title;
@@ -11,14 +11,14 @@ public class StartGameText {
         this.subtitle = subtitle;
     }
 
-    public TextComponent GetTitle()
+    public Component GetTitle()
     {
-        return new TextComponent(title);
+        return Component.literal(title);
     }
 
-    public TextComponent GetSubtitle()
+    public Component GetSubtitle()
     {
-        return new TextComponent(subtitle);
+        return Component.literal(subtitle);
     }
 
 }

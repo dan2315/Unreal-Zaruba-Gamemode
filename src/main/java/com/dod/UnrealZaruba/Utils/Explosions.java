@@ -23,12 +23,11 @@ public class Explosions {
         // Create the explosion with custom parameters
         world.explode(
                 sourceEntity,       // The entity that caused the explosion, can be null
-                pos.getX(),         // X coordinate of the explosion
-                pos.getY(),         // Y coordinate of the explosion
-                pos.getZ(),         // Z coordinate of the explosion
-                strength,           // Explosion strength (like TNT is 4.0F)
-                false,              // Set fire (false to prevent setting fire)
-                Explosion.BlockInteraction.NONE // Block interaction type: NONE means no block damage
+                pos.getX() + 0.5,         // X coordinate of the explosion
+                pos.getY()  + 0.5,         // Y coordinate of the explosion
+                pos.getZ()  + 0.5,         // Z coordinate of the explosion
+                strength,                     // Explosion strength (like TNT is 4.0F)
+                Level.ExplosionInteraction.NONE // Block interaction type: NONE means no block damage
         );
     }
 

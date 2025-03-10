@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
@@ -20,7 +20,7 @@ public class ScoreboardManager {
         Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
 
         if (objective == null) {
-            objective = scoreboard.addObjective(OBJECTIVE_NAME, ObjectiveCriteria.DUMMY, new TextComponent("Game Time"), ObjectiveCriteria.RenderType.INTEGER);
+            objective = scoreboard.addObjective(OBJECTIVE_NAME, ObjectiveCriteria.DUMMY, Component.literal("Game Time"), ObjectiveCriteria.RenderType.INTEGER);
         }
 
         minutes = scoreboard.getOrCreatePlayerScore("Minutes", objective);

@@ -8,7 +8,7 @@ import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedInEvent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientEvents {
 
     @SubscribeEvent
-    public static void onClientPlayerLoggedIn(LoggedInEvent event) {
+    public static void onClientPlayerLoggedIn(LoggingIn event) {
     }
 
     @SubscribeEvent

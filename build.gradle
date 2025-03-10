@@ -31,7 +31,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: '1.20.1'
 
     runs {
         client {
@@ -136,25 +136,22 @@ repositories {
                 includeGroup("com.simibubi.create")
             }
         }
-        // maven {
-        //     name = "spigot-repo"
-        //     url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
-        // }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.2.21'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    // implementation 'org.bukkit:bukkit:1.18.2-R0.1-SNAPSHOT'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
+    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
 
     implementation ('com.fasterxml.jackson.core:jackson-databind:2.13.3')
     implementation('org.spongepowered:mixin:0.8.5')
     implementation("org.joml:joml:1.10.4")
     implementation("org.joml:joml-primitives:1.10.0")
-
     
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-forge:$vs2_version") { transitive = false }
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-118-common:$vs2_version") { transitive = false }
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-forge:$vs2_version") { transitive = false }
+    implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-common:$vs2_version") { transitive = false }
 
     implementation fg.deobf("org.valkyrienskies.core:api:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
@@ -165,6 +162,7 @@ dependencies {
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+    
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
     // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')

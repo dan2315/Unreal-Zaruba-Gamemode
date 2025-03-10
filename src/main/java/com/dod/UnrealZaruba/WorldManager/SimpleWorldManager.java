@@ -14,6 +14,7 @@ import com.dod.UnrealZaruba.WorldManager.Lobby.Lobby;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -27,29 +28,29 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class SimpleWorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION_1 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "game_dim1"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim1"));
     public static final ResourceKey<Level> LOBBY_DIMENSION_1 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "lobby_dim1"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim1"));
     public static final ResourceKey<Level> GAME_DIMENSION_2 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "game_dim2"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim2"));
     public static final ResourceKey<Level> LOBBY_DIMENSION_2 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "lobby_dim2"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim2"));
     public static final ResourceKey<Level> GAME_DIMENSION_3 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "game_dim3"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim3"));
     public static final ResourceKey<Level> LOBBY_DIMENSION_3 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "lobby_dim3"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim3"));
     public static final ResourceKey<Level> GAME_DIMENSION_4 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "game_dim4"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim4"));
     public static final ResourceKey<Level> LOBBY_DIMENSION_4 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "lobby_dim4"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim4"));
     public static final ResourceKey<Level> GAME_DIMENSION_5 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "game_dim5"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim5"));
     public static final ResourceKey<Level> LOBBY_DIMENSION_5 = ResourceKey
-            .create(Registry.DIMENSION_REGISTRY, new ResourceLocation("unrealzaruba", "lobby_dim5"));
+            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim5"));
 
     // Dimension Type - Could use the same type for all game dimensions
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
-            .create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
+            .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
     public static final Lobby UnrealZarubaLobby = new Lobby(() -> new DestroyObjectivesGamemode(ServerLifecycleHooks.getCurrentServer()), 50, LOBBY_DIMENSION_1, GAME_DIMENSION_1);
 

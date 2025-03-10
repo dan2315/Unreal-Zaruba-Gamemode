@@ -34,7 +34,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -129,8 +129,8 @@ public class CommandRegistration {
                                             .getPlayerByName(playerName);
                                     if (player != null) {
                                         Utils.SetPrefixTo(player, prefix);
-                                        context.getSource().sendSuccess(
-                                                new TextComponent(
+                                        context.getSource().sendSuccess(() ->
+                                                Component.literal(
                                                         "Set prefix for "
                                                                 + playerName
                                                                 + " to "
@@ -138,7 +138,7 @@ public class CommandRegistration {
                                                 true);
                                     } else {
                                         context.getSource()
-                                                .sendFailure(new TextComponent(
+                                                .sendFailure(Component.literal(
                                                         "Player " + playerName
                                                                 + " not found."));
                                     }
@@ -162,8 +162,7 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(3))
                 .executes(context -> {
                     ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
-                    serverPlayer.sendMessage(new TextComponent("Пока что так скоро будет"),
-                            serverPlayer.getUUID());
+                    serverPlayer.sendSystemMessage(Component.literal("Пока что так скоро будет"));
                     return 1;
                 }));
 
@@ -176,7 +175,7 @@ public class CommandRegistration {
                             Level world = sender.getCommandSenderWorld();
                             ClickableHumanoidEntity mob = new ClickableHumanoidEntity(
                                     ModMobs.CLICKABLE_HUMANOID_ENTITY.get(), world);
-                        mob.Initialize(IntegerArgumentType.getInteger(context, "npc_id"));
+                            mob.Initialize(IntegerArgumentType.getInteger(context, "npc_id"));
                             mob.setPos(sender.position().x, sender.position().y,
                                     sender.position().z);
                             world.addFreshEntity(mob);
@@ -198,18 +197,18 @@ public class CommandRegistration {
                 .then(Commands.argument("name", TeamColorArgument.color())
                         .then(Commands.argument("x1", IntegerArgumentType.integer())
                                 .then(Commands.argument("y1",
-                                        IntegerArgumentType.integer())
+                                                IntegerArgumentType.integer())
                                         .then(Commands.argument("z1",
-                                                IntegerArgumentType
-                                                        .integer())
-                                                .then(Commands.argument(
-                                                        "x2",
                                                         IntegerArgumentType
                                                                 .integer())
-                                                        .then(Commands.argument(
-                                                                "y2",
+                                                .then(Commands.argument(
+                                                                "x2",
                                                                 IntegerArgumentType
                                                                         .integer())
+                                                        .then(Commands.argument(
+                                                                        "y2",
+                                                                        IntegerArgumentType
+                                                                                .integer())
                                                                 .then(Commands
                                                                         .argument("z2", IntegerArgumentType
                                                                                 .integer())
@@ -255,9 +254,9 @@ public class CommandRegistration {
                                                                                             volume);
 
                                                                             context.getSource()
-                                                                                    .sendSuccess(new TextComponent(
-                                                                                            "Created team base "
-                                                                                                    + Team),
+                                                                                    .sendSuccess(() -> Component.literal(
+                                                                                                    "Created team base "
+                                                                                                            + Team),
                                                                                             true);
                                                                             return 1;
                                                                         })))))))));
@@ -273,18 +272,18 @@ public class CommandRegistration {
                 .then(Commands.argument("name", StringArgumentType.string())
                         .then(Commands.argument("x1", IntegerArgumentType.integer())
                                 .then(Commands.argument("y1",
-                                        IntegerArgumentType.integer())
+                                                IntegerArgumentType.integer())
                                         .then(Commands.argument("z1",
-                                                IntegerArgumentType
-                                                        .integer())
-                                                .then(Commands.argument(
-                                                        "x2",
                                                         IntegerArgumentType
                                                                 .integer())
-                                                        .then(Commands.argument(
-                                                                "y2",
+                                                .then(Commands.argument(
+                                                                "x2",
                                                                 IntegerArgumentType
                                                                         .integer())
+                                                        .then(Commands.argument(
+                                                                        "y2",
+                                                                        IntegerArgumentType
+                                                                                .integer())
                                                                 .then(Commands
                                                                         .argument("z2", IntegerArgumentType
                                                                                 .integer())
@@ -325,9 +324,9 @@ public class CommandRegistration {
                                                                                     .Add(objective);
 
                                                                             context.getSource()
-                                                                                    .sendSuccess(new TextComponent(
-                                                                                            "Created objective: "
-                                                                                                    + objective),
+                                                                                    .sendSuccess(() -> Component.literal(
+                                                                                                    "Created objective: "
+                                                                                                            + objective),
                                                                                             true);
                                                                             return 1;
                                                                         })))))))));
@@ -363,19 +362,19 @@ public class CommandRegistration {
                 .GetTeamManager();
 
         teamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(
-                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
+        context.getSource().sendSuccess( () ->
+                Component.literal("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
                         + position),
                 true);
         return 0;
     }
 
     private static int ChooseRespawnPoint(CommandContext<CommandSourceStack> context, boolean tentChosen,
-            String response, SoundEvent sound) throws CommandSyntaxException {
+                                          String response, SoundEvent sound) throws CommandSyntaxException {
         ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
 
         PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), tentChosen);
-        TitleMessage.sendSubtitle(serverPlayer, new TextComponent(response));
+        TitleMessage.sendSubtitle(serverPlayer, Component.literal(response));
         SoundHandler.playSoundToPlayer(serverPlayer, sound, 1.0f, 1.0f);
 
         return 1;
@@ -390,15 +389,15 @@ public class CommandRegistration {
 
     private static int SetTeamSpawn(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        BlockPos position = new BlockPos(player.position());
+        BlockPos position = new BlockPos(player.getBlockX(), player.getBlockY(), player.getBlockZ());
         TeamColor color = TeamColorArgument.getColor(context, TeamColorArgument.PropertyName);
         TeamManager teamManager = ((TeamGamemode) (PlayerContext
                 .Get(context.getSource().getPlayerOrException().getUUID()).Gamemode()))
                 .GetTeamManager();
 
         teamManager.SetSpawn(color, position);
-        context.getSource().sendSuccess(
-                new TextComponent("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
+        context.getSource().sendSuccess(() ->
+                Component.literal("Спавн команды " + color.toString().toUpperCase() + " поставлен в "
                         + position),
                 true);
         return 0;
@@ -412,15 +411,15 @@ public class CommandRegistration {
         try {
             player = source.getPlayerOrException();
         } catch (CommandSyntaxException e) {
-            source.sendFailure(new TextComponent("This command can only be run by a player."));
+            source.sendFailure(Component.literal("This command can only be run by a player."));
             return 0;
         }
 
-        player.sendMessage(new TextComponent("Нашёл тебя"), player.getUUID());
+        player.sendSystemMessage(Component.literal("Нашёл тебя"));
 
         DyeColor[] colors = DyeColor.values(); // Get all wool colors.
         for (DyeColor color : colors) {
-            player.sendMessage(new TextComponent("Даю цвет" + color), player.getUUID());
+            player.sendSystemMessage(Component.literal("Даю цвет" + color));
 
             String woolName = player.getName().getString() + " " + color.getName();
             ItemStack itemStack = new ItemStack((itemMap.get(color)), 1);
@@ -433,10 +432,10 @@ public class CommandRegistration {
 
             itemStack.setTag(nbtData);
 
-            itemStack.setHoverName(new TextComponent(woolName));
+            itemStack.setHoverName(Component.literal(woolName));
             player.getInventory().add(itemStack);
         }
-        source.sendSuccess(new TextComponent("Given all colored wool to " + player.getName().getString()),
+        source.sendSuccess(() -> Component.literal("Given all colored wool to " + player.getName().getString()),
                 true);
         return 1;
     }

@@ -27,8 +27,10 @@ import com.dod.UnrealZaruba.Utils.NBT;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.network.PacketDistributor;
@@ -93,8 +95,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 var serverPlayer = server.getPlayerList().getPlayer(player);
                 if (serverPlayer == null) continue;
     
-                TitleMessage.showTitle(serverPlayer, new TextComponent("§6Выбор командира"),
-                        new TextComponent("Для того, чтобы проголосовать используй"));
+                TitleMessage.showTitle(serverPlayer, Component.literal("§6Выбор командира"),
+                        Component.literal("Для того, чтобы проголосовать используй"));
     
                 Map<String, Object> data = new HashMap<>();
                 data.put("teammates", team.getValue().Members());
@@ -131,7 +133,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                         }
                         StartPreparation(context);
                     } catch (Exception e) {
-                        context.getSource().sendFailure(new TextComponent(e.getMessage()));
+                        context.getSource().sendFailure(Component.literal(e.getMessage()));
                     }
                 }, ticks -> {
                     if (ticks % 20 != 0)
@@ -150,8 +152,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         gameStage = GameStage.StrategyTime;
 
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-            TitleMessage.showTitle(serverPlayer, new TextComponent("§6Стадия подготовки"),
-                    new TextComponent("Коммандиром стал " +
+            TitleMessage.showTitle(serverPlayer, Component.literal("§6Стадия подготовки"),
+                    Component.literal("Коммандиром стал " +
                             TeamManager.GetPlayersTeam(serverPlayer).CommanderName() + ", он определяет стратегию"));
             TeamManager.GiveKitTo(context.getSource().getServer(), serverPlayer);
         }
@@ -161,7 +163,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                     try {
                         StartBattle(context);
                     } catch (Exception e) {
-                        context.getSource().sendFailure(new TextComponent(e.getMessage()));
+                        context.getSource().sendFailure(Component.literal(e.getMessage()));
                     }
                 }, ticks -> {
                     if (ticks % 20 != 0)
@@ -184,9 +186,13 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos SpawnRed = TeamManager.Get(TeamColor.RED).Spawn();
         BlockPos SpawnBlue = TeamManager.Get(TeamColor.BLUE).Spawn();
-        SoundHandler.playSoundFromPosition(player.getLevel(), SpawnRed, ModSounds.HORN_DIRE.get(),
+
+        if (!(player.level() instanceof ServerLevel)) return 0;
+        ServerLevel serverLevel = (ServerLevel) player.level();
+
+        SoundHandler.playSoundFromPosition(serverLevel, SpawnRed, ModSounds.HORN_DIRE.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
-        SoundHandler.playSoundFromPosition(player.getLevel(), SpawnBlue, ModSounds.HORN_RADIANT.get(),
+        SoundHandler.playSoundFromPosition(serverLevel, SpawnBlue, ModSounds.HORN_RADIANT.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
 
         int timerDuration = 10;
@@ -202,7 +208,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             var success = TeamManager.DeleteBarriersAtSpawn();
 
             if (!success)
-                context.getSource().sendFailure(new TextComponent("Спавны команд ещё не готовы"));
+                context.getSource().sendFailure(Component.literal("Спавны команд ещё не готовы"));
 
 
             TimerManager.Create(GAME_DURATION_TICKS * 1000,
@@ -222,8 +228,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                     if (ticks % 20 != 0)
                         return;
                     for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, new TextComponent("§6До начала игры§r"),
-                                new TextComponent("▌§l " + String.valueOf(timerDuration - ticks / 20) + " §r▌"));
+                        TitleMessage.showTitle(serverPlayer, Component.literal("§6До начала игры§r"),
+                                Component.literal("▌§l " + String.valueOf(timerDuration - ticks / 20) + " §r▌"));
                     }
                 });
         return 1;
@@ -296,10 +302,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
         String colorCode = TeamColor.getColorCodeForTeam(wonTeam);
-        TextComponent titleText = new TextComponent(
+        Component titleText = Component.literal(
                 "Команда " + colorCode + wonTeam.toString() + ChatFormatting.RESET + " победила");
-        TextComponent wonText = new TextComponent("Можешь сказать оппоненту \'Сори, что трахнул\'");
-        TextComponent loseText = new TextComponent("Что могу сказать? Старайся лучше");
+        Component wonText = Component.literal("Можешь сказать оппоненту \'Сори, что трахнул\'");
+        Component loseText = Component.literal("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {
             TeamU team = TeamManager.GetPlayersTeam(player);
             if (team == null)

@@ -17,7 +17,7 @@ import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -116,7 +116,7 @@ public class DestructibleObjective extends GameObjective {
         String message = border + "\n" + paddedName + "\n" + border;
 
         for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
-            player.sendMessage(new TextComponent(message), player.getUUID());
+            player.sendSystemMessage(Component.literal(message));
         }
 
         FireworkLauncher.launchFireworks(world, volume.GetCenter(), 10);

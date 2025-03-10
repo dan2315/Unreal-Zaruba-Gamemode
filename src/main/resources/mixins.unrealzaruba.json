@@ -10,7 +10,6 @@
     "LecternControllerBlockEntityMixin",
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
-    "MixinExplosionMixin",
     "ItemStackMixin",
     "RedstoneLinkBlockMixin"
   ],

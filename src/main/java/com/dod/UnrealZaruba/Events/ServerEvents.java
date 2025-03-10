@@ -1,14 +1,11 @@
 package com.dod.UnrealZaruba.Events;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.DiscordIntegration.CallbackServer;
 import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
-import com.dod.UnrealZaruba.DiscordIntegration.Tokens;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
@@ -22,10 +19,9 @@ import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.CommandEvent;
@@ -34,14 +30,10 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
@@ -90,7 +82,7 @@ public class ServerEvents {
         if (!server.isDedicatedServer())
             return;
 
-        ServerPlayer player = (ServerPlayer) event.getPlayer();
+        ServerPlayer player = (ServerPlayer) event.getEntity();
         PlayerContext playerContext = PlayerContext.Instantiate(player.getUUID(),
                 player.gameMode.getGameModeForPlayer());
         playerContext.SetGamemode(gamemode);
@@ -103,124 +95,33 @@ public class ServerEvents {
         TimerManager.Create(60 * 1000, () -> {
             if (!playerContext.IsAuthorized()) {
                 UnrealZaruba.LOGGER.info("[INFO] Player disconected " + player.getName().getString());
-                player.connection.disconnect(new TextComponent("Ну ты это, авторизуйся как бы. [60 sec]"));
+                player.connection.disconnect(Component.literal("Ну ты это, авторизуйся как бы. [60 sec]"));
             }
         },
                 ticks -> {
                     if (ticks % 100 == 0 && ticks >= 400) {
                         if (!playerContext.IsAuthorized()) {
-                            player.sendMessage(new TextComponent(
-                                    "§4[SERVER]§r Не авторизован. Чтобы войти, используй открывшийся браузер. После первого раза авторизация происходит по сохраненным токенам"),
-                                    player.getUUID());
+                            player.sendSystemMessage(Component.literal(
+                                    "§4[SERVER]§r Не авторизован. Чтобы войти, используй открывшийся браузер. После первого раза авторизация происходит по сохраненным токенам"));
                         }
                     }
                 });
 
-        gamemode.HandleConnectedPlayer(event.getPlayer());
+        gamemode.HandleConnectedPlayer(event.getEntity());
         String state = UUID.randomUUID().toString();
         DiscordAuth.unresolvedRequests.add(state);
 
         NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new LoginPacket(state,
-                player.getUUID(), player.getName().getString(), event.getPlayer().getServer().getPort()));
+                player.getUUID(), player.getName().getString(), event.getEntity().getServer().getPort()));
 
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (!ServerLifecycleHooks.getCurrentServer().isDedicatedServer())
-            return;
 
-        PlayerContext.Deauthorize(event.getPlayer().getUUID());
-    }
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         UnrealZaruba.LOGGER.info("COMMANDS Registered");
         CommandRegistration.onCommandRegister(event);
-    }
-
-    @SubscribeEvent
-    public static void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to interact!"), player.getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerAttack(AttackEntityEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to attack!"), player.getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerBreakBlock(PlayerEvent.BreakSpeed event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to break blocks!"), player.getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to place blocks!"), player.getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerItemPickup(EntityItemPickupEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(event.getPlayer().getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to pick up items!"), player.getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingUpdate(LivingUpdateEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            UUID playerUUID = player.getUUID();
-            if (!PlayerContext.Get(playerUUID).IsAuthorized()) {
-                Vec3 prevPos = player.position();
-                player.teleportTo(prevPos.x, prevPos.y, prevPos.z);
-                player.setDeltaMovement(Vec3.ZERO);
-                player.fallDistance = 0.0f;
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onBlockBreak(BreakEvent event) {
-        if (event.getPlayer() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                event.getPlayer().sendMessage(new TextComponent("You are not authorized to break blocks!"),
-                        event.getPlayer().getUUID());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onBlockPlace(EntityPlaceEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
-                event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to place blocks!"), player.getUUID());
-            }
-        }
     }
 
     @SubscribeEvent
@@ -235,7 +136,7 @@ public class ServerEvents {
             return;
         if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
             event.setCanceled(true); // Cancel the command
-            player.sendMessage(new TextComponent("You are not authorized to use commands!"), player.getUUID());
+            player.sendSystemMessage(Component.literal("You are not authorized to use commands!"));
         }
     }
 
@@ -245,7 +146,7 @@ public class ServerEvents {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 
         if (!PlayerContext.Get(event.getPlayer().getUUID()).IsAuthorized()) {
-            event.getPlayer().sendMessage(new TextComponent("Chat is disabled"), event.getPlayer().getUUID());
+            event.getPlayer().sendSystemMessage(Component.literal("Chat is disabled"));
             return;
         }
 
@@ -255,20 +156,18 @@ public class ServerEvents {
                 ServerPlayer player = server.getPlayerList().getPlayer(memberUUID);
                 if (player == null)
                     continue;
-                player.sendMessage(
-                        new TextComponent(
-                                "§4" + event.getPlayer().getName().getString() + "§r" + ":" + event.getMessage()),
-                        memberUUID);
+                player.sendSystemMessage(
+                        Component.literal(
+                                "§4" + event.getPlayer().getName().getString() + "§r" + ":" + event.getMessage()));
             }
         }
     }
 
     @SubscribeEvent
     public static void onPlayerSleep(PlayerSleepInBedEvent event) {
-        if (!PlayerContext.Get(event.getPlayer().getUUID()).IsAuthorized()) {
+        if (!PlayerContext.Get(event.getEntity().getUUID()).IsAuthorized()) {
             event.setResult(PlayerSleepInBedEvent.Result.DENY);
-            event.getPlayer().sendMessage(new TextComponent("You are not authorized to sleep!"),
-                    event.getPlayer().getUUID());
+            event.getEntity().sendSystemMessage(Component.literal("You are not authorized to sleep!"));
         }
     }
 
@@ -277,7 +176,7 @@ public class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
                 event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to attack!"), player.getUUID());
+                player.sendSystemMessage(Component.literal("You are not authorized to attack!"));
             }
         }
     }
@@ -287,7 +186,7 @@ public class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
                 event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to take damage!"), player.getUUID());
+                player.sendSystemMessage(Component.literal("You are not authorized to take damage!"));
             }
         }
     }
@@ -297,7 +196,7 @@ public class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!PlayerContext.Get(player.getUUID()).IsAuthorized()) {
                 event.setCanceled(true);
-                player.sendMessage(new TextComponent("You are not authorized to be knocked back!"), player.getUUID());
+                player.sendSystemMessage(Component.literal("You are not authorized to be knocked back!"));
             }
         }
     }

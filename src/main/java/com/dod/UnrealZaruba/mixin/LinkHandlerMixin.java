@@ -17,7 +17,7 @@ public abstract class LinkHandlerMixin {
     @Inject(method = "onBlockActivated",at = @At("HEAD"), cancellable = true)
     private static void beforeOnBlockActivated(PlayerInteractEvent.RightClickBlock event, CallbackInfo ci)
     {
-        if (Gamerules.DO_LINKS_SAFE && !event.getPlayer().mayBuild()) {
+        if (Gamerules.DO_LINKS_SAFE && !event.getEntity().mayBuild()) {
             ci.cancel();
         }
     }

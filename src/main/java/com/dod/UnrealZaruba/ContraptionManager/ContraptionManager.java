@@ -1,13 +1,8 @@
 package com.dod.UnrealZaruba.ContraptionManager;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.schematics.SchematicWorld;
-import com.simibubi.create.foundation.utility.NBTHelper;
-import com.simibubi.create.foundation.utility.WorldAttached;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
@@ -50,7 +45,7 @@ public class ContraptionManager {
             ListTag posList = blockTag.getList("pos", Tag.TAG_INT);
             BlockPos pos = new BlockPos(posList.getInt(0), posList.getInt(1), posList.getInt(2));
 
-            Block block = Registry.BLOCK.get(new ResourceLocation(palette.getString(state)));
+            Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(palette.getString(state)));
             BlockState blockState = block.defaultBlockState();
 
             world.setBlock(origin.offset(pos), blockState, 2);

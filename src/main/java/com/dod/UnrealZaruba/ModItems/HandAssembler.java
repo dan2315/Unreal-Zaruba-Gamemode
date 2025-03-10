@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.util.datastructures.DenseBlockPosSet;
+import org.valkyrienskies.core.impl.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
@@ -62,9 +62,9 @@ public class HandAssembler extends Item {
         
         createdShip.setStatic(true);
         BlockState blockState = Blocks.STONE.defaultBlockState();
-        level.setBlock(new BlockPos(shipPos.x(), level.getMinBuildHeight(), shipPos.z()), blockState, 3);
+        level.setBlock(new BlockPos((int)shipPos.x(), level.getMinBuildHeight(), (int)shipPos.z()), blockState, 3);
 
-        ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos(shipPos.x(), shipPos.y(), shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
+        ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos((int)shipPos.x(), (int)shipPos.y(), (int)shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
 
         return InteractionResult.SUCCESS;
     };

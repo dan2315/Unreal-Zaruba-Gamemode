@@ -15,13 +15,13 @@ import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -41,7 +41,7 @@ public class TeamManager {
         if (teamData != null) {
             for (var data : teamData.teamSpawns.entrySet()) {
                 AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
-                StructureManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
+                StructureTemplateManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
 
                 StructureTemplate template_red = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "red_tent"));
                 StructureTemplate template_blue = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
@@ -139,10 +139,9 @@ public class TeamManager {
 
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
         if (!AreTeamsBalanced(dyeColor)) {
-            player.sendMessage(
-                    new TextComponent(
-                            "Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"),
-                    player.getUUID());
+            player.sendSystemMessage(
+                    Component.literal(
+                            "Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"));
             return;
         }
 
@@ -183,8 +182,7 @@ public class TeamManager {
     public void teleportToSpawn(ServerPlayer serverPlayer) {
         TeamU team = GetPlayersTeam(serverPlayer);
         if (team == null){
-            serverPlayer.sendMessage(new TextComponent("Вы не присоединены ни к одной команде"),
-                serverPlayer.getUUID());
+            serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
         }
         
@@ -198,8 +196,7 @@ public class TeamManager {
     public void teleportToTent(ServerPlayer serverPlayer) {
         TeamU team = GetPlayersTeam(serverPlayer);
         if (team == null) {
-            serverPlayer.sendMessage(new TextComponent("Вы не присоединены ни к одной команде"),
-                    serverPlayer.getUUID());
+            serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
         }
 

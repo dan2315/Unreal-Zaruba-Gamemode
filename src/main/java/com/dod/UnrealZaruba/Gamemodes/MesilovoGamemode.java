@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
@@ -20,11 +20,11 @@ public class MesilovoGamemode {
 
         if (scoreboard.getObjective("defendersTimer") == null) {
             defendersObjective = scoreboard.addObjective("defendersTimer", ObjectiveCriteria.AIR,
-                    new TextComponent("Защищай цели"), ObjectiveCriteria.RenderType.INTEGER);
+                    Component.literal("Защищай цели"), ObjectiveCriteria.RenderType.INTEGER);
         }
         if (scoreboard.getObjective("defendersTimer") == null) {
             attackersObjective = scoreboard.addObjective("attackersScore", ObjectiveCriteria.AIR,
-                    new TextComponent("Набери 100 очков"), ObjectiveCriteria.RenderType.INTEGER);
+                    Component.literal("Набери 100 очков"), ObjectiveCriteria.RenderType.INTEGER);
         }
 
         scoreboard.getOrCreatePlayerScore("Villager", attackersObjective).setScore(30);

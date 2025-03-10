@@ -8,10 +8,12 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.synchronization.ArgumentSerializer;
-import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.NotNull;
 
 
 public class TeamColorArgument implements ArgumentType<TeamColor> {
@@ -45,27 +47,49 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
         }
     }
 
-    public static class Serializer implements ArgumentSerializer<TeamColorArgument> {
+    public static class Info implements ArgumentTypeInfo<TeamColorArgument, Info.Template> {
         @Override
-        public void serializeToNetwork(@Nonnull TeamColorArgument argument,@Nonnull FriendlyByteBuf buffer) {
-            buffer.writeInt(argument.getColor().ordinal());
+        public void serializeToNetwork(Template template, FriendlyByteBuf buffer) {
+            buffer.writeEnum(template.color);
         }
 
         @Override
-        public TeamColorArgument deserializeFromNetwork(@Nonnull FriendlyByteBuf buffer) {
-            int ordinal = buffer.readInt();
-            return new TeamColorArgument(TeamColor.values()[ordinal]);
+        public @NotNull Template deserializeFromNetwork(@Nonnull FriendlyByteBuf buffer) {
+            return new Template(buffer.readEnum(TeamColor.class));
         }
 
         @Override
-        public void serializeToJson(@Nonnull TeamColorArgument argument,@Nonnull JsonObject buffer) {
-            buffer.addProperty(PropertyName, argument.getColor().name());
+        public void serializeToJson(Template template, JsonObject jsonObject) {
+            jsonObject.addProperty(PropertyName, template.color.name());
         }
 
-        
+        @Override
+        public @NotNull Template unpack(TeamColorArgument argument) {
+            return new Template(argument.getColor());
+        }
+
+
+        public static class Template implements ArgumentTypeInfo.Template<TeamColorArgument> {
+            private final TeamColor color;
+
+            public Template(TeamColor color) {
+                this.color = color;
+            }
+
+            @Override
+            public TeamColorArgument instantiate(CommandBuildContext commandBuildContext) {
+                return new TeamColorArgument(color);
+            }
+
+            @Override
+            public ArgumentTypeInfo<TeamColorArgument, ?> type() {
+                return new Info();
+            }
+        }
     }
 
+
     public static void RegisterArgument() {
-        ArgumentTypes.register(PropertyName, TeamColorArgument.class, new Serializer());
+        ArgumentTypeInfos.registerByClass(TeamColorArgument.class, new Info());
     }
 }

@@ -16,8 +16,8 @@ public class FireworkLauncher {
 
     public static void launchFireworks(ServerLevel world, BlockPos pos, int radius) {
         for (int i = 0; i < 5; i++) {
-            double offsetX = RANDOM.nextDouble() * radius * 2 - radius;
-            double offsetZ = RANDOM.nextDouble() * radius * 2 - radius;
+            int offsetX = (int)(RANDOM.nextDouble() * radius * 2 - radius);
+            int offsetZ = (int)(RANDOM.nextDouble() * radius * 2 - radius);
             BlockPos fireworkPos = pos.offset(offsetX, 0, offsetZ);
             launchFirework(world, fireworkPos);
         }

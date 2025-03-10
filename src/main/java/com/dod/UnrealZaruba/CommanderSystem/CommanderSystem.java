@@ -6,7 +6,7 @@ import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -23,11 +23,11 @@ public class CommanderSystem {
         
         if (invokerPlayer == null) return;
         if (targetPlayer == null) {
-            invokerPlayer.sendMessage(new TextComponent("Выбранный игрок не найден"), invokerPlayer.getUUID());
+            invokerPlayer.sendSystemMessage(Component.literal("Выбранный игрок не найден"));
             return;
         }
 
-        UnrealZaruba.LOGGER.warn("Invoker :" + invokerPlayer.getUUID().toString() + "         Target: " + targetPlayer.getUUID().toString());
+        UnrealZaruba.LOGGER.warn("Invoker :" + invokerPlayer.getUUID() + "         Target: " + targetPlayer.getUUID().toString());
 
         PlayerContext invokerPlayerContext = PlayerContext.Get(invokerPlayerUUID);
         PlayerContext targetPlayerContext = PlayerContext.Get(targetPlayerUUID);
@@ -37,26 +37,26 @@ public class CommanderSystem {
         TeamColor targetTeamId = teamGamemode.GetTeamManager().GetPlayersTeam(targetPlayer).Color();
 
         if (teamGamemode.gameStage != GameStage.CommanderVoting) { 
-            invokerPlayer.sendMessage(new TextComponent("Еще рано или уже поздно"), invokerPlayer.getUUID());
+            invokerPlayer.sendSystemMessage(Component.literal("Еще рано или уже поздно"));
             return;
         }
 
         if (invokerTeamId != targetTeamId) { 
-            invokerPlayer.sendMessage(new TextComponent("Нахуй ты за противника голосуешь"), invokerPlayer.getUUID());
+            invokerPlayer.sendSystemMessage(Component.literal("Нахуй ты за противника голосуешь"));
             return;
         }
 
         if (invokerPlayerUUID.equals(targetPlayerUUID)) {
-            invokerPlayer.sendMessage(new TextComponent("Ты мне блять за себя поголосуй"), invokerPlayer.getUUID());
+            invokerPlayer.sendSystemMessage(Component.literal("Ты мне блять за себя поголосуй"));
             return;
         }
 
         if (invokerPlayerContext.AlreadyVoted()) {
-            invokerPlayer.sendMessage(new TextComponent("Ты не можешь проголосовать дважды"), invokerPlayer.getUUID());
+            invokerPlayer.sendSystemMessage(Component.literal("Ты не можешь проголосовать дважды"));
             return;
         }
 
-        invokerPlayer.sendMessage(new TextComponent("Голос отправлен за " + targetPlayer.getName().getString() + ", ожидайте!"), invokerPlayer.getUUID());
+        invokerPlayer.sendSystemMessage(Component.literal("Голос отправлен за " + targetPlayer.getName().getString() + ", ожидайте!"));
         teamGamemode.GetTeamManager().GetPlayersTeam(targetPlayer).GiveVote(targetPlayer, targetPlayerContext);
         invokerPlayerContext.SetVoted();
     }

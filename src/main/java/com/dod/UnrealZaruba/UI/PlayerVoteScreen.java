@@ -7,13 +7,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -33,7 +35,7 @@ public class PlayerVoteScreen extends Screen {
     List<UUID> teammates;
 
     public PlayerVoteScreen(List<UUID> teammates) {
-        super(new TextComponent("Vote for a Player"));
+        super(Component.literal("Vote for a Player"));
         this.teammates = teammates;
     }
 
@@ -47,7 +49,7 @@ public class PlayerVoteScreen extends Screen {
         int padding = 5;       // Space between elements
 
         // Adjust the position of the search field to be below the header
-        this.searchField = new EditBox(this.font, this.width / 2 - 100, headerHeight + padding, 200, 20, new TextComponent("Search"));
+        this.searchField = new EditBox(this.font, this.width / 2 - 100, headerHeight + padding, 200, 20, Component.literal("Search"));
         this.searchField.setResponder(this::onSearchTextChanged);
         this.addRenderableWidget(this.searchField);
 
@@ -57,9 +59,10 @@ public class PlayerVoteScreen extends Screen {
         this.addRenderableWidget(this.playerList);
 
         // Position the vote button at the bottom of the screen
-        this.voteButton = new Button(this.width / 2 - 50, this.height - 30, 100, 20, new TextComponent("Vote"),
-                button -> voteForSelectedPlayer());
-        this.addRenderableWidget(this.voteButton);
+        this.voteButton = Button.builder(Component.literal("Vote"), button -> voteForSelectedPlayer())
+                .bounds(this.width / 2 - 50, this.height - 30, 100, 20)
+                .build();
+        this.addRenderableWidget(voteButton);
 
         populatePlayerList("");
     }
@@ -92,12 +95,12 @@ public class PlayerVoteScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics);
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
-        this.blit(matrices, 0, 0, 0, 0, this.width, this.height);
-        super.render(matrices, mouseX, mouseY, delta);
-        this.searchField.render(matrices, mouseX, mouseY, delta);
+        guiGraphics.blit(BACKGROUND_TEXTURE, 0, 0, 0, 0, this.width, this.height);
+        super.render(guiGraphics, mouseX, mouseY, delta);
+        this.searchField.render(guiGraphics, mouseX, mouseY, delta);
         // this.playerList.render(matrices, mouseX, mouseY, delta);
     }
 
@@ -125,7 +128,7 @@ public class PlayerVoteScreen extends Screen {
         }
 
         @Override
-        public void render(PoseStack matrices, int index, int y, int x, int itemWidth, int itemHeight, int mouseX,
+        public void render(GuiGraphics guiGraphics, int index, int y, int x, int itemWidth, int itemHeight, int mouseX,
                 int mouseY, boolean hovered, float delta) {
             // Check if this player is the selected player and apply a highlight if so
             if (selectedPlayer != null && selectedPlayer.getUUID().equals(this.player.getUUID())) {
@@ -133,19 +136,30 @@ public class PlayerVoteScreen extends Screen {
                 int borderThickness = 2;
 
                 // Top border
-                fill(matrices, x - borderThickness, y - borderThickness, x + itemWidth + borderThickness, y,
+                guiGraphics.fill(x - borderThickness, y - borderThickness, x + itemWidth + borderThickness, y,
                         borderColor);
                 // Bottom border
-                fill(matrices, x - borderThickness, y + itemHeight, x + itemWidth + borderThickness,
+                guiGraphics.fill(x - borderThickness, y + itemHeight, x + itemWidth + borderThickness,
                         y + itemHeight + borderThickness, borderColor);
                 // Left border
-                fill(matrices, x - borderThickness, y, x, y + itemHeight, borderColor);
+                guiGraphics.fill(x - borderThickness, y, x, y + itemHeight, borderColor);
                 // Right border
-                fill(matrices, x + itemWidth, y, x + itemWidth + borderThickness, y + itemHeight, borderColor);
+                guiGraphics.fill(x + itemWidth, y, x + itemWidth + borderThickness, y + itemHeight, borderColor);
             } else if (hovered) {
-                fill(matrices, x, y, x + itemWidth, y + itemHeight, 0x80FFFFFF); // Highlight on hover
+                guiGraphics.fill(x, y, x + itemWidth, y + itemHeight, 0x80FFFFFF); // Highlight on hover
             }
-            Minecraft.getInstance().font.draw(matrices, this.player.getName().getString(), x + 2, y + 2, 0xFFFFFF);
+            Minecraft.getInstance().font.drawInBatch(
+                    this.player.getName(), // Component, no need to use getString()
+                    x + 2,
+                    y + 2,
+                    0xFFFFFF,
+                    false,
+                    guiGraphics.pose().last().pose(), // Use pose() from GuiGraphics
+                    guiGraphics.bufferSource(),
+                    Font.DisplayMode.NORMAL,
+                    0,
+                    15728880 // Light value
+            );
         }
 
         @Override
@@ -159,7 +173,7 @@ public class PlayerVoteScreen extends Screen {
 
         @Override
         public Component getNarration() {
-            return new TextComponent("Если ты глухой, пойди пива попей, как ты в майнкрафт играть собрался?");
+            return Component.literal("Если ты глухой, пойди пива попей, как ты в майнкрафт играть собрался?");
         }
     }
 }

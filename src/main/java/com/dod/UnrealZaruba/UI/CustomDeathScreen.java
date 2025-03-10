@@ -6,9 +6,10 @@ import com.dod.UnrealZaruba.NetworkPackets.SelectTentPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class CustomDeathScreen extends Screen {
@@ -23,7 +24,7 @@ public class CustomDeathScreen extends Screen {
     private Button tentButton;
 
     public CustomDeathScreen(boolean tentExist) {
-        super(new TextComponent("You Died"));
+        super(Component.literal("You Died"));
         this.minecraft = Minecraft.getInstance();
         this.tentExist = tentExist;
     }
@@ -32,10 +33,15 @@ public class CustomDeathScreen extends Screen {
     protected void init() {
         super.init();
         if (tentExist) {
-            baseButton = this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 2 - 10, 200, 20,
-                    new TextComponent("Respawn on Base"), button -> selectBase()));
-            tentButton = this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 2 + 20, 200, 20,
-                    new TextComponent("Respawn in Tent"), button -> selectTent()));
+
+            baseButton = Button.builder(Component.literal("Respawn on Base"), button -> selectBase()).
+                bounds(this.width / 2 - 100, this.height / 2 - 10, 200, 20).build();
+            this.addRenderableWidget(baseButton);
+
+            tentButton = Button.builder(Component.literal("Respawn on Tent"), button -> selectTent()).
+                    bounds(this.width / 2 - 100, this.height / 2 - 10, 200, 20).build();
+            this.addRenderableWidget(tentButton);
+
             baseButton.active = false;
         }
     }
@@ -76,28 +82,27 @@ public class CustomDeathScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices); // Draw background
-        UnrealZaruba.LOGGER.info("Loading background texture: " + BACKGROUND_TEXTURE);
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
-        blit(matrices, this.width / 2 - 128, this.height / 2 - 128, 0, 0, 256, 256, 256, 256); // Draw the background
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        this.renderBackground(guiGraphics); // Draw background
+
+        guiGraphics.blit(BACKGROUND_TEXTURE,this.width / 2 - 128, this.height / 2 - 128, 0, 0, 256, 256, 256, 256); // Draw the background
         // texture
 
-        super.render(matrices, mouseX, mouseY, delta); // Draw buttons
+        super.render(guiGraphics, mouseX, mouseY, delta); // Draw buttons
 
         String timerText = "Respawn in: §4" + (respawnTimer / 20) + "§r seconds";
 
-        matrices.pushPose();
+        guiGraphics.pose().pushPose();
 
         float scale = 2.0f; // Example scale factor (2x bigger)
-        matrices.scale(scale, scale, scale);
+        guiGraphics.pose().scale(scale, scale, scale);
 
         int scaledWidth = (int) (this.width / (2 * scale)); // Adjust position based on scale
         int scaledHeight = (int) ((this.height / 2 - 40) / scale); // Adjust position based on scale
 
-        drawCenteredString(matrices, this.font, timerText, scaledWidth, scaledHeight, 0xFFFFFF);
+        guiGraphics.drawCenteredString(this.font, timerText, scaledWidth, scaledHeight, 0xFFFFFF);
 
-        matrices.popPose();
+        guiGraphics.pose().popPose();
     }
 
     @Override

@@ -6,13 +6,11 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
-import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
-import com.ibm.icu.impl.Pair;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -103,7 +101,7 @@ public class TeamU {
         this.members.forEach(element -> {
             ServerPlayer player = server.getPlayerList().getPlayer(element);
             if (player != null) {
-                player.sendMessage(new TextComponent(message), element);
+                player.sendSystemMessage(Component.literal(message));
             }
         });
     }
@@ -117,7 +115,7 @@ public class TeamU {
             redTeam = scoreboard.addPlayerTeam("RED");
         }
         redTeam.setColor(ChatFormatting.RED);
-        redTeam.setDisplayName(new TextComponent("Red Team"));
+        redTeam.setDisplayName(Component.literal("Red Team"));
         redTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
         redTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
 
@@ -127,7 +125,7 @@ public class TeamU {
             blueTeam = scoreboard.addPlayerTeam("BLUE");
         }
         blueTeam.setColor(ChatFormatting.BLUE);
-        blueTeam.setDisplayName(new TextComponent("Blue Team"));
+        blueTeam.setDisplayName(Component.literal("Blue Team"));
         blueTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
         blueTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
     }
@@ -138,7 +136,7 @@ public class TeamU {
 
 
         if (spawn == null) {
-            player.sendMessage(new TextComponent("Скажи Доду, что он забыл спавн поставить))"), player.getUUID());
+            player.sendSystemMessage(Component.literal("Скажи Доду, что он забыл спавн поставить))"));
         } else {
             members.add(player.getUUID());
             if (team == null) {
@@ -154,10 +152,10 @@ public class TeamU {
                 System.out.println("XUINUA");
             }
             player.displayClientMessage(
-                    new TextComponent("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
+                    Component.literal("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
                             .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
                     true);
-            player.setRespawnPosition(player.getLevel().dimension(), spawn, 0, false, false);
+            player.setRespawnPosition(player.level().dimension(), spawn, 0, false, false);
             // Utils.setSpawnPoint(player, spawn);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();

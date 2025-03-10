@@ -5,7 +5,7 @@ import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +27,7 @@ public class Utils {
             CommandSourceStack commandSourceStack = server.createCommandSourceStack();
             String command = String.format("/spawnpoint %s %d %d %d", player.getName().getString(),
                     pos.getX(), pos.getY(), pos.getZ());
-            server.getCommands().performCommand(commandSourceStack, command);
+            server.getCommands().performPrefixedCommand(commandSourceStack, command);
         }
     }
 
@@ -71,7 +71,7 @@ public class Utils {
     }
 
     public static void SetPrefixTo(ServerPlayer player, String prefix) {
-        player.setCustomName(new TextComponent("[" + prefix + "] " + player.getName().toString()));
+        player.setCustomName(Component.literal("[" + prefix + "] " + player.getName().toString()));
     }
 
     public static void LoadChunksInArea(ServerLevel world, int minX, int minZ, int maxX, int maxZ) {

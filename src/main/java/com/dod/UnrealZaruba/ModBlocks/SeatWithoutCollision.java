@@ -15,8 +15,8 @@ public class SeatWithoutCollision extends SeatBlock {
 
     VoxelShape selectionShape = Shapes.box(0.6, 0.0, 0.6, 0.9, 0.5, 0.9);
 
-    public SeatWithoutCollision(Properties properties, DyeColor color, boolean inCreativeTab) {
-        super(properties, color, inCreativeTab);
+    public SeatWithoutCollision(Properties properties, DyeColor color) {
+        super(properties, color);
     }
 
     @Override

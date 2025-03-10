@@ -5,7 +5,8 @@ import javax.annotation.Nonnull;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -14,7 +15,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.resources.ResourceLocation;
@@ -58,7 +58,7 @@ public class EnterUnrealZarubaEntityRenderer extends MobRenderer<ClickableHumano
                 poseStack.pushPose();
                 poseStack.translate(0.0D, i * 0.25D, 0.0D);  // Increase height for each subsequent label
 
-                renderNameTagAboba(entity, new TextComponent(labels[i]), poseStack, buffer, packedLight);
+                renderNameTagAboba(entity, Component.literal(labels[i]), poseStack, buffer, packedLight);
 
                 poseStack.popPose();
             }
@@ -72,13 +72,16 @@ public class EnterUnrealZarubaEntityRenderer extends MobRenderer<ClickableHumano
         Font font = Minecraft.getInstance().font;
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(-camera.getYRot())); // Rotate horizontally to face the player
-        poseStack.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
+        poseStack.mulPose(new Quaternionf().rotationYXZ(
+                (float) Math.toRadians(-camera.getYRot()),
+                (float) Math.toRadians(camera.getXRot()),
+                0.0F
+        ));
 
         float scale = 0.025F;
         poseStack.scale(-scale, -scale, scale); // Scale the text
         int yOffset = -8; // Offset the text above the entity
 
-        font.drawInBatch(label.getString(), -font.width(label.getString()) / 2.0F, yOffset, 0xFFFFFF, false, poseStack.last().pose(), buffer, false, 0, packedLight);
+        font.drawInBatch(label.getString(), -font.width(label.getString()) / 2.0F, yOffset, 0xFFFFFF, false, poseStack.last().pose(), buffer, Font.DisplayMode.NORMAL, 0, packedLight);
     }
 }

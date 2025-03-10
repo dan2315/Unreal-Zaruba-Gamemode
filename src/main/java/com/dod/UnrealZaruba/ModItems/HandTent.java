@@ -9,7 +9,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -57,13 +57,11 @@ public class HandTent extends Item {
                 TeamGamemode gamemode = PlayerContext.Get(player.getUUID()).Gamemode(TeamGamemode.class);
                 if (gamemode.GetTeamManager().GetPlayersTeam(player).active_tent == null) {
                     ServerLevel serverLevel = (ServerLevel) world;
-                    placeCustomStructure(serverLevel, new BlockPos(player.position()), player);
+                    placeCustomStructure(serverLevel, new BlockPos((int)player.getX(), (int)player.getY(), (int)player.getZ()), player);
                     stack.setCount(stack.getCount() - 1);
                     return stack;
                 } else {
-                    player.sendMessage(
-                            new TextComponent("Вы не можете установить вторую палатку, когда первая все еще существует"),
-                            player.getUUID());
+                    player.sendSystemMessage(Component.literal("Вы не можете установить вторую палатку, когда первая все еще существует"));
                 }
             }
         }

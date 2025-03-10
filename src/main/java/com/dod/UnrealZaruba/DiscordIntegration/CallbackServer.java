@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba.DiscordIntegration;
 
 import com.sun.net.httpserver.HttpServer;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.PacketDistributor;
@@ -92,7 +92,7 @@ public class CallbackServer {
                     // TODO: Сохранять только в случае, когда они рефрешатся (то есть в случаях tokens_valid на пересохранять)
                     NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                             new SaveTokensPacket(token, refreshToken));
-                    player.sendMessage(new TextComponent("§4[SERVER]§r Ку, " + player.getName().getString() + ". Авторизация §a§lуспешна§r."), playerUUID);
+                    player.sendSystemMessage(Component.literal("§4[SERVER]§r Ку, " + player.getName().getString() + ". Авторизация §a§lуспешна§r."));
 
                     String response = String.format("Auth status for player [%s] set to [%b]",
                             playerList.getPlayer(UUID.fromString(uuid)), isAuthenticated);

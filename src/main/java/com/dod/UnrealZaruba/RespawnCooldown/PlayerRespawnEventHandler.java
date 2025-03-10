@@ -17,7 +17,7 @@ import com.dod.UnrealZaruba.Utils.TimerManager;
 
 import com.dod.UnrealZaruba.Utils.NBT;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -48,10 +48,10 @@ public class PlayerRespawnEventHandler {
             return;
         }
 
-        if (!(event.getEntityLiving() instanceof ServerPlayer serverPlayer))
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer))
             return;
         
-        BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level);
+        BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level());
         
         if (gamemode.gameStage == GameStage.Preparation) {
             serverPlayer.setHealth(20.0F);
@@ -68,12 +68,12 @@ public class PlayerRespawnEventHandler {
         if (event.getSource().getEntity() != null && event.getSource().getEntity() instanceof Player) {
             Entity killer_entity = event.getSource().getEntity();
             ServerPlayer killer_player = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayer(killer_entity.getUUID());
-            TitleMessage.sendActionbar(killer_player, new TextComponent("§c ☠ Вы убили " + serverPlayer.getName().getString() + " ☠"));
-            TitleMessage.sendActionbar(serverPlayer, new TextComponent("§c ☠ Вас убил " + killer_player.getName().getString() + " ☠"));
+            TitleMessage.sendActionbar(killer_player, Component.literal("§c ☠ Вы убили " + serverPlayer.getName().getString() + " ☠"));
+            TitleMessage.sendActionbar(serverPlayer, Component.literal("§c ☠ Вас убил " + killer_player.getName().getString() + " ☠"));
         }
 
         if (gamemode.gameStage != GameStage.Preparation) {
-                ServerLevel serverWorld = serverPlayer.getLevel();
+                ServerLevel serverWorld = (ServerLevel) serverPlayer.level();
                 serverWorld.getServer().execute(() -> {
                     serverPlayer.setGameMode(GameType.SPECTATOR);
                 });

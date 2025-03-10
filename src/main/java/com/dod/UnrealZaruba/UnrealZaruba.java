@@ -1,24 +1,20 @@
 package com.dod.UnrealZaruba;
 
-import org.slf4j.Logger;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
-import com.dod.UnrealZaruba.Mobs.MobRenderers.EnterUnrealZarubaEntityRenderer;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.mojang.logging.LogUtils;
-
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import com.mojang.logging.LogUtils;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.slf4j.Logger;
+
+
+import net.minecraftforge.common.MinecraftForge;
 
 @Mod(UnrealZaruba.MOD_ID)
 public class UnrealZaruba {

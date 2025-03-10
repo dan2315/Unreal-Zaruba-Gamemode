@@ -7,7 +7,7 @@ import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
 import java.util.function.Function;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,7 +65,7 @@ public class ClickableHumanoidEntity extends Mob {
 
     @Override
     public InteractionResult interactAt(Player player, Vec3 hitVec, InteractionHand hand) {
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
 
             switch (id) {
                 case 1:
@@ -84,7 +84,7 @@ public class ClickableHumanoidEntity extends Mob {
     public void teleportPlayerToDimension(ServerPlayer player, ResourceKey<Level> targetDimension, double x, double y, double z) {
     ServerLevel targetWorld = player.getServer().getLevel(targetDimension); // Get the target dimension's world
 
-    if (targetWorld != null && !player.getLevel().dimension().equals(targetDimension)) {
+    if (targetWorld != null && !player.level().dimension().equals(targetDimension)) {
         player.teleportTo(targetWorld, x, y, z, player.getYRot(), player.getXRot());
     } else {
         player.teleportTo(x, y, z);

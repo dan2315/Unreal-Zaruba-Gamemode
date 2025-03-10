@@ -6,7 +6,7 @@ import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.TeamLogic.TeamU;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class TentMainBlock extends Block {
@@ -25,7 +25,8 @@ public class TentMainBlock extends Block {
     public TeamColor teamColor = TeamColor.UNDEFINED;
 
     public TentMainBlock(TeamColor teamColor) {
-        super(BlockBehaviour.Properties.of(Material.METAL)
+        super(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.METAL)
                 .strength(2.0f, 3.0f)
                 .sound(SoundType.METAL));
         this.teamColor = teamColor;
@@ -43,7 +44,7 @@ public class TentMainBlock extends Block {
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
         if (!level.isClientSide) {
             TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level));
-            sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(), new TextComponent("§4Палатка команды "
+            sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(), Component.literal("§4Палатка команды "
                     + gamemode.GetTeamManager().Get(teamColor).color.toString() + " была разрушена!"));
             gamemode.GetTeamManager().Get(teamColor).setActiveTent(null);
         }
@@ -75,7 +76,7 @@ public class TentMainBlock extends Block {
             TeamU team = gamemode.GetTeamManager().Get(teamColor);
 
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(),
-                    new TextComponent("§4Палатка команды " + team.color.toString() + " была разрушена!"));
+                    Component.literal("§4Палатка команды " + team.color.toString() + " была разрушена!"));
             team.setActiveTent(null);
         }
         // Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),
@@ -91,9 +92,9 @@ public class TentMainBlock extends Block {
      * @param server
      * @param message
      */
-    public void sendGlobalMessage(MinecraftServer server, TextComponent message) {
+    public void sendGlobalMessage(MinecraftServer server, Component message) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            player.sendMessage(message, player.getUUID());
+            player.sendSystemMessage(message);
         }
     }
 }

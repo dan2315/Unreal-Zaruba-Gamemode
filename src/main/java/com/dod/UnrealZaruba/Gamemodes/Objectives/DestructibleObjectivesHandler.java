@@ -12,7 +12,7 @@ import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.BossEvent;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,7 +32,7 @@ public class DestructibleObjectivesHandler {
     private static final Map<UUID, Integer> playerTickCounters = new HashMap<>();
 
     public static void Add(DestructibleObjective objective) {
-        destructibleObjectives.put(objective, new ServerBossEvent(new TextComponent(objective.GetName()),
+        destructibleObjectives.put(objective, new ServerBossEvent(Component.literal(objective.GetName()),
                 BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS));
         playersWithBossBar.put(objective, new HashSet<>());
     }
