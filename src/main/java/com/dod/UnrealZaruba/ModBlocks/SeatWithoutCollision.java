@@ -1,6 +1,5 @@
 package com.dod.UnrealZaruba.ModBlocks;
 
-
 import com.simibubi.create.content.contraptions.actors.seat.SeatBlock;
 
 import net.minecraft.core.BlockPos;

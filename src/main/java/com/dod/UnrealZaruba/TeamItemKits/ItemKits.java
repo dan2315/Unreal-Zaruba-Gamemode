@@ -11,6 +11,9 @@ import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * Проклятый класс 💀
+ */
 public class ItemKits {
     public static final HashMap<String, Integer> redTeamKit;
     public static final HashMap<String, Integer> redTeamCommanderKit;

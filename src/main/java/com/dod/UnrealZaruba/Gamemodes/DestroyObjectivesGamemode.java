@@ -28,7 +28,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.scores.Objective;
@@ -297,7 +296,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
-        // WorldManager.ReloadMap(server);
+        // TODO: WorldManager.ReloadMap(server);
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {

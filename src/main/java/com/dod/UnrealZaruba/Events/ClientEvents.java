@@ -1,12 +1,7 @@
 package com.dod.UnrealZaruba.Events;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
-import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingIn;
 import net.minecraftforge.event.RegisterCommandsEvent;

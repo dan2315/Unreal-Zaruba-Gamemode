@@ -1,12 +1,17 @@
 package com.dod.UnrealZaruba.Utils;
 
-
 public class TickTimer {
 
     private int duration; // time in milliseconds
     private boolean started;
     private int currentAccumulatedTicks;
 
+    /**
+     * Instantiates a new Tick timer.
+     *
+     * @param duration     the duration
+     * @param preventStart the prevent start
+     */
     public TickTimer(int duration, boolean preventStart)
     {
         this.duration = duration;
@@ -14,12 +19,18 @@ public class TickTimer {
         if (!preventStart) Start();
     }
 
-    public void Start() 
+    /**
+     * Start.
+     */
+    public void Start()
     {
         started = true;
     }
 
-    public void Update() 
+    /**
+     * Update.
+     */
+    public void Update()
     {
         if (started)
         {
@@ -33,14 +44,27 @@ public class TickTimer {
         }
     }
 
+    /**
+     * On updated.
+     *
+     * @param currentAccumulatedTicks the current accumulated ticks
+     */
     public void OnUpdated(int currentAccumulatedTicks) {}
 
+    /**
+     * On completed.
+     */
     public void OnCompleted() {}
 
     private void Dispose() {
         TimerManager.DisposeTimer(this, false);
     }
 
+    /**
+     * Dispose.
+     *
+     * @param complete the complete
+     */
     public void Dispose(boolean complete) {
         TimerManager.DisposeTimer(this, complete);
     }

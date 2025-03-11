@@ -3,7 +3,6 @@ package com.dod.UnrealZaruba.Commands;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
@@ -11,12 +10,9 @@ import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
-import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
@@ -37,9 +33,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -131,16 +124,12 @@ public class CommandRegistration {
                                         Utils.SetPrefixTo(player, prefix);
                                         context.getSource().sendSuccess(() ->
                                                 Component.literal(
-                                                        "Set prefix for "
-                                                                + playerName
-                                                                + " to "
-                                                                + prefix),
+                                                        "Set prefix for " + playerName + " to " + prefix),
                                                 true);
                                     } else {
                                         context.getSource()
                                                 .sendFailure(Component.literal(
-                                                        "Player " + playerName
-                                                                + " not found."));
+                                                        "Player " + playerName + " not found."));
                                     }
 
                                     return 1;
@@ -150,7 +139,7 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(3))
                 .then(Commands.argument("isSafe", BoolArgumentType.bool())
                         .executes(context -> {
-                            Boolean isSafe = BoolArgumentType
+                            boolean isSafe = BoolArgumentType
                                     .getBool(context, "isSafe");
 
                             Gamerules.DO_LINKS_SAFE = isSafe;
@@ -342,7 +331,6 @@ public class CommandRegistration {
         // .then(Commands.argument("y", IntegerArgumentType.integer())
         // .then(Commands.argument("z", IntegerArgumentType.integer())
         // .executes(CommandRegistration::SetTeamSpawnTo))))));
-
     }
 
     private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player)

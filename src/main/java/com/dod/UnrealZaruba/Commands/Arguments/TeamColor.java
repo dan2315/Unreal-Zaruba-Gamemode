@@ -9,21 +9,15 @@ public enum TeamColor {
     PURPLE,
     YELLOW;
 
-
     public static String getColorCodeForTeam(TeamColor teamColor) {
-    switch (teamColor) {
-        case RED:
-            return ChatFormatting.RED.toString();
-        case BLUE:
-            return ChatFormatting.BLUE.toString();
-        case PURPLE:
-            return ChatFormatting.DARK_PURPLE.toString();
-        case YELLOW:
-            return ChatFormatting.YELLOW.toString();
-        default:
-            return ChatFormatting.WHITE.toString();
+        return switch (teamColor) {
+            case RED -> ChatFormatting.RED.toString();
+            case BLUE -> ChatFormatting.BLUE.toString();
+            case PURPLE -> ChatFormatting.DARK_PURPLE.toString();
+            case YELLOW -> ChatFormatting.YELLOW.toString();
+            default -> ChatFormatting.WHITE.toString();
+        };
     }
-}
 }
 
 

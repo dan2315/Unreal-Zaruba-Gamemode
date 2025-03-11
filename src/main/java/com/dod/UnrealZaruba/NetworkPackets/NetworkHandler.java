@@ -4,8 +4,6 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -69,8 +67,8 @@ public class NetworkHandler {
         MinecraftForge.EVENT_BUS.register(new NetworkHandler());
     }
 
-    // TODO: Найху удалить систему акноледжмента, ТСП и так релаебл духоя, а чат ГПТ
-    // гандон
+    // TODO: Найху удалить систему акноледжмента, ТСП и так релаебл духоя, а чат ГПТ гандон
+    // Воистину гандон👌
 
     public static void sendToServerWithAcknowledgement(Object packet, int packetId, UUID senderUUID) {
         CHANNEL.sendToServer(packet);

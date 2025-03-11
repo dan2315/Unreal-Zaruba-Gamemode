@@ -76,7 +76,6 @@ public class LoginPacket {
                                 msg.getPort());
                     }
                 });
-
             });
         }
     }

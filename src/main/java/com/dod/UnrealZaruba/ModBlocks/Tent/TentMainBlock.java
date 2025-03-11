@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModBlocks;
+package com.dod.UnrealZaruba.ModBlocks.Tent;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;

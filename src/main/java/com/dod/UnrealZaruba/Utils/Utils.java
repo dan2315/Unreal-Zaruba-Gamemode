@@ -21,6 +21,8 @@ import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class Utils {
+
+    @Deprecated
     public static void setSpawnPoint(ServerPlayer player, BlockPos pos) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {

@@ -7,6 +7,9 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+/**
+ * DeferredRegister звуков
+ */
 public class ModSounds {
     private static final String MOD_ID = "unrealzaruba";
 

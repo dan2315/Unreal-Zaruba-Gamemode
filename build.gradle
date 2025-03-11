@@ -7,19 +7,20 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
     }
 }
+
 plugins {
     id 'net.minecraftforge.gradle' version '6.+'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'eclipse'
-    // id "architectury-plugin" version "3.4.146"
-    // id "dev.architectury.loom" version "1.3.355"
-    // id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'idea'
     id 'maven-publish'
-
     id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
     id "com.modrinth.minotaur" version "2.4.5" apply false
-
     id "com.github.johnrengelman.shadow" version "7.1.2"
+     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+
+    // id "architectury-plugin" version "3.4.146"
+    // id "dev.architectury.loom" version "1.3.355"
 }
 
 version = '0.2'
@@ -136,6 +137,16 @@ repositories {
                 includeGroup("com.simibubi.create")
             }
         }
+
+        maven { // Registrate
+            url "https://maven.tterrag.com/"
+        }
+
+        maven {
+            name "ModMaven"
+            url "https://modmaven.dev"
+        }
+    mavenLocal()
 }
 
 dependencies {
@@ -149,7 +160,10 @@ dependencies {
     implementation('org.spongepowered:mixin:0.8.5')
     implementation("org.joml:joml:1.10.4")
     implementation("org.joml:joml-primitives:1.10.0")
-    
+
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[MC1.20-1.3.3, MC1.21)")
+
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-forge:$vs2_version") { transitive = false }
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-common:$vs2_version") { transitive = false }
 
@@ -160,9 +174,8 @@ dependencies {
 
     // Create and its dependencies
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
-    
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20.1:0.6.11-12")
+
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
     // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
@@ -207,11 +220,17 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+reobf {
+    jarJar { }
+}
 
-task buildClient(type: Exec) {
+tasks.jarJar.finalizedBy('reobfJarJar')
+
+
+tasks.register('buildClient', Exec) {
     commandLine 'cmd', '/c', 'buildClient.bat', archivesBaseName + "-" + version + ".jar"
 }
 
-task buildServer(type: Exec) {
+tasks.register('buildServer', Exec) {
     commandLine 'cmd', '/c', 'buildServer.bat', archivesBaseName + "-" + version + ".jar"
 }
