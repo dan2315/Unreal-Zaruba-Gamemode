@@ -26,7 +26,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class TeamManager {
 
-    HashMap<TeamColor, TeamU> teams = new HashMap<>();
+    HashMap<TeamColor, TeamContext> teams = new HashMap<>();
 
     public HashMap<TeamColor, StructureTemplate> tent_templates = new HashMap<>();
 
@@ -35,7 +35,7 @@ public class TeamManager {
      *
      * @return the hash map
      */
-    public HashMap<TeamColor, TeamU> GetTeams() {
+    public HashMap<TeamColor, TeamContext> GetTeams() {
         return teams;
     }
 
@@ -68,7 +68,7 @@ public class TeamManager {
      */
     public void AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamU(this ,spawn, teamColor, baseVolume));
+        teams.put(teamColor, new TeamContext(this ,spawn, teamColor, baseVolume));
     }
 
     /**
@@ -82,7 +82,7 @@ public class TeamManager {
     @Deprecated
     public void AddTeam(TeamColor teamColor, BlockPos spawn) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamU(this, spawn, teamColor));
+        teams.put(teamColor, new TeamContext(this, spawn, teamColor));
     }
 
     /**
@@ -102,20 +102,20 @@ public class TeamManager {
      * @return the boolean
      */
     public boolean IsInTeam(Player player) {
-        for (TeamU team : teams.values()) {
+        for (TeamContext team : teams.values()) {
             return team.members.contains(player.getUUID());
         }
         return false;
     }
 
     /**
-     * Get players team {@link TeamU}
+     * Get players team {@link TeamContext}
      *
      * @param player the player
      * @return the TeamU
      */
-    public TeamU GetPlayersTeam(Player player) {
-        for (TeamU team : teams.values()) {
+    public TeamContext GetPlayersTeam(Player player) {
+        for (TeamContext team : teams.values()) {
             if (team.members.contains(player.getUUID())) {
                 return team;
             }
@@ -127,9 +127,9 @@ public class TeamManager {
      * Get players opposite team
      *
      * @param player the player
-     * @return {@link TeamU}
+     * @return {@link TeamContext}
      */
-    public TeamU GetPlayersOppositeTeam(Player player) {
+    public TeamContext GetPlayersOppositeTeam(Player player) {
         TeamColor color = GetPlayersTeam(player).Color();
         return GetOppositeTeamTo(color);
     }
@@ -138,9 +138,9 @@ public class TeamManager {
      * Get opposite team to team u.
      *
      * @param teamColor the team color
-     * @return {@link TeamU}
+     * @return {@link TeamContext}
      */
-    public TeamU GetOppositeTeamTo(TeamColor teamColor) {
+    public TeamContext GetOppositeTeamTo(TeamColor teamColor) {
         return switch (teamColor) {
             case RED -> teams.get(TeamColor.BLUE);
             case BLUE -> teams.get(TeamColor.RED);
@@ -149,12 +149,12 @@ public class TeamManager {
     }
 
     /**
-     * Get {@link TeamU}
+     * Get {@link TeamContext}
      *
      * @param color the color
-     * @return {@link TeamU}
+     * @return {@link TeamContext}
      */
-    public TeamU Get(TeamColor color) {
+    public TeamContext Get(TeamColor color) {
         return teams.get(color);
     }
 
@@ -164,7 +164,7 @@ public class TeamManager {
      * @return the boolean
      */
     public boolean DeleteBarriersAtSpawn() {
-        for (TeamU team : teams.values()) {
+        for (TeamContext team : teams.values()) {
             if (team.Spawn() == null) {
                 return false;
             }
@@ -186,7 +186,7 @@ public class TeamManager {
      * @return the boolean
      */
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
-        TeamU targetTeam = teams.get(dyeColor);
+        TeamContext targetTeam = teams.get(dyeColor);
         if (targetTeam == null) {
             UnrealZaruba.LOGGER.warn("Команда [" + dyeColor.toString() + "] не проиницилизирована");
             return false;
@@ -195,7 +195,7 @@ public class TeamManager {
 
         int maxOtherTeamsCount = teams.values().stream()
                 .filter(team -> !team.equals(targetTeam))
-                .mapToInt(TeamU::MembersCount)
+                .mapToInt(TeamContext::MembersCount)
                 .max()
                 .orElse(0);
 
@@ -216,7 +216,7 @@ public class TeamManager {
             return;
         }
 
-        for (TeamU team : teams.values()) {
+        for (TeamContext team : teams.values()) {
             team.TryRemove(player);
         }
 
@@ -227,7 +227,7 @@ public class TeamManager {
      * Give kit.
      */
     public void GiveKit() {
-        for (TeamU team : teams.values()) {
+        for (TeamContext team : teams.values()) {
             team.GiveKit();
         }
     }
@@ -249,7 +249,7 @@ public class TeamManager {
      * @param player the player
      */
     public void GiveKitTo(MinecraftServer server, ServerPlayer player) {
-        TeamU team = GetPlayersTeam(player);
+        TeamContext team = GetPlayersTeam(player);
         if (team == null) return;
         ItemKits.GiveKit(server, player, team);
     }
@@ -261,7 +261,7 @@ public class TeamManager {
      */
     public void ChangeGameModeOfAllParticipants(GameType gameType) {
         var playerList = ServerLifecycleHooks.getCurrentServer().getPlayerList();
-        for (TeamU team : teams.values()) {
+        for (TeamContext team : teams.values()) {
             for (UUID playerId : team.members) {
                 var player = playerList.getPlayer(playerId);
                 if (player != null)
@@ -276,7 +276,7 @@ public class TeamManager {
      * @param serverPlayer the server player
      */
     public void teleportToSpawn(ServerPlayer serverPlayer) {
-        TeamU team = GetPlayersTeam(serverPlayer);
+        TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null){
             serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
@@ -295,7 +295,7 @@ public class TeamManager {
      * @param serverPlayer the server player
      */
     public void teleportToTent(ServerPlayer serverPlayer) {
-        TeamU team = GetPlayersTeam(serverPlayer);
+        TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null) {
             serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
@@ -332,7 +332,7 @@ public class TeamManager {
     public void Save() {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();
-        for (Map.Entry<TeamColor, TeamU> team : teams.entrySet()) {
+        for (Map.Entry<TeamColor, TeamContext> team : teams.entrySet()) {
 
             data.teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().Spawn(), team.getValue().BarrierVolumes()));
         }

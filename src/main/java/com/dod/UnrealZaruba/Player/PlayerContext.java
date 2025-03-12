@@ -32,6 +32,8 @@ public class PlayerContext {
     private int voteCount;
     private boolean isVoted;
 
+    public boolean sosal;
+
     private BaseGamemode gamemode;
 
 

@@ -6,7 +6,7 @@ import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -79,7 +79,7 @@ public class HandTent extends Item {
         BaseGamemode gamemode = GamemodeManager.Get(world);
         TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
 
-        TeamU player_team = teamManager.GetPlayersTeam(player);
+        TeamContext player_team = teamManager.GetPlayersTeam(player);
 
         BlockPos center = clickPos;
         BlockPos buildPoint = clickPos.offset(-4, -2, -4);

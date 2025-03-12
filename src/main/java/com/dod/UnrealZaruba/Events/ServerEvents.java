@@ -15,7 +15,7 @@ import com.dod.UnrealZaruba.NetworkPackets.LoginPacket;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -48,7 +48,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         CallbackServer.StartServer(event.getServer());
-        TeamU.SetupMinecraftTeams(event.getServer());
+        TeamContext.SetupMinecraftTeams(event.getServer());
         gamemode = new DestroyObjectivesGamemode(event.getServer());
         teamManager = gamemode.GetTeamManager();
         ScoreboardManager.clearScoreboard(event.getServer());
@@ -67,8 +67,8 @@ public class ServerEvents {
     public static void onServerStopped(ServerStoppedEvent event) {
         Scoreboard scoreboard = event.getServer().getScoreboard();
 
-        scoreboard.removePlayerTeam(TeamU.redTeam);
-        scoreboard.removePlayerTeam(TeamU.blueTeam);
+        scoreboard.removePlayerTeam(TeamContext.redTeam);
+        scoreboard.removePlayerTeam(TeamContext.blueTeam);
 
         UnrealZaruba.LOGGER.info("Server has stopped. Finalizing...");
         DestructibleObjectivesHandler.Save();
@@ -150,9 +150,9 @@ public class ServerEvents {
             return;
         }
 
-        TeamU teamU = teamManager.GetPlayersTeam(event.getPlayer());
-        if (teamU != null) {
-            for (var memberUUID : teamU.Members()) {
+        TeamContext teamContext = teamManager.GetPlayersTeam(event.getPlayer());
+        if (teamContext != null) {
+            for (var memberUUID : teamContext.Members()) {
                 ServerPlayer player = server.getPlayerList().getPlayer(memberUUID);
                 if (player == null)
                     continue;

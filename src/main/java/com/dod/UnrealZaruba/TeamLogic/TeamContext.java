@@ -23,7 +23,7 @@ import net.minecraft.world.scores.Team.Visibility;
 /**
  * Team core data.
  */
-public class TeamU {
+public class TeamContext {
     private BlockPos spawn;
     public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
@@ -34,7 +34,6 @@ public class TeamU {
     MinecraftServer server;
     TeamManager batya;
     public Tent active_tent;
-
 
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
@@ -54,7 +53,7 @@ public class TeamU {
      * @param color          the color
      * @param barrierVolumes the barrier volumes
      */
-    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
+    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
@@ -62,7 +61,7 @@ public class TeamU {
         server = ServerLifecycleHooks.getCurrentServer();
     }
 
-    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color) {
+    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color) {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
