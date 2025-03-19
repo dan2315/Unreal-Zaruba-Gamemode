@@ -3,7 +3,6 @@ package com.dod.UnrealZaruba.WorldManager.Lobby;
 import com.dod.UnrealZaruba.Player.PlayerStatus;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -46,7 +45,6 @@ public class Lobby {
 
     public void StartGame() {
         BaseGamemode gamemode = gamemodeFactory.get();
-        gamemode.TeleportPlayersInGame(gameDimension);
     }
 
     public ResourceKey<Level> GetDimension() {

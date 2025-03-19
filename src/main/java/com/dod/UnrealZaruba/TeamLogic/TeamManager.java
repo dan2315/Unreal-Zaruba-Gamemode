@@ -15,7 +15,6 @@ import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -39,25 +38,35 @@ public class TeamManager {
         return teams;
     }
 
+
+    
     /**
      * Instantiates a new Team manager.
      */
     public TeamManager() {
         var teamData = Load();
         if (teamData != null) {
-            for (var data : teamData.teamSpawns.entrySet()) {
-                AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
+            for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.teamSpawns.entrySet()) {
+                var teamContext = AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
                 StructureTemplateManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
 
-                StructureTemplate template_red = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "red_tent"));
-                StructureTemplate template_blue = structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
-
-                tent_templates.put(TeamColor.RED, template_red);
-                tent_templates.put(TeamColor.BLUE, template_blue);
-                UnrealZaruba.LOGGER.warn("[Во, бля] " + data.getKey().toString());
+                tent_templates.put(data.getKey(), teamContext.GetTentTemplate(structureManager));
             }
         }
     }
+
+
+    public void Initialize() {
+        for (TeamContext team : teams.values()) {
+            team.SetupMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
+        }
+    }
+
+    public void Cleanup() {
+        for (TeamContext team : teams.values()) {
+            team.CleanMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
+        }
+    } 
 
     /**
      * Add team.
@@ -66,9 +75,11 @@ public class TeamManager {
      * @param spawn      the spawn
      * @param baseVolume the base volume
      */
-    public void AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
+    public TeamContext AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamContext(this ,spawn, teamColor, baseVolume));
+        var teamContext = new TeamContext(this ,spawn, teamColor, baseVolume);
+        teams.put(teamColor, teamContext);
+        return teamContext;
     }
 
     /**
@@ -129,7 +140,7 @@ public class TeamManager {
      * @param player the player
      * @return {@link TeamContext}
      */
-    public TeamContext GetPlayersOppositeTeam(Player player) {
+    public TeamContext GetPlayersOppositeTeam(ServerPlayer player) {
         TeamColor color = GetPlayersTeam(player).Color();
         return GetOppositeTeamTo(color);
     }
@@ -308,23 +319,6 @@ public class TeamManager {
         serverPlayer.teleportTo(x, y, z);
     }
 
-    /**
-     * Respawn player.
-     *
-     * @param player     the player
-     * @param tentChosen the tent chosen
-     */
-    public void RespawnPlayer(ServerPlayer player, boolean tentChosen) {
-        if (!(GetPlayersTeam(player).active_tent == null)) {
-            if (tentChosen) {
-                teleportToTent(player);
-            } else {
-                teleportToSpawn(player);
-            }
-        } else {
-            teleportToSpawn(player);
-        }
-    }
 
     /**
      * Save.
@@ -358,5 +352,5 @@ public class TeamManager {
             UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
             return null;
         }
-    } 
+    }
 }

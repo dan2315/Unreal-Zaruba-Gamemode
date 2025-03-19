@@ -28,10 +28,17 @@ public class RacingGamemode extends BaseGamemode {
         throw new UnsupportedOperationException("Unimplemented method 'StartBattle'");
     }
 
+
     @Override
-    public void TeleportPlayersInGame(ResourceKey<Level> gameDimension) {
+    protected void Initialize() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'TeleportPlayersInGame'");
+        throw new UnsupportedOperationException("Unimplemented method 'Initialize'");
+    }
+
+    @Override
+    protected void Cleanup() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'Cleanup'");
     }
 
     

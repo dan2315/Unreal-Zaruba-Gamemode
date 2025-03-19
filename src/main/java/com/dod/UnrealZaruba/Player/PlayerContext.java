@@ -14,7 +14,6 @@ import net.minecraft.world.level.GameType;
  * <li>{@link Boolean} authorized;</li>
  * <li>{@link PlayerStatus} status;</li>
  * <li>{@link GameType} originalGameType;</li>
- * <li>{@link Boolean} previouslyOpped;</li>
  * <li>{@link Integer} voteCount;</li>
  * <li>{@link Boolean} isVoted;</li>
  * <li>{@link BaseGamemode} gamemode;</li>
@@ -26,9 +25,9 @@ public class PlayerContext {
     private UUID id;
     private GameType originalGameType;
     private PlayerStatus status;
-    private boolean previouslyOpped;
     private int voteCount;
     private boolean isVoted;
+    private boolean isDead;
 
     public boolean sosal;
 
@@ -39,16 +38,16 @@ public class PlayerContext {
         return id;
     }
 
-    public boolean PreviouslyOpped() {
-        return previouslyOpped;
-    }
-
     public int Votes() {
         return voteCount;
     }
 
     public PlayerStatus Status() {
         return this.status;
+    }
+
+    public boolean IsDead() {
+        return isDead;
     }
 
     public BaseGamemode Gamemode() { return gamemode; } 
@@ -77,10 +76,6 @@ public class PlayerContext {
 
     public void SetGamemode(BaseGamemode gamemode) {
         this.gamemode = gamemode;
-    }
-
-    public void SetPreviouslyOpped() {
-        previouslyOpped = true;
     }
 
     public void SetStatus(PlayerStatus status) {

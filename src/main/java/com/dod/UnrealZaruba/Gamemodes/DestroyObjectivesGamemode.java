@@ -1,7 +1,5 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Utils.TimerManager;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -22,6 +20,7 @@ import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
+import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.Utils.NBT;
 
 import com.mojang.brigadier.context.CommandContext;
@@ -46,9 +45,12 @@ import net.minecraft.world.entity.player.Player;
 
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
-    private static final int COMMANDER_VOTING_DURATION_TICKS = 3 * 60; // 3 minutes in seconds
-    private static final int PREPARATION_DURATION_TICKS = 7 * 60; // 7 minutes in seconds
-    private static final int GAME_DURATION_TICKS = 50 * 60; // 50 minutes in seconds
+    // Duration constants in milliseconds for better readability
+    private static final int COMMANDER_VOTING_DURATION_MS = 3 * 60 * 1000; // 3 minutes
+    private static final int PREPARATION_DURATION_MS = 7 * 60 * 1000; // 7 minutes
+    private static final int GAME_DURATION_MS = 50 * 60 * 1000; // 50 minutes
+    private static final int COUNTDOWN_DURATION_MS = 10 * 1000; // 10 seconds
+    
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     private LeaderboardService leaderboardService;
@@ -91,6 +93,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
         HashMap<TeamColor, TeamContext> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
 
+        // Show voting UI to all players
         for (var team : teams.entrySet()) {
             for (var player : team.getValue().Members()) {
                 var serverPlayer = server.getPlayerList().getPlayer(player);
@@ -105,53 +108,66 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             } 
         }
 
-
-        TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
-                () -> {
-                    try {
-                        for (Map.Entry<TeamColor, TeamContext> teamEntry : teams.entrySet()) {
-                            TeamContext team = teamEntry.getValue();
-                            if (team.VoteList().isEmpty()) {
-                                UnrealZaruba.LOGGER.warn("Vote list is empty");
-                                continue;
-                            }
-        
-                            
-                            int listSize = team.VoteList().size();
-                            Player most_voted_player = server.getPlayerList().getPlayer(team.VoteList().get(0));
-                            StringBuilder message = new StringBuilder (
-                                "===========================\nТоп 5 голосования:\n");
-                            for (int i = 0; i < Math.min(5, listSize); i++) {
-                                ServerPlayer topPlayer = server.getPlayerList().getPlayer(team.VoteList().get(i));
-                                if (topPlayer != null) {
-                                    Integer voteCount = PlayerContext.Get(topPlayer.getUUID()).Votes();
-                                    message.append(i + 1 +". " + topPlayer.getName().getString() + ": " + voteCount + "\n");
-                                }
-                            }
-                            message.append("===========================");
-                            teamEntry.getValue().setCommander(context.getSource().getServer(), most_voted_player);
-                            team.SendMessage(server, message.toString());
-                        }
-                        StartPreparation(context);
-                    } catch (Exception e) {
-                        context.getSource().sendFailure(Component.literal(e.getMessage()));
-                    }
-                }, ticks -> {
-                    if (ticks % 20 != 0)
-                        return;
-                    ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective,
-                            (COMMANDER_VOTING_DURATION_TICKS - (ticks / 20)) / 60);
-                    ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective,
-                            ((COMMANDER_VOTING_DURATION_TICKS - (ticks / 20)) % 60));
-                });
+        // Create a timer for the voting phase
+        TimerManager.createRealTimeTimer(
+            COMMANDER_VOTING_DURATION_MS,
+            () -> handleVotingCompleted(context, teams, server),
+            ticks -> updateVotingTimer(ticks)
+        );
 
         return 1;
+    }
+    
+    // Handler for when voting is completed
+    private void handleVotingCompleted(CommandContext<CommandSourceStack> context, 
+                                      HashMap<TeamColor, TeamContext> teams, 
+                                      MinecraftServer server) {
+        try {
+            for (Map.Entry<TeamColor, TeamContext> teamEntry : teams.entrySet()) {
+                TeamContext team = teamEntry.getValue();
+                if (team.VoteList().isEmpty()) {
+                    UnrealZaruba.LOGGER.warn("Vote list is empty");
+                    continue;
+                }
+                
+                int listSize = team.VoteList().size();
+                Player most_voted_player = server.getPlayerList().getPlayer(team.VoteList().get(0));
+                StringBuilder message = new StringBuilder(
+                    "===========================\nТоп 5 голосования:\n");
+                
+                for (int i = 0; i < Math.min(5, listSize); i++) {
+                    ServerPlayer topPlayer = server.getPlayerList().getPlayer(team.VoteList().get(i));
+                    if (topPlayer != null) {
+                        Integer voteCount = PlayerContext.Get(topPlayer.getUUID()).Votes();
+                        message.append(i + 1 +". " + topPlayer.getName().getString() + ": " + voteCount + "\n");
+                    }
+                }
+                
+                message.append("===========================");
+                teamEntry.getValue().setCommander(context.getSource().getServer(), most_voted_player);
+                team.SendMessage(server, message.toString());
+            }
+            
+            StartPreparation(context);
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal(e.getMessage()));
+        }
+    }
+    
+    // Update the scoreboard timer during voting
+    private void updateVotingTimer(int ticks) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (COMMANDER_VOTING_DURATION_MS / 1000) - (ticks / 20);
+        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective, secondsRemaining / 60);
+        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective, secondsRemaining % 60);
     }
 
     public int StartPreparation(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         Utils.SetGamemodeAllExcludeOP(context.getSource().getServer().getPlayerList(), GameType.ADVENTURE);
         gameStage = GameStage.StrategyTime;
 
+        // Show preparation phase message to all players
         for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
             TitleMessage.showTitle(serverPlayer, Component.literal("§6Стадия подготовки"),
                     Component.literal("Коммандиром стал " +
@@ -159,23 +175,32 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             TeamManager.GiveKitTo(context.getSource().getServer(), serverPlayer);
         }
 
-        TimerManager.Create(PREPARATION_DURATION_TICKS * 1000,
-                () -> {
-                    try {
-                        StartBattle(context);
-                    } catch (Exception e) {
-                        context.getSource().sendFailure(Component.literal(e.getMessage()));
-                    }
-                }, ticks -> {
-                    if (ticks % 20 != 0)
-                        return;
-                    ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective,
-                            (PREPARATION_DURATION_TICKS - (ticks / 20)) / 60);
-                    ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective,
-                            ((PREPARATION_DURATION_TICKS - (ticks / 20)) % 60));
-                });
+        // Create a timer for the preparation phase
+        TimerManager.createRealTimeTimer(
+            PREPARATION_DURATION_MS,
+            () -> handlePreparationCompleted(context),
+            ticks -> updatePreparationTimer(ticks)
+        );
 
         return 1;
+    }
+    
+    // Handler for when preparation phase is completed
+    private void handlePreparationCompleted(CommandContext<CommandSourceStack> context) {
+        try {
+            StartBattle(context);
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal(e.getMessage()));
+        }
+    }
+    
+    // Update the scoreboard timer during preparation
+    private void updatePreparationTimer(int ticks) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (PREPARATION_DURATION_MS / 1000) - (ticks / 20);
+        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective, secondsRemaining / 60);
+        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective, secondsRemaining % 60);
     }
 
     public int StartBattle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -191,49 +216,66 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (!(player.level() instanceof ServerLevel)) return 0;
         ServerLevel serverLevel = (ServerLevel) player.level();
 
+        // Play horn sounds
         SoundHandler.playSoundFromPosition(serverLevel, SpawnRed, ModSounds.HORN_DIRE.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
         SoundHandler.playSoundFromPosition(serverLevel, SpawnBlue, ModSounds.HORN_RADIANT.get(),
                 SoundSource.BLOCKS, 5.0F, 1.0F);
 
-        int timerDuration = 10;
-        TimerManager.Create(timerDuration * 1000, () -> {
-            for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                var team = TeamManager.GetPlayersTeam(serverPlayer);
-                if (team == null)
-                    continue;
-                TitleMessage.showTitle(serverPlayer, startGameTexts.get(team.Color()).GetTitle(),
-                        startGameTexts.get(team.Color()).GetSubtitle());
-            }
-
-            var success = TeamManager.DeleteBarriersAtSpawn();
-
-            if (!success)
-                context.getSource().sendFailure(Component.literal("Спавны команд ещё не готовы"));
-
-
-            TimerManager.Create(GAME_DURATION_TICKS * 1000,
-                    () -> {
-                        CompleteGame(context.getSource().getServer(), TeamColor.BLUE);
-
-                    }, ticks -> {
-                        if (ticks % 20 != 0)
-                            return;
-                        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective,
-                                (GAME_DURATION_TICKS - (ticks / 20)) / 60);
-                        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective,
-                                ((GAME_DURATION_TICKS - (ticks / 20)) % 60));
-                    });
-        },
-                ticks -> {
-                    if (ticks % 20 != 0)
-                        return;
-                    for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
-                        TitleMessage.showTitle(serverPlayer, Component.literal("§6До начала игры§r"),
-                                Component.literal("▌§l " + String.valueOf(timerDuration - ticks / 20) + " §r▌"));
-                    }
-                });
+        // Create a countdown timer before the battle starts
+        TimerManager.createRealTimeTimer(
+            COUNTDOWN_DURATION_MS,
+            () -> handleCountdownCompleted(context),
+            ticks -> updateCountdownTimer(ticks, context.getSource().getServer())
+        );
+        
         return 1;
+    }
+    
+    // Handler for when countdown is completed
+    private void handleCountdownCompleted(CommandContext<CommandSourceStack> context) {
+        // Show game start messages to all players
+        for (ServerPlayer serverPlayer : context.getSource().getServer().getPlayerList().getPlayers()) {
+            var team = TeamManager.GetPlayersTeam(serverPlayer);
+            if (team == null) continue;
+            
+            TitleMessage.showTitle(serverPlayer, 
+                startGameTexts.get(team.Color()).GetTitle(),
+                startGameTexts.get(team.Color()).GetSubtitle());
+        }
+
+        // Remove barriers at spawn points
+        var success = TeamManager.DeleteBarriersAtSpawn();
+        if (!success) {
+            context.getSource().sendFailure(Component.literal("Спавны команд ещё не готовы"));
+        }
+
+        // Start the main game timer
+        TimerManager.createRealTimeTimer(
+            GAME_DURATION_MS,
+            () -> CompleteGame(context.getSource().getServer(), TeamColor.BLUE),
+            ticks -> updateGameTimer(ticks)
+        );
+    }
+    
+    // Update the countdown timer
+    private void updateCountdownTimer(int ticks, MinecraftServer server) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (COUNTDOWN_DURATION_MS / 1000) - (ticks / 20);
+        for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
+            TitleMessage.showTitle(serverPlayer, Component.literal("§6До начала игры§r"),
+                    Component.literal("▌§l " + secondsRemaining + " §r▌"));
+        }
+    }
+    
+    // Update the main game timer
+    private void updateGameTimer(int ticks) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
+        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, objective, secondsRemaining / 60);
+        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, objective, secondsRemaining % 60);
     }
 
     public void HandleConnectedPlayer(Player player) {
@@ -302,7 +344,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
-        String colorCode = TeamColor.getColorCodeForTeam(wonTeam);
+        String colorCode = wonTeam.getColorCode();
         Component titleText = Component.literal(
                 "Команда " + colorCode + wonTeam.toString() + ChatFormatting.RESET + " победила");
         Component wonText = Component.literal("Можешь сказать оппоненту \'Сори, что трахнул\'");
@@ -318,5 +360,4 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             }
         }
     }
-
 }

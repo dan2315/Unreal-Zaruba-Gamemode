@@ -3,9 +3,11 @@ package com.dod.UnrealZaruba.NetworkPackets;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 
 public class SelectTentPacket {
     
@@ -38,7 +40,7 @@ public class SelectTentPacket {
 
     public static void handle(SelectTentPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            PlayerRespawnEventHandler.SelectTentFor(packet.getPlayerID(), packet.isChosen());
+            ((TeamPlayerContext)PlayerContext.Get(packet.getPlayerID())).SelectTent(packet.isChosen());
         });
         ctx.get().setPacketHandled(true);
     }

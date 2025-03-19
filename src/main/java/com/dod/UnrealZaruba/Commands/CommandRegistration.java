@@ -9,7 +9,7 @@ import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Title.TitleMessage;
@@ -361,7 +361,9 @@ public class CommandRegistration {
                                           String response, SoundEvent sound) throws CommandSyntaxException {
         ServerPlayer serverPlayer = context.getSource().getPlayerOrException();
 
-        PlayerRespawnEventHandler.DeadPlayers.put(serverPlayer.getUUID(), tentChosen);
+        TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(serverPlayer.getUUID());
+        playerContext.SelectTent(tentChosen);
+
         TitleMessage.sendSubtitle(serverPlayer, Component.literal(response));
         SoundHandler.playSoundToPlayer(serverPlayer, sound, 1.0f, 1.0f);
 

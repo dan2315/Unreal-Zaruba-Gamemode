@@ -8,15 +8,16 @@ import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.server.ServerLifecycleHooks;
-
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
 
@@ -35,8 +36,7 @@ public class TeamContext {
     TeamManager batya;
     public Tent active_tent;
 
-    public static PlayerTeam redTeam;
-    public static PlayerTeam blueTeam;
+    public PlayerTeam minecraftTeam;
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
@@ -116,28 +116,20 @@ public class TeamContext {
         });
     }
 
-    public static void SetupMinecraftTeams(MinecraftServer server) {
+    public void SetupMinecraftTeam(MinecraftServer server) {
         Scoreboard scoreboard = server.getScoreboard();
 
-        // Create Red Team
-        redTeam = scoreboard.getPlayerTeam("RED");
-        if (redTeam == null) {
-            redTeam = scoreboard.addPlayerTeam("RED");
-        }
-        redTeam.setColor(ChatFormatting.RED);
-        redTeam.setDisplayName(Component.literal("Red Team"));
-        redTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
-        redTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+        minecraftTeam = scoreboard.getPlayerTeam(color.getColorCode());
 
-        // Create Blue Team
-        blueTeam = scoreboard.getPlayerTeam("BLUE");
-        if (blueTeam == null) {
-            blueTeam = scoreboard.addPlayerTeam("BLUE");
-        }
-        blueTeam.setColor(ChatFormatting.BLUE);
-        blueTeam.setDisplayName(Component.literal("Blue Team"));
-        blueTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
-        blueTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+        minecraftTeam.setColor(color.getChatFormatting());
+        minecraftTeam.setDisplayName(Component.literal(color.getDisplayName()));
+        minecraftTeam.setNameTagVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+        minecraftTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
+    }
+
+    public void CleanMinecraftTeam(MinecraftServer server) {
+        Scoreboard scoreboard = server.getScoreboard();
+        scoreboard.removePlayerTeam(minecraftTeam);
     }
 
     /**
@@ -147,31 +139,18 @@ public class TeamContext {
      */
     public void Assign(ServerPlayer player) {
         Scoreboard scoreboard = player.getServer().getScoreboard();
-        PlayerTeam team = scoreboard.getPlayerTeam(player.getName().getString());
-
 
         if (spawn == null) {
             player.sendSystemMessage(Component.literal("Скажи Доду, что он забыл спавн поставить))"));
         } else {
             members.add(player.getUUID());
-            if (team == null) {
-                if (color == TeamColor.RED) {
-                    scoreboard.addPlayerToTeam(player.getName().getString(), redTeam);
-                }
-                if (color == TeamColor.BLUE) {
-                    scoreboard.addPlayerToTeam(player.getName().getString(), blueTeam);
-                } else {
-                    System.out.println("[PIZDA RYLU] ");
-                }
-            } else {
-                System.out.println("XUINUA");
-            }
+            scoreboard.addPlayerToTeam(player.getName().getString(), minecraftTeam);
+
             player.displayClientMessage(
-                    Component.literal("Вы присоединились к команде " + color.toString().toUpperCase() + "!")
-                            .withStyle(color == TeamColor.RED ? ChatFormatting.RED : ChatFormatting.BLUE),
+                    Component.literal("Вы присоединились к команде " + color.getDisplayName() + "!")
+                            .withStyle(color.getChatFormatting()),
                     true);
             player.setRespawnPosition(player.level().dimension(), spawn, 0, false, false);
-            // Utils.setSpawnPoint(player, spawn);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             batya.GiveArmorKitTo(server, player);
@@ -190,6 +169,11 @@ public class TeamContext {
 
     public void SetSpawn(BlockPos pos) {
         spawn = pos;
+    }
+
+    public StructureTemplate GetTentTemplate(StructureTemplateManager structureManager) {
+        return structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
+        
     }
 
     public void ProcessWin() {

@@ -7,7 +7,8 @@ public class GamemodeManager {
     public static HashMap<Level, BaseGamemode> worldToGamemode = new HashMap<>();
 
 
-    public static void StartGame(Level level, BaseGamemode gamemode) {
+    public static void InitializeGamemode(Level level, BaseGamemode gamemode) {
+        gamemode.Initialize();
         worldToGamemode.put(level, gamemode);
     }
 
