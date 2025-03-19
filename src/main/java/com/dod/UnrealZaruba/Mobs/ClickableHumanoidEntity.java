@@ -1,26 +1,17 @@
 package com.dod.UnrealZaruba.Mobs;
 
-
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
-
-import java.util.function.Function;
-
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.ITeleporter;
 
 public class ClickableHumanoidEntity extends Mob {
 
@@ -69,7 +60,7 @@ public class ClickableHumanoidEntity extends Mob {
 
             switch (id) {
                 case 1:
-                    teleportPlayerToDimension((ServerPlayer) player, SimpleWorldManager.UnrealZarubaLobby.GetDimension(),0d, 128d, 0d);
+                    // teleportPlayerToDimension((ServerPlayer) player, SimpleWorldManager.UnrealZarubaLobby.GetDimension(),0d, 128d, 0d);
                     break;
 
                 default:

@@ -1,7 +1,6 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.UnrealZaruba.Player;
 
 public enum PlayerStatus {
-    OnSpawn,
     InLobby,
     InGame
 }

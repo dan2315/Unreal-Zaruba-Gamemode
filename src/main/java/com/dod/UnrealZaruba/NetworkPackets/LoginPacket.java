@@ -5,8 +5,6 @@ import java.util.function.Supplier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.dod.UnrealZaruba.DiscordIntegration.DiscordAuth;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -69,12 +67,7 @@ public class LoginPacket {
             Minecraft.getInstance().execute(() -> {
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.submit(() -> {
-                    boolean verified = DiscordAuth.CheckAuthTokens(msg.getState(), msg.getUuid(), msg.getPort());
 
-                    if (!verified) {
-                        DiscordAuth.OpenAuthPage(msg.getState(), msg.getUuid(), msg.getMinecraftUsername(),
-                                msg.getPort());
-                    }
                 });
 
             });

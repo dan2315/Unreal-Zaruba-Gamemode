@@ -2,7 +2,6 @@ package com.dod.UnrealZaruba.Player;
 
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.Events.PlayerStatus;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
 import java.util.HashMap;
@@ -14,7 +13,6 @@ public class PlayerContext {
     public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
     
     private UUID id;
-    private boolean authorized = true;
     private GameType originalGameType;
     private PlayerStatus status;
     private boolean previouslyOpped;
@@ -66,18 +64,6 @@ public class PlayerContext {
 
     public void SetGamemode(BaseGamemode gamemode) {
         this.gamemode = gamemode;
-    }
-
-    public void SetAuthorized(boolean authorized) {
-        this.authorized = authorized;
-    }
-
-    public boolean IsAuthorized() {
-        return this.authorized;
-    }
-    
-    public static void Deauthorize(UUID id) {
-        playerContextMap.get(id).authorized = false;
     }
 
     public void SetPreviouslyOpped() {

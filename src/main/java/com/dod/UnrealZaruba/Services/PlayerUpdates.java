@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.DiscordIntegration;
+package com.dod.UnrealZaruba.Services;
 
 import java.util.List;
 import java.util.UUID;

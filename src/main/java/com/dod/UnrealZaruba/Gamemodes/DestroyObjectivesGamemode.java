@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
+import com.dod.UnrealZaruba.Services.LeaderboardService;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
@@ -27,7 +27,6 @@ import com.dod.UnrealZaruba.Utils.NBT;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -52,12 +51,14 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     private static final int GAME_DURATION_TICKS = 50 * 60; // 50 minutes in seconds
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
+    private LeaderboardService leaderboardService;
     Scoreboard scoreboard;
     Objective objective;
 
     GameObjective[] objectives;
 
-    public DestroyObjectivesGamemode(MinecraftServer server) {
+    public DestroyObjectivesGamemode(MinecraftServer server, LeaderboardService leaderboardService) {
+        this.leaderboardService = leaderboardService;
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
         objective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
@@ -293,7 +294,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
         scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS);
-        LeaderboardReqs.UpdatePlayerRanking(TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
+        leaderboardService.UpdatePlayerRanking(TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {

@@ -35,11 +35,6 @@ public class NetworkHandler {
                 LoginPacket::decode,
                 LoginPacket::handle);
 
-        CHANNEL.registerMessage(packetId++, SaveTokensPacket.class,
-                SaveTokensPacket::encode,
-                SaveTokensPacket::decode,
-                SaveTokensPacket::handle);
-
         CHANNEL.registerMessage(packetId++, OpenScreenPacket.class,
                 OpenScreenPacket::encode,
                 OpenScreenPacket::decode,

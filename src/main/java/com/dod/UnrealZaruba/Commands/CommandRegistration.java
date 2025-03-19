@@ -1,9 +1,8 @@
 package com.dod.UnrealZaruba.Commands;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
-import com.dod.UnrealZaruba.DiscordIntegration.LeaderboardReqs;
+import com.dod.UnrealZaruba.Services.LeaderboardService;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GameStage;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
@@ -11,12 +10,9 @@ import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
-import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Utils.Utils;
@@ -37,9 +33,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -76,7 +69,7 @@ public class CommandRegistration {
         itemMap.put(DyeColor.BLACK, Items.BLACK_WOOL);
     }
 
-    public static void onCommandRegister(RegisterCommandsEvent event) {
+    public static void onCommandRegister(RegisterCommandsEvent event, LeaderboardService leaderboardService) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
         dispatcher.register(Commands.literal("testlb")
@@ -94,7 +87,7 @@ public class CommandRegistration {
                         }
                     }
 
-                    LeaderboardReqs.UpdatePlayerRanking(won, lost);
+                    leaderboardService.UpdatePlayerRanking(won, lost);
 
                     return 1;
                 }));
@@ -103,7 +96,7 @@ public class CommandRegistration {
                 .executes(context -> {
                     SimpleWorldManager.teleportPlayerToDimension(
                             context.getSource().getPlayerOrException(),
-                            SimpleWorldManager.GAME_DIMENSION_1);
+                            SimpleWorldManager.GAME_DIMENSION);
                     return 1;
                 }));
 

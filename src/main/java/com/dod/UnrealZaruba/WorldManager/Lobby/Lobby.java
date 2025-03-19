@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.WorldManager.Lobby;
 
-import com.dod.UnrealZaruba.Events.PlayerStatus;
+import com.dod.UnrealZaruba.Player.PlayerStatus;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
@@ -39,7 +39,7 @@ public class Lobby {
     }
 
     public void Leave(PlayerContext playerContext) {
-        playerContext.SetStatus(PlayerStatus.OnSpawn);
+        playerContext.SetStatus(PlayerStatus.InGame);
         players.remove(playerContext.UUID());
         playerCount--;
     }
