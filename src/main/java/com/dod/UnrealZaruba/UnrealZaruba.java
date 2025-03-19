@@ -16,8 +16,8 @@ import com.dod.UnrealZaruba.RespawnCooldown.PlayerRespawnEventHandler;
 import com.dod.UnrealZaruba.Services.HttpClientService;
 import com.dod.UnrealZaruba.Services.LeaderboardService;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
 import com.mojang.logging.LogUtils;
@@ -54,7 +54,7 @@ public class UnrealZaruba {
         httpClientService = new HttpClientService();
         leaderboardService = new LeaderboardService(httpClientService);
         simpleWorldManager = new SimpleWorldManager(leaderboardService);
-        
+
         // Register mod event listeners
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new PlayerRespawnEventHandler());
@@ -77,7 +77,7 @@ public class UnrealZaruba {
     public static class ServerEvents {
         @SubscribeEvent
         public static void onServerStarting(ServerStartingEvent event) {
-            TeamU.SetupMinecraftTeams(event.getServer());
+            TeamContext.SetupMinecraftTeams(event.getServer());
             gamemode = new DestroyObjectivesGamemode(event.getServer(), leaderboardService);
             teamManager = gamemode.GetTeamManager();
             ScoreboardManager.clearScoreboard(event.getServer());
@@ -95,8 +95,8 @@ public class UnrealZaruba {
         public static void onServerStopped(ServerStoppedEvent event) {
             Scoreboard scoreboard = event.getServer().getScoreboard();
 
-            scoreboard.removePlayerTeam(TeamU.redTeam);
-            scoreboard.removePlayerTeam(TeamU.blueTeam);
+            scoreboard.removePlayerTeam(TeamContext.redTeam);
+            scoreboard.removePlayerTeam(TeamContext.blueTeam);
 
             LOGGER.info("Server has stopped. Finalizing...");
             DestructibleObjectivesHandler.Save();
