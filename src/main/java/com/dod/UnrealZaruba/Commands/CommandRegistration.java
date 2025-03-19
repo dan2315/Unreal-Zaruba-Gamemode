@@ -124,16 +124,12 @@ public class CommandRegistration {
                                         Utils.SetPrefixTo(player, prefix);
                                         context.getSource().sendSuccess(() ->
                                                 Component.literal(
-                                                        "Set prefix for "
-                                                                + playerName
-                                                                + " to "
-                                                                + prefix),
+                                                        "Set prefix for " + playerName + " to " + prefix),
                                                 true);
                                     } else {
                                         context.getSource()
                                                 .sendFailure(Component.literal(
-                                                        "Player " + playerName
-                                                                + " not found."));
+                                                        "Player " + playerName + " not found."));
                                     }
 
                                     return 1;
@@ -143,7 +139,7 @@ public class CommandRegistration {
                 .requires(cs -> cs.hasPermission(3))
                 .then(Commands.argument("isSafe", BoolArgumentType.bool())
                         .executes(context -> {
-                            Boolean isSafe = BoolArgumentType
+                            boolean isSafe = BoolArgumentType
                                     .getBool(context, "isSafe");
 
                             Gamerules.DO_LINKS_SAFE = isSafe;
@@ -335,7 +331,6 @@ public class CommandRegistration {
         // .then(Commands.argument("y", IntegerArgumentType.integer())
         // .then(Commands.argument("z", IntegerArgumentType.integer())
         // .executes(CommandRegistration::SetTeamSpawnTo))))));
-
     }
 
     private static int voteForPlayer(CommandContext<CommandSourceStack> context, ServerPlayer player)

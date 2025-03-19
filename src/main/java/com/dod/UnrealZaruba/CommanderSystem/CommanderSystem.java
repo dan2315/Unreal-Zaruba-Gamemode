@@ -20,7 +20,6 @@ public class CommanderSystem {
         ServerPlayer invokerPlayer = server.getPlayerList().getPlayer(invokerPlayerUUID);
         ServerPlayer targetPlayer = server.getPlayerList().getPlayer(targetPlayerUUID);
         
-        
         if (invokerPlayer == null) return;
         if (targetPlayer == null) {
             invokerPlayer.sendSystemMessage(Component.literal("Выбранный игрок не найден"));
@@ -52,11 +51,11 @@ public class CommanderSystem {
         }
 
         if (invokerPlayerContext.AlreadyVoted()) {
-            invokerPlayer.sendSystemMessage(Component.literal("Ты не можешь проголосовать дважды"));
+            invokerPlayer.sendSystemMessage(Component.literal("Рот один - голос один"));
             return;
         }
 
-        invokerPlayer.sendSystemMessage(Component.literal("Голос отправлен за " + targetPlayer.getName().getString() + ", ожидайте!"));
+        invokerPlayer.sendSystemMessage(Component.literal("Голос отправлен в пользу " + targetPlayer.getName().getString() + ", ожидайте!"));
         teamGamemode.GetTeamManager().GetPlayersTeam(targetPlayer).GiveVote(targetPlayer, targetPlayerContext);
         invokerPlayerContext.SetVoted();
     }

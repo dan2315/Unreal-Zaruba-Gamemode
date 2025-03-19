@@ -3,7 +3,7 @@ package com.dod.UnrealZaruba.TeamLogic;
 import java.util.*;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
+import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -20,7 +20,10 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
 
-public class TeamU {
+/**
+ * Team core data.
+ */
+public class TeamContext {
     private BlockPos spawn;
     public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
@@ -32,7 +35,6 @@ public class TeamU {
     TeamManager batya;
     public Tent active_tent;
 
-
     public static PlayerTeam redTeam;
     public static PlayerTeam blueTeam;
 
@@ -42,8 +44,16 @@ public class TeamU {
     public String CommanderName() {return commanderName;}
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
-    
-    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
+
+    /**
+     * Instantiates a new Team u.
+     *
+     * @param teamManager    the team manager
+     * @param spawn          the spawn
+     * @param color          the color
+     * @param barrierVolumes the barrier volumes
+     */
+    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
@@ -51,13 +61,13 @@ public class TeamU {
         server = ServerLifecycleHooks.getCurrentServer();
     }
 
-    public TeamU(TeamManager teamManager, BlockPos spawn, TeamColor color) {
+    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color) {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
         server = ServerLifecycleHooks.getCurrentServer();
     }
-    
+
     public void AddBarrierVolume(BlockVolume barrierVolume) {
         if (barrierVolumes == null) barrierVolumes = new ArrayList<BlockVolume>();
         barrierVolumes.add(barrierVolume);
@@ -130,6 +140,11 @@ public class TeamU {
         blueTeam.setDeathMessageVisibility(Visibility.HIDE_FOR_OTHER_TEAMS);
     }
 
+    /**
+     * Assign player into a scoreboard team
+     *
+     * @param player the player
+     */
     public void Assign(ServerPlayer player) {
         Scoreboard scoreboard = player.getServer().getScoreboard();
         PlayerTeam team = scoreboard.getPlayerTeam(player.getName().getString());
@@ -185,7 +200,7 @@ public class TeamU {
         
     }
 
-    public void TeleportToSpawn() 
+    public void TeleportToSpawn()
     {
         for (UUID playerId : members) {
             ServerPlayer player = server.getPlayerList().getPlayer(playerId);

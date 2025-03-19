@@ -6,11 +6,14 @@ import org.spongepowered.asm.mixin.injection.struct.InjectorGroupInfo.Map;
 
 import com.dod.UnrealZaruba.Commands.CommandPresets;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * Проклятый класс 💀
+ */
 public class ItemKits {
     public static final HashMap<String, Integer> redTeamKit;
     public static final HashMap<String, Integer> redTeamCommanderKit;
@@ -101,21 +104,21 @@ public class ItemKits {
         TeamArmorKits.put(TeamColor.BLUE, blueTeamArmorKit);
     }
 
-    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
+    public static void GiveKit(MinecraftServer server, ServerPlayer serverPlayer, TeamContext team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.TeamKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
         }
     }
 
-    public static void GiveCommanderKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
+    public static void GiveCommanderKit(MinecraftServer server, ServerPlayer serverPlayer, TeamContext team) {
         for (Map.Entry<String, Integer> itemElement : ItemKits.CommanderKits.get(team.Color()).entrySet()) {
             CommandPresets.executeGiveCommandSilent(server, serverPlayer.getName().getString(),
                     itemElement.getKey() + " " + itemElement.getValue());
         }
     }
 
-    public static void GiveArmorKit(MinecraftServer server, ServerPlayer serverPlayer, TeamU team) {
+    public static void GiveArmorKit(MinecraftServer server, ServerPlayer serverPlayer, TeamContext team) {
         for (Map.Entry<String, String> itemElement : ItemKits.TeamArmorKits.get(team.Color()).entrySet()) {
             CommandPresets.executeEquipArmorCommandSilent(server, serverPlayer.getName().getString(), itemElement.getValue(), itemElement.getKey());
         }

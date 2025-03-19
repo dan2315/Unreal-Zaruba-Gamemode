@@ -3,7 +3,6 @@ package com.dod.UnrealZaruba.Mobs.MobRenderers;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

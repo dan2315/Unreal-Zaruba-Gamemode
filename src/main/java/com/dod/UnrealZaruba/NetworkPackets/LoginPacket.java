@@ -69,7 +69,6 @@ public class LoginPacket {
                 executorService.submit(() -> {
 
                 });
-
             });
         }
     }

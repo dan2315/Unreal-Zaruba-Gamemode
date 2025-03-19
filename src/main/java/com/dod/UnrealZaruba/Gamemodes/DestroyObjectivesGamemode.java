@@ -19,7 +19,7 @@ import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.NBT;
@@ -89,7 +89,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         gameStage = GameStage.CommanderVoting;
         MinecraftServer server = context.getSource().getServer();
 
-        HashMap<TeamColor, TeamU> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
+        HashMap<TeamColor, TeamContext> teams = GamemodeManager.Get(context.getSource().getLevel(), TeamGamemode.class).TeamManager.GetTeams();
 
         for (var team : teams.entrySet()) {
             for (var player : team.getValue().Members()) {
@@ -109,8 +109,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         TimerManager.Create(COMMANDER_VOTING_DURATION_TICKS * 1000,
                 () -> {
                     try {
-                        for (Map.Entry<TeamColor, TeamU> teamEntry : teams.entrySet()) {
-                            TeamU team = teamEntry.getValue();
+                        for (Map.Entry<TeamColor, TeamContext> teamEntry : teams.entrySet()) {
+                            TeamContext team = teamEntry.getValue();
                             if (team.VoteList().isEmpty()) {
                                 UnrealZaruba.LOGGER.warn("Vote list is empty");
                                 continue;
@@ -298,7 +298,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
-        // WorldManager.ReloadMap(server);
+        // TODO: WorldManager.ReloadMap(server);
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
@@ -308,7 +308,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         Component wonText = Component.literal("Можешь сказать оппоненту \'Сори, что трахнул\'");
         Component loseText = Component.literal("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {
-            TeamU team = TeamManager.GetPlayersTeam(player);
+            TeamContext team = TeamManager.GetPlayersTeam(player);
             if (team == null)
                 continue;
             if (team.Color() == wonTeam) {

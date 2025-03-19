@@ -8,6 +8,17 @@ import java.util.HashMap;
 
 import net.minecraft.world.level.GameType;
 
+/**
+ * <p>Хранитель данных игроков.</p>
+ * <li>{@link UUID} id;</li>
+ * <li>{@link Boolean} authorized;</li>
+ * <li>{@link PlayerStatus} status;</li>
+ * <li>{@link GameType} originalGameType;</li>
+ * <li>{@link Boolean} previouslyOpped;</li>
+ * <li>{@link Integer} voteCount;</li>
+ * <li>{@link Boolean} isVoted;</li>
+ * <li>{@link BaseGamemode} gamemode;</li>
+ */
 public class PlayerContext {
 
     public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
@@ -18,6 +29,8 @@ public class PlayerContext {
     private boolean previouslyOpped;
     private int voteCount;
     private boolean isVoted;
+
+    public boolean sosal;
 
     private BaseGamemode gamemode;
 

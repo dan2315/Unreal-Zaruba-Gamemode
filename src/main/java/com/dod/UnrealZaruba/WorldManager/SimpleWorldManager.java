@@ -22,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+
 public class SimpleWorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
             .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim"));

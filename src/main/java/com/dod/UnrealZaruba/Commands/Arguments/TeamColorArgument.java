@@ -88,7 +88,6 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
         }
     }
 
-
     public static void RegisterArgument() {
         ArgumentTypeInfos.registerByClass(TeamColorArgument.class, new Info());
     }

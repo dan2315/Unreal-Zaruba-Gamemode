@@ -9,6 +9,8 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
+
+@Deprecated
 public class Explosions {
 
     /**

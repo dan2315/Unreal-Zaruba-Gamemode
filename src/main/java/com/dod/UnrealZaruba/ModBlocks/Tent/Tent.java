@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModBlocks.Teams;
+package com.dod.UnrealZaruba.ModBlocks.Tent;
 
 import net.minecraft.core.BlockPos;
 

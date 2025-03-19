@@ -5,9 +5,18 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
-
+/**
+ * Clickable text in chat
+ */
 public class TextClickEvent {
 
+    /**
+     * Send clickable message.
+     *
+     * @param player       the player
+     * @param message_text the message text
+     * @param command      the command
+     */
     public static void sendClickableMessage(ServerPlayer player, String message_text, String command) {
         // Create the text component
         MutableComponent clickableText = Component.literal(message_text);
@@ -22,7 +31,5 @@ public class TextClickEvent {
 
         // Send the message to the player
         player.sendSystemMessage(clickableText);
-
-
     }
 }

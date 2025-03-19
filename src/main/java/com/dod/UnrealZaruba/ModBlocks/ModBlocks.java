@@ -1,5 +1,8 @@
 package com.dod.UnrealZaruba.ModBlocks;
 
+import com.dod.UnrealZaruba.ModBlocks.TeamBlock.SpawnBlock;
+import com.dod.UnrealZaruba.ModBlocks.TeamBlock.TeamBlock;
+import com.dod.UnrealZaruba.ModBlocks.Tent.TentMainBlock;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 

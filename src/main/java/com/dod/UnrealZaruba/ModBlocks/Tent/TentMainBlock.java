@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.ModBlocks;
+package com.dod.UnrealZaruba.ModBlocks.Tent;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -73,7 +73,7 @@ public class TentMainBlock extends Block {
         if (!level.isClientSide) {
 
             TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level));
-            TeamU team = gamemode.GetTeamManager().Get(teamColor);
+            TeamContext team = gamemode.GetTeamManager().Get(teamColor);
 
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(),
                     Component.literal("§4Палатка команды " + team.color.toString() + " была разрушена!"));

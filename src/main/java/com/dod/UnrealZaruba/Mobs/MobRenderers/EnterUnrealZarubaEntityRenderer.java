@@ -2,11 +2,9 @@ package com.dod.UnrealZaruba.Mobs.MobRenderers;
 
 import javax.annotation.Nonnull;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;

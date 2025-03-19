@@ -3,10 +3,10 @@ package com.dod.UnrealZaruba.ModItems;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.ModBlocks.Teams.Tent;
+import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -39,10 +39,9 @@ public class HandTent extends Item {
         return 100;  // 5 seconds (100 ticks)
     }
 
-    // 2. Override to set the use animation to the bow's animation
     @Override
     public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;  // Use bow animation
+        return UseAnim.BOW;
     }
 
     @Override
@@ -70,21 +69,17 @@ public class HandTent extends Item {
     }
 
     /**
-     * Не для использования!
-     * <p>
-     * Юзается в UseOn
-     * </p>
-     *
-     * @param world
-     * @param clickPos
-     * @param player
+     * @implSpec HandTent.java
+     * @param world - ServerLevel
+     * @param clickPos - BlockPos
+     * @param player - Player
      */
     public void placeCustomStructure(ServerLevel world, BlockPos clickPos, Player player) {
         UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
         BaseGamemode gamemode = GamemodeManager.Get(world);
         TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
 
-        TeamU player_team = teamManager.GetPlayersTeam(player);
+        TeamContext player_team = teamManager.GetPlayersTeam(player);
 
         BlockPos center = clickPos;
         BlockPos buildPoint = clickPos.offset(-4, -2, -4);

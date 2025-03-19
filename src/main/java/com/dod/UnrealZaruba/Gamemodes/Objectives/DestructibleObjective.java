@@ -2,17 +2,13 @@ package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
 import java.util.List;
 import java.util.Set;
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map.Entry;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.TeamLogic.TeamU;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
@@ -46,7 +42,7 @@ public class DestructibleObjective extends GameObjective {
     }
     
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
-        UnrealZaruba.LOGGER.info("Начал прогружать: " + name);
+        UnrealZaruba.LOGGER.info("Начал прогружать: {}", name);
         Set<BlockPos> solidBlocks = new HashSet<>();
         
         volume.ForEachBlock(pos -> {
@@ -58,7 +54,7 @@ public class DestructibleObjective extends GameObjective {
         
         this.remainingBlockAmount = blockAmount;
 
-        UnrealZaruba.LOGGER.info("Цель инициализирована: " + name);
+        UnrealZaruba.LOGGER.info("Цель инициализирована: {}", name);
         return solidBlocks;
     }
 
@@ -91,7 +87,6 @@ public class DestructibleObjective extends GameObjective {
                 teamGamemode.GetTeamManager().GetTeams().get(TeamColor.BLUE).SendMessage(server, 
                 "Ваша точка §b" + name + "§r атакована §l§4противниками§r");
             }
-            
         }
 
         trackedBlocks.removeAll(toRemove);
