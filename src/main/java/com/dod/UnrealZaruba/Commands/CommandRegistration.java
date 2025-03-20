@@ -309,8 +309,8 @@ public class CommandRegistration {
                                                                             DestructibleObjective objective = new DestructibleObjective(
                                                                                     volume,
                                                                                     name);
-                                                                            DestructibleObjectivesHandler
-                                                                                    .Add(objective);
+                                                                        // TODO:     DestructibleObjectivesHandler
+                                                                        //             .Add(objective);
 
                                                                             context.getSource()
                                                                                     .sendSuccess(() -> Component.literal(

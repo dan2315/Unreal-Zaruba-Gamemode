@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class DestructibleObjective extends GameObjective {
+public class DestructibleObjective extends PositionedGameobjective {
     BlockVolume volume;
     int blockAmount;
     int remainingBlockAmount;
@@ -35,10 +35,12 @@ public class DestructibleObjective extends GameObjective {
     transient BaseGamemode containingGamemode;
 
     public DestructibleObjective(BlockVolume volume, String name) {
+        super(volume.GetCenter());
         this.volume = volume;
         this.name = name;
         this.world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
         this.trackedBlocks = InitializeTrackedBlocks(volume);
+        this.progressDisplay = new ProgressbarForObjective(this, name);
     }
     
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
@@ -62,16 +64,17 @@ public class DestructibleObjective extends GameObjective {
         this.containingGamemode = containingGamemode;
     }
     
-    public float Update() {
-        if (isCompleted) return 0; 
-        if (trackedBlocks == null) return 0;
+    @Override
+    public void Update() {
+        if (isCompleted) return; 
+        if (trackedBlocks == null) return;
 
         int counter = 0;
         List<BlockPos> toRemove = new ArrayList<>();
 
         for (BlockPos pos : trackedBlocks) {
             LevelChunk chunk = world.getChunkSource().getChunk(pos.getX() >> 4, pos.getZ() >> 4, false);
-            if (chunk == null) return 1;
+            if (chunk == null) return;
 
             if (world.getBlockState(pos).getBlock() == Blocks.AIR) {
                 toRemove.add(pos);
@@ -92,13 +95,15 @@ public class DestructibleObjective extends GameObjective {
         trackedBlocks.removeAll(toRemove);
         remainingBlockAmount -= counter;
 
-        float progress = GetProgress();
+        progress = GetProgress();
         float degreeOfDestruction = 1 - progress;
         if (degreeOfDestruction >= requiredDegreeOfDestruction) {
             Complete();
         }
 
-        return 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
+        progress = 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
+        
+        updateProgressDisplay();
     }
 
    

@@ -1,106 +1,90 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.BossEvent;
-import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class DestructibleObjectivesHandler {
-    public static final Map<DestructibleObjective, ServerBossEvent> destructibleObjectives = new HashMap<>();
-    private static final Map<DestructibleObjective, Set<UUID>> playersWithBossBar = new HashMap<>();
-    private static float PROGRESSBAR_ACTIVATION_DISTANCE = 10000f;
-    private static final int BossbarUpdateFrequency = 40; //ticks
-    private static final int ObjectiveUpdateFrequency = 40; //ticks
+public class DestructibleObjectivesHandler extends ObjectivesHandler {
+    private final List<DestructibleObjective> objectives = new ArrayList<>();
+    private static final int OBJECTIVE_UPDATE_FREQUENCY = 40; //ticks
+    private static final int BOSSBAR_UPDATE_FREQUENCY = 40; //ticks
     private static int serverTickCounter = 0;
     private static final Map<UUID, Integer> playerTickCounters = new HashMap<>();
-
-    public static void Add(DestructibleObjective objective) {
-        destructibleObjectives.put(objective, new ServerBossEvent(Component.literal(objective.GetName()),
-                BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS));
-        playersWithBossBar.put(objective, new HashSet<>());
+    
+    // Static instance for event handling
+    private static DestructibleObjectivesHandler instance;
+    
+    public DestructibleObjectivesHandler() {
+        instance = this;
     }
 
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
+    public void add(DestructibleObjective objective) {
+        objectives.add(objective);
+    }
+
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (instance == null) return;
+        
         if (event.phase == ServerTickEvent.Phase.START) {
             serverTickCounter++;
-            if (serverTickCounter % ObjectiveUpdateFrequency != 0) return; 
-            UpdateObjectives(event);
+            if (serverTickCounter % OBJECTIVE_UPDATE_FREQUENCY != 0) return; 
+            instance.updateObjectives(event);
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (instance == null) return;
+        
         UUID id = event.player.getUUID();
         playerTickCounters.putIfAbsent(id, 0);
         playerTickCounters.put(id, playerTickCounters.get(id) + 1);
-        if (playerTickCounters.get(id) % BossbarUpdateFrequency != 0) return;
+        if (playerTickCounters.get(id) % BOSSBAR_UPDATE_FREQUENCY != 0) return;
 
-        UpdatePlayersWithBossBar(event);
+        instance.updatePlayersWithBossBar(event);
     }
 
-    private static void UpdateObjectives(TickEvent.ServerTickEvent event) {
-        for (var objective : destructibleObjectives.keySet()) {
-            float progress = objective.Update();
-            updateBossBar(objective, progress);
+    private void updateObjectives(TickEvent.ServerTickEvent event) {
+        for (DestructibleObjective objective : objectives) {
+            objective.Update();
         }
     }
 
-    private static void UpdatePlayersWithBossBar(TickEvent.PlayerTickEvent event) {
+    private void updatePlayersWithBossBar(TickEvent.PlayerTickEvent event) {
         if (event.player instanceof ServerPlayer) {
             ServerPlayer player = (ServerPlayer) event.player;
-            for (DestructibleObjective objective : destructibleObjectives.keySet()) {
-
-                boolean isNearTarget = isPlayerNearTarget(player, objective.volume.GetCenter());
-
-                if (isNearTarget && !playersWithBossBar.get(objective).contains(player.getUUID())) {
-                    addPlayerToBossBar(player, objective);
-                } else if (!isNearTarget && playersWithBossBar.get(objective).contains(player.getUUID())) {
-                    removePlayerFromBossBar(player, objective);
+            for (DestructibleObjective objective : objectives) {
+                IProgressDisplay progressDisplay = objective.getProgressDisplay();
+                if (progressDisplay != null) {
+                    progressDisplay.updatePlayerVisibility(player);
                 }
             }
         }
     }
 
-
-    private static boolean isPlayerNearTarget(ServerPlayer player, BlockPos pos) {
-        double distance = player.blockPosition().distSqr(pos);
-        return distance <= PROGRESSBAR_ACTIVATION_DISTANCE;
+    public void setProgressBarActivationDistance(float distance) {
+        for (DestructibleObjective objective : objectives) {
+            IProgressDisplay progressDisplay = objective.getProgressDisplay();
+            if (progressDisplay != null) {
+                progressDisplay.setActivationDistance(distance);
+            }
+        }
     }
 
-    private static void addPlayerToBossBar(ServerPlayer player, DestructibleObjective objective) {
-        destructibleObjectives.get(objective).addPlayer(player);
-        playersWithBossBar.get(objective).add(player.getUUID());
-    }
-
-    private static void removePlayerFromBossBar(ServerPlayer player, DestructibleObjective objective) {
-        destructibleObjectives.get(objective).removePlayer(player);
-        playersWithBossBar.get(objective).remove(player.getUUID());
-    }
-
-    public static void updateBossBar(DestructibleObjective objective, float progress) {
-        destructibleObjectives.get(objective).setProgress(progress);
-    }
-
-    public static void Save() {
-        DestructibleObjective[] objectivesArray = destructibleObjectives.keySet().toArray(new DestructibleObjective[destructibleObjectives.size()]);
+    public void save() {
+        DestructibleObjective[] objectivesArray = objectives.toArray(new DestructibleObjective[objectives.size()]);
         for (DestructibleObjective objective : objectivesArray) {
             UnrealZaruba.LOGGER.info(objective.name);
         }
@@ -113,15 +97,17 @@ public class DestructibleObjectivesHandler {
         }
     }
 
-    public static DestructibleObjective[] Load(BaseGamemode containingGamemode) {
+    public DestructibleObjective[] load(BaseGamemode containingGamemode) {
         DestructibleObjective[] loadedObjectives;
         try {
             loadedObjectives = ConfigManager.loadConfig(ConfigManager.Objectives, DestructibleObjective[].class);
             if (loadedObjectives == null) return loadedObjectives;
-            Clear();
+            clear();
             for (DestructibleObjective objective : loadedObjectives) {
-                DestructibleObjectivesHandler.Add(objective);
+                this.add(objective);
                 objective.SetContainingGamemode(containingGamemode);
+                // Re-initialize the progress display since it's transient
+                objective.setProgressDisplay(new ProgressbarForObjective(objective, objective.GetName()));
                 UnrealZaruba.LOGGER.info("[Во, бля] " + objective.name);
             }
             UnrealZaruba.LOGGER.info("[Во, бля] Загрузил конфиг для DestructibleObjectivesHandler");
@@ -133,8 +119,13 @@ public class DestructibleObjectivesHandler {
         return null;
     }
 
-    public static void Clear() {
-        destructibleObjectives.clear();
-        playersWithBossBar.clear();
+    public void clear() {
+        for (DestructibleObjective objective : objectives) {
+            IProgressDisplay progressDisplay = objective.getProgressDisplay();
+            if (progressDisplay != null) {
+                progressDisplay.clear();
+            }
+        }
+        objectives.clear();
     }
 }

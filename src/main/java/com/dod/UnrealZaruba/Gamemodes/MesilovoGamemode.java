@@ -5,10 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
-import net.minecraftforge.fml.common.Mod;
 
-
-@Mod.EventBusSubscriber
 public class MesilovoGamemode {
 
     public static void setupScoreboard(MinecraftServer server) {

@@ -89,7 +89,7 @@ public class UnrealZaruba {
         public static void onServerStopped(ServerStoppedEvent event) {
 
             LOGGER.info("Server has stopped. Finalizing...");
-            DestructibleObjectivesHandler.Save();
+            // TODO: DestructibleObjectivesHandler.Save();
             gamemode.Cleanup();
         }
 
