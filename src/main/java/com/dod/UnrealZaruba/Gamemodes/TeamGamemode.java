@@ -11,6 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.TickEvent;
 
 import java.util.HashMap;
 
@@ -38,11 +39,6 @@ public class TeamGamemode extends BaseGamemode {
 
 
 
-    /**
-     * Respawn player.
-     *
-     * @param player     the player
-     */
     @Override
     public void HandleRespawn(ServerPlayer player) {
         super.HandleRespawn(player);
@@ -67,10 +63,11 @@ public class TeamGamemode extends BaseGamemode {
     public void Cleanup() {
         TeamManager.Cleanup();
     }
+    @Override
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+    }
 
-
-
-
-    // public static BaseGamemode GetCurrentGamemode() { return (TeamGamemode) currentGamemode; }
-    
+    @Override
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    }
 }

@@ -30,6 +30,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.ChatFormatting;
@@ -42,10 +43,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.EnoughPlayersCondition;
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.SustainedPlayerCountCondition;
+import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
-    // Duration constants in milliseconds for better readability
     private static final int COMMANDER_VOTING_DURATION_MS = 3 * 60 * 1000; // 3 minutes
     private static final int PREPARATION_DURATION_MS = 7 * 60 * 1000; // 7 minutes
     private static final int GAME_DURATION_MS = 50 * 60 * 1000; // 50 minutes
@@ -65,24 +66,50 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
         minecraftObjective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
+
+        TeamManager teamManager = new TeamManager();
+        teamManager.Initialize();
+        SetTeamManager(teamManager);
+
+        TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
+
+        TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
+        
         startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",
                 "Необходимо уничтожить 3 цели"));
         startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
                 "Продержитесь 50 минут"));
-        Utils.LoadChunksInArea(server.getLevel(Level.OVERWORLD), -1024, -512, 1024, 512);
+        // TODO: Utils.LoadChunksInArea(server.getLevel(Level.OVERWORLD), -1024, -512, 1024, 512);
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         objectivesHandler = new DestructibleObjectivesHandler();
-        objectivesHandler.load(this);
+        var objectives = objectivesHandler.load();
+        for (var objective : objectives) {
+            for (Map.Entry<TeamColor, TeamContext> team : TeamManager.GetTeams().entrySet()) {
+                objective.addNotificationRecipient(team.getValue());
+            }
+        }
     }
 
     @Override
     protected void Initialize() {
         super.Initialize();
-        startCondition = new EnoughPlayersCondition(10);
+        
+        startCondition = new SustainedPlayerCountCondition(10, 10);
         startCondition.SetOnConditionMet(this::StartGame);
+    }
+
+    @Override
+    public void onServerTick(TickEvent.ServerTickEvent serverTickEvent) {
+        startCondition.Update();
+        objectivesHandler.updateObjectives();
+    }
+
+    @Override
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        objectivesHandler.onPlayerTick(event);
     }
 
     public void StartGame() {
@@ -343,11 +370,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         server.overworld();
         serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
         serverPlayer.setGameMode(GameType.ADVENTURE);
-    }
-
-    public void onServerTick() {
-        startCondition.Update();
-        objectivesHandler.updateObjectives();
     }
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {

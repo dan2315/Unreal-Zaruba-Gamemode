@@ -2,37 +2,44 @@ package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class DestructibleObjective extends PositionedGameobjective {
+    private static final int PROGRESS_UPDATE_INTERVAL = 40;
+    private static final int VISIBILITY_UPDATE_INTERVAL = 40;
+    private static final int NOTIFY_BLOCK_THRESHOLD = 10;
+
     BlockVolume volume;
     int blockAmount;
     int remainingBlockAmount;
-    String name;
     float requiredDegreeOfDestruction = 0.1f;
 
     transient Boolean isCompleted = false; 
-    transient Set<BlockPos>  trackedBlocks;
+    transient Set<BlockPos> trackedBlocks;
     transient ServerLevel world;
-    transient BaseGamemode containingGamemode;
+    transient int updateCounter = 0;
+    transient int notifyBlockCounter = 0;
+    
+    private final transient Map<UUID, Integer> playerVisibilityTicks = new HashMap<>();
+    private final transient List<IObjectiveNotifier> notificationRecipients = new ArrayList<>();
 
     public DestructibleObjective(BlockVolume volume, String name) {
         super(volume.GetCenter());
@@ -41,6 +48,17 @@ public class DestructibleObjective extends PositionedGameobjective {
         this.world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
         this.trackedBlocks = InitializeTrackedBlocks(volume);
         this.progressDisplay = new ProgressbarForObjective(this, name);
+    }
+    
+
+    public void addNotificationRecipient(IObjectiveNotifier recipient) {
+        if (recipient != null && !notificationRecipients.contains(recipient)) {
+            notificationRecipients.add(recipient);
+        }
+    }
+    
+    public void removeNotificationRecipient(IObjectiveNotifier recipient) {
+        notificationRecipients.remove(recipient);
     }
     
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
@@ -60,12 +78,20 @@ public class DestructibleObjective extends PositionedGameobjective {
         return solidBlocks;
     }
 
-    public void SetContainingGamemode(BaseGamemode containingGamemode) {
-        this.containingGamemode = containingGamemode;
-    }
-    
     @Override
     public void Update() {
+        updateCounter++;
+        
+        // Only update objective state at the specified interval
+        if (updateCounter % PROGRESS_UPDATE_INTERVAL == 0) {
+            updateObjectiveState();
+        }
+    }
+    
+    /**
+     * Updates the objective's state (block tracking, progress, etc.)
+     */
+    private void updateObjectiveState() {
         if (isCompleted) return; 
         if (trackedBlocks == null) return;
 
@@ -82,16 +108,6 @@ public class DestructibleObjective extends PositionedGameobjective {
             }
         }
 
-        if (counter >= 6) {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (containingGamemode instanceof TeamGamemode teamGamemode) {
-                teamGamemode.GetTeamManager().GetTeams().get(TeamColor.RED).SendMessage(server, 
-                "Ваша §l§4команда§r атакует точку §b" + name + "§r. Гойда!");
-                teamGamemode.GetTeamManager().GetTeams().get(TeamColor.BLUE).SendMessage(server, 
-                "Ваша точка §b" + name + "§r атакована §l§4противниками§r");
-            }
-        }
-
         trackedBlocks.removeAll(toRemove);
         remainingBlockAmount -= counter;
 
@@ -104,13 +120,42 @@ public class DestructibleObjective extends PositionedGameobjective {
         progress = 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
         
         updateProgressDisplay();
+
+        notifyBlockCounter += counter;
+        if (notifyBlockCounter >= NOTIFY_BLOCK_THRESHOLD) {
+            for (IObjectiveNotifier notifier : notificationRecipients) {
+                notifier.onObjectiveStateChanged(this); 
+            }
+            notifyBlockCounter = 0;
+        }
+    }
+    
+    /**
+     * Handles player tick events for this objective
+     */
+    public void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player) {
+        UUID playerId = player.getUUID();
+        
+        // Initialize or increment the player's tick counter
+        playerVisibilityTicks.putIfAbsent(playerId, 0);
+        int ticks = playerVisibilityTicks.get(playerId) + 1;
+        playerVisibilityTicks.put(playerId, ticks);
+        
+        // Only update visibility at the specified interval
+        if (ticks % VISIBILITY_UPDATE_INTERVAL == 0) {
+            updateProgressDisplayForPlayer(player);
+        }
     }
 
-   
     public void Complete() {
         isCompleted = true;
-        containingGamemode.CheckObjectives();
 
+        // Notify all registered notifiers
+        for (IObjectiveNotifier notifier : notificationRecipients) {
+            notifier.onObjectiveCompleted(this);
+        }
+
+        // Display completion message
         String border = "==================================";
         String paddedName = String.format("||           §b%s§r был уничтожен           ", name);
         String message = border + "\n" + paddedName + "\n" + border;
@@ -133,5 +178,25 @@ public class DestructibleObjective extends PositionedGameobjective {
 
     private float GetProgress() {
         return ((float) (remainingBlockAmount)) / blockAmount;
+    }
+
+    /**
+     * Updates the visibility of this objective's progress display for a player
+     */
+    private void updateProgressDisplayForPlayer(ServerPlayer player) {
+        if (progressDisplay != null) {
+            progressDisplay.updatePlayerVisibility(player);
+        }
+    }
+
+    /**
+     * Sets the activation distance for the progress display
+     * 
+     * @param distance The squared distance at which the display becomes visible
+     */
+    public void setProgressBarActivationDistance(float distance) {
+        if (progressDisplay != null) {
+            progressDisplay.setActivationDistance(distance);
+        }
     }
 }

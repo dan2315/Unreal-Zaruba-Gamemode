@@ -43,8 +43,7 @@ public class UnrealZaruba {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "unrealzaruba";
     
-    private static TeamGamemode gamemode;
-    private static TeamManager teamManager;
+    private static BaseGamemode gamemode;
     private static HttpClientService httpClientService;
     private static LeaderboardService leaderboardService;
     private static SimpleWorldManager simpleWorldManager;
@@ -81,6 +80,7 @@ public class UnrealZaruba {
         @SubscribeEvent
         public static void onServerTick(ServerTickEvent event) {
             if (event.phase == ServerTickEvent.Phase.START) {
+                // TODO: gamemode.onServerTick(event);
                 TimerManager.updateAll();
             }
         }

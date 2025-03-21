@@ -4,9 +4,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 
 public class RacingGamemode extends BaseGamemode {
 
@@ -36,9 +36,21 @@ public class RacingGamemode extends BaseGamemode {
     }
 
     @Override
-    protected void Cleanup() {
+    public void Cleanup() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'Cleanup'");
+    }
+
+    @Override
+    public void onServerTick(TickEvent.ServerTickEvent server) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'onServerTick'");
+    }
+
+    @Override
+    public void onPlayerTick(PlayerTickEvent event) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'onPlayerTick'");
     }
 
     

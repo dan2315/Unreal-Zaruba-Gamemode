@@ -29,27 +29,17 @@ public class TeamManager {
 
     public HashMap<TeamColor, StructureTemplate> tent_templates = new HashMap<>();
 
-    /**
-     * Get teams hash map.
-     *
-     * @return the hash map
-     */
     public HashMap<TeamColor, TeamContext> GetTeams() {
         return teams;
     }
 
-
-    
-    /**
-     * Instantiates a new Team manager.
-     */
     public TeamManager() {
         var teamData = Load();
         if (teamData != null) {
             for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.teamSpawns.entrySet()) {
+                UnrealZaruba.LOGGER.info("[UnrealZaruba] Loading team: " + data.getKey());
                 var teamContext = AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
                 StructureTemplateManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
-
                 tent_templates.put(data.getKey(), teamContext.GetTentTemplate(structureManager));
             }
         }
@@ -68,13 +58,6 @@ public class TeamManager {
         }
     } 
 
-    /**
-     * Add team.
-     *
-     * @param teamColor  the team color
-     * @param spawn      the spawn
-     * @param baseVolume the base volume
-     */
     public TeamContext AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
         var teamContext = new TeamContext(this ,spawn, teamColor, baseVolume);
@@ -82,36 +65,16 @@ public class TeamManager {
         return teamContext;
     }
 
-    /**
-     * Add team.
-     *
-     * @deprecated
-     *
-     * @param teamColor the team color
-     * @param spawn     the spawn
-     */
     @Deprecated
     public void AddTeam(TeamColor teamColor, BlockPos spawn) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
         teams.put(teamColor, new TeamContext(this, spawn, teamColor));
     }
 
-    /**
-     * Set spawn.
-     *
-     * @param color the color
-     * @param spawn the spawn
-     */
     public void SetSpawn(TeamColor color, BlockPos spawn) {
         teams.get(color).SetSpawn(spawn);
     }
 
-    /**
-     * Checks if player in any team
-     *
-     * @param player the player
-     * @return the boolean
-     */
     public boolean IsInTeam(Player player) {
         for (TeamContext team : teams.values()) {
             return team.members.contains(player.getUUID());
@@ -119,12 +82,6 @@ public class TeamManager {
         return false;
     }
 
-    /**
-     * Get players team {@link TeamContext}
-     *
-     * @param player the player
-     * @return the TeamU
-     */
     public TeamContext GetPlayersTeam(Player player) {
         for (TeamContext team : teams.values()) {
             if (team.members.contains(player.getUUID())) {
@@ -134,23 +91,11 @@ public class TeamManager {
         return null;
     }
 
-    /**
-     * Get players opposite team
-     *
-     * @param player the player
-     * @return {@link TeamContext}
-     */
     public TeamContext GetPlayersOppositeTeam(ServerPlayer player) {
         TeamColor color = GetPlayersTeam(player).Color();
         return GetOppositeTeamTo(color);
     }
 
-    /**
-     * Get opposite team to team u.
-     *
-     * @param teamColor the team color
-     * @return {@link TeamContext}
-     */
     public TeamContext GetOppositeTeamTo(TeamColor teamColor) {
         return switch (teamColor) {
             case RED -> teams.get(TeamColor.BLUE);
@@ -159,21 +104,10 @@ public class TeamManager {
         };
     }
 
-    /**
-     * Get {@link TeamContext}
-     *
-     * @param color the color
-     * @return {@link TeamContext}
-     */
     public TeamContext Get(TeamColor color) {
         return teams.get(color);
     }
 
-    /**
-     * Delete barriers at spawn boolean.
-     *
-     * @return the boolean
-     */
     public boolean DeleteBarriersAtSpawn() {
         for (TeamContext team : teams.values()) {
             if (team.Spawn() == null) {
@@ -190,12 +124,6 @@ public class TeamManager {
         return true;
     }
 
-    /**
-     * Are teams balanced boolean.
-     *
-     * @param dyeColor the dye color
-     * @return the boolean
-     */
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
         TeamContext targetTeam = teams.get(dyeColor);
         if (targetTeam == null) {
@@ -213,12 +141,6 @@ public class TeamManager {
         return targetTeamCount <= maxOtherTeamsCount;
     }
 
-    /**
-     * Assign to team.
-     *
-     * @param dyeColor the dye color
-     * @param player   the player
-     */
     public void AssignToTeam(TeamColor dyeColor, ServerPlayer player) {
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendSystemMessage(
@@ -234,42 +156,22 @@ public class TeamManager {
         teams.get(dyeColor).Assign(player);
     }
 
-    /**
-     * Give kit.
-     */
     public void GiveKit() {
         for (TeamContext team : teams.values()) {
             team.GiveKit();
         }
     }
 
-    /**
-     * Give armor kit to.
-     *
-     * @param server the server
-     * @param player the player
-     */
     public void GiveArmorKitTo(MinecraftServer server, ServerPlayer player) {
         ItemKits.GiveArmorKit(server, player, GetPlayersTeam(player));
     }
 
-    /**
-     * Give kit to.
-     *
-     * @param server the server
-     * @param player the player
-     */
     public void GiveKitTo(MinecraftServer server, ServerPlayer player) {
         TeamContext team = GetPlayersTeam(player);
         if (team == null) return;
         ItemKits.GiveKit(server, player, team);
     }
 
-    /**
-     * Change game mode of all participants.
-     *
-     * @param gameType the game type
-     */
     public void ChangeGameModeOfAllParticipants(GameType gameType) {
         var playerList = ServerLifecycleHooks.getCurrentServer().getPlayerList();
         for (TeamContext team : teams.values()) {
@@ -281,11 +183,6 @@ public class TeamManager {
         }
     }
 
-    /**
-     * Teleport to spawn.
-     *
-     * @param serverPlayer the server player
-     */
     public void teleportToSpawn(ServerPlayer serverPlayer) {
         TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null){
@@ -300,11 +197,6 @@ public class TeamManager {
         serverPlayer.teleportTo(x, y ,z);
     }
 
-    /**
-     * Teleport to tent.
-     *
-     * @param serverPlayer the server player
-     */
     public void teleportToTent(ServerPlayer serverPlayer) {
         TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null) {
@@ -319,10 +211,6 @@ public class TeamManager {
         serverPlayer.teleportTo(x, y, z);
     }
 
-
-    /**
-     * Save.
-     */
     public void Save() {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();
@@ -338,15 +226,10 @@ public class TeamManager {
         }
     }
 
-    /**
-     * Load team data.
-     *
-     * @return the team data
-     */
     public TeamData Load() {
         try {
             TeamData loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
-            UnrealZaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager");
+            UnrealZaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager {}", loadedData);
             return loadedData;
         } catch (IOException e) {
             UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");

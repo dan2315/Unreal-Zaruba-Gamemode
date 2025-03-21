@@ -1,8 +1,11 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
 import java.util.*;
+import java.util.function.Function;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjectiveNotifier;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
@@ -24,7 +27,7 @@ import net.minecraft.world.scores.Team.Visibility;
 /**
  * Team core data.
  */
-public class TeamContext {
+public class TeamContext implements IObjectiveNotifier {
     private BlockPos spawn;
     public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
@@ -35,8 +38,10 @@ public class TeamContext {
     MinecraftServer server;
     TeamManager batya;
     public Tent active_tent;
-
     public PlayerTeam minecraftTeam;
+    
+    private Function<GameObjective, String> notificationMessageGenerator;
+    private Function<GameObjective, String> objectiveCompletedMessageGenerator;
 
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
@@ -45,14 +50,6 @@ public class TeamContext {
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
 
-    /**
-     * Instantiates a new Team u.
-     *
-     * @param teamManager    the team manager
-     * @param spawn          the spawn
-     * @param color          the color
-     * @param barrierVolumes the barrier volumes
-     */
     public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
         this.batya = teamManager;
         this.spawn = spawn;
@@ -67,6 +64,19 @@ public class TeamContext {
         this.color = color;
         server = ServerLifecycleHooks.getCurrentServer();
     }
+    
+
+    public void setNotificationMessage(Function<GameObjective, String> generator) {
+        if (generator != null) {
+            this.notificationMessageGenerator = generator;
+        }
+    }
+
+    public void setObjectiveCompletedMessageGenerator(Function<GameObjective, String> generator) {
+        if (generator != null) {
+            this.objectiveCompletedMessageGenerator = generator;
+        }
+    }
 
     public void AddBarrierVolume(BlockVolume barrierVolume) {
         if (barrierVolumes == null) barrierVolumes = new ArrayList<BlockVolume>();
@@ -77,14 +87,11 @@ public class TeamContext {
         this.active_tent = active_tent;
     }
 
-
     public void GiveVote(Player player ,PlayerContext playerContext) {
-
         playerContext.AddVote();
     }
 
     public List<UUID> VoteList() {
-
         Collections.sort(members, new Comparator<UUID>() {
             @Override
             public int compare(UUID o1, UUID o2) {
@@ -98,13 +105,11 @@ public class TeamContext {
     }
 
     public void setCommander(MinecraftServer server, Player player) {
-
         if (player instanceof ServerPlayer serverPlayer) {
             ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
             commander = serverPlayer.getUUID();
             commanderName = serverPlayer.getDisplayName().getString();
         }
-
     }
 
     public void SendMessage(MinecraftServer server, String message) {
@@ -120,6 +125,9 @@ public class TeamContext {
         Scoreboard scoreboard = server.getScoreboard();
 
         minecraftTeam = scoreboard.getPlayerTeam(color.getColorCode());
+        if (minecraftTeam == null) {
+            minecraftTeam = scoreboard.addPlayerTeam(color.getColorCode());
+        }
 
         minecraftTeam.setColor(color.getChatFormatting());
         minecraftTeam.setDisplayName(Component.literal(color.getDisplayName()));
@@ -173,7 +181,6 @@ public class TeamContext {
 
     public StructureTemplate GetTentTemplate(StructureTemplateManager structureManager) {
         return structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
-        
     }
 
     public void ProcessWin() {
@@ -184,8 +191,7 @@ public class TeamContext {
         
     }
 
-    public void TeleportToSpawn()
-    {
+    public void TeleportToSpawn() {
         for (UUID playerId : members) {
             ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player == null) return;
@@ -197,5 +203,23 @@ public class TeamContext {
         for (UUID playerId : members) {
             ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);
         }
+    }
+
+    @Override
+    public void onObjectiveStateChanged(GameObjective objective) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null || notificationMessageGenerator == null) return;
+        
+        String message = notificationMessageGenerator.apply(objective);
+        SendMessage(server, message);
+    }
+
+    @Override
+    public void onObjectiveCompleted(GameObjective objective) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null || objectiveCompletedMessageGenerator == null) return;
+        
+        String message = objectiveCompletedMessageGenerator.apply(objective);
+        SendMessage(server, message);
     }
 }

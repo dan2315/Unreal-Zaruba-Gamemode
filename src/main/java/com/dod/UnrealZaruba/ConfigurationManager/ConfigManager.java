@@ -10,10 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class ConfigManager {
-    final static String directoryPath = "unrealzaruba";
-    public final static String Objectives = directoryPath + File.pathSeparator + "destructibleObjectives.json";
-    public final static String Teams = directoryPath + File.pathSeparator + "teams.json";
-    public final static String Tokens = directoryPath + File.pathSeparator + "tokens.json";
+    final static String UNREALZARUBA_MAP_DATA = "world" + File.separator + "unrealzaruba";
+    public final static String Objectives = UNREALZARUBA_MAP_DATA + File.separator + "destructibleObjectives.json";
+    public final static String Teams = UNREALZARUBA_MAP_DATA + File.separator + "teams.json";
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(DestructibleObjective.class, new DObjectiveDeserializer()).setPrettyPrinting()
@@ -30,6 +29,10 @@ public class ConfigManager {
     public static <T> T loadConfig(String filePath, Class<T> configClass) throws IOException {
         try (FileReader reader = new FileReader(filePath)) {
             return gson.fromJson(reader, configClass);
+        } catch (IOException e) {
+            System.out.println("[UnrealZaruba] Error loading config file: " + filePath);
+            e.printStackTrace();
+            return null;
         }
     }
 

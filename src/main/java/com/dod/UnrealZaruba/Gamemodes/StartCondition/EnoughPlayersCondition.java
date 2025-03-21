@@ -10,7 +10,6 @@ public class EnoughPlayersCondition extends StartCondition {
     }
 
 
-
     @Override
     public boolean isMet() {
         return ServerLifecycleHooks.getCurrentServer().getPlayerCount() >= requiredPlayers;
