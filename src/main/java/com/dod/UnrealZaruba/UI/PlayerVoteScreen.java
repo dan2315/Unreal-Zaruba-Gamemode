@@ -89,7 +89,7 @@ public class PlayerVoteScreen extends Screen {
     private void voteForSelectedPlayer() {
         if (this.selectedPlayer != null) {
             UnrealZaruba.LOGGER.warn("Кликнул на проголосовать за " + selectedPlayer.getName().toString());
-            NetworkHandler.CHANNEL.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
+            //TODO: NetworkHandler.CHANNEL.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
             this.onClose();
         }
     }

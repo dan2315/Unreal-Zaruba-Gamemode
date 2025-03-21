@@ -6,7 +6,7 @@ public class PacketMetadata {
     private final long sendTime;
     private final UUID playerUUID;
     private final boolean fromServer;
-    private final Object packet; // Add the packet object to the metadata
+    private final Object packet;
 
     public PacketMetadata(long sendTime, UUID playerUUID, boolean fromServer, Object packet) {
         this.sendTime = sendTime;

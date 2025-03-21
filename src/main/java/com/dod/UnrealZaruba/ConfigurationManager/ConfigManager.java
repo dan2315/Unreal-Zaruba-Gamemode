@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class ConfigManager {
-    final static String UNREALZARUBA_MAP_DATA = "world" + File.separator + "unrealzaruba";
+    final static String UNREALZARUBA_MAP_DATA = "unrealzaruba";
     public final static String Objectives = UNREALZARUBA_MAP_DATA + File.separator + "destructibleObjectives.json";
     public final static String Teams = UNREALZARUBA_MAP_DATA + File.separator + "teams.json";
 

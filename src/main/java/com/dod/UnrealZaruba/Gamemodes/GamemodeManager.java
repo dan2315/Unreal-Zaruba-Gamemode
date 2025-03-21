@@ -8,7 +8,7 @@ public class GamemodeManager {
 
 
     public static void InitializeGamemode(Level level, BaseGamemode gamemode) {
-        gamemode.Initialize();
+        // gamemode.Initialize();
         worldToGamemode.put(level, gamemode);
     }
 

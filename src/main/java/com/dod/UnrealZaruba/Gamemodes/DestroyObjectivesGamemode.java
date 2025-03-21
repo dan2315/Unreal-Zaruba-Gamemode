@@ -65,7 +65,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         this.leaderboardService = leaderboardService;
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
-        minecraftObjective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
+        //TODO: minecraftObjective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
 
         TeamManager teamManager = new TeamManager();
         teamManager.Initialize();
@@ -123,7 +123,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             UnrealZaruba.LOGGER.info("Starting game with " + 
                                    server.getPlayerList().getPlayerCount() + " players");
             
-            ScoreboardManager.setupScoreboard(server, 999);
+            //TODO: ScoreboardManager.setupScoreboard(server, 999);
             
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
@@ -139,7 +139,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MinecraftServer server = context.getSource().getServer();
-        ScoreboardManager.setupScoreboard(server, 999);
+        //TODO: ScoreboardManager.setupScoreboard(server, 999);
         
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
@@ -164,7 +164,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
                 Map<String, Object> data = new HashMap<>();
                 data.put("teammates", team.getValue().Members());
-                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, data));
+                //TODO: NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, data));
             } 
         }
         
@@ -298,16 +298,16 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (COMMANDER_VOTING_DURATION_MS / 1000) - (ticks / 20);
-        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
     }
 
     private void updatePreparationTimer(int ticks) {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (PREPARATION_DURATION_MS / 1000) - (ticks / 20);
-        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
     }
 
     private void updateCountdownTimer(int ticks, MinecraftServer server) {
@@ -324,8 +324,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
-        ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
+        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
     }
 
     public void HandleConnectedPlayer(Player player) {

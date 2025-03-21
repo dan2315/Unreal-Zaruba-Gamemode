@@ -48,13 +48,13 @@ public class TeamManager {
 
     public void Initialize() {
         for (TeamContext team : teams.values()) {
-            team.SetupMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
+            //TODO: team.SetupMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
         }
     }
 
     public void Cleanup() {
         for (TeamContext team : teams.values()) {
-            team.CleanMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
+            //TODO: team.CleanMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
         }
     } 
 

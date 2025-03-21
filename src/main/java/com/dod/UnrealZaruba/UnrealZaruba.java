@@ -74,7 +74,7 @@ public class UnrealZaruba {
             gamemode = new DestroyObjectivesGamemode(event.getServer(), leaderboardService);
             GamemodeManager.InitializeGamemode(event.getServer().overworld(), gamemode);
 
-            ScoreboardManager.clearScoreboard(event.getServer());
+            //TODO: ScoreboardManager.clearScoreboard(event.getServer());
         }
 
         @SubscribeEvent

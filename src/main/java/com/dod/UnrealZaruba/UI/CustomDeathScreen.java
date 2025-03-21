@@ -71,14 +71,14 @@ public class CustomDeathScreen extends Screen {
         var playerID = Minecraft.getInstance().player.getUUID();
         if (playerID == null)
             UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, false));
+        //TODO: NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, false));
     }
 
     private void respawnInTent() {
         var playerID = Minecraft.getInstance().player.getUUID();
         if (playerID == null)
             UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, true));
+        //TODO: NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, true));
     }
 
     @Override

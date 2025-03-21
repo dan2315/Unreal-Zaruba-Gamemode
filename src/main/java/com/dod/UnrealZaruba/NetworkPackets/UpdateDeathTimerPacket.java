@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 
 public class UpdateDeathTimerPacket {
     
-    private int remainingTime; // The remaining time in seconds
+    private int remainingTime;
 
     public UpdateDeathTimerPacket(int remainingTime) {
         this.remainingTime = remainingTime;
@@ -18,7 +18,6 @@ public class UpdateDeathTimerPacket {
         return remainingTime;
     }
 
-    // Encode the packet data to the buffer
     public static void encode(UpdateDeathTimerPacket packet, FriendlyByteBuf buffer) {
         buffer.writeInt(packet.getRemainingTime());
     }

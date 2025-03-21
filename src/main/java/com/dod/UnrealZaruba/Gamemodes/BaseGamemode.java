@@ -64,9 +64,9 @@ public abstract class BaseGamemode {
         
         int remainingSeconds = RESPAWN_DURATION_SECONDS - (ticks / 20);
         
-        NetworkHandler.CHANNEL.send(
-            PacketDistributor.PLAYER.with(() -> player), 
-            new UpdateDeathTimerPacket(remainingSeconds)
-        );
+        // TODO: NetworkHandler.CHANNEL.send(
+        //     PacketDistributor.PLAYER.with(() -> player), 
+        //     new UpdateDeathTimerPacket(remainingSeconds)
+        // );
     }
 }
