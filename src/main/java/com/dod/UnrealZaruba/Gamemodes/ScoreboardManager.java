@@ -38,7 +38,7 @@ public class ScoreboardManager {
         seconds.setScore(timeleft);
     }
 
-    public static void clearScoreboard(MinecraftServer server) {
+    public static void resetScoreboard(MinecraftServer server) {
         Scoreboard scoreboard = server.getScoreboard();
         Objective objective = scoreboard.getObjective(OBJECTIVE_NAME);
 

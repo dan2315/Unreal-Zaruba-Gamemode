@@ -2,6 +2,7 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
 import com.dod.UnrealZaruba.Utils.NBT;
 
 import com.mojang.brigadier.context.CommandContext;
@@ -97,7 +99,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     protected void Initialize() {
         super.Initialize();
         
-        startCondition = new SustainedPlayerCountCondition(10, 10);
+        UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
+        startCondition = new SustainedPlayerCountCondition(1, 10);
         startCondition.SetOnConditionMet(this::StartGame);
     }
 
@@ -351,6 +354,17 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 MakePlayerSpectator(serverPlayer, server);
             }
         }
+
+        if (gameStage == GameStage.Preparation) {
+            TeleportToLobby(serverPlayer, server);
+        }
+    }
+
+    private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
+        serverPlayer.setGameMode(GameType.ADVENTURE);
+        var lobby = server.getLevel(SimpleWorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
+        serverPlayer.teleportTo(server.getLevel(SimpleWorldManager.LOBBY_DIMENSION), lobby.getX(), lobby.getY(), lobby.getZ(), Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+        serverPlayer.teleportTo(lobby.getX(), lobby.getY(), lobby.getZ());
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {

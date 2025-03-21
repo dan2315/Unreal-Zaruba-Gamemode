@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes.StartCondition;
 
-
+import com.dod.UnrealZaruba.UnrealZaruba;
 public abstract class StartCondition {
     private Runnable onConditionMet;
 

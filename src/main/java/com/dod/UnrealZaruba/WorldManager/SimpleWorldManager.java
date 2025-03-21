@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-
 public class SimpleWorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
             .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim"));
@@ -36,7 +35,9 @@ public class SimpleWorldManager {
     public final Lobby UnrealZarubaLobby;
 
     public SimpleWorldManager(LeaderboardService leaderboardService) {
-        UnrealZarubaLobby = new Lobby(() -> new DestroyObjectivesGamemode(ServerLifecycleHooks.getCurrentServer(), leaderboardService), 50, LOBBY_DIMENSION, GAME_DIMENSION);
+        UnrealZarubaLobby = new Lobby();
+        var server = ServerLifecycleHooks.getCurrentServer();
+        
     }
 
 

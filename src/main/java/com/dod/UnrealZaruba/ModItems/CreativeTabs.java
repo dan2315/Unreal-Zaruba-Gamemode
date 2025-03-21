@@ -5,14 +5,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CreativeTabs {
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
@@ -35,18 +34,24 @@ public class CreativeTabs {
         })
         .build());
 
-    @SubscribeEvent
-    public static void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTab() == MAIN_TAB.get()) {
-            event.accept(ModItems.TENT.get());
-            event.accept(ModItems.HAND_ASSEMBLER.get());
-            event.accept(ModItems.RED_BLOCK_ITEM.get());
-            event.accept(ModItems.BLUE_BLOCK_ITEM.get());
-            event.accept(ModItems.RED_SPAWN_ITEM.get());
-            event.accept(ModItems.BLUE_SPAWN_ITEM.get());
-            event.accept(ModItems.SEAT_WITHOUT_COLLISION_ITEM.get());
-            event.accept(ModItems.TENT_MAIN_BLOCK_BLUE_ITEM.get());
-            event.accept(ModItems.TENT_MAIN_BLOCK_RED_ITEM.get());
+    public static void register(IEventBus eventBus) {
+        CREATIVE_TABS.register(eventBus);
+    }
+    
+    public static class EventHandler {
+        @SubscribeEvent
+        public static void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTab() == MAIN_TAB.get()) {
+                event.accept(ModItems.TENT.get());
+                event.accept(ModItems.HAND_ASSEMBLER.get());
+                event.accept(ModItems.RED_BLOCK_ITEM.get());
+                event.accept(ModItems.BLUE_BLOCK_ITEM.get());
+                event.accept(ModItems.RED_SPAWN_ITEM.get());
+                event.accept(ModItems.BLUE_SPAWN_ITEM.get());
+                event.accept(ModItems.SEAT_WITHOUT_COLLISION_ITEM.get());
+                event.accept(ModItems.TENT_MAIN_BLOCK_BLUE_ITEM.get());
+                event.accept(ModItems.TENT_MAIN_BLOCK_RED_ITEM.get());
+            }
         }
     }
 }

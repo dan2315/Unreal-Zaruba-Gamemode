@@ -3,6 +3,9 @@ package com.dod.UnrealZaruba.Gamemodes.StartCondition;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.network.chat.Component;
+import com.dod.UnrealZaruba.Title.TitleMessage;
+
 
 /**
  * A start condition that requires a minimum number of players to be present
@@ -42,13 +45,19 @@ public class SustainedPlayerCountCondition extends StartCondition {
         
         if (currentPlayerCount >= requiredPlayerCount) {
             sustainedTicks++;
-            
-            // Log progress at regular intervals
-            if (sustainedTicks % 20 == 0) { // Every second
+            if (sustainedTicks % 20 == 0) {
                 int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
                 UnrealZaruba.LOGGER.info("Player count condition: " + currentPlayerCount + 
                                       "/" + requiredPlayerCount + " players, " +
                                       remainingSeconds + " seconds remaining");
+                
+                // Show countdown to all players
+                for (var player : server.getPlayerList().getPlayers()) {
+                    TitleMessage.sendActionbar(player, Component.literal(
+                        "Starting in " + remainingSeconds + " seconds (" + 
+                        currentPlayerCount + "/" + requiredPlayerCount + " players)"
+                    ));
+                }
             }
             
             if (sustainedTicks >= requiredDurationTicks) {
@@ -56,15 +65,32 @@ public class SustainedPlayerCountCondition extends StartCondition {
                 UnrealZaruba.LOGGER.info("Player count condition met: " + currentPlayerCount + 
                                       "/" + requiredPlayerCount + " players for " +
                                       (requiredDurationTicks / 20) + " seconds");
+                
+                // Show game starting message to all players
+                for (var player : server.getPlayerList().getPlayers()) {
+                    TitleMessage.showTitle(player, 
+                        Component.literal("Game Starting!"),
+                        Component.literal("Good luck!"),
+                        60
+                    );
+                }
+                
                 if (onConditionMet != null) {
                     onConditionMet.run();
                 }
             }
         } else {
-            // Reset the counter if player count drops below threshold
             if (sustainedTicks > 0) {
                 UnrealZaruba.LOGGER.info("Player count dropped to " + currentPlayerCount + 
                                       "/" + requiredPlayerCount + ", resetting timer");
+                
+                // Notify players that countdown was reset
+                for (var player : server.getPlayerList().getPlayers()) {
+                    TitleMessage.sendActionbar(player, Component.literal(
+                        "Not enough players! Need " + requiredPlayerCount + " to start"
+                    ));
+                }
+                
                 sustainedTicks = 0;
             }
         }

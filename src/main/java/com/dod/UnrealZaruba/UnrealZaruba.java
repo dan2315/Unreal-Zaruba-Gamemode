@@ -10,6 +10,7 @@ import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.UnrealZaruba.ModItems.CreativeTabs;
 import com.dod.UnrealZaruba.ModItems.ModItems;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Player.PlayerContext;
@@ -60,6 +61,7 @@ public class UnrealZaruba {
         ModBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModMobs.register(FMLJavaModLoadingContext.get().getModEventBus());
+        CreativeTabs.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         NetworkHandler.init();
     }
@@ -74,13 +76,13 @@ public class UnrealZaruba {
             gamemode = new DestroyObjectivesGamemode(event.getServer(), leaderboardService);
             GamemodeManager.InitializeGamemode(event.getServer().overworld(), gamemode);
 
-            //TODO: ScoreboardManager.clearScoreboard(event.getServer());
+            ScoreboardManager.resetScoreboard(event.getServer());
         }
 
         @SubscribeEvent
         public static void onServerTick(ServerTickEvent event) {
             if (event.phase == ServerTickEvent.Phase.START) {
-                // TODO: gamemode.onServerTick(event);
+                gamemode.onServerTick(event);
                 TimerManager.updateAll();
             }
         }
@@ -90,7 +92,7 @@ public class UnrealZaruba {
 
             LOGGER.info("Server has stopped. Finalizing...");
             // TODO: DestructibleObjectivesHandler.Save();
-            gamemode.Cleanup();
+            // gamemode.Cleanup();
         }
 
         @SubscribeEvent
@@ -108,22 +110,22 @@ public class UnrealZaruba {
 
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
-            LOGGER.info("COMMANDS Registered");
-            CommandRegistration.onCommandRegister(event, leaderboardService);
+            // LOGGER.info("COMMANDS Registered");
+            // CommandRegistration.onCommandRegister(event, leaderboardService);
         }
         
         @SubscribeEvent
         public static void onPlayerDeath(LivingDeathEvent event) {
-            if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
-                return;
-            }
+            // if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
+            //     return;
+            // }
             
-            BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level());
-            if (gamemode == null) {
-                return;
-            }
+            // BaseGamemode gamemode = GamemodeManager.Get(event.getEntity().level());
+            // if (gamemode == null) {
+            //     return;
+            // }
             
-            gamemode.HandleDeath(serverPlayer);
+            // gamemode.HandleDeath(serverPlayer);
         }
     }
     
@@ -135,7 +137,7 @@ public class UnrealZaruba {
         @SubscribeEvent
         public static void onRegisterCommands(RegisterCommandsEvent event) {
             LOGGER.info("COMMANDS Registered");
-            CommandRegistration.onCommandRegister(event, leaderboardService);
+            // CommandRegistration.onCommandRegister(event, leaderboardService);
         }
     }
 }

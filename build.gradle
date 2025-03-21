@@ -94,8 +94,9 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 mixin {
-    add sourceSets.main, 'mixins.unrealzaruba.refmap.json'
-    config 'mixins.unrealzaruba.json'
+    disableAnnotationProcessorCheck()
+    // add sourceSets.main, 'mixins.unrealzaruba.refmap.json'
+    // config 'mixins.unrealzaruba.json'
 }
 
 
