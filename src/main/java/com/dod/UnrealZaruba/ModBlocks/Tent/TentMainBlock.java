@@ -43,7 +43,7 @@ public class TentMainBlock extends Block {
     @Override
     public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion) {
         if (!level.isClientSide) {
-            TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level));
+            TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level.dimension()));
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(), Component.literal("§4Палатка команды "
                     + gamemode.GetTeamManager().Get(teamColor).color.toString() + " была разрушена!"));
             gamemode.GetTeamManager().Get(teamColor).setActiveTent(null);
@@ -72,7 +72,7 @@ public class TentMainBlock extends Block {
             FluidState fluid) {
         if (!level.isClientSide) {
 
-            TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level));
+            TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level.dimension()));
             TeamContext team = gamemode.GetTeamManager().Get(teamColor);
 
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(),

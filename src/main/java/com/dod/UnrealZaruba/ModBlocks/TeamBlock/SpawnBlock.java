@@ -23,7 +23,7 @@ public class SpawnBlock extends Block {
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         try {
-            ((TeamGamemode)GamemodeManager.Get(level)).GetTeamManager().AddTeam(teamColor, pos, null);
+            ((TeamGamemode)GamemodeManager.Get(level.dimension())).GetTeamManager().AddTeam(teamColor, pos, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

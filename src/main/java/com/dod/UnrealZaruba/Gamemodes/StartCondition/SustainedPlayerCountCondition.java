@@ -1,31 +1,31 @@
 package com.dod.UnrealZaruba.Gamemodes.StartCondition;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.network.chat.Component;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * A start condition that requires a minimum number of players to be present
- * for a sustained period of time before triggering.
- */
+
 public class SustainedPlayerCountCondition extends StartCondition {
-    private final int requiredPlayerCount;
+    private final int requiredPlayersPerTeam;
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;
     private boolean conditionMet = false;
     private Runnable onConditionMet;
+    private final TeamManager teamManager;
+    private final HashMap<TeamColor, Boolean> teamReadyStatus = new HashMap<>();
 
-    /**
-     * Creates a new sustained player count condition
-     * 
-     * @param requiredPlayerCount The minimum number of players required
-     * @param requiredDurationSeconds The duration in seconds that the player count must be maintained
-     */
-    public SustainedPlayerCountCondition(int requiredPlayerCount, int requiredDurationSeconds) {
-        this.requiredPlayerCount = requiredPlayerCount;
+    public SustainedPlayerCountCondition(TeamManager teamManager, int requiredPlayersPerTeam, int requiredDurationSeconds) {
+        this.teamManager = teamManager;
+        this.requiredPlayersPerTeam = requiredPlayersPerTeam;
         this.requiredDurationTicks = requiredDurationSeconds * 20; // Convert seconds to ticks (20 ticks per second)
     }
 
@@ -41,32 +41,51 @@ public class SustainedPlayerCountCondition extends StartCondition {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
         
-        int currentPlayerCount = server.getPlayerList().getPlayerCount();
+        teamReadyStatus.clear();
         
-        if (currentPlayerCount >= requiredPlayerCount) {
+        boolean allTeamsReady = true;
+        int teamsCount = 0;
+        
+        for (Map.Entry<TeamColor, TeamContext> entry : teamManager.GetTeams().entrySet()) {
+            TeamColor teamColor = entry.getKey();
+            TeamContext team = entry.getValue();
+            int teamPlayerCount = team.MembersCount();
+            
+            boolean isTeamReady = teamPlayerCount >= requiredPlayersPerTeam;
+            teamReadyStatus.put(teamColor, isTeamReady);
+            
+            if (!isTeamReady) {
+                allTeamsReady = false;
+            }
+            
+            teamsCount++;
+        }
+        
+        if (teamsCount < 2) {
+            allTeamsReady = false;
+        }
+        
+        if (allTeamsReady) {
             sustainedTicks++;
             if (sustainedTicks % 20 == 0) {
                 int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-                UnrealZaruba.LOGGER.info("Player count condition: " + currentPlayerCount + 
-                                      "/" + requiredPlayerCount + " players, " +
+                UnrealZaruba.LOGGER.info("Team player count condition: all teams have at least " + 
+                                      requiredPlayersPerTeam + " players, " +
                                       remainingSeconds + " seconds remaining");
                 
-                // Show countdown to all players
                 for (var player : server.getPlayerList().getPlayers()) {
                     TitleMessage.sendActionbar(player, Component.literal(
-                        "Starting in " + remainingSeconds + " seconds (" + 
-                        currentPlayerCount + "/" + requiredPlayerCount + " players)"
+                        "Starting in " + remainingSeconds + " seconds (all teams ready)"
                     ));
                 }
             }
             
             if (sustainedTicks >= requiredDurationTicks) {
                 conditionMet = true;
-                UnrealZaruba.LOGGER.info("Player count condition met: " + currentPlayerCount + 
-                                      "/" + requiredPlayerCount + " players for " +
+                UnrealZaruba.LOGGER.info("Team player count condition met: all teams have at least " + 
+                                      requiredPlayersPerTeam + " players for " +
                                       (requiredDurationTicks / 20) + " seconds");
                 
-                // Show game starting message to all players
                 for (var player : server.getPlayerList().getPlayers()) {
                     TitleMessage.showTitle(player, 
                         Component.literal("Game Starting!"),
@@ -81,14 +100,29 @@ public class SustainedPlayerCountCondition extends StartCondition {
             }
         } else {
             if (sustainedTicks > 0) {
-                UnrealZaruba.LOGGER.info("Player count dropped to " + currentPlayerCount + 
-                                      "/" + requiredPlayerCount + ", resetting timer");
+                UnrealZaruba.LOGGER.info("Team player count dropped below required level, resetting timer");
                 
-                // Notify players that countdown was reset
+                StringBuilder statusMessage = new StringBuilder("Not enough players! Need ");
+                statusMessage.append(requiredPlayersPerTeam).append(" per team: ");
+                
+                for (Map.Entry<TeamColor, Boolean> status : teamReadyStatus.entrySet()) {
+                    TeamColor teamColor = status.getKey();
+                    boolean isReady = status.getValue();
+                    TeamContext team = teamManager.GetTeams().get(teamColor);
+                    int playerCount = team.MembersCount();
+                    
+                    statusMessage.append(teamColor.getDisplayName())
+                                 .append(" (")
+                                 .append(playerCount)
+                                 .append("/")
+                                 .append(requiredPlayersPerTeam)
+                                 .append(") ")
+                                 .append(isReady ? "✓" : "✗")
+                                 .append(" ");
+                }
+                
                 for (var player : server.getPlayerList().getPlayers()) {
-                    TitleMessage.sendActionbar(player, Component.literal(
-                        "Not enough players! Need " + requiredPlayerCount + " to start"
-                    ));
+                    TitleMessage.sendActionbar(player, Component.literal(statusMessage.toString()));
                 }
                 
                 sustainedTicks = 0;
@@ -101,23 +135,15 @@ public class SustainedPlayerCountCondition extends StartCondition {
         this.onConditionMet = onConditionMet;
     }
 
-    /**
-     * Gets the current sustained duration in ticks
-     */
     public int getSustainedTicks() {
         return sustainedTicks;
     }
     
-    /**
-     * Gets the required duration in ticks
-     */
     public int getRequiredDurationTicks() {
         return requiredDurationTicks;
     }
     
-    public int getRequiredPlayerCount() {
-        return requiredPlayerCount;
+    public int getRequiredPlayersPerTeam() {
+        return requiredPlayersPerTeam;
     }
-
-
 } 

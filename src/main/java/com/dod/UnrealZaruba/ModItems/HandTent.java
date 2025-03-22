@@ -77,7 +77,7 @@ public class HandTent extends Item {
      */
     public void placeCustomStructure(ServerLevel world, BlockPos clickPos, Player player) {
         UnrealZaruba.LOGGER.info("[Ох, бля] Читаю NBT");
-        BaseGamemode gamemode = GamemodeManager.Get(world);
+        BaseGamemode gamemode = GamemodeManager.Get(world.dimension());
         TeamManager teamManager = ((TeamGamemode) gamemode).GetTeamManager();
 
         TeamContext player_team = teamManager.GetPlayersTeam(player);

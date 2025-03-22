@@ -1,7 +1,5 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.Utils.NBT;
@@ -14,11 +12,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+
 
 public abstract class BaseGamemode {
     protected static BaseGamemode currentGamemode;
     private static final int RESPAWN_DURATION_SECONDS = 10;
+    protected ResourceKey<Level> lobbyDimension;
+    protected ResourceKey<Level> gameDimension;
+    
 
     public GameStage gameStage = GameStage.Preparation;
 

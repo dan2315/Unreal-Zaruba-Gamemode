@@ -7,9 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Services.LeaderboardService;
-import com.dod.UnrealZaruba.WorldManager.Lobby.Lobby;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -20,7 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class SimpleWorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
@@ -32,12 +30,12 @@ public class SimpleWorldManager {
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
             .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
-    public final Lobby UnrealZarubaLobby;
-
     public SimpleWorldManager(LeaderboardService leaderboardService) {
-        UnrealZarubaLobby = new Lobby();
-        var server = ServerLifecycleHooks.getCurrentServer();
         
+    }
+
+    public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
+        return Pair.of(GAME_DIMENSION, LOBBY_DIMENSION);
     }
 
 

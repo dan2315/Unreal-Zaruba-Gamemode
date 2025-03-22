@@ -1,13 +1,10 @@
 package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
-import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.ScoreboardManager;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.CreativeTabs;
@@ -17,7 +14,6 @@ import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Services.HttpClientService;
 import com.dod.UnrealZaruba.Services.LeaderboardService;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
 import com.mojang.logging.LogUtils;
@@ -74,7 +70,7 @@ public class UnrealZaruba {
         @SubscribeEvent
         public static void onServerStarting(ServerStartingEvent event) {
             gamemode = new DestroyObjectivesGamemode(event.getServer(), leaderboardService);
-            GamemodeManager.InitializeGamemode(event.getServer().overworld(), gamemode);
+            GamemodeManager.InitializeGamemode(SimpleWorldManager.getDimensions(), gamemode);
 
             ScoreboardManager.resetScoreboard(event.getServer());
         }
@@ -141,3 +137,12 @@ public class UnrealZaruba {
         }
     }
 }
+
+// TODO: Chini epta
+// Caused by: java.lang.NullPointerException: Cannot invoke "net.minecraft.world.scores.PlayerTeam.m_6809_()" because "p_83435_" is null
+//         at net.minecraft.world.scores.Scoreboard.m_6546_(Scoreboard.java:212) ~[server-1.20.1-20230612.114412-srg.jar%23129!/:?] {re:classloading}
+//         at net.minecraft.server.ServerScoreboard.m_6546_(ServerScoreboard.java:85) ~[server-1.20.1-20230612.114412-srg.jar%23129!/:?] {re:classloading}
+//         at com.dod.UnrealZaruba.TeamLogic.TeamContext.Assign(TeamContext.java:155) ~[unrealzaruba-0.2.jar%23126!/:0.2] {re:classloading}
+//         at com.dod.UnrealZaruba.TeamLogic.TeamManager.AssignToTeam(TeamManager.java:156) ~[unrealzaruba-0.2.jar%23126!/:0.2] {re:classloading}
+//         at com.dod.UnrealZaruba.ModBlocks.TeamBlock.TeamBlock.m_141947_(TeamBlock.java:55) ~[unrealzaruba-0.2.jar%23126!/:0.2] {re:classloading}
+//         at net.minecraft.world.entity.Entity.m_6478_(Entity.java:676) ~[server-1.20.1-20230612.114412-srg.jar%23129!/:?]

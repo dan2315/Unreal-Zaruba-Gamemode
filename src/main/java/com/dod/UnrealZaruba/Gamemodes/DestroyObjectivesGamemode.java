@@ -100,7 +100,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         super.Initialize();
         
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
-        startCondition = new SustainedPlayerCountCondition(1, 10);
+        startCondition = new SustainedPlayerCountCondition(TeamManager, 5, 10); // 5 players in each team for 10 sec
         startCondition.SetOnConditionMet(this::StartGame);
     }
 
@@ -342,27 +342,21 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             return;
 
         if (gameStage == GameStage.Preparation) {
-            ReturnToSpawn(serverPlayer, server);
-        } else {
-            if (isInTeam) {
-                if (isDead == 1) {
-                    ReturnToTeamSpawn(serverPlayer);
-                } else {
-                    serverPlayer.setGameMode(GameType.ADVENTURE);
-                }
-            } else {
-                MakePlayerSpectator(serverPlayer, server);
-            }
-        }
-
-        if (gameStage == GameStage.Preparation) {
             TeleportToLobby(serverPlayer, server);
+            return;
+        }
+        if (!isInTeam) {
+            MakePlayerSpectator(serverPlayer, server);
+            return;
+        }
+        if (isDead == 1) {
+            ReturnToTeamSpawn(serverPlayer);
         }
     }
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
         serverPlayer.setGameMode(GameType.ADVENTURE);
-        var lobby = server.getLevel(SimpleWorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
+        BlockPos lobby = server.getLevel(SimpleWorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
         serverPlayer.teleportTo(server.getLevel(SimpleWorldManager.LOBBY_DIMENSION), lobby.getX(), lobby.getY(), lobby.getZ(), Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
         serverPlayer.teleportTo(lobby.getX(), lobby.getY(), lobby.getZ());
     }
@@ -376,14 +370,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         serverPlayer.setGameMode(GameType.SPECTATOR);
         var spawn = server.overworld().getSharedSpawnPos();
         serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-    }
-
-    private void ReturnToSpawn(ServerPlayer serverPlayer, MinecraftServer server) {
-        BlockPos spawn = server.overworld().getSharedSpawnPos();
-        serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-        server.overworld();
-        serverPlayer.setRespawnPosition(Level.OVERWORLD, spawn, 0, true, false);
-        serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
