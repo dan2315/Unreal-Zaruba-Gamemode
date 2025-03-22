@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Services.LeaderboardService;
+import com.dod.UnrealZaruba.Services.GameStatisticsService;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -30,7 +30,7 @@ public class SimpleWorldManager {
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
             .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
-    public SimpleWorldManager(LeaderboardService leaderboardService) {
+    public SimpleWorldManager(GameStatisticsService leaderboardService) {
         
     }
 

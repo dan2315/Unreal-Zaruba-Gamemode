@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Services.LeaderboardService;
+import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
@@ -56,15 +56,17 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
-    private LeaderboardService leaderboardService;
+    private GameStatisticsService leaderboardService;
     private Scoreboard scoreboard;
     private Objective minecraftObjective;
+    private GameTimer gameTimer;
 
     private DestructibleObjectivesHandler objectivesHandler;
     private StartCondition startCondition;
 
-    public DestroyObjectivesGamemode(MinecraftServer server, LeaderboardService leaderboardService) {
+    public DestroyObjectivesGamemode(MinecraftServer server, GameStatisticsService leaderboardService, GameTimer gameTimer) {
         this.leaderboardService = leaderboardService;
+        this.gameTimer = gameTimer;
         currentGamemode = this;
         scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
         //TODO: minecraftObjective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
@@ -126,7 +128,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             UnrealZaruba.LOGGER.info("Starting game with " + 
                                    server.getPlayerList().getPlayerCount() + " players");
             
-            //TODO: ScoreboardManager.setupScoreboard(server, 999);
+            gameTimer.setupScoreboard();
             
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
@@ -140,9 +142,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         }
     }
 
-    public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    public int StartGame(CommandContext<CommandSourceStack> context, GameTimer gameTimer) throws CommandSyntaxException {
         MinecraftServer server = context.getSource().getServer();
-        //TODO: ScoreboardManager.setupScoreboard(server, 999);
+        gameTimer.setupScoreboard();
         
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
@@ -156,7 +158,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         gameStage = GameStage.CommanderVoting;
         HashMap<TeamColor, TeamContext> teams = TeamManager.GetTeams();
         
-        // Show voting UI to all players
         for (var team : teams.entrySet()) {
             for (var player : team.getValue().Members()) {
                 var serverPlayer = server.getPlayerList().getPlayer(player);
@@ -167,11 +168,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
                 Map<String, Object> data = new HashMap<>();
                 data.put("teammates", team.getValue().Members());
-                //TODO: NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, data));
+                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OpenScreenPacket(1, data));
             } 
         }
         
-        // Create a timer for the voting phase
         TimerManager.createRealTimeTimer(
             COMMANDER_VOTING_DURATION_MS,
             () -> handleVotingCompleted(teams, server),
@@ -301,16 +301,16 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (COMMANDER_VOTING_DURATION_MS / 1000) - (ticks / 20);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
+        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
     }
 
     private void updatePreparationTimer(int ticks) {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (PREPARATION_DURATION_MS / 1000) - (ticks / 20);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
+        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
     }
 
     private void updateCountdownTimer(int ticks, MinecraftServer server) {
@@ -327,8 +327,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerMinutes(scoreboard, minecraftObjective, secondsRemaining / 60);
-        //TODO: ScoreboardManager.UpdateScoreboardTimerSeconds(scoreboard, minecraftObjective, secondsRemaining % 60);
+        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
+        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
     }
 
     public void HandleConnectedPlayer(Player player) {
@@ -357,7 +357,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
         serverPlayer.setGameMode(GameType.ADVENTURE);
         BlockPos lobby = server.getLevel(SimpleWorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
-        serverPlayer.teleportTo(server.getLevel(SimpleWorldManager.LOBBY_DIMENSION), lobby.getX(), lobby.getY(), lobby.getZ(), Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+        serverPlayer.teleportTo(server.getLevel(SimpleWorldManager.LOBBY_DIMENSION), 0, 0, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
         serverPlayer.teleportTo(lobby.getX(), lobby.getY(), lobby.getZ());
     }
 

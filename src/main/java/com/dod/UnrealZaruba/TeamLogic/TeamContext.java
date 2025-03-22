@@ -23,7 +23,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
-
+import com.dod.UnrealZaruba.UnrealZaruba;
 /**
  * Team core data.
  */
@@ -146,6 +146,9 @@ public class TeamContext implements IObjectiveNotifier {
      * @param player the player
      */
     public void Assign(ServerPlayer player) {
+        UnrealZaruba.LOGGER.info("Assigning player to team: ");
+        UnrealZaruba.LOGGER.info("Player: " + player.getName().getString());
+        UnrealZaruba.LOGGER.info("Server: " + player.getServer());
         Scoreboard scoreboard = player.getServer().getScoreboard();
 
         if (spawn == null) {

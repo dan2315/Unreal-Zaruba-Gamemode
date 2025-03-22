@@ -14,13 +14,13 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class LeaderboardService {
+public class GameStatisticsService {
 
     public static final Gson jsonConverter = new GsonBuilder().create();
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     private HttpClientService httpClientService;
 
-    public LeaderboardService(HttpClientService httpClientService) {
+    public GameStatisticsService(HttpClientService httpClientService) {
         this.httpClientService = httpClientService;
     }
 

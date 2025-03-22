@@ -48,7 +48,7 @@ public class TeamManager {
 
     public void Initialize() {
         for (TeamContext team : teams.values()) {
-            //TODO: team.SetupMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
+            team.SetupMinecraftTeam(ServerLifecycleHooks.getCurrentServer());
         }
     }
 
