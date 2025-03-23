@@ -142,7 +142,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         }
     }
 
-    public int StartGame(CommandContext<CommandSourceStack> context, GameTimer gameTimer) throws CommandSyntaxException {
+    public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MinecraftServer server = context.getSource().getServer();
         gameTimer.setupScoreboard();
         

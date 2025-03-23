@@ -49,6 +49,7 @@ public class GameTimer {
     }
 
     public void resetScoreboard() {
+        objective = scoreboard.getObjective(OBJECTIVE_NAME);
         if (objective != null) {
             scoreboard.resetPlayerScore("Minutes", objective);
             scoreboard.resetPlayerScore("Seconds", objective);
