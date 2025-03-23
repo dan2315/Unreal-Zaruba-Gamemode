@@ -43,7 +43,7 @@ public class TeamGamemode extends BaseGamemode {
     public void HandleRespawn(ServerPlayer player) {
         super.HandleRespawn(player);
         TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(player.getUUID());
-        if (!(playerContext.Team().active_tent == null)) {
+        if (!(playerContext.Team().Tent() == null)) {
             if (playerContext.TentChosen()) {
                 TeamManager.teleportToTent(player);
             } else {

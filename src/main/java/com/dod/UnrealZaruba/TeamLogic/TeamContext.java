@@ -10,11 +10,13 @@ import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.UnrealZaruba.SoundHandler.SoundHandler;  
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
@@ -23,39 +25,50 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
+import net.minecraft.world.level.Level;
+import net.minecraft.sounds.SoundSource;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import net.minecraft.sounds.SoundEvent;
 /**
  * Team core data.
  */
 public class TeamContext implements IObjectiveNotifier {
+    private final TeamManager batya;
+    private final ResourceLocation tentTemplate;
+    private final SoundEvent hornSound;
+    
+    private final TeamColor color;
+    private final MinecraftServer server;
+    
     private BlockPos spawn;
-    public BlockPos tentSpawn;
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     private UUID commander;
     private String commanderName;
-    List<UUID> members = new ArrayList<>();
-    public TeamColor color;
-    MinecraftServer server;
-    TeamManager batya;
-    public Tent active_tent;
-    public PlayerTeam minecraftTeam;
+    private Tent active_tent;
+    private PlayerTeam minecraftTeam;
     
     private Function<GameObjective, String> notificationMessageGenerator;
     private Function<GameObjective, String> objectiveCompletedMessageGenerator;
-
+    
+    public final List<UUID> members = new ArrayList<>();
     public TeamColor Color() {return color;}
     public BlockPos Spawn() {return spawn;}
     public UUID Commander() {return commander;}
     public String CommanderName() {return commanderName;}
     public List<UUID> Members() {return members;}
     public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
+    public Tent Tent() {return active_tent;}
 
     public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
-        this.barrierVolumes = barrierVolumes;
+        this.barrierVolumes = new ArrayList<>(barrierVolumes);
         server = ServerLifecycleHooks.getCurrentServer();
+        
+        TeamAssets assets = TeamAssets.getByTeamColor(color);
+        this.tentTemplate = assets.getTentTemplate();
+        this.hornSound = assets.getHornSound();
     }
 
     public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color) {
@@ -63,8 +76,12 @@ public class TeamContext implements IObjectiveNotifier {
         this.spawn = spawn;
         this.color = color;
         server = ServerLifecycleHooks.getCurrentServer();
+        this.barrierVolumes = new ArrayList<>();
+        
+        TeamAssets assets = TeamAssets.getByTeamColor(color);
+        this.tentTemplate = assets.getTentTemplate();
+        this.hornSound = assets.getHornSound();
     }
-    
 
     public void setNotificationMessage(Function<GameObjective, String> generator) {
         if (generator != null) {
@@ -79,7 +96,6 @@ public class TeamContext implements IObjectiveNotifier {
     }
 
     public void AddBarrierVolume(BlockVolume barrierVolume) {
-        if (barrierVolumes == null) barrierVolumes = new ArrayList<BlockVolume>();
         barrierVolumes.add(barrierVolume);
     }
 
@@ -140,11 +156,6 @@ public class TeamContext implements IObjectiveNotifier {
         scoreboard.removePlayerTeam(minecraftTeam);
     }
 
-    /**
-     * Assign player into a scoreboard team
-     *
-     * @param player the player
-     */
     public void Assign(ServerPlayer player) {
         UnrealZaruba.LOGGER.info("Assigning player to team: ");
         UnrealZaruba.LOGGER.info("Player: " + player.getName().getString());
@@ -183,7 +194,7 @@ public class TeamContext implements IObjectiveNotifier {
     }
 
     public StructureTemplate GetTentTemplate(StructureTemplateManager structureManager) {
-        return structureManager.getOrCreate(new ResourceLocation("unrealzaruba", "blue_tent"));
+        return structureManager.getOrCreate(tentTemplate);
     }
 
     public void ProcessWin() {
@@ -192,6 +203,11 @@ public class TeamContext implements IObjectiveNotifier {
 
     public void ProcessLose() {
         
+    }
+
+    public void PlayBattleSound() {
+        // ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
+        // SoundHandler.playSoundFromPosition(serverLevel, spawn, hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
     }
 
     public void TeleportToSpawn() {

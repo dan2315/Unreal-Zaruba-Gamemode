@@ -23,6 +23,9 @@ import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Utils.NBT;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.GamePhase;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.TimedGamePhase;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -60,6 +63,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     private Scoreboard scoreboard;
     private Objective minecraftObjective;
     private GameTimer gameTimer;
+    private MinecraftServer server;
 
     private DestructibleObjectivesHandler objectivesHandler;
     private StartCondition startCondition;
@@ -68,15 +72,14 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         this.leaderboardService = leaderboardService;
         this.gameTimer = gameTimer;
         currentGamemode = this;
-        scoreboard = ServerLifecycleHooks.getCurrentServer().getScoreboard();
-        //TODO: minecraftObjective = scoreboard.getObjective(ScoreboardManager.OBJECTIVE_NAME);
+        this.server = server;
+        scoreboard = server.getScoreboard();
 
         TeamManager teamManager = new TeamManager();
         teamManager.Initialize();
         SetTeamManager(teamManager);
 
         TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
-
         TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
         
         startGameTexts.put(TeamColor.RED, new StartGameText(
@@ -104,6 +107,49 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
         startCondition = new SustainedPlayerCountCondition(TeamManager, 5, 10); // 5 players in each team for 10 sec
         startCondition.SetOnConditionMet(this::StartGame);
+
+        AddPhase(
+            new GamePhase(
+                PhaseId.PREPARATION,
+                this::StartPreparation,
+                this::CompletePreparation
+            )   
+        );
+        AddPhase(
+            new TimedGamePhase(
+                PhaseId.BATTLE,
+                GAME_DURATION_MS,
+                this::StartBattle,
+                this::UpdateBattle,
+                this::CompleteBattle
+            )
+        );
+    }
+
+    public void StartPreparation() {
+        gameStage = GameStage.Preparation;
+    }
+
+    public void CompletePreparation() {
+        ProceedToNextPhase();
+    }
+
+    public void StartBattle() {
+        gameStage = GameStage.Battle;
+        gameTimer.setupScoreboard();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            TeamManager.teleportToSpawn(player);
+        }
+        TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
+        server.setDifficulty(Difficulty.NORMAL, true);
+        TeamManager.PlayBattleSound();
+
+    }
+
+    public void UpdateBattle(int ticks) {
+    }
+
+    public void CompleteBattle() {
     }
 
     @Override
@@ -116,42 +162,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         objectivesHandler.onPlayerTick(event);
     }
-
-    public void StartGame() {
-        try {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server == null) {
-                UnrealZaruba.LOGGER.error("Cannot start game: Server is null");
-                return;
-            }
-            
-            UnrealZaruba.LOGGER.info("Starting game with " + 
-                                   server.getPlayerList().getPlayerCount() + " players");
-            
-            gameTimer.setupScoreboard();
-            
-            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
-                TeamManager.teleportToSpawn(player);
-            }
-            
-            StartVotingForCommander(server);
-        } catch (Exception e) {
-            UnrealZaruba.LOGGER.error("Failed to start game: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
+    
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        MinecraftServer server = context.getSource().getServer();
-        gameTimer.setupScoreboard();
-        
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            UnrealZaruba.LOGGER.info("Teleporting player: " + player.getName().getString());
-            TeamManager.teleportToSpawn(player);
-        }
-        
-        return StartVotingForCommander(context);
+        ProceedToNextPhase(PhaseId.BATTLE);
+        return 1;
     }
 
     private void StartVotingForCommander(MinecraftServer server) {
@@ -211,14 +225,14 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 team.SendMessage(server, message.toString());
             }
             
-            StartPreparation(server);
+            StartStrategyTime();
         } catch (Exception e) {
             UnrealZaruba.LOGGER.error("Error handling voting completion: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void StartPreparation(MinecraftServer server) {
+    private void StartStrategyTime() {
         Utils.SetGamemodeAllExcludeOP(server.getPlayerList(), GameType.ADVENTURE);
         gameStage = GameStage.StrategyTime;
 
@@ -238,26 +252,18 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         );
     }
     
-    public int StartPreparation(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        StartPreparation(context.getSource().getServer());
+    public int StartStrategyTime(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        StartStrategyTime();
         return 1;
     }
 
     private void StartBattle(MinecraftServer server) {
-        gameStage = GameStage.Battle;
+        // gameStage = GameStage.Battle;
 
-        TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
-        server.setDifficulty(Difficulty.NORMAL, true);
+        // TeamManager.ChangeGameModeOfAllParticipants(GameType.ADVENTURE);
+        // server.setDifficulty(Difficulty.NORMAL, true);
 
-        BlockPos SpawnRed = TeamManager.Get(TeamColor.RED).Spawn();
-        BlockPos SpawnBlue = TeamManager.Get(TeamColor.BLUE).Spawn();
-        ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
 
-        // Play horn sounds
-        SoundHandler.playSoundFromPosition(serverLevel, SpawnRed, ModSounds.HORN_DIRE.get(),
-                SoundSource.BLOCKS, 5.0F, 1.0F);
-        SoundHandler.playSoundFromPosition(serverLevel, SpawnBlue, ModSounds.HORN_RADIANT.get(),
-                SoundSource.BLOCKS, 5.0F, 1.0F);
 
         // Create a countdown timer before the battle starts
         TimerManager.createRealTimeTimer(
