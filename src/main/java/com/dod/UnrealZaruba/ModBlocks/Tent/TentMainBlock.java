@@ -45,7 +45,7 @@ public class TentMainBlock extends Block {
         if (!level.isClientSide) {
             TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.Get(level.dimension()));
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(), Component.literal("§4Палатка команды "
-                    + gamemode.GetTeamManager().Get(teamColor).color.toString() + " была разрушена!"));
+                    + gamemode.GetTeamManager().Get(teamColor).Color().toString() + " была разрушена!"));
             gamemode.GetTeamManager().Get(teamColor).setActiveTent(null);
         }
         // Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),
@@ -76,7 +76,7 @@ public class TentMainBlock extends Block {
             TeamContext team = gamemode.GetTeamManager().Get(teamColor);
 
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(),
-                    Component.literal("§4Палатка команды " + team.color.toString() + " была разрушена!"));
+                    Component.literal("§4Палатка команды " + team.Color().toString() + " была разрушена!"));
             team.setActiveTent(null);
         }
         // Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),

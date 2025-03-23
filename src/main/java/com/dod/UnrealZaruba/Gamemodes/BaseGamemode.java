@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.IGamePhase;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.Utils.NBT;
@@ -14,6 +16,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.TickEvent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 
 public abstract class BaseGamemode {
@@ -21,7 +26,9 @@ public abstract class BaseGamemode {
     private static final int RESPAWN_DURATION_SECONDS = 10;
     protected ResourceKey<Level> lobbyDimension;
     protected ResourceKey<Level> gameDimension;
-    
+    protected IGamePhase currentPhase;
+    protected List<IGamePhase> phases = new ArrayList<>();
+    protected int currentPhaseIndex = 0;
 
     public GameStage gameStage = GameStage.Preparation;
 
@@ -36,6 +43,56 @@ public abstract class BaseGamemode {
         currentGamemode = gamemode;
     }
 
+    protected BaseGamemode AddPhase(IGamePhase phase) {
+        phases.add(phase);
+        return this;
+    }
+
+    protected BaseGamemode ProceedToNextPhase() {
+        if (currentPhaseIndex < phases.size() - 1) {
+            currentPhaseIndex++;
+            currentPhase = phases.get(currentPhaseIndex);
+        }
+        return this;
+    }
+
+    protected BaseGamemode ProceedToNextPhase(PhaseId phaseId) {
+        if (currentPhaseIndex < phases.size() - 1) {
+            currentPhaseIndex++;
+            var nextPhase = phases.get(currentPhaseIndex);
+            if (nextPhase.GetPhaseId() == phaseId) {
+                currentPhase = nextPhase;
+            } else {
+                throw new RuntimeException("Expected phase " + phaseId + " but got " + nextPhase.GetPhaseId());
+            }
+        }
+        return this;
+    }
+    
+    protected BaseGamemode ProceedToPhaseForced(PhaseId phaseId) {
+        for (int i = 0; i < phases.size(); i++) {
+            if (phases.get(i).GetPhaseId() == phaseId) {
+                currentPhaseIndex = i;
+                currentPhase = phases.get(i);
+                return this;
+            }
+        }
+        return this;
+    }
+    
+    protected Optional<IGamePhase> GetPhaseById(PhaseId phaseId) {
+        return phases.stream()
+                .filter(phase -> phase.GetPhaseId() == phaseId)
+                .findFirst();
+    }
+    
+    public PhaseId GetCurrentPhaseId() {
+        return currentPhase != null ? currentPhase.GetPhaseId() : PhaseId.UNDEFINED;
+    }
+
+    public void StartGame() {
+
+    }
     public abstract void onServerTick(TickEvent.ServerTickEvent event);
     public abstract void onPlayerTick(TickEvent.PlayerTickEvent event);
 

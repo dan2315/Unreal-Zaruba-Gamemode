@@ -55,7 +55,7 @@ public class HandTent extends Item {
         if (!world.isClientSide) {
             if (livingEntity instanceof Player player) {
                 TeamGamemode gamemode = PlayerContext.Get(player.getUUID()).Gamemode(TeamGamemode.class);
-                if (gamemode.GetTeamManager().GetPlayersTeam(player).active_tent == null) {
+                if (gamemode.GetTeamManager().GetPlayersTeam(player).Tent() == null) {
                     ServerLevel serverLevel = (ServerLevel) world;
                     placeCustomStructure(serverLevel, new BlockPos((int)player.getX(), (int)player.getY(), (int)player.getZ()), player);
                     stack.setCount(stack.getCount() - 1);
@@ -102,7 +102,7 @@ public class HandTent extends Item {
         // } 
 
         // List<StructureBlockInfo> blockInfos = settings.getRandomPalette(palettes, buildPoint).blocks(); 
-        teamManager.tent_templates.get(player_team.color).placeInWorld(world, buildPoint, buildPoint,
+        teamManager.tent_templates.get(player_team.Color()).placeInWorld(world, buildPoint, buildPoint,
                 new StructurePlaceSettings(), world.random, 2);
 
         UnrealZaruba.LOGGER.info("[Ох, бля] Поставил ёпта");

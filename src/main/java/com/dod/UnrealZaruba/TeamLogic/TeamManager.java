@@ -183,6 +183,12 @@ public class TeamManager {
         }
     }
 
+    public void PlayBattleSound() {
+        for (TeamContext team : teams.values()) {
+            team.PlayBattleSound();
+        }
+    }
+
     public void teleportToSpawn(ServerPlayer serverPlayer) {
         TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null){
@@ -204,7 +210,7 @@ public class TeamManager {
             return;
         }
 
-        BlockPos Spawn = team.active_tent.spawn_point;
+        BlockPos Spawn = team.Tent().spawn_point;
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
