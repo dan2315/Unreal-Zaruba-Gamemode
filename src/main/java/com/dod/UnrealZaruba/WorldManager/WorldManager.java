@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class SimpleWorldManager {
+public class WorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
             .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim"));
     public static final ResourceKey<Level> LOBBY_DIMENSION = ResourceKey
@@ -30,7 +30,7 @@ public class SimpleWorldManager {
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
             .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
-    public SimpleWorldManager(GameStatisticsService leaderboardService) {
+    public WorldManager(GameStatisticsService leaderboardService) {
         
     }
 

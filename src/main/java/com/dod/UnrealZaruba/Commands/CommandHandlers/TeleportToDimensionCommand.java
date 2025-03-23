@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -11,9 +11,9 @@ public class TeleportToDimensionCommand implements ICommandHandler {
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("tptodim")
                 .executes(context -> {
-                    SimpleWorldManager.teleportPlayerToDimension(
+                    WorldManager.teleportPlayerToDimension(
                             context.getSource().getPlayerOrException(),
-                            SimpleWorldManager.GAME_DIMENSION);
+                            WorldManager.GAME_DIMENSION);
                     return 1;
                 }));
     }

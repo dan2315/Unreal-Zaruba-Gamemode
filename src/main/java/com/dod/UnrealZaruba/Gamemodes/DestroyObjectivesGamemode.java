@@ -21,7 +21,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
-import com.dod.UnrealZaruba.WorldManager.SimpleWorldManager;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Utils.NBT;
 
 import com.mojang.brigadier.context.CommandContext;
@@ -356,8 +356,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
         serverPlayer.setGameMode(GameType.ADVENTURE);
-        BlockPos lobby = server.getLevel(SimpleWorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
-        serverPlayer.teleportTo(server.getLevel(SimpleWorldManager.LOBBY_DIMENSION), 0, 0, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+        BlockPos lobby = server.getLevel(WorldManager.LOBBY_DIMENSION).getSharedSpawnPos();
+        serverPlayer.teleportTo(server.getLevel(WorldManager.LOBBY_DIMENSION), 0, 0, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
         serverPlayer.teleportTo(lobby.getX(), lobby.getY(), lobby.getZ());
     }
 
