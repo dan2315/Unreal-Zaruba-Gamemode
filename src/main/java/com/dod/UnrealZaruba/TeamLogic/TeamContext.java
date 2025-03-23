@@ -10,6 +10,7 @@ import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;  
 
 import net.minecraft.core.BlockPos;
@@ -63,7 +64,7 @@ public class TeamContext implements IObjectiveNotifier {
         this.batya = teamManager;
         this.spawn = spawn;
         this.color = color;
-        this.barrierVolumes = new ArrayList<>(barrierVolumes);
+        this.barrierVolumes = barrierVolumes;
         server = ServerLifecycleHooks.getCurrentServer();
         
         TeamAssets assets = TeamAssets.getByTeamColor(color);
@@ -206,8 +207,8 @@ public class TeamContext implements IObjectiveNotifier {
     }
 
     public void PlayBattleSound() {
-        // ServerLevel serverLevel = server.getLevel(Level.OVERWORLD);
-        // SoundHandler.playSoundFromPosition(serverLevel, spawn, hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
+        ServerLevel serverLevel = server.getLevel(WorldManager.GAME_DIMENSION);
+        SoundHandler.playSoundFromPosition(serverLevel, spawn, hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
     }
 
     public void TeleportToSpawn() {
