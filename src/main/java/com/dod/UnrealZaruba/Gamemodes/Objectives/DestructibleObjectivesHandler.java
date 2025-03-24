@@ -15,26 +15,29 @@ import net.minecraftforge.fml.common.Mod;
 public class DestructibleObjectivesHandler extends ObjectivesHandler {
     private final List<DestructibleObjective> objectives = new ArrayList<>();
     
-    private static DestructibleObjectivesHandler instance;
-    
+
     public DestructibleObjectivesHandler() {
-        instance = this;
     }
+
 
     public void add(DestructibleObjective objective) {
         objectives.add(objective);
     }
 
 
-    public void updateObjectives() {
+    public void onServerTick() {
         for (DestructibleObjective objective : objectives) {
             objective.Update();
+        }
+
+        if (objectives.stream().allMatch(DestructibleObjective::IsCompleted)) {
+            onCompleted.run();
         }
     }
 
 
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (instance == null || !(event.player instanceof ServerPlayer player)) return;
+        if (!(event.player instanceof ServerPlayer player)) return;
         
         for (DestructibleObjective objective : objectives) {
             objective.onPlayerTick(event, player);

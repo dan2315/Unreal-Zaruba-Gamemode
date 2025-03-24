@@ -30,13 +30,12 @@ public class UnrealZaruba {
 
     private static HttpClientService httpClientService;
     private static GameStatisticsService GameStatisticsService;
-    private static WorldManager worldManager;
+    public static WorldManager worldManager;
 
     public UnrealZaruba() {
 
         httpClientService = new HttpClientService();
         GameStatisticsService = new GameStatisticsService(httpClientService);
-        worldManager = new WorldManager(GameStatisticsService);
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(ServerEvents.class);

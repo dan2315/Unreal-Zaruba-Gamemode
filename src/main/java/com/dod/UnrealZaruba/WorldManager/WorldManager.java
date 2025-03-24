@@ -1,14 +1,17 @@
 package com.dod.UnrealZaruba.WorldManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -16,8 +19,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.server.level.progress.LoggerChunkProgressListener;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.validation.ContentValidationException;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class WorldManager {
@@ -26,12 +34,33 @@ public class WorldManager {
     public static final ResourceKey<Level> LOBBY_DIMENSION = ResourceKey
             .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim"));
     
-    // Dimension Type - Could use the same type for all game dimensions
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
             .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
-    public WorldManager(GameStatisticsService leaderboardService) {
-        
+    public static ServerLevel serverLevel;
+
+    public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
+        // ServerShipWorldCore shipWorldCore = VSGameUtilsKt.getShipObjectWorld(server.overworld());
+        // LevelYRange yRange = new LevelYRange(server.overworld().getMinBuildHeight(), server.overworld().getMaxBuildHeight());
+        // shipWorldCore.addDimension(GAME_DIMENSION.location().toString(), yRange);
+
+        File file = new File("universe");
+        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+        LevelStorageSource.LevelStorageAccess access;
+        try {
+            // TODO: Manage how and why to use try with resource
+            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
+        } catch (IOException | ContentValidationException e) {
+            throw new RuntimeException(e);
+        }
+
+        LevelStem levelStem = new LevelStem(
+            server.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(DIMENSION_TYPE),
+            server.overworld().getChunkSource().getGenerator()
+        );
+        ChunkProgressListener progressListener = new LoggerChunkProgressListener(11);
+
+        serverLevel = new ServerLevel(server, Util.backgroundExecutor(), access, server.getWorldData().overworldData(), GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), true, null);
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {

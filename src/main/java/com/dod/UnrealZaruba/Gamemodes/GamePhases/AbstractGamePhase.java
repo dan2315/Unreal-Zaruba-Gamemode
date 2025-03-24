@@ -1,9 +1,9 @@
 package com.dod.UnrealZaruba.Gamemodes.GamePhases;
 
-public abstract class IGamePhase {
+public abstract class AbstractGamePhase {
     public PhaseId phaseId;
 
-    public IGamePhase(PhaseId phaseId) {
+    public AbstractGamePhase(PhaseId phaseId) {
         this.phaseId = phaseId;
     }
 

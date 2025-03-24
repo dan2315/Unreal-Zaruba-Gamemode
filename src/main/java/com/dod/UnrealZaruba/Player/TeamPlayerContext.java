@@ -1,6 +1,9 @@
 package com.dod.UnrealZaruba.Player;
 
+import java.util.UUID;
+
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import net.minecraft.world.level.GameType;
 
 public class TeamPlayerContext extends PlayerContext {
     private TeamContext team;
@@ -10,4 +13,11 @@ public class TeamPlayerContext extends PlayerContext {
     public void SetTeam(TeamContext team) { this.team = team; }
     public boolean TentChosen() { return tentChosen; }
     public void SelectTent(boolean tentChosen) { this.tentChosen = tentChosen; }
+
+    public static TeamPlayerContext Instantiate(UUID id, GameType gameType) {
+        TeamPlayerContext playerContext = new TeamPlayerContext();
+        playerContext.id = id;
+        playerContext.originalGameType = gameType;
+        return playerContext;
+    }
 }

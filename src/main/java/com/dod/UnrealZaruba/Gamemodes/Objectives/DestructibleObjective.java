@@ -82,16 +82,12 @@ public class DestructibleObjective extends PositionedGameobjective {
     public void Update() {
         updateCounter++;
         
-        // Only update objective state at the specified interval
         if (updateCounter % PROGRESS_UPDATE_INTERVAL == 0) {
-            updateObjectiveState();
+            UpdateObjectiveState();
         }
     }
     
-    /**
-     * Updates the objective's state (block tracking, progress, etc.)
-     */
-    private void updateObjectiveState() {
+    private void UpdateObjectiveState() {
         if (isCompleted) return; 
         if (trackedBlocks == null) return;
 
@@ -136,12 +132,10 @@ public class DestructibleObjective extends PositionedGameobjective {
     public void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player) {
         UUID playerId = player.getUUID();
         
-        // Initialize or increment the player's tick counter
         playerVisibilityTicks.putIfAbsent(playerId, 0);
         int ticks = playerVisibilityTicks.get(playerId) + 1;
         playerVisibilityTicks.put(playerId, ticks);
         
-        // Only update visibility at the specified interval
         if (ticks % VISIBILITY_UPDATE_INTERVAL == 0) {
             updateProgressDisplayForPlayer(player);
         }
@@ -150,16 +144,15 @@ public class DestructibleObjective extends PositionedGameobjective {
     public void Complete() {
         isCompleted = true;
 
-        // Notify all registered notifiers
         for (IObjectiveNotifier notifier : notificationRecipients) {
             notifier.onObjectiveCompleted(this);
         }
 
-        // Display completion message
         String border = "==================================";
         String paddedName = String.format("||           §b%s§r был уничтожен           ", name);
         String message = border + "\n" + paddedName + "\n" + border;
 
+        // TODO: Add to Notifier
         for (ServerPlayer player : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
             player.sendSystemMessage(Component.literal(message));
         }

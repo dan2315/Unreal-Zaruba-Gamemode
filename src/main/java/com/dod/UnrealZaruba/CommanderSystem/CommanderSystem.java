@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba.CommanderSystem;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GameStage;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 
@@ -35,7 +35,7 @@ public class CommanderSystem {
         TeamColor invokerTeamId = teamGamemode.GetTeamManager().GetPlayersTeam(invokerPlayer).Color();
         TeamColor targetTeamId = teamGamemode.GetTeamManager().GetPlayersTeam(targetPlayer).Color();
 
-        if (teamGamemode.gameStage != GameStage.CommanderVoting) { 
+        if (teamGamemode.GetCurrentPhase().GetPhaseId() != PhaseId.COMMANDER_VOTING) { 
             invokerPlayer.sendSystemMessage(Component.literal("Еще рано или уже поздно"));
             return;
         }

@@ -5,6 +5,12 @@ import java.util.List;
 public class ObjectivesHandler {
     List<GameObjective> objectives;
 
+    protected Runnable onCompleted;
+
+    public void OnObjectivesCompleted(Runnable onCompleted) {
+        this.onCompleted = onCompleted;
+    }
+
     public void addObjective(GameObjective objective) {
         objectives.add(objective);
     }
@@ -13,7 +19,7 @@ public class ObjectivesHandler {
         objectives.remove(objective);
     }
 
-    public void updateObjectives() {
+    public void onServerTick() {
         objectives.forEach(objective -> objective.Update());
     }
 }

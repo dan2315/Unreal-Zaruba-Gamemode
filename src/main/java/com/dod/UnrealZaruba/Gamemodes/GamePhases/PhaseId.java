@@ -3,11 +3,13 @@ package com.dod.UnrealZaruba.Gamemodes.GamePhases;
 
 public enum PhaseId {
     // Common game phases
+    TEAM_SELECTION("TeamSelection"),
+    GAME("Game"),
+
     PREPARATION("Preparation"),
     STRATEGY_TIME("StrategyTime"),
     BATTLE("Battle"),
     COMMANDER_VOTING("CommanderVoting"),
-    TEAM_SELECTION("TeamSelection"),
     GAME_OVER("GameOver"),
     
     // Add other specific phases as needed

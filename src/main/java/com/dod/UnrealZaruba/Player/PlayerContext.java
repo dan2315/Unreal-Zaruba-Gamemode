@@ -22,16 +22,16 @@ public class PlayerContext {
 
     public static HashMap<UUID, PlayerContext> playerContextMap = new HashMap<>();
     
-    private UUID id;
-    private GameType originalGameType;
-    private PlayerStatus status;
-    private int voteCount;
-    private boolean isVoted;
-    private boolean isDead;
+    protected UUID id;
+    protected GameType originalGameType;
+    protected PlayerStatus status;
+    protected int voteCount;
+    protected boolean isVoted;
+    protected boolean isDead;
 
     public boolean sosal;
 
-    private BaseGamemode gamemode;
+    protected BaseGamemode gamemode;
 
 
     public UUID UUID () {

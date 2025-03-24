@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GameTimer;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -22,6 +23,8 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 
 import static com.dod.UnrealZaruba.UnrealZaruba.*;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
+
 
 /**
  * Все сервер-side ивенты сюда епт
@@ -35,10 +38,11 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        gameTimer = new GameTimer(event.getServer());
-        gameTimer.resetScoreboard();
-        gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
-        GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
+       gameTimer = new GameTimer(event.getServer());
+       gameTimer.resetScoreboard();
+       gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
+       GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
+        UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, event.getServer());
     }
 
     @SubscribeEvent
@@ -54,7 +58,7 @@ public class ServerEvents {
 
         LOGGER.info("Server has stopped. Finalizing...");
         // TODO: DestructibleObjectivesHandler.Save();
-        // gamemode.Cleanup();
+        gamemode.Cleanup();
     }
 
     @SubscribeEvent
@@ -63,11 +67,12 @@ public class ServerEvents {
         if (!server.isDedicatedServer())
             return;
 
-        ServerPlayer player = (ServerPlayer) event.getEntity();
-        PlayerContext playerContext = PlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
-        playerContext.SetGamemode(gamemode);
 
-        gamemode.HandleConnectedPlayer(event.getEntity());
+       ServerPlayer player = (ServerPlayer) event.getEntity();
+       PlayerContext playerContext = TeamPlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
+       playerContext.SetGamemode(gamemode);
+
+       gamemode.HandleConnectedPlayer(event.getEntity());
     }
 
     @SubscribeEvent

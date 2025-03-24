@@ -1,7 +1,8 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.IGamePhase;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.AbstractGamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.IPhaseHolder;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.Utils.NBT;
@@ -21,66 +22,73 @@ import java.util.List;
 import java.util.Optional;
 
 
-public abstract class BaseGamemode {
+public abstract class BaseGamemode implements IPhaseHolder {
     protected static BaseGamemode currentGamemode;
     private static final int RESPAWN_DURATION_SECONDS = 10;
     protected ResourceKey<Level> lobbyDimension;
     protected ResourceKey<Level> gameDimension;
-    protected IGamePhase currentPhase;
-    protected List<IGamePhase> phases = new ArrayList<>();
+    protected AbstractGamePhase currentPhase;
+    protected List<AbstractGamePhase> phases = new ArrayList<>();
     protected int currentPhaseIndex = 0;
 
-    public GameStage gameStage = GameStage.Preparation;
+    public AbstractGamePhase GetCurrentPhase() {
+        return currentPhase;
+    }
 
     protected abstract void Initialize();
     public abstract void Cleanup();
 
     public abstract void HandleConnectedPlayer(Player player);
     public abstract void CheckObjectives();
-    public abstract int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException;
 
     public void SetCurrentGamemode(BaseGamemode gamemode) {
         currentGamemode = gamemode;
     }
 
-    protected BaseGamemode AddPhase(IGamePhase phase) {
+    public IPhaseHolder AddPhase(AbstractGamePhase phase) {
         phases.add(phase);
         return this;
     }
 
-    protected BaseGamemode ProceedToNextPhase() {
-        if (currentPhaseIndex < phases.size() - 1) {
-            currentPhaseIndex++;
-            currentPhase = phases.get(currentPhaseIndex);
-        }
-        return this;
+    public AbstractGamePhase Build() {
+        return null;
     }
 
-    protected BaseGamemode ProceedToNextPhase(PhaseId phaseId) {
+    public void BeginPhase(AbstractGamePhase phase) {
+        currentPhase = phase;
+        currentPhase.OnStart();
+    }
+
+    public void ProceedToNextPhase() {
+        if (currentPhaseIndex < phases.size() - 1) {
+            currentPhaseIndex++;
+            BeginPhase(phases.get(currentPhaseIndex));
+        }
+    }
+
+    public void ProceedToNextPhase(PhaseId phaseId) {
         if (currentPhaseIndex < phases.size() - 1) {
             currentPhaseIndex++;
             var nextPhase = phases.get(currentPhaseIndex);
             if (nextPhase.GetPhaseId() == phaseId) {
-                currentPhase = nextPhase;
+                BeginPhase(nextPhase);
             } else {
                 throw new RuntimeException("Expected phase " + phaseId + " but got " + nextPhase.GetPhaseId());
             }
         }
-        return this;
     }
     
-    protected BaseGamemode ProceedToPhaseForced(PhaseId phaseId) {
+    public void ProceedToPhaseForced(PhaseId phaseId) {
         for (int i = 0; i < phases.size(); i++) {
             if (phases.get(i).GetPhaseId() == phaseId) {
                 currentPhaseIndex = i;
-                currentPhase = phases.get(i);
-                return this;
+                BeginPhase(phases.get(i));
             }
         }
-        return this;
     }
     
-    protected Optional<IGamePhase> GetPhaseById(PhaseId phaseId) {
+    
+    public Optional<AbstractGamePhase> GetPhaseById(PhaseId phaseId) {
         return phases.stream()
                 .filter(phase -> phase.GetPhaseId() == phaseId)
                 .findFirst();
@@ -91,8 +99,14 @@ public abstract class BaseGamemode {
     }
 
     public void StartGame() {
-
+        ProceedToNextPhase(PhaseId.BATTLE);
     }
+
+    public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        StartGame();
+        return 1;
+    }
+    
     public abstract void onServerTick(TickEvent.ServerTickEvent event);
     public abstract void onPlayerTick(TickEvent.PlayerTickEvent event);
 

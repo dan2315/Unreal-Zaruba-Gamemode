@@ -3,7 +3,7 @@ package com.dod.UnrealZaruba.Gamemodes.GamePhases;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import java.util.function.Consumer;
 
-public class TimedGamePhase extends IGamePhase {
+public class TimedGamePhase extends AbstractGamePhase {
     public int duration; // milliseconds
     public Runnable onStart;
     public Runnable onCompleted;
