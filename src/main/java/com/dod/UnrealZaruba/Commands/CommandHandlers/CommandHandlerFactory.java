@@ -20,6 +20,7 @@ public class CommandHandlerFactory {
         // handlers.add(new SetTeamBaseCommand());
         handlers.add(new StartBattleCommand());
         handlers.add(new CreateObjectiveCommand());
+        handlers.add(new ResetGameWorldCommand());
         
         return handlers;
     }

@@ -32,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.SustainedPlayerCountCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
     private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
@@ -188,8 +189,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
         serverPlayer.setGameMode(GameType.CREATIVE);
-        serverPlayer.teleportTo(server.getLevel(WorldManager.GAME_DIMENSION), 0, 0, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
-        // TODO: There is no server level in levels list
+        serverPlayer.teleportTo(server.getLevel(WorldManager.GAME_DIMENSION), 0, 16, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
@@ -228,6 +228,18 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             } else {
                 TitleMessage.showTitle(player, titleText, loseText);
             }
+        }
+    }
+
+    public void preventLevelSaving(MinecraftServer server) {
+        for (ServerLevel level : server.getAllLevels()) {
+            level.noSave = true;
+        }
+    }
+
+    public void preventLevelSaving(ServerLevel level) {
+        if (level != null) {
+            level.noSave = true;
         }
     }
 }

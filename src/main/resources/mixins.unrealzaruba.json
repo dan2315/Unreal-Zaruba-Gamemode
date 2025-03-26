@@ -11,7 +11,8 @@
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
     "ItemStackMixin",
-    "RedstoneLinkBlockMixin"
+    "RedstoneLinkBlockMixin",
+    "MinecraftServerMixin"
   ],
   "client": [],
   "injectors": {

@@ -22,6 +22,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.server.level.ServerLevel;
 
 public class TeamManager {
 
@@ -240,6 +241,18 @@ public class TeamManager {
         } catch (IOException e) {
             UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
             return null;
+        }
+    }
+
+    public void disableLevelSaving(ServerLevel level) {
+        if (level != null) {
+            level.noSave = true;
+        }
+    }
+
+    public void enableLevelSaving(ServerLevel level) {
+        if (level != null) {
+            level.noSave = false;
         }
     }
 }

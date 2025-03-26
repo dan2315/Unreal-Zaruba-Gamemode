@@ -10,9 +10,13 @@ import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
+import com.dod.UnrealZaruba.WorldManager.ChunkGenerator.VoidChunkGenerator;
+import com.dod.UnrealZaruba.api.IMinecraftServerExtended;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,9 +26,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.LoggerChunkProgressListener;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPresets;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -38,35 +48,58 @@ public class WorldManager {
             .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
 
     public static ServerLevel serverLevel;
+    public static MinecraftServer server;
+    public static LevelStorageSource.LevelStorageAccess access; 
+    public static ChunkProgressListener progressListener;
+    public static LevelStem levelStem;
+    public static ServerLevelData serverLevelData;
 
     public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
+        WorldManager.server = server;
         // ServerShipWorldCore shipWorldCore = VSGameUtilsKt.getShipObjectWorld(server.overworld());
         // LevelYRange yRange = new LevelYRange(server.overworld().getMinBuildHeight(), server.overworld().getMaxBuildHeight());
         // shipWorldCore.addDimension(GAME_DIMENSION.location().toString(), yRange);
-
-        File file = new File("universe");
-        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
-        LevelStorageSource.LevelStorageAccess access;
-        try {
-            // TODO: Manage how and why to use try with resource
-            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
-        } catch (IOException | ContentValidationException e) {
-            throw new RuntimeException(e);
-        }
-
-        LevelStem levelStem = new LevelStem(
-            server.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(DIMENSION_TYPE),
-            server.overworld().getChunkSource().getGenerator()
-        );
-        ChunkProgressListener progressListener = new LoggerChunkProgressListener(11);
-
-        serverLevel = new ServerLevel(server, Util.backgroundExecutor(), access, server.getWorldData().overworldData(), GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), true, null);
+        ResetGameWorld();
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
         return Pair.of(GAME_DIMENSION, LOBBY_DIMENSION);
     }
 
+    public static void ResetGameWorld() {
+        File file = new File("universe");
+        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+        try {
+            if (access != null) {
+                access.close();
+            }
+            // TODO: Manage how and why to use try with resource
+            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
+        } catch (IOException | ContentValidationException e) {
+            throw new RuntimeException(e);
+        }
+
+        Registry<FlatLevelGeneratorPreset> presetRegistry = server.registryAccess().registryOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET);
+        FlatLevelGeneratorPreset voidPreset = presetRegistry.get(FlatLevelGeneratorPresets.THE_VOID);
+        FlatLevelGeneratorSettings voidSettings = voidPreset.settings();
+        ChunkGenerator chunkGenerator = new FlatLevelSource(voidSettings);
+
+        levelStem = new LevelStem(
+                server.registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(DIMENSION_TYPE),
+                chunkGenerator
+        );
+
+        progressListener = new LoggerChunkProgressListener(11);
+        serverLevelData = server.getWorldData().overworldData();
+
+        ((IMinecraftServerExtended) server).deleteLevel(GAME_DIMENSION);
+
+        
+        serverLevel = new ServerLevel(server, Util.backgroundExecutor(), access, serverLevelData, GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), false, null);
+        serverLevel.noSave = true;
+        ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, serverLevel);
+        server.markWorldsDirty();
+    }
 
     public static void teleportPlayerToDimension(ServerPlayer player, ResourceKey<Level> dimensionKey) {
         MinecraftServer server = player.getServer();
