@@ -3,8 +3,7 @@ package com.dod.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer;
+import com.dod.UnrealZaruba.Utils.Gamerules; // It needs to be imported
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.CreativeTabs;
@@ -40,6 +39,7 @@ public class UnrealZaruba {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(ServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ClientEvents.class);
+        MinecraftForge.EVENT_BUS.register(new NetworkHandler());
 
         TeamColorArgument.RegisterArgument();
         ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -53,3 +53,7 @@ public class UnrealZaruba {
         NetworkHandler.init();
     }
 }
+
+// TODO: 
+// Reset teams on game restart
+// Reset destructible objectives on game restart

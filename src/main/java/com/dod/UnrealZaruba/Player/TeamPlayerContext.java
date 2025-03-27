@@ -15,9 +15,13 @@ public class TeamPlayerContext extends PlayerContext {
     public void SelectTent(boolean tentChosen) { this.tentChosen = tentChosen; }
 
     public static TeamPlayerContext Instantiate(UUID id, GameType gameType) {
+        if (playerContextMap.containsKey(id)) return (TeamPlayerContext) playerContextMap.get(id);
+
         TeamPlayerContext playerContext = new TeamPlayerContext();
         playerContext.id = id;
         playerContext.originalGameType = gameType;
+
+        playerContextMap.put(id, playerContext);
         return playerContext;
     }
 }

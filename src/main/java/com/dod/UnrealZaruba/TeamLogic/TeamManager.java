@@ -218,6 +218,12 @@ public class TeamManager {
         serverPlayer.teleportTo(x, y, z);
     }
 
+    public void Reset() {
+        for (TeamContext team : teams.values()) {
+            team.Reset();
+        }
+    }
+
     public void Save() {
         TeamData data = new TeamData(); 
         data.teamSpawns = new HashMap<>();

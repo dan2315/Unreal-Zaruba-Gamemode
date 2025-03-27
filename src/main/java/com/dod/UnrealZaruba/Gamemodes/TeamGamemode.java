@@ -2,6 +2,7 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
@@ -12,6 +13,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 import java.util.HashMap;
 
@@ -55,8 +57,9 @@ public class TeamGamemode extends BaseGamemode {
     }
     
     @Override
-    public void HandleDeath(ServerPlayer player) {
-        super.HandleDeath(player);
+    public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
+        super.HandleDeath(player, event);
+        NetworkHandler.Screens.openDeathScreen(player, TeamManager.GetPlayersTeam(player).Tent() != null);
     }
 
     @Override

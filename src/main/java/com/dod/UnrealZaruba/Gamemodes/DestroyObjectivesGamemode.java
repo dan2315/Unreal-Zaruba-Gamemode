@@ -19,7 +19,7 @@ import com.dod.UnrealZaruba.Utils.NBT;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.GamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.TimedGamePhase;
-
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.EnoughPlayersCondition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.TickEvent;
@@ -35,12 +35,13 @@ import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
-    private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+    // private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+    private static final int GAME_DURATION_MS = 20 * 1000; // 10 minutes
     private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 10 seconds
     
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
-    private GameStatisticsService leaderboardService;
+    private GameStatisticsService gameStatistics;
     private GameTimer gameTimer;
     private MinecraftServer server;
 
@@ -48,7 +49,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     private StartCondition startCondition;
 
     public DestroyObjectivesGamemode(MinecraftServer server, GameStatisticsService leaderboardService, GameTimer gameTimer) {
-        this.leaderboardService = leaderboardService;
+        this.gameStatistics = leaderboardService;
         this.gameTimer = gameTimer;
         currentGamemode = this;
         this.server = server;
@@ -98,15 +99,19 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 GAME_DURATION_MS,
                 this::StartBattle,
                 this::UpdateBattle,
-                () -> {
+                () -> { // On phase end
                     CompleteGame(server, TeamColor.BLUE);
                 }
             )
         );
 
         ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
-        startCondition = new SustainedPlayerCountCondition(TeamManager, 5, 10); // 5 players in each team for 10 sec
-        startCondition.SetOnConditionMet(this::StartGame);
+
+        // startCondition = new SustainedPlayerCountCondition(TeamManager, 1, 10); // 5 players in each team for 10 sec
+        startCondition = new EnoughPlayersCondition(1);
+        startCondition.SetOnConditionMet(() -> {
+            ProceedToPhaseForced(PhaseId.BATTLE);
+        });
 
         objectivesHandler.OnObjectivesCompleted(() -> {
             CompleteGame(server, TeamColor.RED);
@@ -176,11 +181,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             TeleportToLobby(serverPlayer, server);
             return;
         }
-        if (!isInTeam) {
+        if (GetCurrentPhaseId() == PhaseId.BATTLE && !isInTeam) {
             MakePlayerSpectator(serverPlayer, server);
             return;
         }
-        if (isDead == 1) {
+        if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
             ReturnToTeamSpawn(serverPlayer);
         }
     }
@@ -188,7 +193,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     // TODO: All methods below is like more util
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
-        serverPlayer.setGameMode(GameType.CREATIVE);
         serverPlayer.teleportTo(server.getLevel(WorldManager.GAME_DIMENSION), 0, 16, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
     }
 
@@ -205,12 +209,14 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
+        if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
         scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS);
-        leaderboardService.UpdatePlayerRanking(TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
-        // TODO: WorldManager.ReloadMap(server);
+        WorldManager.TeleportAllPlayersToLobby(server);
+        startCondition.ResetCondition();
+        WorldManager.ResetGameWorld();
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {

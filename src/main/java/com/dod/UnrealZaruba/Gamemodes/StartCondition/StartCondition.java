@@ -1,16 +1,20 @@
 package com.dod.UnrealZaruba.Gamemodes.StartCondition;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
 public abstract class StartCondition {
-    private Runnable onConditionMet;
+    protected Runnable onConditionMet;
+    protected boolean conditionMet = false;
 
     public void SetOnConditionMet(Runnable onConditionMet) {
         this.onConditionMet = onConditionMet;
     }   
 
-    public abstract boolean isMet();
+    // It's responsible for both returning if the condition is met and setting the conditionMet flag
+    public abstract boolean isMet(); 
+
+    public abstract void ResetCondition();
 
     public void Update() {
+        if (conditionMet) return;
         if (isMet()) {
             onConditionMet.run();
         }

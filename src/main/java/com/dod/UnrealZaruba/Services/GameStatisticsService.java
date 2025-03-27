@@ -24,7 +24,7 @@ public class GameStatisticsService {
         this.httpClientService = httpClientService;
     }
 
-    public void UpdatePlayerRanking(List<UUID> playersWhoWon, List<UUID> playersWhoLost) {
+    public void SendGameData(String gamemodeName, List<UUID> playersWhoWon, List<UUID> playersWhoLost) {
         executor.submit(() -> {
             try {
                 HttpClient client = httpClientService.get();

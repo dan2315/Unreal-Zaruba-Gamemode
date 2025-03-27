@@ -11,6 +11,7 @@ import java.util.HashSet;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -45,7 +46,7 @@ public class DestructibleObjective extends PositionedGameobjective {
         super(volume.GetCenter());
         this.volume = volume;
         this.name = name;
-        this.world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
+        this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
         this.progressDisplay = new ProgressbarForObjective(this, name);
     }

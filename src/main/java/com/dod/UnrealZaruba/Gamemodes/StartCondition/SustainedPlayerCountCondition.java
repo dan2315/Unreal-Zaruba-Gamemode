@@ -18,8 +18,6 @@ public class SustainedPlayerCountCondition extends StartCondition {
     private final int requiredPlayersPerTeam;
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;
-    private boolean conditionMet = false;
-    private Runnable onConditionMet;
     private final TeamManager teamManager;
     private final HashMap<TeamColor, Boolean> teamReadyStatus = new HashMap<>();
 
@@ -32,6 +30,13 @@ public class SustainedPlayerCountCondition extends StartCondition {
     @Override
     public boolean isMet() {
         return conditionMet;
+    }
+
+    @Override
+    public void ResetCondition() {
+        sustainedTicks = 0;
+        conditionMet = false;
+        teamReadyStatus.clear();
     }
 
     @Override

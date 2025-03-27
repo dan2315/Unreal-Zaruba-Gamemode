@@ -1,11 +1,12 @@
 package com.dod.UnrealZaruba.NetworkPackets;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import java.util.HashMap;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.PacketDistributor;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -14,6 +15,14 @@ public class NetworkHandler {
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);
+
+    public static final ResourceLocation VELOCITY_CHANNEL_LOCATION = new ResourceLocation("velocity", "main");
+    public static final SimpleChannel VELOCITY_CHANNEL = NetworkRegistry.newSimpleChannel(
+        VELOCITY_CHANNEL_LOCATION,
+        () -> PROTOCOL_VERSION,
+        PROTOCOL_VERSION::equals,
+        PROTOCOL_VERSION::equals
+    );
 
     private static int packetId = 0;
 
@@ -40,6 +49,16 @@ public class NetworkHandler {
                 SelectTentPacket::decode,
                 SelectTentPacket::handle);
 
-        MinecraftForge.EVENT_BUS.register(new NetworkHandler());
+    }
+
+    public class Screens {
+        public static void openDeathScreen(ServerPlayer player, boolean tentExist) {
+            NetworkHandler.CHANNEL.send(
+                PacketDistributor.PLAYER.with(() -> player),
+                new OpenScreenPacket(2, new HashMap<String, Object>() {{
+                    put("tentExist", tentExist);
+                }})
+            );
+        }
     }
 }

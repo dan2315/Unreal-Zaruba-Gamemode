@@ -50,6 +50,10 @@ public class TeamBlock extends Block {
                     UnrealZaruba.LOGGER.warn("No team manager found in gamemode");
                     return;
                 }
+
+                if (teamManager.IsInTeam(player)) {
+                    return;
+                }
                 
                 UnrealZaruba.LOGGER.info("Assigning player " + player.getName().getString() + " to team " + teamColor);
                 teamManager.AssignToTeam(teamColor, player);

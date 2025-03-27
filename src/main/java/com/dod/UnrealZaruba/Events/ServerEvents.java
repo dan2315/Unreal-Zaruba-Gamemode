@@ -38,11 +38,11 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-       gameTimer = new GameTimer(event.getServer());
-       gameTimer.resetScoreboard();
-       gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
-       GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
+        gameTimer = new GameTimer(event.getServer());
+        gameTimer.resetScoreboard();
         UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, event.getServer());
+        gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
+        GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
     }
 
     @SubscribeEvent
@@ -78,14 +78,15 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
+
             return;
         }
-
+        
         BaseGamemode gamemode = GamemodeManager.Get(WorldManager.GAME_DIMENSION);
         if (gamemode == null) {
             return;
         }
 
-        gamemode.HandleDeath(serverPlayer);
+        gamemode.HandleDeath(serverPlayer, event);
     }
 }

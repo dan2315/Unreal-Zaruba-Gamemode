@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjectiveNotifier;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -159,14 +160,13 @@ public class TeamContext implements IObjectiveNotifier {
 
     public void Assign(ServerPlayer player) {
         UnrealZaruba.LOGGER.info("Assigning player to team: ");
-        UnrealZaruba.LOGGER.info("Player: " + player.getName().getString());
-        UnrealZaruba.LOGGER.info("Server: " + player.getServer());
         Scoreboard scoreboard = player.getServer().getScoreboard();
 
         if (spawn == null) {
             player.sendSystemMessage(Component.literal("Скажи Доду, что он забыл спавн поставить))"));
         } else {
             members.add(player.getUUID());
+            ((TeamPlayerContext) PlayerContext.Get(player.getUUID())).SetTeam(this);
             scoreboard.addPlayerToTeam(player.getName().getString(), minecraftTeam);
 
             player.displayClientMessage(
@@ -241,5 +241,12 @@ public class TeamContext implements IObjectiveNotifier {
         
         String message = objectiveCompletedMessageGenerator.apply(objective);
         SendMessage(server, message);
+    }
+    public void Reset() {
+        members.clear();
+        active_tent = null;
+        spawn = null;
+        commander = null;
+        commanderName = null;
     }
 }

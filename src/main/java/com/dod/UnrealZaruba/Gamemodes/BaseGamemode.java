@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.AbstractGamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
+import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.IPhaseHolder;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
@@ -9,6 +11,7 @@ import com.dod.UnrealZaruba.Utils.NBT;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.dod.UnrealZaruba.UnrealZaruba;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +23,9 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.network.PacketDistributor;
+import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
 
 public abstract class BaseGamemode implements IPhaseHolder {
     protected static BaseGamemode currentGamemode;
@@ -55,14 +60,16 @@ public abstract class BaseGamemode implements IPhaseHolder {
     }
 
     public void BeginPhase(AbstractGamePhase phase) {
+        UnrealZaruba.LOGGER.info("Beginning phase " + phase.GetPhaseId());
         currentPhase = phase;
         currentPhase.OnStart();
     }
 
     public void ProceedToNextPhase() {
-        if (currentPhaseIndex < phases.size() - 1) {
+        if (currentPhaseIndex < phases.size() - 1) { 
             currentPhaseIndex++;
-            BeginPhase(phases.get(currentPhaseIndex));
+            int loopedIndex = currentPhaseIndex % phases.size();
+            BeginPhase(phases.get(loopedIndex));
         }
     }
 
@@ -83,6 +90,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
             if (phases.get(i).GetPhaseId() == phaseId) {
                 currentPhaseIndex = i;
                 BeginPhase(phases.get(i));
+                return;
             }
         }
     }
@@ -116,10 +124,15 @@ public abstract class BaseGamemode implements IPhaseHolder {
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
     
-    public void HandleDeath(ServerPlayer player) {                    
+    public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {                    
         player.setGameMode(GameType.SPECTATOR);
+
+        player.setHealth(20);
+        event.setCanceled(true);
+
         NBT.addEntityTag(player, "isPlayerDead", 1);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
+                
         startRespawnTimer(player);
     }
     
@@ -138,9 +151,9 @@ public abstract class BaseGamemode implements IPhaseHolder {
         
         int remainingSeconds = RESPAWN_DURATION_SECONDS - (ticks / 20);
         
-        // TODO: NetworkHandler.CHANNEL.send(
-        //     PacketDistributor.PLAYER.with(() -> player), 
-        //     new UpdateDeathTimerPacket(remainingSeconds)
-        // );
+        NetworkHandler.CHANNEL.send(
+            PacketDistributor.PLAYER.with(() -> player), 
+            new UpdateDeathTimerPacket(remainingSeconds)
+        );
     }
 }
