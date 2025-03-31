@@ -3,9 +3,10 @@ package com.dod.UnrealZaruba.Player;
 import java.util.UUID;
 
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.UnrealZaruba.Utils.IResettable;
 import net.minecraft.world.level.GameType;
 
-public class TeamPlayerContext extends PlayerContext {
+public class TeamPlayerContext extends PlayerContext implements IResettable {
     private TeamContext team;
     private boolean tentChosen;
 
@@ -23,5 +24,11 @@ public class TeamPlayerContext extends PlayerContext {
 
         playerContextMap.put(id, playerContext);
         return playerContext;
+    }
+
+    @Override
+    public void reset() {
+        team = null;
+        tentChosen = false;
     }
 }

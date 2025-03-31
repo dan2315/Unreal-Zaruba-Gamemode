@@ -10,9 +10,8 @@
     "LecternControllerBlockEntityMixin",
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
-    "ItemStackMixin",
-    "RedstoneLinkBlockMixin",
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "RedstoneLinkBlockMixin"
   ],
   "client": [],
   "injectors": {

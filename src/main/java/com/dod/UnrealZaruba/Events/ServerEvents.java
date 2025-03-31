@@ -38,16 +38,22 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        gameTimer = new GameTimer(event.getServer());
+        MinecraftServer server = event.getServer();
+        if (!server.isDedicatedServer()) return;
+
+        gameTimer = new GameTimer(server);
         gameTimer.resetScoreboard();
-        UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, event.getServer());
+        UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, server);
         gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
         GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.ServerTickEvent.Phase.START) {
+        MinecraftServer server = event.getServer();
+        if (!server.isDedicatedServer()) return;
+
+        if (event.phase.equals(TickEvent.Phase.START)) {
             gamemode.onServerTick(event);
             TimerManager.updateAll();
         }
@@ -55,6 +61,8 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
+        MinecraftServer server = event.getServer();
+        if (!server.isDedicatedServer()) return;
 
         LOGGER.info("Server has stopped. Finalizing...");
         // TODO: DestructibleObjectivesHandler.Save();
@@ -64,10 +72,8 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (!server.isDedicatedServer())
-            return;
-
-
+        if (!server.isDedicatedServer()) return;
+            
        ServerPlayer player = (ServerPlayer) event.getEntity();
        PlayerContext playerContext = TeamPlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
        playerContext.SetGamemode(gamemode);
@@ -77,6 +83,9 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (!server.isDedicatedServer()) return;
+
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) {
 
             return;

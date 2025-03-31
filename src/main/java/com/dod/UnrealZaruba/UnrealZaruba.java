@@ -36,7 +36,6 @@ public class UnrealZaruba {
         httpClientService = new HttpClientService();
         GameStatisticsService = new GameStatisticsService(httpClientService);
 
-        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(ServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ClientEvents.class);
         MinecraftForge.EVENT_BUS.register(new NetworkHandler());

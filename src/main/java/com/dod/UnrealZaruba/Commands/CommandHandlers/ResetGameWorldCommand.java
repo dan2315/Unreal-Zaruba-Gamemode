@@ -13,7 +13,7 @@ public class ResetGameWorldCommand implements ICommandHandler {
         dispatcher.register(Commands.literal("resetgameworld")
                 .requires(source -> source.hasPermission(4))
                 .executes(context -> {
-                    WorldManager.ResetGameWorld();
+                    WorldManager.ResetGameWorldDelayed();
                     context.getSource().sendSuccess(() -> 
                         Component.literal("Game world has been reset successfully!"), true);
                     return 1;

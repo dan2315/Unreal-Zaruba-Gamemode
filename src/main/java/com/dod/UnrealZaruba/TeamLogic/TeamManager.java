@@ -12,6 +12,7 @@ import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -23,8 +24,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.server.level.ServerLevel;
+import com.dod.UnrealZaruba.Utils.IResettable;
 
-public class TeamManager {
+public class TeamManager implements IResettable {
 
     HashMap<TeamColor, TeamContext> teams = new HashMap<>();
 
@@ -201,7 +203,7 @@ public class TeamManager {
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
-        serverPlayer.teleportTo(x, y ,z);
+        serverPlayer.teleportTo(WorldManager.gameLevel, x, y, z, 0, 0);
     }
 
     public void teleportToTent(ServerPlayer serverPlayer) {
@@ -215,12 +217,13 @@ public class TeamManager {
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
-        serverPlayer.teleportTo(x, y, z);
+        serverPlayer.teleportTo(WorldManager.gameLevel, x, y, z, 0, 0);
     }
 
-    public void Reset() {
+    @Override
+    public void reset() {
         for (TeamContext team : teams.values()) {
-            team.Reset();
+            team.reset();
         }
     }
 

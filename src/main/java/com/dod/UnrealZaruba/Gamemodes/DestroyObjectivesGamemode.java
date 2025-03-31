@@ -16,6 +16,7 @@ import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Utils.NBT;
+import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.GamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.TimedGamePhase;
@@ -193,7 +194,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     // TODO: All methods below is like more util
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
-        serverPlayer.teleportTo(server.getLevel(WorldManager.GAME_DIMENSION), 0, 16, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+        serverPlayer.teleportTo(server.getLevel(WorldManager.LOBBY_DIMENSION), 0, 16, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
@@ -210,13 +211,16 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
         if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
-        scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS);
+        TimerManager.createRealTimeTimer(10 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);
+        // scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS); // Vot tak ne delat'
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
         WorldManager.TeleportAllPlayersToLobby(server);
+        WorldManager.ResetGameWorldDelayed();
         startCondition.ResetCondition();
-        WorldManager.ResetGameWorld();
+        objectivesHandler.reset();
+        TeamManager.reset();
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {

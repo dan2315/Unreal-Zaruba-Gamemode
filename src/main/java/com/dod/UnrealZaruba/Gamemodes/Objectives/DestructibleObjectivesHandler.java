@@ -6,13 +6,15 @@ import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.Utils.IResettable;
+
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class DestructibleObjectivesHandler extends ObjectivesHandler {
+public class DestructibleObjectivesHandler extends ObjectivesHandler implements IResettable {
     private final List<DestructibleObjective> objectives = new ArrayList<>();
     
 
@@ -34,6 +36,14 @@ public class DestructibleObjectivesHandler extends ObjectivesHandler {
             onCompleted.run();
         }
     }
+
+    @Override
+    public void reset() {
+        for (DestructibleObjective objective : objectives) {
+            objective.reset();
+        }
+    }
+
 
 
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {

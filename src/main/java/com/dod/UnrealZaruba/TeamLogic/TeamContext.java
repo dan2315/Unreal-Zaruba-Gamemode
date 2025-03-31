@@ -10,6 +10,7 @@ import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
+import com.dod.UnrealZaruba.Utils.IResettable;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;  
@@ -34,7 +35,7 @@ import net.minecraft.sounds.SoundEvent;
 /**
  * Team core data.
  */
-public class TeamContext implements IObjectiveNotifier {
+public class TeamContext implements IObjectiveNotifier, IResettable {
     private final TeamManager batya;
     private final ResourceLocation tentTemplate;
     private final SoundEvent hornSound;
@@ -242,10 +243,16 @@ public class TeamContext implements IObjectiveNotifier {
         String message = objectiveCompletedMessageGenerator.apply(objective);
         SendMessage(server, message);
     }
-    public void Reset() {
+
+    @Override
+    public void reset() {
+        for (UUID playerId : members) {
+            ((TeamPlayerContext) PlayerContext.Get(playerId)).reset();
+        }
+        server.getScoreboard().removePlayerTeam(minecraftTeam); // I hope that would work
+        SetupMinecraftTeam(server);
         members.clear();
         active_tent = null;
-        spawn = null;
         commander = null;
         commanderName = null;
     }

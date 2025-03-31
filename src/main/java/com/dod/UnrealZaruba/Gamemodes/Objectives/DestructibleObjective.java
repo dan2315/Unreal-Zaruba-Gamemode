@@ -12,7 +12,7 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
-
+import com.dod.UnrealZaruba.Utils.IResettable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +23,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class DestructibleObjective extends PositionedGameobjective {
+public class DestructibleObjective extends PositionedGameobjective implements IResettable {
     private static final int PROGRESS_UPDATE_INTERVAL = 40;
     private static final int VISIBILITY_UPDATE_INTERVAL = 40;
     private static final int NOTIFY_BLOCK_THRESHOLD = 10;
@@ -174,23 +174,23 @@ public class DestructibleObjective extends PositionedGameobjective {
         return ((float) (remainingBlockAmount)) / blockAmount;
     }
 
-    /**
-     * Updates the visibility of this objective's progress display for a player
-     */
     private void updateProgressDisplayForPlayer(ServerPlayer player) {
         if (progressDisplay != null) {
             progressDisplay.updatePlayerVisibility(player);
         }
     }
 
-    /**
-     * Sets the activation distance for the progress display
-     * 
-     * @param distance The squared distance at which the display becomes visible
-     */
+
     public void setProgressBarActivationDistance(float distance) {
         if (progressDisplay != null) {
             progressDisplay.setActivationDistance(distance);
         }
+    }
+
+
+    @Override
+    public void reset() {
+        isCompleted = false;
+        trackedBlocks = InitializeTrackedBlocks(volume);
     }
 }

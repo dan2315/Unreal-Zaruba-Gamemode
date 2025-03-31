@@ -2,6 +2,7 @@ package com.dod.UnrealZaruba.WorldManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
@@ -30,7 +31,13 @@ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
+import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import org.apache.commons.lang3.tuple.Pair;
+import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.apigame.VSCore;
+import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.core.impl.game.ships.ShipObjectServerWorld;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class WorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
@@ -50,10 +57,10 @@ public class WorldManager {
 
     public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
         WorldManager.server = server;
-        // ServerShipWorldCore shipWorldCore = VSGameUtilsKt.getShipObjectWorld(server.overworld());
-        // LevelYRange yRange = new LevelYRange(server.overworld().getMinBuildHeight(), server.overworld().getMaxBuildHeight());
-        // shipWorldCore.addDimension(GAME_DIMENSION.location().toString(), yRange);
+        prepareWorldStorage();
         ResetGameWorld();
+
+        ShipObjectServerWorld shipObjectServerWorld;
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
@@ -61,6 +68,24 @@ public class WorldManager {
     }
 
     public static void ResetGameWorld() {
+        deleteGameWorld();
+        createGameWorld();
+    }
+    
+    public static void ResetGameWorldDelayed() {
+        TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
+            UnrealZaruba.LOGGER.info("Deleting ships in game world");
+            clearShipsInDimension(gameLevel);
+            UnrealZaruba.LOGGER.info("Deleting game world");
+            deleteGameWorld();
+            TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
+                UnrealZaruba.LOGGER.info("Creating game world");
+                createGameWorld();
+            }, null);
+        }, null);
+    }
+
+    private static void prepareWorldStorage() {
         File file = new File("universe");
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
         try {
@@ -85,14 +110,36 @@ public class WorldManager {
 
         progressListener = new LoggerChunkProgressListener(11);
         serverLevelData = server.getWorldData().overworldData();
+    }
 
+    public static void deleteGameWorld() {
         ((IMinecraftServerExtended) server).deleteLevel(GAME_DIMENSION);
+        gameLevel = null;
+    }
 
-        
+    public static void createGameWorld() {
+        File file = new File("universe");
+        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+        try {
+            if (access != null) {
+                access.close();
+            }
+            // TODO: Manage how and why to use try with resource
+            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
+        } catch (IOException | ContentValidationException e) {
+            throw new RuntimeException(e);
+        }
         gameLevel = new ServerLevel(server, Util.backgroundExecutor(), access, serverLevelData, GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), false, null);
         gameLevel.noSave = true;
         ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, gameLevel);
         server.markWorldsDirty();
+    }
+
+    public static void clearShipsInDimension(ServerLevel level) {
+        VSCore vsCore = VSGameUtilsKt.getVsCore();
+        ServerShipWorldCore shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+        List<ServerShip> ships = new ArrayList<>(shipWorld.getAllShips());
+        vsCore.deleteShips(shipWorld, ships);
     }
 
     public static void TeleportAllPlayersToLobby(MinecraftServer server) {
