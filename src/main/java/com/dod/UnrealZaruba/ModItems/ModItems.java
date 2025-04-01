@@ -38,6 +38,8 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.TENT_MAIN_BLOCK_BLUE.get(), new Item.Properties()));
     public static final RegistryObject<Item> TENT_MAIN_BLOCK_RED_ITEM = ModItems.ITEMS.register("tent_main_block_red",
             () -> new BlockItem(ModBlocks.TENT_MAIN_BLOCK_RED.get(), new Item.Properties()));
+    public static final RegistryObject<Item> VEHICLE_PURCHASE_BLOCK_ITEM = ModItems.ITEMS.register("vehicle_purchase_block",
+            () -> new BlockItem(ModBlocks.VEHICLE_PURCHASE_BLOCK.get(), new Item.Properties()));
 
 
     public static void register(IEventBus eventBus) {

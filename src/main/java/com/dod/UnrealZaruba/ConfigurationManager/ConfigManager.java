@@ -1,55 +1,92 @@
 package com.dod.UnrealZaruba.ConfigurationManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.dod.UnrealZaruba.Config.AbstractConfig;
+import com.dod.UnrealZaruba.Config.DestructibleObjectiveDeserializer;
+import com.dod.UnrealZaruba.Config.DestructibleObjectivesConfig;
+import com.dod.UnrealZaruba.Config.MainConfig;
+import com.dod.UnrealZaruba.Config.TeamsConfig;
+import com.dod.UnrealZaruba.Config.MainConfig.MainConfigData;
+import com.dod.UnrealZaruba.Config.MainConfig.Mode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class ConfigManager {
-    final static String UNREALZARUBA_MAP_DATA = "unrealzaruba";
-    public final static String Objectives = UNREALZARUBA_MAP_DATA + File.separator + "destructibleObjectives.json";
-    public final static String Teams = UNREALZARUBA_MAP_DATA + File.separator + "teams.json";
-
+    
+    private static final Map<Class<?>, AbstractConfig<?>> configInstances = new HashMap<>();
+    
     private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(DestructibleObjective.class, new DObjectiveDeserializer()).setPrettyPrinting()
+            .registerTypeAdapter(DestructibleObjective.class, new DestructibleObjectiveDeserializer())
+            .setPrettyPrinting()
             .create();
-
-    public static <T> void saveConfig(String filePath, T config) throws IOException {
-        CreateDirectoryIfNotExist(filePath);
-
-        try (FileWriter writer = new FileWriter(filePath)) {
-            gson.toJson(config, writer);
-        }
+    
+    public static Gson getGson() {
+        return gson;
+    }
+    
+    public static <T> void registerConfig(Class<T> configClass, AbstractConfig<T> config) {
+        configInstances.put(configClass, config);
+        UnrealZaruba.LOGGER.debug("[UnrealZaruba] Registered config: " + configClass.getSimpleName());
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> AbstractConfig<T> get(Class<T> configClass) {
+        return (AbstractConfig<T>) configInstances.get(configClass);
     }
 
-    public static <T> T loadConfig(String filePath, Class<T> configClass) throws IOException {
-        try (FileReader reader = new FileReader(filePath)) {
-            return gson.fromJson(reader, configClass);
-        } catch (IOException e) {
-            System.out.println("[UnrealZaruba] Error loading config file: " + filePath);
-            e.printStackTrace();
-            return null;
-        }
+    public static void init() {
+        // Initialize all configs
+        MainConfig.getInstance();
+        DestructibleObjectivesConfig.getInstance();
+        TeamsConfig.getInstance();
+        
+        // Create default configurations if they don't exist
+        getMainConfig().createDefaultIfNotExist();
+        
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Configuration system initialized");
     }
 
-    public static <T> void createDefaultConfig(String filePath, T defaultConfig) throws IOException {
-        CreateDirectoryIfNotExist(filePath);
-        File file = new File(filePath);
-        if (!file.exists()) {
-            saveConfig(filePath, defaultConfig);
-        }
+    public static MainConfig getMainConfig() {
+        return MainConfig.getInstance();
     }
 
-    private static void CreateDirectoryIfNotExist(String filePath) {
-        File file = new File(filePath);
-        File directory = file.getParentFile();
+    public static DestructibleObjectivesConfig getObjectivesConfig() {
+        return DestructibleObjectivesConfig.getInstance();
+    }
 
-        if (directory != null && !directory.exists()) {
-            directory.mkdirs();
+    public static TeamsConfig getTeamsConfig() {
+        return TeamsConfig.getInstance();
+    }
+
+    public static boolean isDevMode() {
+        return getMainConfig().getMode() == Mode.DEV;
+    }
+
+    public static void setDevMode() {
+        getMainConfig().setMode(Mode.DEV);
+    }
+
+    public static void setGameMode() {
+        getMainConfig().setMode(Mode.GAME);
+    }
+
+    public static void saveAllConfigs() {
+        try {
+            // Save main config
+            MainConfig.MainConfigData mainConfigData = getMainConfig().loadMainConfig();
+            getMainConfig().saveMainConfig(mainConfigData);
+            
+            // Save objectives and teams if available using their handlers
+            getObjectivesConfig().loadObjectives();
+            getTeamsConfig().loadTeamData();
+            
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] All configurations saved successfully");
+        } catch (Exception e) {
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Failed to save all configurations", e);
         }
     }
-}
+} 

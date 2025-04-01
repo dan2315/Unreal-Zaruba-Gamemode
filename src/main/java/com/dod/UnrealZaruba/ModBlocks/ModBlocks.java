@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.ModBlocks.TeamBlock.TeamBlock;
 import com.dod.UnrealZaruba.ModBlocks.Tent.TentMainBlock;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.ModBlocks.BlockEntities.VehiclePurchaseBlockEntity;
 
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
@@ -15,6 +16,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+
 
 public class ModBlocks {
 
@@ -37,9 +40,19 @@ public class ModBlocks {
             () -> new TentMainBlock(TeamColor.BLUE));
     public static final RegistryObject<Block> TENT_MAIN_BLOCK_RED = ModBlocks.BLOCKS.register("tent_main_block_red",
             () -> new TentMainBlock(TeamColor.RED));
+    public static final RegistryObject<Block> VEHICLE_PURCHASE_BLOCK = ModBlocks.BLOCKS.register("vehicle_purchase_block",
+            () -> new VehiclePurchaseBlock());
+
+
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES 
+    = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, UnrealZaruba.MOD_ID);
+
+    public static final RegistryObject<BlockEntityType<VehiclePurchaseBlockEntity>> VEHICLE_PURCHASE_BLOCK_ENTITY = BLOCK_ENTITIES.register("vehicle_purchase_block_entity",
+            () -> BlockEntityType.Builder.of(VehiclePurchaseBlockEntity::new, ModBlocks.VEHICLE_PURCHASE_BLOCK.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {
         ModBlocks.BLOCKS.register(eventBus);
+        ModBlocks.BLOCK_ENTITIES.register(eventBus);
     }
 }

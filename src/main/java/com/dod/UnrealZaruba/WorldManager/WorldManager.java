@@ -8,7 +8,7 @@ import java.util.List;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.api.IMinecraftServerExtended;
-
+import com.dod.UnrealZaruba.Config.MainConfig;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -73,14 +73,21 @@ public class WorldManager {
     }
     
     public static void ResetGameWorldDelayed() {
-        TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
+        // First step: Clear ships in the game world
+        TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
             UnrealZaruba.LOGGER.info("Deleting ships in game world");
             clearShipsInDimension(gameLevel);
-            UnrealZaruba.LOGGER.info("Deleting game world");
-            deleteGameWorld();
-            TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
-                UnrealZaruba.LOGGER.info("Creating game world");
-                createGameWorld();
+            
+            // Second step: Delete the game world after ships are cleared
+            TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
+                UnrealZaruba.LOGGER.info("Deleting game world");
+                deleteGameWorld();
+                
+                // Third step: Create a new game world
+                TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
+                    UnrealZaruba.LOGGER.info("Creating game world");
+                    createGameWorld();
+                }, null);
             }, null);
         }, null);
     }
@@ -130,6 +137,7 @@ public class WorldManager {
             throw new RuntimeException(e);
         }
         gameLevel = new ServerLevel(server, Util.backgroundExecutor(), access, serverLevelData, GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), false, null);
+        // boolean shouldSave = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV; Maybe it will be used at some point
         gameLevel.noSave = true;
         ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, gameLevel);
         server.markWorldsDirty();

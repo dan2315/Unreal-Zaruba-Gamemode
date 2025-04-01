@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Utils.Gamerules; // It needs to be imported
@@ -32,6 +33,9 @@ public class UnrealZaruba {
     public static WorldManager worldManager;
 
     public UnrealZaruba() {
+        // Initialize configuration system
+        ConfigManager.init();
+        LOGGER.info("Configuration system initialized");
 
         httpClientService = new HttpClientService();
         GameStatisticsService = new GameStatisticsService(httpClientService);

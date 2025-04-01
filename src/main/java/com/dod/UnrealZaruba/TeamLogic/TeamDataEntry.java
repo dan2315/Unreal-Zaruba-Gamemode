@@ -6,20 +6,64 @@ import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import net.minecraft.core.BlockPos;
 
 /**
- * Team data entry point.
+ * Team data entry class.
+ * Contains the spawn position and barrier volumes for a team.
  */
 public class TeamDataEntry {
-    public BlockPos blockPos;
-    public List<BlockVolume> barrierVolumes;
+    private BlockPos blockPos;
+    private List<BlockVolume> barrierVolumes;
 
     /**
-     * Instantiates a new Team data entry.
-     *
-     * @param blockPos      the block pos
-     * @param barrierVolume the barrier volume
+     * Default constructor for JSON deserialization
      */
-    public TeamDataEntry(BlockPos blockPos, List<BlockVolume> barrierVolume) {
+    public TeamDataEntry() {
+        // Default constructor for JSON deserialization
+    }
+
+    /**
+     * Creates a new team data entry with the specified spawn position and barrier volumes
+     *
+     * @param blockPos The spawn position
+     * @param barrierVolumes The barrier volumes
+     */
+    public TeamDataEntry(BlockPos blockPos, List<BlockVolume> barrierVolumes) {
         this.blockPos = blockPos;
-       barrierVolumes = barrierVolume;
+        this.barrierVolumes = barrierVolumes;
+    }
+    
+    /**
+     * Gets the spawn position
+     * 
+     * @return The spawn position
+     */
+    public BlockPos getBlockPos() {
+        return blockPos;
+    }
+    
+    /**
+     * Sets the spawn position
+     * 
+     * @param blockPos The spawn position to set
+     */
+    public void setBlockPos(BlockPos blockPos) {
+        this.blockPos = blockPos;
+    }
+    
+    /**
+     * Gets the barrier volumes
+     * 
+     * @return The barrier volumes
+     */
+    public List<BlockVolume> getBarrierVolumes() {
+        return barrierVolumes;
+    }
+    
+    /**
+     * Sets the barrier volumes
+     * 
+     * @param barrierVolumes The barrier volumes to set
+     */
+    public void setBarrierVolumes(List<BlockVolume> barrierVolumes) {
+        this.barrierVolumes = barrierVolumes;
     }
 }

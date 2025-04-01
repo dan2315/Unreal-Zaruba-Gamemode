@@ -33,6 +33,7 @@ import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.SustainedPlayerCountCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.Config.MainConfig;
 import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
@@ -83,7 +84,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     @Override
     protected void Initialize() {
         super.Initialize();
-        
+
+        MainConfig.Mode mode = MainConfig.getInstance().getMode();
+        if (mode != MainConfig.Mode.GAME) return;
+
+
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
 
 

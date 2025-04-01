@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.Config.DestructibleObjectivesConfig;
 import com.dod.UnrealZaruba.Utils.IResettable;
-
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
@@ -59,33 +58,25 @@ public class DestructibleObjectivesHandler extends ObjectivesHandler implements 
         for (DestructibleObjective objective : objectivesArray) {
             UnrealZaruba.LOGGER.info(objective.name);
         }
-        try {
-            ConfigManager.saveConfig(ConfigManager.Objectives, objectivesArray);
-            UnrealZaruba.LOGGER.info("[Во, бля] Сделал конфиг");
-        } catch (IOException e) {
-            UnrealZaruba.LOGGER.warn("[Ай, бля] Unable to create Config file for DestructibleObjectivesHandler");
-            e.printStackTrace();
-        }
+        
+        DestructibleObjectivesConfig.getInstance().saveObjectives(objectivesArray);
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved destructible objectives configuration");
     }
 
     public DestructibleObjective[] load() {
-        DestructibleObjective[] loadedObjectives;
-        try {
-            loadedObjectives = ConfigManager.loadConfig(ConfigManager.Objectives, DestructibleObjective[].class);
-            if (loadedObjectives == null) return loadedObjectives;
+        DestructibleObjective[] loadedObjectives = DestructibleObjectivesConfig.getInstance().loadObjectives();
+        if (loadedObjectives != null && loadedObjectives.length > 0) {
             clear();
             for (DestructibleObjective objective : loadedObjectives) {
                 this.add(objective);
                 objective.setProgressDisplay(new ProgressbarForObjective(objective, objective.GetName()));
-                UnrealZaruba.LOGGER.info("[UnrealZaruba] " + "Загрузил цель: " + objective.name);
+                UnrealZaruba.LOGGER.info("[UnrealZaruba] " + "Loaded objective: " + objective.name);
             }
-            UnrealZaruba.LOGGER.info("[UnrealZaruba] Загрузил конфиг для DestructibleObjectivesHandler");
-            return loadedObjectives;
-        } catch (IOException e) {
-            UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for DestructibleObjectivesHandler was not found");
-            e.printStackTrace();
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] Loaded configuration for DestructibleObjectivesHandler");
+        } else {
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] No destructible objectives found or empty configuration");
         }
-        return null;
+        return loadedObjectives;
     }
 
     public void clear() {

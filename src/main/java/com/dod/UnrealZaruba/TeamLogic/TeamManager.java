@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.Config.TeamsConfig;
 import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -39,9 +39,9 @@ public class TeamManager implements IResettable {
     public TeamManager() {
         var teamData = Load();
         if (teamData != null) {
-            for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.teamSpawns.entrySet()) {
+            for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.getTeamSpawns().entrySet()) {
                 UnrealZaruba.LOGGER.info("[UnrealZaruba] Loading team: " + data.getKey());
-                var teamContext = AddTeam(data.getKey(), data.getValue().blockPos, data.getValue().barrierVolumes);
+                var teamContext = AddTeam(data.getKey(), data.getValue().getBlockPos(), data.getValue().getBarrierVolumes());
                 StructureTemplateManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
                 tent_templates.put(data.getKey(), teamContext.GetTentTemplate(structureManager));
             }
@@ -229,28 +229,25 @@ public class TeamManager implements IResettable {
 
     public void Save() {
         TeamData data = new TeamData(); 
-        data.teamSpawns = new HashMap<>();
+        HashMap<TeamColor, TeamDataEntry> teamSpawns = new HashMap<>();
         for (Map.Entry<TeamColor, TeamContext> team : teams.entrySet()) {
-
-            data.teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().Spawn(), team.getValue().BarrierVolumes()));
+            teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().Spawn(), team.getValue().BarrierVolumes()));
         }
-        try {
-            ConfigManager.saveConfig(ConfigManager.Teams, data);
-            UnrealZaruba.LOGGER.warn("[Во, бля] Сохранил конфиг для TeamManager");
-        } catch (IOException e) {
-            UnrealZaruba.LOGGER.warn("[Ай, бля] Unable to create config for TeamManager");
-        }
+        data.setTeamSpawns(teamSpawns);
+        
+        TeamsConfig.getInstance().saveTeamData(data);
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved teams configuration");
     }
 
     public TeamData Load() {
-        try {
-            TeamData loadedData = ConfigManager.loadConfig(ConfigManager.Teams, TeamData.class);
-            UnrealZaruba.LOGGER.warn("[Во, бля] Загрузил конфиг для TeamManager {}", loadedData);
-            return loadedData;
-        } catch (IOException e) {
-            UnrealZaruba.LOGGER.warn("[Ай, бля] Config file for TeamManager was not found");
-            return null;
+        TeamData loadedData = TeamsConfig.getInstance().loadTeamData();
+        if (loadedData != null) {
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] Loaded teams configuration");
+        } else {
+            UnrealZaruba.LOGGER.warn("[UnrealZaruba] No team data found, using empty team data");
+            loadedData = new TeamData();
         }
+        return loadedData;
     }
 
     public void disableLevelSaving(ServerLevel level) {

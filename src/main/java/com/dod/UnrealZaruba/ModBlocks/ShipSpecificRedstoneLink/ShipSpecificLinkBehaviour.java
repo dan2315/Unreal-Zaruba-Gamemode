@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModBlocks.ShipSpecificRestoneLink;
+package com.dod.UnrealZaruba.ModBlocks.ShipSpecificRedstoneLink;
 
 import org.apache.commons.lang3.tuple.Pair;
 
