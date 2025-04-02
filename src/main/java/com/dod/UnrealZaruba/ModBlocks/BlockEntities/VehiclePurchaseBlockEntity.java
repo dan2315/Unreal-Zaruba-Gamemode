@@ -1,9 +1,9 @@
 package com.dod.UnrealZaruba.ModBlocks.BlockEntities;
 
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-
-import java.io.File;
-
+import com.dod.UnrealZaruba.Vehicles.VehicleData;
+import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
+import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
 
 import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.content.schematics.client.SchematicRenderer;
@@ -21,29 +21,38 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import java.io.InputStream;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.network.chat.Component;
 
-public class VehiclePurchaseBlockEntity extends BlockEntity {
+
+public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvider {
 
     private ResourceLocation schematicLocation;
     private SchematicWorld schematicWorld;
     private SchematicRenderer renderer;
     private boolean rendererInitialized = false;
-
-    public VehiclePurchaseBlockEntity(BlockPos blockPos, BlockState blockState, ResourceLocation schematicLocation) {
-        super(ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), blockPos, blockState);
-        this.schematicLocation = schematicLocation;
-    }
+    private String selectedVehicle;
 
     public VehiclePurchaseBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), blockPos, blockState);
-        this.schematicLocation = new ResourceLocation(UnrealZaruba.MOD_ID, "schematics/test.nbt");
+    }
+    
+    public String getSelectedVehicle() {
+        return selectedVehicle;
     }
 
-    public void setSchematic(ResourceLocation schematicLocation) {
-        this.schematicLocation = schematicLocation;
+    public void setSelectedVehicle(String selectedVehicle) {
+        this.selectedVehicle = selectedVehicle;
+        this.schematicLocation = VehicleRegistry.GetLocation(selectedVehicle);
         setChanged();
 
         if (level != null && !level.isClientSide) {
@@ -87,7 +96,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity {
     }
 
     public void clientTick() {
-        if (level != null && !level.isClientSide) {
+        if (level != null && level.isClientSide) {
             if (!rendererInitialized) {
                 InitializeRenderer();
                 rendererInitialized = true;
@@ -117,13 +126,23 @@ public class VehiclePurchaseBlockEntity extends BlockEntity {
     @Override
     public void saveAdditional(CompoundTag compoundTag) {
         super.saveAdditional(compoundTag);
-        compoundTag.putString("schematicLocation", schematicLocation.toString());
+        if (schematicLocation != null) {
+            compoundTag.putString("schematicLocation", schematicLocation.toString());
+        }
+        if (selectedVehicle != null) {
+            compoundTag.putString("selectedVehicle", selectedVehicle);
+        }
     }
 
     @Override
     public void load(CompoundTag compoundTag) {
         super.load(compoundTag);
-        schematicLocation = new ResourceLocation(compoundTag.getString("schematicLocation"));
+        if (compoundTag.contains("schematicLocation")) {
+            schematicLocation = new ResourceLocation(compoundTag.getString("schematicLocation"));
+        }
+        if (compoundTag.contains("selectedVehicle")) {
+            selectedVehicle = compoundTag.getString("selectedVehicle");
+        }
 
         if (level != null && level.isClientSide()) {
             rendererInitialized = false;
@@ -146,5 +165,16 @@ public class VehiclePurchaseBlockEntity extends BlockEntity {
             renderer.setActive(false);
             renderer = null;
         }
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("container.vehicle_purchase");
+    }
+
+    @Override
+    @Nullable
+    public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        return new VehiclePurchaseMenu(containerId, inventory, this, ContainerLevelAccess.create(level, worldPosition));
     }
 }

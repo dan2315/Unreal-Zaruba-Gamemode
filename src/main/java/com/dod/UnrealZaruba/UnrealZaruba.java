@@ -13,6 +13,7 @@ import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.Services.HttpClientService;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
+import com.dod.UnrealZaruba.UI.ModMenus;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.logging.LogUtils;
 
@@ -33,7 +34,6 @@ public class UnrealZaruba {
     public static WorldManager worldManager;
 
     public UnrealZaruba() {
-        // Initialize configuration system
         ConfigManager.init();
         LOGGER.info("Configuration system initialized");
 
@@ -49,6 +49,7 @@ public class UnrealZaruba {
         ModBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
         ModMobs.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ModMenus.register(FMLJavaModLoadingContext.get().getModEventBus());
         CreativeTabs.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         CommandRegistration.init(GameStatisticsService);

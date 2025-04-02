@@ -11,12 +11,12 @@ import net.minecraft.nbt.NbtIo;
 import java.io.InputStream;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.world.level.Level;
 import net.minecraft.client.Minecraft;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.DataInputStream;
 
 public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();
@@ -38,20 +38,71 @@ public class SchematicLoader {
     }
 
     private static CompoundTag LoadFromResources(ResourceLocation location) {
+        InputStream inputStream = null;
         try {
-            String path = "assets/" + location.getNamespace() + "/" + location.getPath() + ".nbt";
-            InputStream inputStream = SchematicLoader.class.getResourceAsStream(path);
-
+            String path = "data/" + location.getNamespace() + "/" + location.getPath();
+            
+            inputStream = SchematicLoader.class.getClassLoader().getResourceAsStream(path);
+            
             if (inputStream == null) {
-                throw new FileNotFoundException("Schematic not found: " + path);
+                System.out.println("Failed to load: " + path);
+                
+                String altPath = "data/" + location.getNamespace() + "/structures/" + location.getPath();
+                inputStream = SchematicLoader.class.getClassLoader().getResourceAsStream(altPath);
+                
+                if (inputStream == null) {
+                    throw new FileNotFoundException("Schematic not found at: " + path + " or " + altPath);
+                } else {
+                    System.out.println("Found at alternative path: " + altPath);
+                    path = altPath;
+                }
             }
-
-            CompoundTag tag = NbtIo.readCompressed(inputStream);
-            inputStream.close();
-            return tag;
+    
+            byte[] bytes = inputStream.readAllBytes();
+            System.out.println("File size: " + bytes.length + " bytes for " + path);
+            
+            if (bytes.length == 0) {
+                throw new IOException("File is empty: " + path);
+            }
+            
+            inputStream = new ByteArrayInputStream(bytes);
+            
+            try {
+                CompoundTag tag = NbtIo.readCompressed(new ByteArrayInputStream(bytes));
+                if (tag == null) {
+                    System.out.println("readCompressed returned null for " + path);
+                } else {
+                    // It's actually working way, other is fallbacks that could be removed I guess
+                    System.out.println("Successfully read NBT with " + tag.size() + " entries"); 
+                }
+                return tag;
+            } catch (IOException e) {
+                System.out.println("Failed to read compressed NBT, trying uncompressed: " + e.getMessage());
+                
+                try {
+                    DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(bytes));
+                    CompoundTag tag = NbtIo.read(dataInputStream);
+                    if (tag != null) {
+                        System.out.println("Successfully read uncompressed NBT with " + tag.size() + " entries");
+                        return tag;
+                    }
+                } catch (IOException e2) {
+                    System.out.println("Failed to read uncompressed NBT: " + e2.getMessage());
+                }
+                
+                throw new IOException("File is not a valid NBT format: " + path);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
