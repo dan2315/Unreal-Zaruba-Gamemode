@@ -45,6 +45,7 @@ public class ShipCreator {
             1.0,
             VSGameUtilsKt.getDimensionId(level));
 
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Loading schematic into ship {}", schematicLocation);
         LoadSchematicIntoShip(schematicLocation, ship, level);
     }
 

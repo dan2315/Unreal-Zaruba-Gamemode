@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.UI.VehiclePurchaseMenu;
 
+import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
+import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -32,8 +34,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
     private static final int DROPDOWN_WIDTH = 120;
     private static final int ERROR_DISPLAY_TICKS = 100;
 
-    private List<String> vehicleNames;
-    private String selectedVehicleName = null;
+    private List<String> vehicleKeys;
     private boolean dropdownOpen = false;
     private Button deployButton;
     private List<Button> dropdownButtons = new ArrayList<>();
@@ -45,10 +46,15 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
         this.imageWidth = 176;
         this.imageHeight = 166;
 
-        vehicleNames = new ArrayList<>(VehicleRegistry.getVehicleNames());
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] VehiclePurchaseScreen constructor called");
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Menu: {}", menu);
 
-        if (menu.getSelectedVehicle() == null && !vehicleNames.isEmpty()) {
-            menu.setSelectedVehicle(vehicleNames.get(0));
+        vehicleKeys = new ArrayList<>(VehicleRegistry.getVehicleKeys());
+
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Vehicle names: {}", vehicleKeys);
+
+        if (menu.getSelectedVehicle() == null && !vehicleKeys.isEmpty()) {
+            menu.setSelectedVehicle(vehicleKeys.get(0));
         }
 
         updateItemRequirements();
@@ -73,19 +79,16 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
 
         addRenderableWidget(Button.builder(Component.literal("▼"), button -> {
             dropdownOpen = !dropdownOpen;
+            updateDropdown();
         }).pos(x + 140, y + 20).size(20, DROPDOWN_HEIGHT).build());
         
 
-        deployButton = addRenderableWidget(Button.builder(Component.literal("Deploy"), button -> {
+        deployButton = addRenderableWidget(Button.builder(Component.translatable("button.unrealzaruba.deploy"), button -> {
             if (menu.getSelectedVehicle() != null) {
-                var result = menu.purchaseVehicle(minecraft.player);
-                if (result.getA()) {
-                    minecraft.setScreen(null);
-                }
-                else {
-                    errorMessage = result.getB();
-                    errorDisplayTicks = ERROR_DISPLAY_TICKS;
-                }
+                var result = menu.getBlockEntity().getBlockPos();
+                NetworkHandler.CHANNEL.sendToServer(
+                    new PurchaseVehiclePacket(result, menu.getSelectedVehicle())
+                );
             }
         }).pos(x + 48, y + 130).size(80, 20).build());
 
@@ -102,16 +105,18 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
             int x = (width - imageWidth) / 2;
             int y = (height - imageHeight) / 2;
 
-            for (int i = 0; i < vehicleNames.size(); i++) {
-                String vehicleName = vehicleNames.get(i);
-                Button button = addRenderableWidget(Button.builder(Component.literal(vehicleName), btn -> {
-                    menu.setSelectedVehicle(vehicleName);
+            for (int i = 0; i < vehicleKeys.size(); i++) {
+                String vehicleKey = vehicleKeys.get(i);
+                String vehicleName = VehicleRegistry.getVehicle(vehicleKey).getName();
+                Button button = Button.builder(Component.literal(vehicleName), btn -> {
+                    menu.setSelectedVehicle(vehicleKey);
                     dropdownOpen = false;
                     updateDropdown();
                     updateItemRequirements();
                     updateDeployButton();
-                }).pos(x + 20, y + 20 + DROPDOWN_HEIGHT * (i + 1)).size(DROPDOWN_WIDTH, DROPDOWN_HEIGHT).build());
+                }).pos(x + 20, y + 20 + DROPDOWN_HEIGHT * (i + 1)).size(DROPDOWN_WIDTH, DROPDOWN_HEIGHT).build();
 
+                addRenderableWidget(button);
                 dropdownButtons.add(button);
             }
         }
@@ -124,7 +129,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
             deployButton.active = vehicleData != null && vehicleData.hasRequiredItems(minecraft.player.getInventory());
         } else {
             deployButton.active = false;
-            deployButton.setMessage(Component.literal("Missing Items"));
+            deployButton.setMessage(Component.translatable("button.unrealzaruba.missing_items"));
         }
     }
     
@@ -136,16 +141,16 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
-        graphics.drawString(font, "Vehicle Purchase", x + 8, y + 6, 0x404040, false);
-        
         VehicleData selectedVehicle = VehicleRegistry.getVehicle(menu.getSelectedVehicle());
         if (selectedVehicle != null) {
             graphics.drawString(font, selectedVehicle.getName(), x + 25, y + 25, 0x404040, false);
         }
 
-        graphics.drawString(font, "Required Items:", x + 25, y + 50, 0x404040, false);
-        renderRequiredItems(graphics, x, y, mouseX, mouseY);
-        renderTooltips(graphics, mouseX, mouseY, x, y);
+        if (!dropdownOpen) {
+            graphics.drawString(font, Component.translatable("label.unrealzaruba.required_items"), x + 25, y + 50, 0x404040, false);
+            renderRequiredItems(graphics, x, y, mouseX, mouseY);
+            renderTooltips(graphics, mouseX, mouseY, x, y);
+        }
 
         if (errorMessage != null && errorDisplayTicks > 0) {
             int errorX = x + (imageWidth / 2) - (font.width(errorMessage) / 2);
@@ -209,13 +214,18 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
     }
 
     @Override
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        // graphics.drawString(font, title, titleLabelX, titleLabelY, 0x404040);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (dropdownOpen) {
             int x = (width - imageWidth) / 2;
             int y = (height - imageHeight) / 2;
 
-            boolean clickedInDropdown = mouseX >= x + 20 && mouseX <= x + 140 && 
-                mouseY >= y + 20 && mouseY <= y + 20 + DROPDOWN_HEIGHT * (vehicleNames.size() + 1);
+            boolean clickedInDropdown = mouseX >= x + 20 && mouseX <= x + 20 + DROPDOWN_WIDTH && 
+                mouseY >= y + 20 && mouseY <= y + 20 + DROPDOWN_HEIGHT * (vehicleKeys.size() + 1);
                 
             if (!clickedInDropdown) {
                 dropdownOpen = false;
@@ -237,5 +247,10 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
                 errorMessage = null;
             }
         }
+    }
+
+    public void setErrorMessage(String message) {
+        errorMessage = message;
+        errorDisplayTicks = ERROR_DISPLAY_TICKS;
     }
 }

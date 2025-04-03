@@ -1,11 +1,13 @@
 {
-    "block.unrealzaruba.red_block": "Red Team Block",
-    "block.unrealzaruba.blue_block": "Blue Team Block",
-
-
     "item.unrealzaruba.red_block": "Red Team Assigner",
     "item.unrealzaruba.blue_block": "Blue Team Assigner",
     "item.unrealzaruba.red_spawn_block": "Blue Team Spawn",
     "item.unrealzaruba.blue_spawn_block": "Blue Team Spawn",
-    "item.unrealzaruba.hand_assembler": "Hand Assembler"
+    "item.unrealzaruba.hand_assembler": "Hand Assembler",
+    "item.unrealzaruba.vehicle_purchase_block": "Vehicle Purchase Block",
+    "block.unrealzaruba.vehicle_purchase_block": "Vehicle Purchase Block",
+    "container.vehicle_purchase": "Vehicle Purchase",
+    "button.unrealzaruba.deploy": "Deploy",
+    "button.unrealzaruba.missing_items": "Missing Items",
+    "label.unrealzaruba.required_items": "Required Items:"
   }

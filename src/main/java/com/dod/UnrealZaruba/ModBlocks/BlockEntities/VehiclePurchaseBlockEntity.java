@@ -1,9 +1,11 @@
 package com.dod.UnrealZaruba.ModBlocks.BlockEntities;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.Vehicles.VehicleData;
 import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
 import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
+import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
 
 import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.content.schematics.client.SchematicRenderer;
@@ -20,7 +22,14 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+
 import java.io.InputStream;
+import java.util.List;
+
 
 import javax.annotation.Nullable;
 
@@ -52,7 +61,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
 
     public void setSelectedVehicle(String selectedVehicle) {
         this.selectedVehicle = selectedVehicle;
-        this.schematicLocation = VehicleRegistry.GetLocation(selectedVehicle);
+        this.schematicLocation = VehicleRegistry.getVehicle(selectedVehicle).getSchematicLocation();
         setChanged();
 
         if (level != null && !level.isClientSide) {
@@ -65,7 +74,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
             CompoundTag compoundTag = new CompoundTag();
             saveAdditional(compoundTag);
 
-            ClientboundBlockEntityDataPacket packet = ClientboundBlockEntityDataPacket.create(this);
+            ClientboundBlockEntityDataPacket packet = ClientboundBlockEntityDataPacket.create(this, blockEntity -> compoundTag);
             ((ServerLevel) level).getChunkSource().chunkMap
             .getPlayers(new ChunkPos(this.getBlockPos()), false)
             .forEach(player -> player.connection.send(packet));
@@ -176,5 +185,35 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     @Nullable
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new VehiclePurchaseMenu(containerId, inventory, this, ContainerLevelAccess.create(level, worldPosition));
+    }
+
+    public Tuple<Boolean, String> purchaseVehicle(ServerPlayer player) {
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Purchasing vehicle: {}", selectedVehicle);
+        if (selectedVehicle == null) {
+            return new Tuple<>(false, "No vehicle selected");
+        }
+    
+        VehicleData vehicleData = VehicleRegistry.getVehicle(selectedVehicle);
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Vehicle data: {}", vehicleData);
+        if (vehicleData == null) {
+            return new Tuple<>(false, "Invalid vehicle selected");
+        }
+    
+
+        if (!vehicleData.hasRequiredItems(player.getInventory())) {
+            return new Tuple<>(false, "Missing items");
+        }
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Consuming items");
+    
+        vehicleData.consumeRequiredItems(player.getInventory());
+        
+    
+        if (level instanceof ServerLevel serverLevel) {
+            ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), 
+                serverLevel, getBlockState().getValue(BlockStateProperties.FACING));
+            return new Tuple<>(true, "Vehicle deployed successfully");
+        } else {
+            return new Tuple<>(false, "Error: Not on server level");
+        }
     }
 }

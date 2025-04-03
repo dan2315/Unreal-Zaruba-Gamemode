@@ -81,7 +81,7 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof VehiclePurchaseBlockEntity) {
-                NetworkHooks.openScreen((ServerPlayer) player, (MenuProvider) blockEntity);
+                NetworkHooks.openScreen((ServerPlayer) player, (MenuProvider) blockEntity, pos);
             } 
         }
         return InteractionResult.sidedSuccess(level.isClientSide());

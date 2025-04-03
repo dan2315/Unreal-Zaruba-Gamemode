@@ -20,22 +20,21 @@ public class VehicleRegistry {
         return VEHICLES.get(vehicleName);
     }
 
-    public static List<String> getVehicleNames() {
+    public static List<String> getVehicleKeys() {
         return new ArrayList<>(VEHICLES.keySet());
     }
 
     public static void init() {
-        register(new VehicleData(GetLocation("test"), "Zalupa")
+        register(new VehicleData("test", "Zalupa")
         .addItemRequirement(new ResourceLocation("minecraft:gold_ingot"), 8));
 
-        register(new VehicleData(GetLocation("test"), "Ebanina")
+        register(new VehicleData("test1", "Ebanina")
         .addItemRequirement(new ResourceLocation("minecraft:iron_ingot"), 16)
         .addItemRequirement(new ResourceLocation("minecraft:oak_planks"), 16));
 
-        register(new VehicleData(GetLocation("test"), "Koncha")
+        register(new VehicleData("test2", "Koncha")
         .addItemRequirement(new ResourceLocation("minecraft:diamond"), 8)
         .addItemRequirement(new ResourceLocation("minecraft:netherite_ingot"), 1));
-
     }
 
     public static ResourceLocation GetLocation(String vehicleName) {

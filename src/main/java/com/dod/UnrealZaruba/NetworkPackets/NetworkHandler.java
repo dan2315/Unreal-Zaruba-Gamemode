@@ -7,6 +7,8 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.PacketDistributor;
+import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
+import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -48,6 +50,16 @@ public class NetworkHandler {
                 SelectTentPacket::encode,
                 SelectTentPacket::decode,
                 SelectTentPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, PurchaseVehiclePacket.class,
+                PurchaseVehiclePacket::encode,
+                PurchaseVehiclePacket::decode,
+                PurchaseVehiclePacket::handle);
+
+        CHANNEL.registerMessage(packetId++, PurchaseResultPacket.class,
+                PurchaseResultPacket::encode,
+                PurchaseResultPacket::decode,
+                PurchaseResultPacket::handle);
 
     }
 

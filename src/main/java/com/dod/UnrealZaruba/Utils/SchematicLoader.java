@@ -40,23 +40,9 @@ public class SchematicLoader {
     private static CompoundTag LoadFromResources(ResourceLocation location) {
         InputStream inputStream = null;
         try {
-            String path = "data/" + location.getNamespace() + "/" + location.getPath();
+            String path = "data/" + location.getNamespace() + "/" + location.getPath() + ".nbt";
             
             inputStream = SchematicLoader.class.getClassLoader().getResourceAsStream(path);
-            
-            if (inputStream == null) {
-                System.out.println("Failed to load: " + path);
-                
-                String altPath = "data/" + location.getNamespace() + "/structures/" + location.getPath();
-                inputStream = SchematicLoader.class.getClassLoader().getResourceAsStream(altPath);
-                
-                if (inputStream == null) {
-                    throw new FileNotFoundException("Schematic not found at: " + path + " or " + altPath);
-                } else {
-                    System.out.println("Found at alternative path: " + altPath);
-                    path = altPath;
-                }
-            }
     
             byte[] bytes = inputStream.readAllBytes();
             System.out.println("File size: " + bytes.length + " bytes for " + path);

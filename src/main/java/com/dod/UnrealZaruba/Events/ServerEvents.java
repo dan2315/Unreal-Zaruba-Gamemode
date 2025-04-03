@@ -30,6 +30,7 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 
 /**
  * Все сервер-side ивенты сюда епт
+ * // TODO: Ubrat' nahui annotation i replace with instance init
  */
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
 public class ServerEvents {

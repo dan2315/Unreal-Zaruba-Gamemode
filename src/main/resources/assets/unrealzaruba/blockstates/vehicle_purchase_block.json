@@ -1,0 +1,8 @@
+{
+    "variants": {
+      "facing=north": { "model": "create:block/track_station/block" },
+      "facing=east": { "model": "create:block/track_station/block", "y": 90 },
+      "facing=south": { "model": "create:block/track_station/block", "y": 180 },
+      "facing=west": { "model": "create:block/track_station/block", "y": 270 }
+    }
+  }

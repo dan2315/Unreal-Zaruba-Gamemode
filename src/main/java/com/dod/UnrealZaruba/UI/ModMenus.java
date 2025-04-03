@@ -19,6 +19,7 @@ public class ModMenus {
 
      public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Menus registered");
     }
 }
 

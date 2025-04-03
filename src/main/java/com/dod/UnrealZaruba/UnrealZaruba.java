@@ -15,12 +15,16 @@ import com.dod.UnrealZaruba.Services.HttpClientService;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.UI.ModMenus;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.UnrealZaruba.Events.ModSetupEvents;
+import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
+
 import com.mojang.logging.LogUtils;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
+import net.minecraftforge.eventbus.api.IEventBus;
 
 import org.slf4j.Logger;
 
@@ -40,19 +44,25 @@ public class UnrealZaruba {
         httpClientService = new HttpClientService();
         GameStatisticsService = new GameStatisticsService(httpClientService);
 
+        TeamColorArgument.RegisterArgument();
+
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ModSounds.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModMobs.register(modEventBus);
+        ModMenus.register(modEventBus);
+        CreativeTabs.register(modEventBus);
+        modEventBus.addListener(ModSetupEvents::onClientSetup);
+        modEventBus.addListener(ModSetupEvents::registerGuiOverlays);
+
+        CommandRegistration.init(GameStatisticsService);
+
         MinecraftForge.EVENT_BUS.register(ServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ClientEvents.class);
         MinecraftForge.EVENT_BUS.register(new NetworkHandler());
-
-        TeamColorArgument.RegisterArgument();
-        ModSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ModBlocks.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ModItems.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ModMobs.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ModMenus.register(FMLJavaModLoadingContext.get().getModEventBus());
-        CreativeTabs.register(FMLJavaModLoadingContext.get().getModEventBus());
-
-        CommandRegistration.init(GameStatisticsService);
+        VehicleRegistry.init();
 
         NetworkHandler.init();
     }

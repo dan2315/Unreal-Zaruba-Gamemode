@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class VehicleData {
     private final ResourceLocation schematicLocation;
-    private final String name;
+    private final String displayName;
     private final Map<ResourceLocation, Integer> requiredItems;
 
     public ResourceLocation getSchematicLocation() {
@@ -25,12 +25,12 @@ public class VehicleData {
     }
 
     public String getName() {
-        return name;
+        return displayName;
     }
 
-    public VehicleData(ResourceLocation schematicLocation, String name) {
-        this.schematicLocation = schematicLocation;
-        this.name = name;
+    public VehicleData(String nameId, String displayName) {
+        this.schematicLocation = VehicleRegistry.GetLocation(nameId);
+        this.displayName = displayName;
         this.requiredItems = new HashMap<>();
     }
 

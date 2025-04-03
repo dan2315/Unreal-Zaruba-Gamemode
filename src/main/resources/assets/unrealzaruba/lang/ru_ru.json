@@ -1,0 +1,13 @@
+{
+    "item.unrealzaruba.red_block": "Военкомат красной команды",
+    "item.unrealzaruba.blue_block": "Военкомат синей команды",
+    "item.unrealzaruba.red_spawn_block": "Спавн красной команды",
+    "item.unrealzaruba.blue_spawn_block": "Спавн синей команды",
+    "item.unrealzaruba.hand_assembler": "Ручная сборка",
+    "item.unrealzaruba.vehicle_purchase_block": "Блок покупки транспорта",
+    "block.unrealzaruba.vehicle_purchase_block": "Блок покупки транспорта",
+    "container.vehicle_purchase": "Покупка транспорта",
+    "button.unrealzaruba.deploy": "Разместить",
+    "button.unrealzaruba.missing_items": "Отсутствуют предметы",
+    "label.unrealzaruba.required_items": "Необходимые предметы:"
+  }
