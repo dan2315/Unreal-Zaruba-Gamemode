@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
@@ -27,11 +28,13 @@ public class ProgressbarForObjective implements IProgressDisplay {
     
     @Override
     public void updateProgress(float progress) {
+        UnrealZaruba.LOGGER.info("Updating progress for objective: {}", objective.GetName());
         bossBar.setProgress(progress);
     }
     
     @Override
     public void updatePlayerVisibility(ServerPlayer player) {
+        UnrealZaruba.LOGGER.info("Updating player visibility for objective: {}", objective.GetName());
         boolean isNearTarget = isPlayerNearTarget(player, objective.getPosition());
         
         if (isNearTarget && !playersWithBossBar.contains(player.getUUID())) {

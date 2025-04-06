@@ -5,6 +5,8 @@ import java.util.List;
 public class ObjectivesHandler {
     List<GameObjective> objectives;
 
+    private boolean allCompleted = false;
+
     protected Runnable onCompleted;
 
     public void OnObjectivesCompleted(Runnable onCompleted) {
@@ -21,5 +23,9 @@ public class ObjectivesHandler {
 
     public void onServerTick() {
         objectives.forEach(objective -> objective.Update());
+        if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
+            allCompleted = true;
+            onCompleted.run();
+        }
     }
 }

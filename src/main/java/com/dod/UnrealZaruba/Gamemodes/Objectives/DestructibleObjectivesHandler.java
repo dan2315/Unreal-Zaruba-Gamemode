@@ -1,6 +1,5 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,24 +15,23 @@ import net.minecraftforge.fml.common.Mod;
 public class DestructibleObjectivesHandler extends ObjectivesHandler implements IResettable {
     private final List<DestructibleObjective> objectives = new ArrayList<>();
     
+    private boolean allCompleted = false;
+
 
     public DestructibleObjectivesHandler() {
     }
 
+    public void onServerTick() {
+        objectives.forEach(objective -> objective.Update());
+        if (allCompleted) return;
+        if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
+            allCompleted = true;
+            onCompleted.run();
+        }
+    }
 
     public void add(DestructibleObjective objective) {
         objectives.add(objective);
-    }
-
-
-    public void onServerTick() {
-        for (DestructibleObjective objective : objectives) {
-            objective.Update();
-        }
-
-        if (objectives.stream().allMatch(DestructibleObjective::IsCompleted)) {
-            onCompleted.run();
-        }
     }
 
     @Override
@@ -42,8 +40,6 @@ public class DestructibleObjectivesHandler extends ObjectivesHandler implements 
             objective.reset();
         }
     }
-
-
 
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (!(event.player instanceof ServerPlayer player)) return;

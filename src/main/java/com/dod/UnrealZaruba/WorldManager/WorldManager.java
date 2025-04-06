@@ -73,22 +73,17 @@ public class WorldManager {
     }
     
     public static void ResetGameWorldDelayed() {
-        // First step: Clear ships in the game world
-        TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
             UnrealZaruba.LOGGER.info("Deleting ships in game world");
             clearShipsInDimension(gameLevel);
             
-            // Second step: Delete the game world after ships are cleared
-            TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
+            TimerManager.createRealTimeTimer(10000 /*10s*/, () -> {
                 UnrealZaruba.LOGGER.info("Deleting game world");
                 deleteGameWorld();
                 
-                // Third step: Create a new game world
-                TimerManager.createRealTimeTimer(3000 /*1s*/, () -> {
+                TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
                     UnrealZaruba.LOGGER.info("Creating game world");
                     createGameWorld();
                 }, null);
-            }, null);
         }, null);
     }
 
@@ -119,6 +114,7 @@ public class WorldManager {
         serverLevelData = server.getWorldData().overworldData();
     }
 
+    // Better not try
     public static void deleteGameWorld() {
         ((IMinecraftServerExtended) server).deleteLevel(GAME_DIMENSION);
         gameLevel = null;
@@ -152,18 +148,17 @@ public class WorldManager {
 
     public static void TeleportAllPlayersToLobby(MinecraftServer server) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            teleportPlayerToDimension(player, LOBBY_DIMENSION);
+            teleportPlayerToDimension(player, LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
         }
     }
 
-    public static void teleportPlayerToDimension(ServerPlayer player, ResourceKey<Level> dimensionKey) {
+    public static void teleportPlayerToDimension(ServerPlayer player, ResourceKey<Level> dimensionKey, BlockPos spawnPos) {
         MinecraftServer server = player.getServer();
 
         if (server != null) {
             ServerLevel targetWorld = server.getLevel(dimensionKey);
 
             if (targetWorld != null) {
-                BlockPos spawnPos = targetWorld.getSharedSpawnPos();
                 player.teleportTo(targetWorld, spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), player.getYRot(), player.getXRot());
             } else {
                 UnrealZaruba.LOGGER.error("Dimension " + dimensionKey.location() + " is not loaded.");

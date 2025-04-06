@@ -194,7 +194,7 @@ public class TeamManager implements IResettable {
 
     public void teleportToSpawn(ServerPlayer serverPlayer) {
         TeamContext team = GetPlayersTeam(serverPlayer);
-        if (team == null){
+        if (team == null) {
             serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
         }

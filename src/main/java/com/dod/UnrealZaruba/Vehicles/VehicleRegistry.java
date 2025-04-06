@@ -25,14 +25,14 @@ public class VehicleRegistry {
     }
 
     public static void init() {
-        register(new VehicleData("test", "Zalupa")
+        register(new VehicleData("test", "Vehicle 1")
         .addItemRequirement(new ResourceLocation("minecraft:gold_ingot"), 8));
 
-        register(new VehicleData("test1", "Ebanina")
+        register(new VehicleData("test1", "Tarahtelka")
         .addItemRequirement(new ResourceLocation("minecraft:iron_ingot"), 16)
         .addItemRequirement(new ResourceLocation("minecraft:oak_planks"), 16));
 
-        register(new VehicleData("test2", "Koncha")
+        register(new VehicleData("test2", "Lobster")
         .addItemRequirement(new ResourceLocation("minecraft:diamond"), 8)
         .addItemRequirement(new ResourceLocation("minecraft:netherite_ingot"), 1));
     }

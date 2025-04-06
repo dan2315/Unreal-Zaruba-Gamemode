@@ -172,6 +172,7 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:util:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
+    implementation fg.deobf("curse.maven:curios-309927:5367944")
 
     // Create and its dependencies
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }

@@ -17,7 +17,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-
+import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
+import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlock;
 
 public class ModBlocks {
 
@@ -42,6 +43,8 @@ public class ModBlocks {
             () -> new TentMainBlock(TeamColor.RED));
     public static final RegistryObject<Block> VEHICLE_PURCHASE_BLOCK = ModBlocks.BLOCKS.register("vehicle_purchase_block",
             () -> new VehiclePurchaseBlock());
+    public static final RegistryObject<Block> CLASS_ASSIGNER_BLOCK = ModBlocks.BLOCKS.register("class_assigner_block",
+            () -> new ClassAssignerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)));
 
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES 
@@ -49,6 +52,9 @@ public class ModBlocks {
 
     public static final RegistryObject<BlockEntityType<VehiclePurchaseBlockEntity>> VEHICLE_PURCHASE_BLOCK_ENTITY = BLOCK_ENTITIES.register("vehicle_purchase_block_entity",
             () -> BlockEntityType.Builder.of(VehiclePurchaseBlockEntity::new, ModBlocks.VEHICLE_PURCHASE_BLOCK.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<ClassAssignerBlockEntity>> CLASS_ASSIGNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("class_assigner_block_entity",
+            () -> BlockEntityType.Builder.of(ClassAssignerBlockEntity::new, ModBlocks.CLASS_ASSIGNER_BLOCK.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {

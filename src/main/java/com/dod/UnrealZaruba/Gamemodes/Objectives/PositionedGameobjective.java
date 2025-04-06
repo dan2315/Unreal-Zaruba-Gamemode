@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
+
 import net.minecraft.core.BlockPos;
 
 public class PositionedGameobjective extends GameObjective {
@@ -14,14 +15,11 @@ public class PositionedGameobjective extends GameObjective {
     }
 
     @Override
-    public Boolean IsCompleted() {
+    protected boolean UpdateImplementation() {
         return false;
     }
 
     @Override
-    public void Update() {
+    protected void OnCompleted() {
     }
-
-
-    
 }

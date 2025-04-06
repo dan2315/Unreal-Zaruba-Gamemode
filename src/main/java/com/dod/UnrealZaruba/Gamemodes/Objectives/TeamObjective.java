@@ -8,7 +8,12 @@ public class TeamObjective extends GameObjective {
     }
 
     @Override
-    public void Update() {
+    protected boolean UpdateImplementation() {
+        return false;
+    }
+
+    @Override
+    protected void OnCompleted() {
     }
     
 }

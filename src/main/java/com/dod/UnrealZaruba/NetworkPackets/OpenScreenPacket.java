@@ -7,10 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.dod.UnrealZaruba.UI.ClassAssignerScreen;
 import com.dod.UnrealZaruba.UI.CustomDeathScreen;
 import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -51,6 +53,18 @@ public class OpenScreenPacket {
                 Boolean tentExist = (Boolean) msg.getData().get("tentExist");
                 buffer.writeBoolean(tentExist != null && tentExist);
                 break;
+            case 3: // ClassAssignerScreen
+                BlockPos blockPos = (BlockPos) msg.getData().get("blockPos");
+                String currentClassId = (String) msg.getData().get("currentClassId");
+                Boolean isAdmin = (Boolean) msg.getData().get("isAdmin");
+                
+                buffer.writeBlockPos(blockPos);
+                buffer.writeBoolean(currentClassId != null);
+                if (currentClassId != null) {
+                    buffer.writeUtf(currentClassId);
+                }
+                buffer.writeBoolean(isAdmin != null && isAdmin);
+                break;
             default:
                 break;
         }
@@ -76,6 +90,17 @@ public class OpenScreenPacket {
             case 2: // CustomDeathScreen
                 Boolean tentExist = buffer.readBoolean();
                 data.put("tentExist", tentExist);
+                break;
+            case 3: // ClassAssignerScreen
+                BlockPos blockPos = buffer.readBlockPos();
+                data.put("blockPos", blockPos);
+                boolean hasClassId = buffer.readBoolean();
+                if (hasClassId) {
+                    String currentClassId = buffer.readUtf();
+                    data.put("currentClassId", currentClassId);
+                }
+                boolean isAdmin = buffer.readBoolean();
+                data.put("isAdmin", isAdmin);
                 break;
             default:
                 break;
@@ -103,6 +128,12 @@ public class OpenScreenPacket {
                         case 2:
                             Boolean tentExist = (Boolean) msg.getData().get("tentExist");
                             Minecraft.getInstance().setScreen(new CustomDeathScreen(tentExist));
+                            break;
+                        case 3:
+                            BlockPos blockPos = (BlockPos) msg.getData().get("blockPos");
+                            String currentClassId = (String) msg.getData().get("currentClassId");
+                            Boolean isAdmin = (Boolean) msg.getData().get("isAdmin");
+                            Minecraft.getInstance().setScreen(new ClassAssignerScreen(blockPos, currentClassId, isAdmin != null && isAdmin));
                             break;
                         default:
                             break;

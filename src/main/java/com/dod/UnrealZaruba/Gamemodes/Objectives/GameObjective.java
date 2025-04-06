@@ -1,8 +1,10 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
+
 public abstract class GameObjective {
     String name;
     public float progress;
+    private boolean isCompleted = false;
     protected IProgressDisplay progressDisplay;
     
     public String GetName() {
@@ -23,7 +25,27 @@ public abstract class GameObjective {
         }
     }
     
-    public abstract Boolean IsCompleted();
+    public Boolean IsCompleted() {
+        return isCompleted;
+    }
 
-    public abstract void Update();
+    public void Complete() {
+        isCompleted = true;
+        OnCompleted();
+    }
+
+    public void Reset() {
+        isCompleted = false;
+    }
+
+    protected abstract void OnCompleted();
+
+    protected abstract boolean UpdateImplementation();
+
+    public void Update() {
+        if (isCompleted) return;
+        if (UpdateImplementation()) {
+            Complete();
+        }
+    }
 } 

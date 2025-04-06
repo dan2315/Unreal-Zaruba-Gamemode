@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba.NetworkPackets;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -9,6 +11,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.PacketDistributor;
 import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
 import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
+import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.SetClassPacket;
+import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -61,6 +65,15 @@ public class NetworkHandler {
                 PurchaseResultPacket::decode,
                 PurchaseResultPacket::handle);
 
+        CHANNEL.registerMessage(packetId++, SetClassPacket.class,
+                SetClassPacket::encode,
+                SetClassPacket::decode,
+                SetClassPacket::handle);
+                
+        CHANNEL.registerMessage(packetId++, AssignClassToPlayerPacket.class,
+                AssignClassToPlayerPacket::encode,
+                AssignClassToPlayerPacket::decode,
+                AssignClassToPlayerPacket::handle);
     }
 
     public class Screens {
@@ -70,6 +83,20 @@ public class NetworkHandler {
                 new OpenScreenPacket(2, new HashMap<String, Object>() {{
                     put("tentExist", tentExist);
                 }})
+            );
+        }
+        
+        public static void openClassAssignerScreen(ServerPlayer player, BlockPos blockPos, String currentClassId) {
+            boolean isAdmin = player.hasPermissions(2); // Check if player has OP level 2 or higher
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("blockPos", blockPos);
+            data.put("currentClassId", currentClassId);
+            data.put("isAdmin", isAdmin);
+            
+            NetworkHandler.CHANNEL.send(
+                PacketDistributor.PLAYER.with(() -> player),
+                new OpenScreenPacket(3, data)
             );
         }
     }

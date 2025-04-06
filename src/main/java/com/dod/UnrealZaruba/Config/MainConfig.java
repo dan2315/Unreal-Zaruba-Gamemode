@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import net.minecraft.core.BlockPos;
 
 public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     
@@ -19,6 +20,7 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
 
     public static class MainConfigData {
         private Mode mode = Mode.GAME;
+        private BlockPos lobbySpawnPoint = new BlockPos(0, 65, 0);
         
         public Mode getMode() {
             return mode;
@@ -26,6 +28,14 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
         
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+
+        public BlockPos getLobbySpawnPoint() {
+            return lobbySpawnPoint;
+        }
+
+        public void setLobbySpawnPoint(BlockPos lobbySpawnPoint) {
+            this.lobbySpawnPoint = lobbySpawnPoint;
         }
     }
     
@@ -37,7 +47,6 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     }
     
     private MainConfig() {
-        // Register this config with the manager
         ConfigManager.registerConfig(MainConfigData.class, this);
     }
     
@@ -84,5 +93,9 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
         config.setMode(mode);
         saveMainConfig(config);
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Zaruba mode set to: " + mode);
+    }
+
+    public BlockPos getLobbySpawnPoint() {
+        return loadMainConfig().getLobbySpawnPoint();
     }
 } 

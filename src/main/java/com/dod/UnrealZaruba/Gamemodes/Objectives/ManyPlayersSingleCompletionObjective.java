@@ -8,6 +8,11 @@ public class ManyPlayersSingleCompletionObjective extends GameObjective {
     }
 
     @Override
-    public void Update() {
+    protected boolean UpdateImplementation() {
+        return false;
+    }
+
+    @Override
+    protected void OnCompleted() {
     }
 }

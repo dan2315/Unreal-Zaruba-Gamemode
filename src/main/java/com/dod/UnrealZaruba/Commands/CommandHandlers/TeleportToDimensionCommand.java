@@ -4,6 +4,7 @@ import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 
 public class TeleportToDimensionCommand implements ICommandHandler {
 
@@ -13,7 +14,8 @@ public class TeleportToDimensionCommand implements ICommandHandler {
                 .executes(context -> {
                     WorldManager.teleportPlayerToDimension(
                             context.getSource().getPlayerOrException(),
-                            WorldManager.GAME_DIMENSION);
+                            WorldManager.GAME_DIMENSION,
+                            new BlockPos(0, 100, 0));
                     return 1;
                 }));
     }

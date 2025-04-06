@@ -13,7 +13,7 @@ public class EnoughPlayersCondition extends StartCondition {
 
     public EnoughPlayersCondition(int requiredPlayers) {
         this.requiredPlayers = requiredPlayers;
-        this.requiredDurationTicks = 10 * 20; // 10 seconds * 20 ticks per second
+        this.requiredDurationTicks = 20 * 20; // 20 seconds * 20 ticks per second
     }
 
     @Override

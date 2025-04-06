@@ -33,7 +33,6 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     int remainingBlockAmount;
     float requiredDegreeOfDestruction = 0.1f;
 
-    transient Boolean isCompleted = false; 
     transient Set<BlockPos> trackedBlocks;
     transient ServerLevel world;
     transient int updateCounter = 0;
@@ -80,24 +79,25 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     }
 
     @Override
-    public void Update() {
+    protected boolean UpdateImplementation() {
         updateCounter++;
         
         if (updateCounter % PROGRESS_UPDATE_INTERVAL == 0) {
-            UpdateObjectiveState();
+            return UpdateObjectiveState();
         }
+        return false;
     }
     
-    private void UpdateObjectiveState() {
-        if (isCompleted) return; 
-        if (trackedBlocks == null) return;
+    private boolean UpdateObjectiveState() {
+        if (IsCompleted()) return false; 
+        if (trackedBlocks == null) return false;
 
         int counter = 0;
         List<BlockPos> toRemove = new ArrayList<>();
 
         for (BlockPos pos : trackedBlocks) {
             LevelChunk chunk = world.getChunkSource().getChunk(pos.getX() >> 4, pos.getZ() >> 4, false);
-            if (chunk == null) return;
+            if (chunk == null) return false;
 
             if (world.getBlockState(pos).getBlock() == Blocks.AIR) {
                 toRemove.add(pos);
@@ -111,7 +111,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         progress = GetProgress();
         float degreeOfDestruction = 1 - progress;
         if (degreeOfDestruction >= requiredDegreeOfDestruction) {
-            Complete();
+            return true; // It means that objective is completed
         }
 
         progress = 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
@@ -125,11 +125,9 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
             }
             notifyBlockCounter = 0;
         }
+        return false;
     }
-    
-    /**
-     * Handles player tick events for this objective
-     */
+
     public void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player) {
         UUID playerId = player.getUUID();
         
@@ -138,13 +136,14 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         playerVisibilityTicks.put(playerId, ticks);
         
         if (ticks % VISIBILITY_UPDATE_INTERVAL == 0) {
+            UnrealZaruba.LOGGER.info("Updating progress display for player: {}", player.getName().getString());
             updateProgressDisplayForPlayer(player);
         }
     }
 
-    public void Complete() {
-        isCompleted = true;
-
+    @Override
+    public void OnCompleted() {
+        UnrealZaruba.LOGGER.info("Objective {} completed", name);
         for (IObjectiveNotifier notifier : notificationRecipients) {
             notifier.onObjectiveCompleted(this);
         }
@@ -159,11 +158,6 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         }
 
         FireworkLauncher.launchFireworks(world, volume.GetCenter(), 10);
-    }
-
-    @Override
-    public Boolean IsCompleted() {
-        return isCompleted;
     }
 
     public String GetName() {
@@ -190,7 +184,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
 
     @Override
     public void reset() {
-        isCompleted = false;
+        Reset();
         trackedBlocks = InitializeTrackedBlocks(volume);
     }
 }

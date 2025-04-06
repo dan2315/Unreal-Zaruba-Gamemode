@@ -37,8 +37,7 @@ import com.dod.UnrealZaruba.Config.MainConfig;
 import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
-    // private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
-    private static final int GAME_DURATION_MS = 20 * 1000; // 10 minutes
+    private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
     private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 10 seconds
     
     private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
@@ -131,6 +130,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void StartBattle() {
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Starting battle");
         gameTimer.setupScoreboard();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             TeamManager.teleportToSpawn(player);
@@ -148,10 +148,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 startGameTexts.get(team.Color()).GetSubtitle());
         }
 
-        var success = TeamManager.DeleteBarriersAtSpawn();
-        if (!success) {
-            UnrealZaruba.LOGGER.error("Спавны команд ещё не готовы");
-        }
+        // var success = TeamManager.DeleteBarriersAtSpawn();
+        // if (!success) {
+        //     UnrealZaruba.LOGGER.error("Спавны команд ещё не готовы");
+        // }
     }
 
     public void UpdateBattle(int ticks) {
@@ -199,7 +199,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     // TODO: All methods below is like more util
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
-        serverPlayer.teleportTo(server.getLevel(WorldManager.LOBBY_DIMENSION), 0, 16, 0, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+        WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
@@ -216,7 +216,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
         if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
-        TimerManager.createRealTimeTimer(10 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);
+        TimerManager.createRealTimeTimer(3 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);
         // scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS); // Vot tak ne delat'
     }
 
