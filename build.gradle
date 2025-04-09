@@ -172,12 +172,15 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:util:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
-    implementation fg.deobf("curse.maven:curios-309927:5367944")
+
+    implementation fg.deobf("curse.maven:curios-309927:5367944") // That shit is not working, sad face
 
     // Create and its dependencies
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20.1:0.6.11-12")
 
+    // Valkyrien Ship Schematics dependency for 1.20.1
+    implementation fg.deobf("net.spaceeye:valkyrien-ship-schematics-forge-${minecraft_version}:1.0")
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
     // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
@@ -235,4 +238,9 @@ tasks.register('buildClient', Exec) {
 
 tasks.register('buildServer', Exec) {
     commandLine 'cmd', '/c', 'buildServer.bat', archivesBaseName + "-" + version + ".jar"
+}
+
+// Add dependency on Valkyrien-Ship-Schematics forge build
+tasks.named("build").configure { 
+    dependsOn gradle.includedBuild("Valkyrien-Ship-Schematics").task(":forge:build") 
 }

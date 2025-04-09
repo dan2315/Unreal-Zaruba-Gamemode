@@ -68,6 +68,9 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        MinecraftServer server = event.player.getServer();
+        if (server == null || !server.isDedicatedServer()) return;
+
         if (!isDevMode) gamemode.onPlayerTick(event);
     }
 

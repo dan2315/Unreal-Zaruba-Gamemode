@@ -13,7 +13,9 @@
     "MinecraftServerMixin",
     "RedstoneLinkBlockMixin"
   ],
-  "client": [],
+  "client": [
+    "ClientPacketListenerMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -32,6 +32,8 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.LevelEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.apigame.VSCore;
@@ -76,6 +78,7 @@ public class WorldManager {
             UnrealZaruba.LOGGER.info("Deleting ships in game world");
             clearShipsInDimension(gameLevel);
             
+            // Idunno why, but it works
             TimerManager.createRealTimeTimer(10000 /*10s*/, () -> {
                 UnrealZaruba.LOGGER.info("Deleting game world");
                 deleteGameWorld();
@@ -137,6 +140,7 @@ public class WorldManager {
         gameLevel.noSave = true;
         ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, gameLevel);
         server.markWorldsDirty();
+        MinecraftForge.EVENT_BUS.post(new LevelEvent.Load(gameLevel));
     }
 
     public static void clearShipsInDimension(ServerLevel level) {

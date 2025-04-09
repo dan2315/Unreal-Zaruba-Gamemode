@@ -1,19 +1,16 @@
 package com.dod.UnrealZaruba.VsIntegration;
 
 import com.dod.UnrealZaruba.Utils.SchematicLoader;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.joml.Vector3i;
-import org.joml.Vector3ic;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.world.LevelYRange;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
@@ -23,18 +20,21 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.server.TickTask;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ShipCreator {
 
     private static final ResourceLocation WHEEL_BLOCK_ID = new ResourceLocation("trackwork:med_simple_wheel");
     private static final Block WHEEL_BLOCK = ForgeRegistries.BLOCKS.getValue(WHEEL_BLOCK_ID);
 
+    private static final ResourceLocation REDSTONE_LINK_ID = new ResourceLocation("create:redstone_link");
+    private static final Block REDSTONE_LINK_BLOCK = ForgeRegistries.BLOCKS.getValue(REDSTONE_LINK_ID);
+
+    private static final ResourceLocation LECTERN_CONTROLLER_ID = new ResourceLocation("create:lectern_controller");
+    private static final Block LECTERN_CONTROLLER_BLOCK = ForgeRegistries.BLOCKS.getValue(LECTERN_CONTROLLER_ID);
+
 
     public static void CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level, Direction direction) {
-
         var server =  ServerLifecycleHooks.getCurrentServer();
         ServerShipWorldCore shipWorld = VSGameUtilsKt.getShipObjectWorld(server);
         BlockPos offsetedPosition = position.relative(direction, 3);
@@ -65,16 +65,22 @@ public class ShipCreator {
         shipPos.getX(), shipPos.getY(), shipPos.getZ());
 
         template.placeInWorld(level, shipPos, shipPos.offset(placementPos), new StructurePlaceSettings(), level.random, Block.UPDATE_ALL);
-        ReplaceWheels(level, new BlockPos(templateSize), shipPos);
+        PostprocessBlocks(level, new BlockPos(templateSize), shipPos);
     }
-    private static void ReplaceWheels(ServerLevel level, BlockPos templateSize, BlockPos shipPos) {
+
+    
+    private static void PostprocessBlocks(ServerLevel level, BlockPos templateSize, BlockPos shipPos) {
         var server = ServerLifecycleHooks.getCurrentServer();
+
+        List<BlockPos> wheelPositions = new ArrayList<>();
+
         for (int x = 0; x < templateSize.getX(); x++) {
             for (int y = 0; y < templateSize.getY(); y++) {
                 for (int z = 0; z < templateSize.getZ(); z++) {
                     BlockPos pos = shipPos.offset(x, y, z);
                     BlockState initialState = level.getBlockState(pos);
-                    if (ForgeRegistries.BLOCKS.getKey(initialState.getBlock()).toString().equals(WHEEL_BLOCK_ID.toString())) {
+                    String blockId = ForgeRegistries.BLOCKS.getKey(initialState.getBlock()).toString();
+                    if (blockId.equals(WHEEL_BLOCK_ID.toString())) {
                         UnrealZaruba.LOGGER.info("Replacing wheel at position: x={}, y={}, z={}", pos.getX(), pos.getY(), pos.getZ());
 
                         String blockStateStr = initialState.toString();
@@ -94,6 +100,14 @@ public class ShipCreator {
                     }
                 }
             }
+        }
+
+        ProcessWheels(level, wheelPositions);
+    }
+
+    private static void ProcessWheels(ServerLevel level, List<BlockPos> wheelPositions) {
+        for (BlockPos pos : wheelPositions) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         }
     }
 }

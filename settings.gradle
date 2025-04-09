@@ -7,13 +7,7 @@ pluginManagement {
             name = "ParchmentMC"
             url = "https://maven.parchmentmc.org"
         }
-        // maven {
-        //     name = 'Architectury'
-        //     url = 'https://maven.architectury.dev'
-        // }
-        // maven() {
-        //     name = "Fabric"
-        //     url = "https://maven.fabricmc.net/"
-        // }
     }
 }
+
+includeBuild("Valkyrien-Ship-Schematics")
