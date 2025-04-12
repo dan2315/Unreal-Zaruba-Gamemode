@@ -153,6 +153,7 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
 
     implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
     implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
@@ -180,7 +181,9 @@ dependencies {
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20.1:0.6.11-12")
 
     // Valkyrien Ship Schematics dependency for 1.20.1
-    implementation fg.deobf("net.spaceeye:valkyrien-ship-schematics-forge-${minecraft_version}:1.0")
+    // implementation fg.deobf("net.spaceeye:valkyrien-ship-schematics-forge-${minecraft_version}:1.0")
+    compileOnly fg.deobf(files("X:/Projects/Unreal-Zaruba-Gamemode/libs/VMod-Forge-1.20.1-1.0.0.jar"))
+    compileOnly fg.deobf(files("X:/Projects/Unreal-Zaruba-Gamemode/Valkyrien-Ship-Schematics/forge/build/libs/valkyrien-ship-schematics-forge-1.20.1-1.0.jar"))
 
     // TODO: бляяяя, добавьте Биг Кэнонс 
     // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
@@ -190,18 +193,49 @@ dependencies {
     // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-2697705")
 }
 
+// configurations {
+//     embeddedDeps
+// }
+
+// dependencies {
+//     embeddedDeps files(
+//     )
+// }
+
 jar {
     manifest {
         attributes([
                 "Specification-Title"     : "unrealzaruba",
-                "Specification-Vendor"    : "unrealzarubasareus",
+                "Specification-Vendor"    : "unrealzaruba",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "unrealzarubasareus",
+                "Implementation-Vendor"   : "unrealzaruba",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+
+    // Fuch that, I am out
+    // duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // from {
+    //     configurations.embeddedDeps.collect { 
+    //         if (it.name.contains("VMod")) {
+    //             zipTree(it).matching {
+    //                 include 'net/spaceeye/vmod/schematic/**'
+    //                 include 'net/spaceeye/vmod/utils/**'
+    //                 include 'net/spaceeye/vmod/config/**'
+    //                 include 'net/spaceeye/vmod/VMConfig*.class'
+    //             }
+    //         } else if (it.name.contains("Valkyrien-Ship-Schematics")) {
+    //             zipTree(it).matching {
+    //                 exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.MF', 'META-INF/mods.toml', 'pack.mcmeta'
+    //             }
+    //         } else {
+    //             zipTree(it)
+    //         }
+    //     }
+    // }
 }
 
 
@@ -238,9 +272,4 @@ tasks.register('buildClient', Exec) {
 
 tasks.register('buildServer', Exec) {
     commandLine 'cmd', '/c', 'buildServer.bat', archivesBaseName + "-" + version + ".jar"
-}
-
-// Add dependency on Valkyrien-Ship-Schematics forge build
-tasks.named("build").configure { 
-    dependsOn gradle.includedBuild("Valkyrien-Ship-Schematics").task(":forge:build") 
 }

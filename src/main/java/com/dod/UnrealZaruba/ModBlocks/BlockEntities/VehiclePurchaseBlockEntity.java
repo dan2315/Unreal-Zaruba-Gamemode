@@ -210,7 +210,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     
         if (level instanceof ServerLevel serverLevel) {
             ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), 
-                serverLevel, getBlockState().getValue(BlockStateProperties.FACING));
+                serverLevel, player, getBlockState().getValue(BlockStateProperties.FACING));
             return new Tuple<>(true, "Vehicle deployed successfully");
         } else {
             return new Tuple<>(false, "Error: Not on server level");

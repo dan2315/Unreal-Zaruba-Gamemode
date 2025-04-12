@@ -18,9 +18,21 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
+
+import net.spaceeye.vmod.schematic.VModShipSchematicV1;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
+import net.spaceeye.valkyrien_ship_schematics.ShipSchematic;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.dod.UnrealZaruba.UnrealZaruba;
+
 public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();
     private static final Map<ResourceLocation, StructureTemplate> TEMPLATE_CACHE = new HashMap<>();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static CompoundTag GetSchematicNbt(ResourceLocation location) {
         if (SCHEMATIC_CACHE.containsKey(location)) {
@@ -120,4 +132,71 @@ public class SchematicLoader {
         return template;
     }
 
+
+    // VSCHEM
+    public static IShipSchematic GetVSchem(ResourceLocation location) {
+        try {
+            byte[] bytes;
+            String source;
+            
+            java.io.File file = new java.io.File("schematics/vs/" + location.getPath() + ".vschem");
+            if (file.exists()) {
+                source = "server directory: " + file.getAbsolutePath();
+                try (java.io.FileInputStream fileInputStream = new java.io.FileInputStream(file)) {
+                    bytes = fileInputStream.readAllBytes();
+                }
+            } else {
+                String resourcePath = "/assets/unrealzaruba/schematics/" + location.getPath();
+                try (InputStream inputStream = SchematicLoader.class.getResourceAsStream(resourcePath)) {
+                    if (inputStream == null) {
+                        throw new IOException("Schematic file not found in both server directory and mod resources: " + location);
+                    }
+                    source = "mod resources: " + resourcePath;
+                    bytes = inputStream.readAllBytes();
+                }
+            }
+            
+            UnrealZaruba.LOGGER.info("Loading schematic from " + source);
+            UnrealZaruba.LOGGER.info("Bytes: " + bytes.length);
+            
+            if (bytes.length > 3 && bytes[3] == 1) {
+                UnrealZaruba.LOGGER.info("VSCHEM version 1 detected");
+                var instance = new VModShipSchematicV1();
+                instance.deserialize(new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes)));
+                return instance;
+            }
+            else {
+                try {
+                    var buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes));
+                    UnrealZaruba.LOGGER.info("Falling to fallback: {}", buf.readUtf());
+                    String type = buf.readUtf();
+                    UnrealZaruba.LOGGER.info("Type: {}", type);
+                    if (type.equals("VModShipSchematicV1")) {
+                        var instance = new VModShipSchematicV1();
+                        boolean result = instance.deserialize(buf);
+                        UnrealZaruba.LOGGER.info("Result: {}", result);
+                        return instance;
+                    }
+                    else {
+                        throw new Exception("Unsupported VSCHEM version");
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return ShipSchematic.getSchematicFromBytes(bytes);
+                }
+                catch (Error e) {
+                    e.printStackTrace();
+                    return ShipSchematic.getSchematicFromBytes(bytes);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        catch (Error e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

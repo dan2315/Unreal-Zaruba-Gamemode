@@ -1,0 +1,68 @@
+package com.dod.UnrealZaruba.Utils.Geometry;
+
+import net.minecraft.core.Direction;
+import org.valkyrienskies.core.api.ships.properties.ShipTransform;
+import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
+import org.joml.Quaterniondc;
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
+
+
+public class VsUtils {
+    public static ShipTransform RotateAroundCenter(ShipTransform rotationPoint, ShipTransform transform, Quaterniondc rotation) {
+        Vector3d shipPosition = new Vector3d(transform.getPositionInWorld());
+        Quaterniondc shipRotation = transform.getShipToWorldRotation();
+
+        Vector3d shipYardCenter = transform.getWorldToShip().transformPosition(shipPosition);
+
+        ShipTransform rotatedCenter = ShipTransformImpl.Companion.create(
+            rotationPoint.getPositionInWorld(),
+            rotationPoint.getPositionInShip(),
+            rotationPoint.getShipToWorldRotation().mul(rotation, new Quaterniond()),
+            rotationPoint.getShipToWorldScaling()
+        );
+
+        Quaterniond difference = rotatedCenter.getShipToWorldRotation()
+        .mul(rotationPoint.getShipToWorldRotation()
+        .invert(new Quaterniond()), new Quaterniond());
+        
+        Quaterniond newRotation = difference.mul(shipRotation, new Quaterniond());
+        Vector3d newPosition = rotatedCenter.getShipToWorld().transformPosition(shipYardCenter);
+
+        return ShipTransformImpl.Companion.create(
+            newPosition,
+            transform.getPositionInShip(),
+            newRotation,
+            transform.getShipToWorldScaling()
+        );
+    }
+
+    public static Quaterniond getQuatFromDir(Direction direction) {
+        Quaterniond quaternion = new Quaterniond();
+        
+        switch (direction) {
+            case UP:
+                quaternion.identity();
+                break;
+            case DOWN:
+                quaternion.rotationY(Math.PI);
+                break;
+            case NORTH:
+                quaternion.rotationY((Math.PI / 2) * 1.5);
+                break;
+            case SOUTH:
+                quaternion.rotationY((Math.PI / 2) * 0.5);
+                break;
+            case EAST:
+                quaternion.rotationY(Math.PI / 2);
+                break;
+            case WEST:
+                quaternion.rotationY(-Math.PI / 2);
+                break;
+            default:
+                quaternion.identity();
+        }
+        
+        return quaternion;
+    }
+}

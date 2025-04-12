@@ -2,25 +2,41 @@ package com.dod.UnrealZaruba.VsIntegration;
 
 import com.dod.UnrealZaruba.Utils.SchematicLoader;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.Utils.Geometry.VsUtils;
+import com.simibubi.create.foundation.utility.Pair;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import org.joml.Vector3d;
 import org.joml.Vector3i;
+import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.world.LevelYRange;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
+import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
+import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
+import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
+import net.spaceeye.vmod.schematic.SchematicActionsQueue;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.world.level.block.Blocks;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
+
+import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematicInfo;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipInfo;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipSchematicDataV1;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.SchemSerializeDataV1Impl;
+import net.spaceeye.vmod.schematic.VModShipSchematicV1Kt;
 
 public class ShipCreator {
 
@@ -33,81 +49,80 @@ public class ShipCreator {
     private static final ResourceLocation LECTERN_CONTROLLER_ID = new ResourceLocation("create:lectern_controller");
     private static final Block LECTERN_CONTROLLER_BLOCK = ForgeRegistries.BLOCKS.getValue(LECTERN_CONTROLLER_ID);
 
+    public static void CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level,
+            ServerPlayer player, Direction direction) {
+        try {
+            IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
 
-    public static void CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level, Direction direction) {
-        var server =  ServerLifecycleHooks.getCurrentServer();
-        ServerShipWorldCore shipWorld = VSGameUtilsKt.getShipObjectWorld(server);
-        BlockPos offsetedPosition = position.relative(direction, 3);
-
-        var ship = shipWorld.createNewShipAtBlock(
-            new Vector3i(offsetedPosition.getX(), offsetedPosition.getY(), offsetedPosition.getZ()),
-            false,
-            1.0,
-            VSGameUtilsKt.getDimensionId(level));
-
-        UnrealZaruba.LOGGER.info("[UnrealZaruba] Loading schematic into ship {}", schematicLocation);
-        LoadSchematicIntoShip(schematicLocation, ship, level);
-    }
-
-    private static void LoadSchematicIntoShip(ResourceLocation schematicLocation, ServerShip ship, ServerLevel level) {
-        StructureTemplate template = SchematicLoader.GetStructureTemplate(schematicLocation);
-        Vector3i centerPos = new Vector3i();
-
-        LevelYRange yRange = new LevelYRange(level.getMinBuildHeight(), level.getMaxBuildHeight() - 1);
-        ship.getChunkClaim().getCenterBlockCoordinates(yRange, centerPos);
-
-        Vec3i templateSize = template.getSize();
-        BlockPos shipPos = new BlockPos(centerPos.x, centerPos.y, centerPos.z);
-
-        BlockPos placementPos = new BlockPos(-templateSize.getX()/2, 0, -templateSize.getZ()/2);;
-
-        UnrealZaruba.LOGGER.info("Placing structure at position: x={}, y={}, z={}", 
-        shipPos.getX(), shipPos.getY(), shipPos.getZ());
-
-        template.placeInWorld(level, shipPos, shipPos.offset(placementPos), new StructurePlaceSettings(), level.random, Block.UPDATE_ALL);
-        PostprocessBlocks(level, new BlockPos(templateSize), shipPos);
-    }
-
-    
-    private static void PostprocessBlocks(ServerLevel level, BlockPos templateSize, BlockPos shipPos) {
-        var server = ServerLifecycleHooks.getCurrentServer();
-
-        List<BlockPos> wheelPositions = new ArrayList<>();
-
-        for (int x = 0; x < templateSize.getX(); x++) {
-            for (int y = 0; y < templateSize.getY(); y++) {
-                for (int z = 0; z < templateSize.getZ(); z++) {
-                    BlockPos pos = shipPos.offset(x, y, z);
-                    BlockState initialState = level.getBlockState(pos);
-                    String blockId = ForgeRegistries.BLOCKS.getKey(initialState.getBlock()).toString();
-                    if (blockId.equals(WHEEL_BLOCK_ID.toString())) {
-                        UnrealZaruba.LOGGER.info("Replacing wheel at position: x={}, y={}, z={}", pos.getX(), pos.getY(), pos.getZ());
-
-                        String blockStateStr = initialState.toString();
-                        int propertiesStart = blockStateStr.indexOf('[');
-                        String propertiesPart = "";
-                        if (propertiesStart > 0) {
-                            propertiesPart = blockStateStr.substring(propertiesStart);
+            UnrealZaruba.LOGGER.info("Got schematic: ");
+            schematic.getInfo().getShipsInfo().forEach(shipData -> {
+                UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
+            });
+            Quaterniond rotation = VsUtils.getQuatFromDir(direction);
+            Vector3d positionVec = new Vector3d(position.getX(), position.getY(), position.getZ());
+            VModShipSchematicV1Kt.placeAt((IShipSchematicDataV1) schematic, level, player, player.getUUID(),
+                    positionVec, rotation,
+                    new Function1<List<? extends ServerShip>, Unit>() {
+                        @Override
+                        public Unit invoke(List<? extends ServerShip> ships) {
+                            return Unit.INSTANCE;
                         }
-                        
-                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-
-                        String command = String.format("setblock %d %d %d %s%s", 
-                            pos.getX(), pos.getY(), pos.getZ(), WHEEL_BLOCK_ID.toString(), propertiesPart);
-
-                        server.getCommands().performPrefixedCommand(
-                            server.createCommandSourceStack().withSuppressedOutput(), command);
-                    }
-                }
-            }
+                    });
+        } catch (Exception e) {
+            UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        ProcessWheels(level, wheelPositions);
     }
 
-    private static void ProcessWheels(ServerLevel level, List<BlockPos> wheelPositions) {
-        for (BlockPos pos : wheelPositions) {
-            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        }
+    private static boolean PlaceAt(IShipSchematic schematic, ServerLevel level, ServerPlayer player, UUID uuid,
+            Vector3d position, Quaterniondc rotation, Consumer<List<ServerShip>> postCreationCallback) {
+        var newTransforms = new ArrayList<ShipTransform>();
+        var shipConstructors = CreateShipConstructors(schematic, level, position, rotation, newTransforms);
+
+        // RIP
+        return false;
+    }
+
+    private static List<Pair<Supplier<ServerShip>, Long>> CreateShipConstructors(
+            IShipSchematic schematic,
+            ServerLevel level,
+            Vector3d position,
+            Quaterniondc rotation,
+            List<ShipTransform> newTransforms) {
+        ShipTransform center = ShipTransformImpl.Companion.create(
+                new Vector3d(),
+                new Vector3d(),
+                new Quaterniond(),
+                new Vector3d(1.0, 1.0, 1.0));
+
+        List<Pair<Supplier<ServerShip>, Long>> shipConstructors = new ArrayList<>();
+        schematic.getInfo().getShipsInfo().forEach(shipData -> {
+            ShipTransform shipTransform = ShipTransformImpl.Companion.create(
+                    shipData.getRelPositionToCenter(),
+                    shipData.getPositionInShip(),
+                    shipData.getRotation(),
+                    new Vector3d(shipData.getShipScale(), shipData.getShipScale(), shipData.getShipScale()));
+            ShipTransform newTransform = VsUtils.RotateAroundCenter(center, shipTransform, rotation);
+            newTransforms.add(newTransform);
+            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+            var destinationPosition = position.add(newTransform.getPositionInWorld());
+
+            ServerShip ship = shipWorld.createNewShipAtBlock(
+                    new Vector3i(),
+                    false,
+                    shipData.getShipScale(),
+                    VSGameUtilsKt.getDimensionId(level));
+
+            ship.setStatic(true);
+
+            shipWorld.teleportShip(ship, new ShipTeleportDataImpl(
+                    destinationPosition,
+                    newTransform.getShipToWorldRotation(),
+                    new Vector3d(0, 0, 0),
+                    newTransform.getShipToWorldScaling()));
+        });
+
+        return shipConstructors;
     }
 }
