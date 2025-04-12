@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Utils.Geometry;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.joml.Quaterniondc;
@@ -8,7 +9,7 @@ import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
 
-public class VsUtils {
+public class Utils {
     public static ShipTransform RotateAroundCenter(ShipTransform rotationPoint, ShipTransform transform, Quaterniondc rotation) {
         Vector3d shipPosition = new Vector3d(transform.getPositionInWorld());
         Quaterniondc shipRotation = transform.getShipToWorldRotation();
@@ -48,10 +49,10 @@ public class VsUtils {
                 quaternion.rotationY(Math.PI);
                 break;
             case NORTH:
-                quaternion.rotationY((Math.PI / 2) * 1.5);
+                quaternion.rotationY((Math.PI / 2) * 2);
                 break;
             case SOUTH:
-                quaternion.rotationY((Math.PI / 2) * 0.5);
+                quaternion.rotationY((Math.PI / 2) * 0);
                 break;
             case EAST:
                 quaternion.rotationY(Math.PI / 2);

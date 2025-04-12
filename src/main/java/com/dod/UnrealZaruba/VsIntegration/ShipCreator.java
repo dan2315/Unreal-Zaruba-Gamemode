@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba.VsIntegration;
 
 import com.dod.UnrealZaruba.Utils.SchematicLoader;
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.Geometry.VsUtils;
+import com.dod.UnrealZaruba.Utils.Geometry.Utils;
 import com.simibubi.create.foundation.utility.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,7 +21,6 @@ import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 
 import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,21 +48,18 @@ public class ShipCreator {
             ServerPlayer player, Direction direction) {
         try {
             IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
+            IShipSchematicDataV1 schematicV1 = (IShipSchematicDataV1) schematic;
 
             UnrealZaruba.LOGGER.info("Got schematic: ");
             schematic.getInfo().getShipsInfo().forEach(shipData -> {
                 UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
             });
-            Quaterniond rotation = VsUtils.getQuatFromDir(direction);
-            Vector3d positionVec = new Vector3d(position.getX(), position.getY(), position.getZ());
-            VModShipSchematicV1Kt.placeAt((IShipSchematicDataV1) schematic, level, player, player.getUUID(),
+            Quaterniond rotation = Utils.getQuatFromDir(direction);
+            BlockPos offsetedPosition = position.relative(direction);
+            Vector3d positionVec = new Vector3d(offsetedPosition.getX(), offsetedPosition.getY(), offsetedPosition.getZ());
+            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player.getUUID(),
                     positionVec, rotation,
-                    new Function1<List<? extends ServerShip>, Unit>() {
-                        @Override
-                        public Unit invoke(List<? extends ServerShip> ships) {
-                            return Unit.INSTANCE;
-                        }
-                    });
+                    ships -> Unit.INSTANCE);
             return true;
         } catch (Exception e) {
             UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());
@@ -100,7 +96,7 @@ public class ShipCreator {
                     shipData.getPositionInShip(),
                     shipData.getRotation(),
                     new Vector3d(shipData.getShipScale(), shipData.getShipScale(), shipData.getShipScale()));
-            ShipTransform newTransform = VsUtils.RotateAroundCenter(center, shipTransform, rotation);
+            ShipTransform newTransform = Utils.RotateAroundCenter(center, shipTransform, rotation);
             newTransforms.add(newTransform);
             var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 

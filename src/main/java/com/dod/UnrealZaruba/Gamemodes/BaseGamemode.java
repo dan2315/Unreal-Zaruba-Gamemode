@@ -3,7 +3,6 @@ package com.dod.UnrealZaruba.Gamemodes;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.AbstractGamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.IPhaseHolder;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
@@ -15,9 +14,6 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraftforge.server.ServerLifecycleHooks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -134,6 +130,13 @@ public abstract class BaseGamemode implements IPhaseHolder {
     }
     
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
+        if (currentPhase.GetPhaseId() == PhaseId.TEAM_SELECTION) {
+            player.setHealth(20);
+            player.getFoodData().setFoodLevel(20);
+            event.setCanceled(true);
+            return;
+        }
+
         player.setGameMode(GameType.SPECTATOR);
 
         player.setHealth(20);
@@ -144,7 +147,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
         NBT.addEntityTag(player, "isPlayerDead", 1);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
-        
+
         startRespawnTimer(player);
     }
     
