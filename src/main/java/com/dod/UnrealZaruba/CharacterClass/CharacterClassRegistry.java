@@ -81,6 +81,9 @@ public class CharacterClassRegistry {
         };
     }
 
+    // TODO: Не регает одежду, гранаты и патроны в List<ItemStack>,
+    //  из-за чего не получается засетапить армор стенды в ClassAssignerBlockEntity.java,
+    //  но не смотря на это без проблем их выдает. Даня блять ты колдун ебучий
     static {
         // Vegetable Warrior =========================================================================
         registerForBothTeams(

@@ -5,8 +5,11 @@ import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.recipes.packs.BundleRecipeProvider;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -30,6 +33,7 @@ import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.registries.ForgeRegistries;
 
 
 public class ClassAssignerBlockEntity extends BlockEntity {
@@ -107,13 +111,14 @@ public class ClassAssignerBlockEntity extends BlockEntity {
             List<ItemStack> kitItems = classData.getKit();
             for (ItemStack item : kitItems) {
                 Item itemType = item.getItem();
-                
-                if (itemType instanceof ArmorItem) {
-                    ArmorItem armorItem = (ArmorItem) itemType;
-                    EquipmentSlot slot = armorItem.getEquipmentSlot();
-                    armorStand.setItemSlot(slot, item.copy());
-                }
-                else if (itemType.toString().contains("pumpkin")) {
+                UnrealZaruba.LOGGER.info("[UZ] {} Equipment slot: {}", item.getDisplayName(), item.getEquipmentSlot());
+//
+//                if (item.getEquipmentSlot() != null) {
+//                    EquipmentSlot slot = item.getEquipmentSlot();
+//                    armorStand.setItemSlot(slot, item.copy());
+//                }
+
+                if (itemType.toString().contains("pumpkin")) {
                     armorStand.setItemSlot(EquipmentSlot.HEAD, item.copy());
                 }
                 else if (isWeaponOrTool(itemType)) {
@@ -121,6 +126,11 @@ public class ClassAssignerBlockEntity extends BlockEntity {
                     break;
                 }
             }
+            // TODO: Убрать и сделать нормально
+            armorStand.setItemSlot(EquipmentSlot.FEET, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:socks_boots")), 1));
+            armorStand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:anchorpoint_leggings")), 1));
+            armorStand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:breaker_chestplate")), 1));
+            armorStand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:hammer_helmet")), 1));
             
             level.addFreshEntity(armorStand);
             armorStandUUID = armorStand.getUUID();
