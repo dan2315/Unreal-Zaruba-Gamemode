@@ -28,6 +28,7 @@ public class PlayerContext {
     protected int voteCount;
     protected boolean isVoted;
     protected boolean isDead;
+    protected boolean isReady;
 
     public boolean sosal;
 
@@ -48,6 +49,10 @@ public class PlayerContext {
 
     public boolean IsDead() {
         return isDead;
+    }
+
+    public boolean IsReady() {
+        return isReady;
     }
 
     public BaseGamemode Gamemode() { return gamemode; } 
@@ -92,6 +97,10 @@ public class PlayerContext {
 
     public void SetVoted() {
         isVoted = true;
+    }
+
+    public void SetReady(boolean ready) {
+        isReady = ready;
     }
 }
 

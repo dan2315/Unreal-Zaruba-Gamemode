@@ -34,5 +34,6 @@ public class TeamPlayerContext extends PlayerContext implements IResettable {
     public void reset() {
         team = null;
         tentChosen = false;
+        isReady = false;
     }
 }

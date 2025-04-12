@@ -14,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class SustainedPlayerCountCondition extends StartCondition {
+public class TeamsHaveEnoughPlayersCondition extends StartCondition implements IDelayedCondition {
     private final int requiredPlayersPerTeam;
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;
     private final TeamManager teamManager;
     private final HashMap<TeamColor, Boolean> teamReadyStatus = new HashMap<>();
 
-    public SustainedPlayerCountCondition(TeamManager teamManager, int requiredPlayersPerTeam, int requiredDurationSeconds) {
+    public TeamsHaveEnoughPlayersCondition(TeamManager teamManager, int requiredPlayersPerTeam, int requiredDurationSeconds) {
         this.teamManager = teamManager;
         this.requiredPlayersPerTeam = requiredPlayersPerTeam;
         this.requiredDurationTicks = requiredDurationSeconds * 20; // Convert seconds to ticks (20 ticks per second)

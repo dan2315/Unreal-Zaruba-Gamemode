@@ -34,7 +34,6 @@ public class ProgressbarForObjective implements IProgressDisplay {
     
     @Override
     public void updatePlayerVisibility(ServerPlayer player) {
-        UnrealZaruba.LOGGER.info("Updating player visibility for objective: {}", objective.GetName());
         boolean isNearTarget = isPlayerNearTarget(player, objective.getPosition());
         
         if (isNearTarget && !playersWithBossBar.contains(player.getUUID())) {

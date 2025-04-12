@@ -9,7 +9,6 @@ import java.util.List;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Config.TeamsConfig;
-import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -157,22 +156,6 @@ public class TeamManager implements IResettable {
         }
 
         teams.get(dyeColor).Assign(player);
-    }
-
-    public void GiveKit() {
-        for (TeamContext team : teams.values()) {
-            team.GiveKit();
-        }
-    }
-
-    public void GiveArmorKitTo(MinecraftServer server, ServerPlayer player) {
-        ItemKits.GiveArmorKit(server, player, GetPlayersTeam(player));
-    }
-
-    public void GiveKitTo(MinecraftServer server, ServerPlayer player) {
-        TeamContext team = GetPlayersTeam(player);
-        if (team == null) return;
-        ItemKits.GiveKit(server, player, team);
     }
 
     public void ChangeGameModeOfAllParticipants(GameType gameType) {

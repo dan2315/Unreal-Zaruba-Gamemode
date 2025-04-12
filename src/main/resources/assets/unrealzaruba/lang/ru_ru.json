@@ -9,5 +9,7 @@
     "container.vehicle_purchase": "Покупка транспорта",
     "button.unrealzaruba.deploy": "Разместить",
     "button.unrealzaruba.missing_items": "Отсутствуют предметы",
-    "label.unrealzaruba.required_items": "Необходимые предметы:"
+    "label.unrealzaruba.required_items": "Необходимые предметы:",
+    "container.vehicle_purchase.missing_items": "Отсутствуют предметы",
+    "container.vehicle_purchase.cooldown": "Покупка транспорта на перезарядке:"
   }

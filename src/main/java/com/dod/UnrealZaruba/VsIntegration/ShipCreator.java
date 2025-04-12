@@ -19,7 +19,6 @@ import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.impl.game.ShipTeleportDataImpl;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
-import net.spaceeye.vmod.schematic.SchematicActionsQueue;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -32,10 +31,7 @@ import java.util.function.Supplier;
 import net.minecraft.server.level.ServerPlayer;
 
 import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematicInfo;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipInfo;
 import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipSchematicDataV1;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.SchemSerializeDataV1Impl;
 import net.spaceeye.vmod.schematic.VModShipSchematicV1Kt;
 
 public class ShipCreator {
@@ -49,7 +45,7 @@ public class ShipCreator {
     private static final ResourceLocation LECTERN_CONTROLLER_ID = new ResourceLocation("create:lectern_controller");
     private static final Block LECTERN_CONTROLLER_BLOCK = ForgeRegistries.BLOCKS.getValue(LECTERN_CONTROLLER_ID);
 
-    public static void CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level,
+    public static boolean CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level,
             ServerPlayer player, Direction direction) {
         try {
             IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
@@ -68,9 +64,11 @@ public class ShipCreator {
                             return Unit.INSTANCE;
                         }
                     });
+            return true;
         } catch (Exception e) {
             UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 

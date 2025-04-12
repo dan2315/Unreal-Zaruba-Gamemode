@@ -21,6 +21,7 @@ public class CommandHandlerFactory {
         handlers.add(new StartBattleCommand());
         handlers.add(new CreateObjectiveCommand());
         handlers.add(new ResetGameWorldCommand());
+        handlers.add(new SetReadyCommand());
         
         return handlers;
     }

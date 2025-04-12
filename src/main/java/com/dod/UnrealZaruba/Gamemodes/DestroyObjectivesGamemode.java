@@ -1,13 +1,10 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
@@ -20,7 +17,8 @@ import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.GamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.TimedGamePhase;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.EnoughPlayersCondition;
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.AllPlayersReadyCondition;
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.CombinedOrCondition;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.event.TickEvent;
@@ -31,17 +29,16 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.SustainedPlayerCountCondition;
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
 import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
+    private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
     private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
-    private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 10 seconds
+    private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 5 seconds
     
-    private static ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-
     private GameStatisticsService gameStatistics;
     private GameTimer gameTimer;
     private MinecraftServer server;
@@ -58,6 +55,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         TeamManager teamManager = new TeamManager();
         teamManager.Initialize();
         SetTeamManager(teamManager);
+        gameTimer.setupScoreboard();
 
         TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
         TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
@@ -90,18 +88,27 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
 
-
+        // TODO: Replace manual phase completion with automatic
         AddPhase(
             new GamePhase(
-                PhaseId.TEAM_SELECTION,
+                PhaseId.TEAM_SELECTION, 
                 this::StartTeamSelection,
                 this::CompleteTeamSelection
             )   
         ).
         AddPhase(
             new TimedGamePhase(
+                PhaseId.STRATEGY_TIME,
+                STRATEGY_TIME_DURATION_MS, // 30 seconds
+                this::StartStrategyTime,
+                this::UpdateStrategyTime,
+                this::CompleteStrategyTime
+            )
+        );
+        AddPhase(
+            new TimedGamePhase(
                 PhaseId.BATTLE,
-                GAME_DURATION_MS,
+                GAME_DURATION_MS, // 10 minutes
                 this::StartBattle,
                 this::UpdateBattle,
                 () -> { // On phase end
@@ -112,10 +119,12 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
         ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
 
-        // startCondition = new SustainedPlayerCountCondition(TeamManager, 1, 10); // 5 players in each team for 10 sec
-        startCondition = new EnoughPlayersCondition(1);
+        startCondition = new CombinedOrCondition(
+            new TeamsHaveEnoughPlayersCondition(TeamManager, 5, 10),
+            new AllPlayersReadyCondition(10)
+        );
         startCondition.SetOnConditionMet(() -> {
-            ProceedToPhaseForced(PhaseId.BATTLE);
+            CompletePhase(PhaseId.TEAM_SELECTION);
         });
 
         objectivesHandler.OnObjectivesCompleted(() -> {
@@ -127,16 +136,18 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void CompleteTeamSelection() {
+        var players = server.getPlayerList().getPlayers();
+        for (ServerPlayer player : players) {
+            TeamManager.teleportToSpawn(player);
+        }
+        CharacterClassEquipper.equipTeamWithSelectedClasses(players);
+        TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
+        server.setDifficulty(Difficulty.NORMAL, true);
     }
 
     public void StartBattle() {
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Starting battle");
-        gameTimer.setupScoreboard();
-        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            TeamManager.teleportToSpawn(player);
-        }
-        TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
-        server.setDifficulty(Difficulty.NORMAL, true);
+
         TeamManager.PlayBattleSound();
 
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
@@ -160,6 +171,21 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
         gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
         gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
+    }
+
+    public void StartStrategyTime() {
+    }
+
+    public void UpdateStrategyTime(int ticks) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (STRATEGY_TIME_DURATION_MS / 1000) - (ticks / 20);
+        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
+        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
+    }
+
+    public void CompleteStrategyTime() {
+        TransitToNextPhase();
     }
 
     @Override
@@ -215,17 +241,28 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         ShowEndText(server, wonTeam);
+        var players = server.getPlayerList().getPlayers();
+        for (ServerPlayer player : players) {
+            player.setGameMode(GameType.SPECTATOR);
+            player.getInventory().clearContent();
+        }
         if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
         TimerManager.createRealTimeTimer(3 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);
         // scheduledExecutorService.schedule(() -> CompleteGameDelayed(server), 10, TimeUnit.SECONDS); // Vot tak ne delat'
     }
 
     public void CompleteGameDelayed(MinecraftServer server) {
+        var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersToLobby(server);
         WorldManager.ResetGameWorldDelayed();
+        for (ServerPlayer player : players) {
+            player.setGameMode(GameType.SPECTATOR);
+            player.getInventory().clearContent();
+        }
         startCondition.ResetCondition();
         objectivesHandler.reset();
         TeamManager.reset();
+        ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
@@ -243,18 +280,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             } else {
                 TitleMessage.showTitle(player, titleText, loseText);
             }
-        }
-    }
-
-    public void preventLevelSaving(MinecraftServer server) {
-        for (ServerLevel level : server.getAllLevels()) {
-            level.noSave = true;
-        }
-    }
-
-    public void preventLevelSaving(ServerLevel level) {
-        if (level != null) {
-            level.noSave = true;
         }
     }
 }

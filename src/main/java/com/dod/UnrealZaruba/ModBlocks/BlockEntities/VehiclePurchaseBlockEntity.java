@@ -24,13 +24,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.io.InputStream;
-import java.util.List;
 
-
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.Connection;
@@ -42,7 +42,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.network.chat.Component;
 
-
+@Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvider {
 
     private ResourceLocation schematicLocation;
@@ -50,6 +50,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     private SchematicRenderer renderer;
     private boolean rendererInitialized = false;
     private String selectedVehicle;
+    private int cooldownTicks = 0;
 
     public VehiclePurchaseBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), blockPos, blockState);
@@ -201,19 +202,39 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     
 
         if (!vehicleData.hasRequiredItems(player.getInventory())) {
+            player.sendSystemMessage(Component.translatable("container.vehicle_purchase.missing_items"));
             return new Tuple<>(false, "Missing items");
         }
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Consuming items");
     
-        vehicleData.consumeRequiredItems(player.getInventory());
+        if (cooldownTicks > 0) {
+            player.sendSystemMessage(Component.translatable("container.vehicle_purchase.cooldown")
+                    .append(" (" + (cooldownTicks / 20) + " seconds)"));
+            return new Tuple<>(false, "Cooldown");
+        }
         
     
         if (level instanceof ServerLevel serverLevel) {
-            ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), 
+            boolean success = ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), 
                 serverLevel, player, getBlockState().getValue(BlockStateProperties.FACING));
-            return new Tuple<>(true, "Vehicle deployed successfully");
+            if (success) {
+                cooldownTicks = 200;
+                vehicleData.consumeRequiredItems(player.getInventory());
+                return new Tuple<>(true, "Vehicle deployed successfully");
+            } else {
+                return new Tuple<>(false, "Error: Failed to deploy vehicle");
+            }
         } else {
             return new Tuple<>(false, "Error: Not on server level");
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            if (cooldownTicks > 0) {
+                cooldownTicks--;
+            }
         }
     }
 }

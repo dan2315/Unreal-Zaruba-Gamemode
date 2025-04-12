@@ -9,5 +9,7 @@
     "container.vehicle_purchase": "Vehicle Purchase",
     "button.unrealzaruba.deploy": "Deploy",
     "button.unrealzaruba.missing_items": "Missing Items",
-    "label.unrealzaruba.required_items": "Required Items:"
+    "label.unrealzaruba.required_items": "Required Items:",
+    "container.vehicle_purchase.missing_items": "Missing Items",
+    "container.vehicle_purchase.cooldown": "Vehicle purchase is on cooldown:"
   }

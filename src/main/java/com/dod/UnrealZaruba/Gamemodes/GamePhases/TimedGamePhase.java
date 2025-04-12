@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes.GamePhases;
 
+import com.dod.UnrealZaruba.Utils.Timers.ITimer;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import java.util.function.Consumer;
 
@@ -8,6 +9,8 @@ public class TimedGamePhase extends AbstractGamePhase {
     public Runnable onStart;
     public Runnable onCompleted;
     public Consumer<Integer> onTick;
+    public ITimer timer;
+    public IPhaseHolder phaseHolder;
 
     public TimedGamePhase(PhaseId phaseId, int duration, Runnable onStart, Consumer<Integer> onTick, Runnable onCompleted) {
         super(phaseId);
@@ -20,11 +23,17 @@ public class TimedGamePhase extends AbstractGamePhase {
     @Override
     public void OnStart() {
         onStart.run();
-        TimerManager.createRealTimeTimer(duration, this::OnCompleted, this::OnTick); 
+        timer = TimerManager.createRealTimeTimer(duration, this::OnCompleted, this::OnTick);
     }
 
     @Override
     public void OnCompleted() {
+        if (timer != null) {
+            timer.dispose(false);
+        }
+        if (phaseHolder != null) { // TODO: Assign phase holder when AddPhase is called
+            phaseHolder.CompletePhase(this.phaseId);
+        }
         onCompleted.run();
     }
 

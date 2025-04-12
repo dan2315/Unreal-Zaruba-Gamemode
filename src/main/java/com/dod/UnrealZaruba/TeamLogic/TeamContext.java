@@ -9,7 +9,6 @@ import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjectiveNotifier;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.TeamItemKits.ItemKits;
 import com.dod.UnrealZaruba.Utils.IResettable;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -125,7 +124,7 @@ public class TeamContext implements IObjectiveNotifier, IResettable {
 
     public void setCommander(MinecraftServer server, Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
+            // ItemKits.GiveCommanderKit(server, serverPlayer, batya.GetPlayersTeam(serverPlayer));
             commander = serverPlayer.getUUID();
             commanderName = serverPlayer.getDisplayName().getString();
         }
@@ -177,7 +176,7 @@ public class TeamContext implements IObjectiveNotifier, IResettable {
             player.setRespawnPosition(player.level().dimension(), spawn, 0, false, false);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            batya.GiveArmorKitTo(server, player);
+            // batya.GiveArmorKitTo(server, player);
         }
     }
 
@@ -217,12 +216,6 @@ public class TeamContext implements IObjectiveNotifier, IResettable {
             ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player == null) return;
             player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-        }
-    }
-
-    public void GiveKit() {
-        for (UUID playerId : members) {
-            ItemKits.GiveKit(server, server.getPlayerList().getPlayer(playerId), this);
         }
     }
 

@@ -1,10 +1,12 @@
 package com.dod.UnrealZaruba.NetworkPackets.CharacterClasses;
 
 import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import net.minecraft.core.BlockPos;
@@ -64,11 +66,12 @@ public class AssignClassToPlayerPacket {
                                 teamPlayerContext.SetSelectedClassId(classId);
                                 player.sendSystemMessage(Component.literal("Selected class: " + classData.getDisplayName() + ". You'll receive your items when the game starts."));
                                 
-                                // TEMPORARY: Immediately equip the player to test our implementation
-                                player.sendSystemMessage(Component.literal("§6[TEST] §eEquipping you with your selected class immediately..."));
-                                boolean success = CharacterClassEquipper.equipPlayerWithSelectedClass(player);
+                                if (ConfigManager.isDevMode()) {
+                                    player.sendSystemMessage(Component.literal("§6[TEST] §eEquipping you with your selected class immediately..."));
+                                    boolean success = CharacterClassEquipper.equipPlayerWithSelectedClass(player);
                                 if (!success) {
-                                    player.sendSystemMessage(Component.literal("§c[TEST] §eEquipping failed. Check server logs for details."));
+                                        player.sendSystemMessage(Component.literal("§c[TEST] §eEquipping failed. Check server logs for details."));
+                                    }
                                 }
                             } else {
                                 player.sendSystemMessage(Component.literal("Failed to save class selection."));

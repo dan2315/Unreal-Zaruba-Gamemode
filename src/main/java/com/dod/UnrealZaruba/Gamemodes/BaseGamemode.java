@@ -12,8 +12,12 @@ import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -65,23 +69,22 @@ public abstract class BaseGamemode implements IPhaseHolder {
         currentPhase.OnStart();
     }
 
-    public void ProceedToNextPhase() {
-        if (currentPhaseIndex < phases.size() - 1) { 
-            currentPhaseIndex++;
-            int loopedIndex = currentPhaseIndex % phases.size();
-            BeginPhase(phases.get(loopedIndex));
-        }
+    public void TransitToNextPhase() {
+        currentPhaseIndex++;
+        int loopedIndex = currentPhaseIndex % phases.size();
+        BeginPhase(phases.get(loopedIndex));
     }
 
-    public void ProceedToNextPhase(PhaseId phaseId) {
-        if (currentPhaseIndex < phases.size() - 1) {
-            currentPhaseIndex++;
-            var nextPhase = phases.get(currentPhaseIndex);
-            if (nextPhase.GetPhaseId() == phaseId) {
-                BeginPhase(nextPhase);
-            } else {
-                throw new RuntimeException("Expected phase " + phaseId + " but got " + nextPhase.GetPhaseId());
-            }
+    public void CompletePhase() {
+        currentPhase.OnCompleted();
+        TransitToNextPhase();
+    }
+
+    public void CompletePhase(PhaseId phaseId) {
+        if (currentPhase.GetPhaseId() == phaseId) {
+            CompletePhase();
+        } else {
+            throw new RuntimeException("Expected phase " + phaseId + " but got " + currentPhase.GetPhaseId());
         }
     }
     
@@ -107,7 +110,11 @@ public abstract class BaseGamemode implements IPhaseHolder {
     }
 
     public void StartGame() {
-        ProceedToNextPhase(PhaseId.BATTLE);
+        CompletePhase(PhaseId.TEAM_SELECTION);
+    }
+
+    public void EndGame() {
+        ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
     }
 
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -119,20 +126,25 @@ public abstract class BaseGamemode implements IPhaseHolder {
     public abstract void onPlayerTick(TickEvent.PlayerTickEvent event);
 
     public void HandleRespawn(ServerPlayer player) {
-        player.setGameMode(GameType.ADVENTURE);
+        player.setGameMode(GameType.SURVIVAL);
+        player.setInvulnerable(false);
+        CharacterClassEquipper.equipPlayerWithSelectedClass(player);
         NBT.addEntityTag(player, "isPlayerDead", 0);
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
     
-    public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {                    
+    public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         player.setGameMode(GameType.SPECTATOR);
 
         player.setHealth(20);
+        player.getFoodData().setFoodLevel(20);
+        player.setInvulnerable(true);
+        player.getInventory().clearContent();
         event.setCanceled(true);
 
         NBT.addEntityTag(player, "isPlayerDead", 1);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
-                
+        
         startRespawnTimer(player);
     }
     

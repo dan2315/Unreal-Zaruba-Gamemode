@@ -136,7 +136,6 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         playerVisibilityTicks.put(playerId, ticks);
         
         if (ticks % VISIBILITY_UPDATE_INTERVAL == 0) {
-            UnrealZaruba.LOGGER.info("Updating progress display for player: {}", player.getName().getString());
             updateProgressDisplayForPlayer(player);
         }
     }

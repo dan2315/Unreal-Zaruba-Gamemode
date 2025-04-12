@@ -28,7 +28,7 @@ public class CompositePhase extends AbstractGamePhase implements IPhaseHolder {
     }
 
     @Override
-    public void ProceedToNextPhase() {
+    public void CompletePhase() {
         if (currentPhaseIndex < phases.size() - 1) {
             currentPhaseIndex++;
             currentPhase = phases.get(currentPhaseIndex);
@@ -36,7 +36,7 @@ public class CompositePhase extends AbstractGamePhase implements IPhaseHolder {
     }
 
     @Override
-    public void ProceedToNextPhase(PhaseId phaseId) {
+    public void CompletePhase(PhaseId phaseId) {
         if (currentPhaseIndex < phases.size() - 1) {
             currentPhaseIndex++;
             var nextPhase = phases.get(currentPhaseIndex);
