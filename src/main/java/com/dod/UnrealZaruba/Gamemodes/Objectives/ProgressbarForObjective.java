@@ -28,7 +28,7 @@ public class ProgressbarForObjective implements IProgressDisplay {
     
     @Override
     public void updateProgress(float progress) {
-        UnrealZaruba.LOGGER.info("Updating progress for objective: {}", objective.GetName());
+//        UnrealZaruba.LOGGER.info("Updating progress for objective: {}", objective.GetName());
         bossBar.setProgress(progress);
     }
     

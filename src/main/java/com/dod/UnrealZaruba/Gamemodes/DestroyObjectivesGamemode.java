@@ -31,8 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Config.MainConfig;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
@@ -56,7 +54,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         TeamManager teamManager = new TeamManager();
         teamManager.Initialize();
         SetTeamManager(teamManager);
-        gameTimer.setupScoreboard();
+        gameTimer.setup();
 
         TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
         TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
@@ -160,7 +158,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (STRATEGY_TIME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.update(secondsRemaining / 60, secondsRemaining % 60, true);
+        gameTimer.update(secondsRemaining % 60, secondsRemaining / 60, true);
     }
 
     public void CompleteStrategyTime() {
@@ -191,7 +189,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.update(secondsRemaining / 60, secondsRemaining % 60, true);
+        gameTimer.update(secondsRemaining % 60, secondsRemaining / 60, true);
     }
 
 

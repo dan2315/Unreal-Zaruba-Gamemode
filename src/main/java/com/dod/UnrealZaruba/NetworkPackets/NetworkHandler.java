@@ -74,6 +74,11 @@ public class NetworkHandler {
                 AssignClassToPlayerPacket::encode,
                 AssignClassToPlayerPacket::decode,
                 AssignClassToPlayerPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, TimerPacket.class,
+                TimerPacket::encode,
+                TimerPacket::decode,
+                TimerPacket::handle);
     }
 
     public class Screens {

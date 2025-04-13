@@ -14,7 +14,7 @@ public class ModSetupEvents {
     
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
         LOGGER.info("[UnrealZaruba] Рисуюсь нахуй");
-        event.registerAboveAll("gametimer", TimerOverlay.TIMER_OVERLAY);
+        event.registerAboveAll("gametimer", TimerOverlay.INSTANCE);
     }
 
     public static void onClientSetup(FMLClientSetupEvent event) {

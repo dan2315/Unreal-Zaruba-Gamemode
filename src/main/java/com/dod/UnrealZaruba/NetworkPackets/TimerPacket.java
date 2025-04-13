@@ -1,9 +1,10 @@
 package com.dod.UnrealZaruba.NetworkPackets;
 
 import java.util.function.Supplier;
+
+import com.dod.UnrealZaruba.UI.TimerOverlay;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-
 
 public class TimerPacket {
     
@@ -45,7 +46,7 @@ public class TimerPacket {
     // Handle the packet on the client side
     public static void handle(TimerPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            // TimerOverlay.INSTANCE.setTime() 
+            TimerOverlay.OVERLAY_INSTANCE.update(packet.seconds, packet.minutes, packet.isVisible);
         });
         ctx.get().setPacketHandled(true);
     }

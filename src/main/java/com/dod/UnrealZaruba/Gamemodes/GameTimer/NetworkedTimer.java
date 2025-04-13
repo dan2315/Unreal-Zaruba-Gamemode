@@ -11,7 +11,7 @@ public class NetworkedTimer implements IGameTimer {
     private final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
 
     @Override
-    public void setupScoreboard() {
+    public void setup() {
         server.getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, true)
@@ -29,7 +29,7 @@ public class NetworkedTimer implements IGameTimer {
     }
 
     @Override
-    public void resetScoreboard() {
+    public void reset() {
         server.getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, false)

@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
+import com.dod.UnrealZaruba.UI.TimerOverlay;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
@@ -28,7 +29,6 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import static com.dod.UnrealZaruba.UnrealZaruba.*;
