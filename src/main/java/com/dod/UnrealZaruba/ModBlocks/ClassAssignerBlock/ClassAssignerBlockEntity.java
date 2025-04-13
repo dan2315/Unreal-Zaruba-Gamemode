@@ -4,8 +4,11 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.recipes.packs.BundleRecipeProvider;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -25,6 +28,7 @@ import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.registries.ForgeRegistries;
 
 
 public class ClassAssignerBlockEntity extends BlockEntity {
@@ -115,6 +119,11 @@ public class ClassAssignerBlockEntity extends BlockEntity {
                     armorStand.setItemSlot(EquipmentSlot.MAINHAND, item.copy());
                 }
             }
+            // TODO: Убрать и сделать нормально
+            armorStand.setItemSlot(EquipmentSlot.FEET, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:socks_boots")), 1));
+            armorStand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:anchorpoint_leggings")), 1));
+            armorStand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:breaker_chestplate")), 1));
+            armorStand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:hammer_helmet")), 1));
             
             level.addFreshEntity(armorStand);
             armorStandUUID = armorStand.getUUID();
