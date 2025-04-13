@@ -7,6 +7,7 @@ import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import net.minecraft.network.chat.Component;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,9 +17,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class TeamBlock extends Block {
     private final TeamColor teamColor;
+
+    private static final Map<UUID, Long> lastMessageTimes = new HashMap<>();
+    private static final long MESSAGE_COOLDOWN = 20;
 
     public TeamBlock(TeamColor teamColor, Properties properties) {
         super(properties);
@@ -30,7 +37,6 @@ public class TeamBlock extends Block {
         if (!level.isClientSide && entity instanceof Player) {
             ServerPlayer player = (ServerPlayer) entity;
             if (player.isCrouching()) {
-                UnrealZaruba.LOGGER.info("Player " + player.getName().getString() + " is crouching on team block for team " + teamColor);
                 
                 BaseGamemode gamemode = GamemodeManager.Get(level.dimension());
                 if (gamemode == null) {
@@ -57,6 +63,15 @@ public class TeamBlock extends Block {
                 
                 UnrealZaruba.LOGGER.info("Assigning player " + player.getName().getString() + " to team " + teamColor);
                 teamManager.AssignToTeam(teamColor, player);
+            }
+            else {
+                UUID playerUUID = player.getUUID();
+                long currentTime = level.getGameTime();
+                if (lastMessageTimes.containsKey(playerUUID) && currentTime - lastMessageTimes.get(playerUUID) < MESSAGE_COOLDOWN) {
+                    return;
+                }
+                lastMessageTimes.put(playerUUID, currentTime);
+                player.displayClientMessage(Component.translatable("block.minecraft.team_block.hint"), true);
             }
         }
     }

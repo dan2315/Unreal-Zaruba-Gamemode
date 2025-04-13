@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.UnrealZaruba.Gamemodes.GameTimer;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 
@@ -9,7 +9,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 
-public class GameTimer {
+public class GameTimer implements IGameTimer {
 
     private final String OBJECTIVE_NAME = "gameTime";
     private Score minutes;
@@ -40,12 +40,12 @@ public class GameTimer {
         scoreboard.setDisplayObjective(Scoreboard.DISPLAY_SLOT_SIDEBAR, objective);
     }
 
-    public void updateScoreboardTimerMinutes(int timeLeft) {
-        minutes.setScore(timeLeft);
+    public void updateMinutes(int minutes) {
+        this.minutes.setScore(minutes);
     }
 
-    public void updateScoreboardTimerSeconds(int timeLeft) {
-        seconds.setScore(timeLeft);
+    public void updateSeconds(int seconds) {
+        this.seconds.setScore(seconds);
     }
 
     public void resetScoreboard() {

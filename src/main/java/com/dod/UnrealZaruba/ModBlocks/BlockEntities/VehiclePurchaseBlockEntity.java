@@ -232,7 +232,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            if (cooldownTicks > 0) {
+            if (cooldownTicks > 0) { //TODO: Didnt work
                 cooldownTicks--;
             }
         }

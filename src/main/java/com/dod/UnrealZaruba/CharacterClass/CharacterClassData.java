@@ -1,9 +1,7 @@
 package com.dod.UnrealZaruba.CharacterClass;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -47,4 +45,14 @@ public class CharacterClassData {
     public List<ItemStack> getKit() {
         return kit;
     }
+
+    @Override
+    public String toString() {
+        return "CharacterClassData{" +
+                "nameId='" + nameId + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", kit=" + kit +
+                '}';
+    }
+    
 } 

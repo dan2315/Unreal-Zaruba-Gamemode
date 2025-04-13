@@ -2,8 +2,8 @@ package com.dod.UnrealZaruba.Events;
 
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.Gamemodes.GameTimer.GameTimer;
 import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;

@@ -110,6 +110,12 @@ public class TeamManager implements IResettable {
         return teams.get(color);
     }
 
+    public TeamContext GetWithMinimumMembers() {
+        return teams.values().stream()
+            .min((a, b) -> a.MembersCount() - b.MembersCount())
+            .orElse(null);
+    }
+
     public boolean DeleteBarriersAtSpawn() {
         for (TeamContext team : teams.values()) {
             if (team.Spawn() == null) {
@@ -134,6 +140,10 @@ public class TeamManager implements IResettable {
         }
         int targetTeamCount = targetTeam.MembersCount();
 
+        teams.forEach((id, team) -> {
+            UnrealZaruba.LOGGER.info("Команда [" + id.toString() + "] содержит " + team.MembersCount() + " участников");
+        });
+
         int maxOtherTeamsCount = teams.values().stream()
                 .filter(team -> !team.equals(targetTeam))
                 .mapToInt(TeamContext::MembersCount)
@@ -147,7 +157,9 @@ public class TeamManager implements IResettable {
         if (!AreTeamsBalanced(dyeColor)) {
             player.sendSystemMessage(
                     Component.literal(
-                            "Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"));
+                            "Команда " + dyeColor.toString().toUpperCase() + " содержит слишком много участников"
+                            ),
+                    true);
             return;
         }
 

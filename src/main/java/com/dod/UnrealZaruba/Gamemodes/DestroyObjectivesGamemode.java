@@ -2,12 +2,12 @@ package com.dod.UnrealZaruba.Gamemodes;
 
 import java.util.Map;
 
-
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
+import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
@@ -31,8 +31,9 @@ import net.minecraft.world.entity.player.Player;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Config.MainConfig;
-import net.minecraft.server.level.ServerLevel;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
     private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
@@ -40,13 +41,13 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 5 seconds
     
     private GameStatisticsService gameStatistics;
-    private GameTimer gameTimer;
+    private IGameTimer gameTimer;
     private MinecraftServer server;
 
     private DestructibleObjectivesHandler objectivesHandler;
     private StartCondition startCondition;
 
-    public DestroyObjectivesGamemode(MinecraftServer server, GameStatisticsService leaderboardService, GameTimer gameTimer) {
+    public DestroyObjectivesGamemode(MinecraftServer server, GameStatisticsService leaderboardService, IGameTimer gameTimer) {
         this.gameStatistics = leaderboardService;
         this.gameTimer = gameTimer;
         currentGamemode = this;
@@ -133,16 +134,38 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void StartTeamSelection() {
+        server.getPlayerList().getPlayers().forEach(player -> {
+            player.setGameMode(GameType.ADVENTURE);
+        });
     }
 
     public void CompleteTeamSelection() {
         var players = server.getPlayerList().getPlayers();
         for (ServerPlayer player : players) {
+            if (!TeamManager.IsInTeam(player)) {
+                TeamManager.AssignToTeam(TeamManager.GetWithMinimumMembers().Color(), player);
+            }
+
             TeamManager.teleportToSpawn(player);
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
+    }
+
+    public void StartStrategyTime() {
+    }
+
+    public void UpdateStrategyTime(int ticks) {
+        if (ticks % 20 != 0) return;
+        
+        int secondsRemaining = (STRATEGY_TIME_DURATION_MS / 1000) - (ticks / 20);
+        gameTimer.updateMinutes(secondsRemaining / 60);
+        gameTimer.updateSeconds(secondsRemaining % 60);
+    }
+
+    public void CompleteStrategyTime() {
+        TransitToNextPhase();
     }
 
     public void StartBattle() {
@@ -169,24 +192,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
-        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
+        gameTimer.updateMinutes(secondsRemaining / 60);
+        gameTimer.updateSeconds(secondsRemaining % 60);
     }
 
-    public void StartStrategyTime() {
-    }
 
-    public void UpdateStrategyTime(int ticks) {
-        if (ticks % 20 != 0) return;
-        
-        int secondsRemaining = (STRATEGY_TIME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.updateScoreboardTimerMinutes(secondsRemaining / 60);
-        gameTimer.updateScoreboardTimerSeconds(secondsRemaining % 60);
-    }
-
-    public void CompleteStrategyTime() {
-        TransitToNextPhase();
-    }
 
     @Override
     public void onServerTick(TickEvent.ServerTickEvent serverTickEvent) {

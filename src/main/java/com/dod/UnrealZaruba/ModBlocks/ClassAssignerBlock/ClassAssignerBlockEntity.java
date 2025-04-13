@@ -1,9 +1,8 @@
 package com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.OpenScreenPacket;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -18,17 +17,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.network.PacketDistributor;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 
 
@@ -107,10 +102,10 @@ public class ClassAssignerBlockEntity extends BlockEntity {
             List<ItemStack> kitItems = classData.getKit();
             for (ItemStack item : kitItems) {
                 Item itemType = item.getItem();
-                
-                if (itemType instanceof ArmorItem) {
-                    ArmorItem armorItem = (ArmorItem) itemType;
-                    EquipmentSlot slot = armorItem.getEquipmentSlot();
+
+                EquipmentSlot slot = item.getEquipmentSlot();
+                UnrealZaruba.LOGGER.info("Item: {} Slot: " + slot);
+                if (slot != null) {
                     armorStand.setItemSlot(slot, item.copy());
                 }
                 else if (itemType.toString().contains("pumpkin")) {
@@ -118,7 +113,6 @@ public class ClassAssignerBlockEntity extends BlockEntity {
                 }
                 else if (isWeaponOrTool(itemType)) {
                     armorStand.setItemSlot(EquipmentSlot.MAINHAND, item.copy());
-                    break;
                 }
             }
             
@@ -130,7 +124,6 @@ public class ClassAssignerBlockEntity extends BlockEntity {
     private boolean isWeaponOrTool(Item item) {
         String itemId = item.toString().toLowerCase();
         return itemId.contains("sword") || 
-               itemId.contains("axe") || 
                itemId.contains("rifle") || 
                itemId.contains("gun") || 
                itemId.contains("cannon") || 
@@ -138,6 +131,7 @@ public class ClassAssignerBlockEntity extends BlockEntity {
                itemId.contains("musket") ||
                itemId.contains("laser") ||
                itemId.contains("stick") ||
+               itemId.contains("bore") ||
                itemId.contains("lance");
     }
 
