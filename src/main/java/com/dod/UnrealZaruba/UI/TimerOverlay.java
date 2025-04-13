@@ -20,7 +20,6 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
     public static IGuiOverlay INSTANCE = new TimerOverlay();
     public static TimerOverlay OVERLAY_INSTANCE = (TimerOverlay) INSTANCE;
 
-
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
@@ -35,7 +34,7 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
 
         Font font = mc.font;
 
-        var displayable_text = String.format("%02d:%02d", this.minutes, this.seconds);;
+        var displayable_text = String.format("%02d:%02d", this.minutes, this.seconds);
         int x = screenWidth / 2 - font.width(displayable_text) / 2;
         int y = 10;
 

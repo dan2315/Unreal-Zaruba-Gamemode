@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassAssignerScreen extends Screen {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("unreal_zaruba", "textures/gui/class_assigner.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(UnrealZaruba.MOD_ID, "textures/gui/class_assigner.png");
     private static final int DROPDOWN_HEIGHT = 20;
     private static final int DROPDOWN_WIDTH = 120;
     
@@ -76,10 +76,12 @@ public class ClassAssignerScreen extends Screen {
         int y = (height - 166) / 2;
         
         // Class dropdown button
-        addRenderableWidget(Button.builder(Component.literal("▼"), button -> {
-            dropdownOpen = !dropdownOpen;
-            updateDropdown();
-        }).pos(x + 140, y + 20).size(20, DROPDOWN_HEIGHT).build());
+        if (isAdmin) {
+            addRenderableWidget(Button.builder(Component.literal("▼"), button -> {
+                dropdownOpen = !dropdownOpen;
+                updateDropdown();
+            }).pos(x + 300, y + 20).size(20, DROPDOWN_HEIGHT).build());
+        }
         
         // Team color buttons - Only for visualization, not for actual assignment
         teamRedButton = addRenderableWidget(Button.builder(Component.literal("RED"), button -> {
@@ -99,16 +101,15 @@ public class ClassAssignerScreen extends Screen {
             applyButton = addRenderableWidget(Button.builder(Component.literal("Apply"), button -> {
                 NetworkHandler.CHANNEL.sendToServer(new SetClassPacket(blockPos, selectedClassId));
                 onClose();
-            }).pos(x + 20, y + 130).size(60, 20).build());
+            }).pos(x + 300, y + 130).size(60, 20).build());
         }
         
         // Position the select button based on whether the admin button is shown
-        int selectButtonX = isAdmin ? x + 90 : x + 55;
         // Select button (for players to select the class)
         selectButton = addRenderableWidget(Button.builder(Component.literal("Select Class"), button -> {
             NetworkHandler.CHANNEL.sendToServer(new AssignClassToPlayerPacket(blockPos));
             onClose();
-        }).pos(selectButtonX, y + 130).size(80, 20).build());
+        }).pos(x + 50, y + 130).size(80, 20).build());
         
         updateTeamButtons();
         updateDropdown();
@@ -139,7 +140,7 @@ public class ClassAssignerScreen extends Screen {
                     dropdownOpen = false;
                     updateDropdown();
                     updateClassItems();
-                }).pos(x + 20, y + 20 + DROPDOWN_HEIGHT * (i + 1)).size(DROPDOWN_WIDTH, DROPDOWN_HEIGHT).build();
+                }).pos(x + 178, y + DROPDOWN_HEIGHT * (i + 1)).size(DROPDOWN_WIDTH, DROPDOWN_HEIGHT).build();
                 
                 addRenderableWidget(button);
                 dropdownButtons.add(button);
@@ -158,19 +159,19 @@ public class ClassAssignerScreen extends Screen {
         int x = (width - 176) / 2;
         int y = (height - 166) / 2;
         
-        graphics.blit(TEXTURE, x, y, 0, 0, 176, 166);
+        graphics.blit(TEXTURE, x, y, 0, 0, 176, 166, 176, 166);
         
         // Draw dropdown box
-        graphics.fill(x + 20, y + 20, x + 140, y + 20 + DROPDOWN_HEIGHT, 0xFFCCCCCC);
-        graphics.fill(x + 21, y + 21, x + 139, y + 20 + DROPDOWN_HEIGHT - 1, 0xFFFFFFFF);
+        graphics.fill(x + 20, y + 15, x + 140, y + 15 + DROPDOWN_HEIGHT, 0xFFCCCCCC);
+        graphics.fill(x + 21, y + 16, x + 139, y + 15 + DROPDOWN_HEIGHT - 1, 0xFFFFFFFF);
         
         // Draw selected class name
         if (selectedClassId != null) {
             CharacterClassData classData = CharacterClassRegistry.getCharacterClass(selectedClassId, visualizationTeam);
             if (classData != null) {
-                graphics.drawString(font, classData.getDisplayName(), x + 25, y + 25, 0x404040, false);
+                graphics.drawString(font, classData.getDisplayName(), x + 25, y + 22, 0x404040, false);
             } else {
-                graphics.drawString(font, selectedClassId, x + 25, y + 25, 0x404040, false);
+                graphics.drawString(font, selectedClassId, x + 25, y + 22, 0x404040, false);
             }
         }
         

@@ -11,6 +11,7 @@ import com.dod.UnrealZaruba.UI.ClassAssignerScreen;
 import com.dod.UnrealZaruba.UI.CustomDeathScreen;
 import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
