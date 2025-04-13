@@ -3,7 +3,7 @@ package com.dod.UnrealZaruba.Events;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.GameTimer;
+import com.dod.UnrealZaruba.Gamemodes.GameTimer.NetworkedTimer;
 import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
@@ -42,7 +42,6 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
 public class ServerEvents {
     private static BaseGamemode gamemode;
-    private static GameTimer gameTimer;
     private static GameStatisticsService GameStatisticsService;
     private static boolean isDevMode = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV;
 
@@ -52,10 +51,8 @@ public class ServerEvents {
         if (!server.isDedicatedServer())
             return;
 
-        gameTimer = new GameTimer(server);
-        gameTimer.resetScoreboard();
         UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, server);
-        gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, gameTimer);
+        gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, new NetworkedTimer());
         GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
     }
 

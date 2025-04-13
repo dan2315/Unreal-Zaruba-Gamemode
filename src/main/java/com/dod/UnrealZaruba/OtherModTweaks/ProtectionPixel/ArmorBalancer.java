@@ -8,6 +8,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Equipable;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -106,7 +107,14 @@ public class ArmorBalancer {
         if (ARMOR_STATS.containsKey(itemKey)) {
             ArmorStats stats = ARMOR_STATS.get(itemKey);
             
-            EquipmentSlot itemSlot = stack.getEquipmentSlot();
+            EquipmentSlot itemSlot = null;
+            if (item instanceof Equipable equipable) {
+                itemSlot = equipable.getEquipmentSlot();
+            }
+            if (itemSlot == null) {
+                UnrealZaruba.LOGGER.error("ArmorBalancer: itemSlot is null for item: {}", itemKey);
+                return;
+            }
 
             if (event.getSlotType() == itemSlot) {
                 replaceAttribute(event, Attributes.ARMOR, stats.armor);

@@ -160,8 +160,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (STRATEGY_TIME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.updateMinutes(secondsRemaining / 60);
-        gameTimer.updateSeconds(secondsRemaining % 60);
+        gameTimer.update(secondsRemaining / 60, secondsRemaining % 60, true);
     }
 
     public void CompleteStrategyTime() {
@@ -192,8 +191,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         if (ticks % 20 != 0) return;
         
         int secondsRemaining = (GAME_DURATION_MS / 1000) - (ticks / 20);
-        gameTimer.updateMinutes(secondsRemaining / 60);
-        gameTimer.updateSeconds(secondsRemaining % 60);
+        gameTimer.update(secondsRemaining / 60, secondsRemaining % 60, true);
     }
 
 
