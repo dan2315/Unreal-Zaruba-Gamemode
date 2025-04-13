@@ -11,8 +11,13 @@ import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
+import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
@@ -119,6 +124,13 @@ public class ServerEvents {
         }
 
         gamemode.HandleDeath(serverPlayer, event);
+    }
+
+    @SubscribeEvent
+    public static void onItemSpawn(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof ItemEntity itemEntity) {
+            itemEntity.lifespan = 200;
+        }
     }
 
     @SubscribeEvent

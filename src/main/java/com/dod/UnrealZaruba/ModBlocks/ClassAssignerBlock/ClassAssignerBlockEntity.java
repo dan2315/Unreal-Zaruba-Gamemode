@@ -4,6 +4,7 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 
+import net.minecraft.world.item.Equipable;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.recipes.packs.BundleRecipeProvider;
@@ -19,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
+import net.minecraft.world.item.ArmorItem;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
@@ -106,24 +107,28 @@ public class ClassAssignerBlockEntity extends BlockEntity {
             List<ItemStack> kitItems = classData.getKit();
             for (ItemStack item : kitItems) {
                 Item itemType = item.getItem();
-
-                EquipmentSlot slot = item.getEquipmentSlot();
-                UnrealZaruba.LOGGER.info("Item: {} Slot: " + slot);
-                if (slot != null) {
+                if (itemType instanceof Equipable equipable) {
+                    EquipmentSlot slot = equipable.getEquipmentSlot();
+                    UnrealZaruba.LOGGER.info("Equipable item: {}    Slot: {}", equipable.toString(), slot != null ? slot.getName() : "null");
                     armorStand.setItemSlot(slot, item.copy());
                 }
-                else if (itemType.toString().contains("pumpkin")) {
+
+                EquipmentSlot slot = item.getEquipmentSlot();
+                UnrealZaruba.LOGGER.info("Item: {}         Slot: {}", item, slot != null ? slot.getName() : "null");
+
+                if (itemType.toString().contains("pumpkin")) {
                     armorStand.setItemSlot(EquipmentSlot.HEAD, item.copy());
+                    UnrealZaruba.LOGGER.info("Pumpkin");
                 }
                 else if (isWeaponOrTool(itemType)) {
                     armorStand.setItemSlot(EquipmentSlot.MAINHAND, item.copy());
+                    UnrealZaruba.LOGGER.info("Weapon");
+                }
+                else if (slot != null) {
+                    armorStand.setItemSlot(slot, item.copy());
+                    UnrealZaruba.LOGGER.info("Armor");
                 }
             }
-            // TODO: Убрать и сделать нормально
-            armorStand.setItemSlot(EquipmentSlot.FEET, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:socks_boots")), 1));
-            armorStand.setItemSlot(EquipmentSlot.LEGS, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:anchorpoint_leggings")), 1));
-            armorStand.setItemSlot(EquipmentSlot.CHEST, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:breaker_chestplate")), 1));
-            armorStand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("protection_pixel:hammer_helmet")), 1));
             
             level.addFreshEntity(armorStand);
             armorStandUUID = armorStand.getUUID();
@@ -134,14 +139,12 @@ public class ClassAssignerBlockEntity extends BlockEntity {
         String itemId = item.toString().toLowerCase();
         return itemId.contains("sword") || 
                itemId.contains("rifle") || 
-               itemId.contains("gun") || 
                itemId.contains("cannon") || 
                itemId.contains("launcher") ||
                itemId.contains("musket") ||
                itemId.contains("laser") ||
                itemId.contains("stick") ||
-               itemId.contains("bore") ||
-               itemId.contains("lance");
+               itemId.contains("bore");
     }
 
     private void removeArmorStand() {

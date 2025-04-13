@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -94,6 +95,7 @@ public class ArmorBalancer {
     }
 
     public static void onItemAttributeModifier(ItemAttributeModifierEvent event) {
+        UnrealZaruba.LOGGER.info("onItemAttributeModifier event: {}", event.getSlotType());
         ItemStack stack = event.getItemStack();
         Item item = stack.getItem();
         ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item);
@@ -104,7 +106,9 @@ public class ArmorBalancer {
         if (ARMOR_STATS.containsKey(itemKey)) {
             ArmorStats stats = ARMOR_STATS.get(itemKey);
             
-            if (event.getSlotType() == stats.getSlotForItem(itemKey)) {
+            EquipmentSlot itemSlot = stack.getEquipmentSlot();
+
+            if (event.getSlotType() == itemSlot) {
                 replaceAttribute(event, Attributes.ARMOR, stats.armor);
                 replaceAttribute(event, Attributes.ARMOR_TOUGHNESS, stats.toughness);
                 replaceAttribute(event, Attributes.KNOCKBACK_RESISTANCE, stats.knockbackResistance);
@@ -147,19 +151,6 @@ public class ArmorBalancer {
         }
     }
 
-    private static EquipmentSlot getSlotForItem(String itemId) {
-        if (itemId.contains("helmet") || itemId.contains("_helmet") || itemId.contains("_head")) {
-            return EquipmentSlot.HEAD;
-        } else if (itemId.contains("chestplate") || itemId.contains("_chest")) {
-            return EquipmentSlot.CHEST;
-        } else if (itemId.contains("leggings") || itemId.contains("_legs")) {
-            return EquipmentSlot.LEGS;
-        } else if (itemId.contains("boots") || itemId.contains("_feet")) {
-            return EquipmentSlot.FEET;
-        }
-        return null;
-    }
-
     private static class ArmorStats {
         float armor = 0.0f;
         float toughness = 0.0f;
@@ -186,10 +177,6 @@ public class ArmorBalancer {
                 customAttributes.put(attribute, value);
             }
             return this;
-        }
-        
-        EquipmentSlot getSlotForItem(String itemId) {
-            return ArmorBalancer.getSlotForItem(itemId);
         }
     }
 }
