@@ -31,6 +31,8 @@ public class CreativeTabs {
             output.accept(ModItems.SEAT_WITHOUT_COLLISION_ITEM.get());
             output.accept(ModItems.TENT_MAIN_BLOCK_BLUE_ITEM.get());
             output.accept(ModItems.TENT_MAIN_BLOCK_RED_ITEM.get());
+            output.accept(ModItems.VEHICLE_PURCHASE_BLOCK_ITEM.get());
+            output.accept(ModItems.CLASS_ASSIGNER_BLOCK_ITEM.get());
         })
         .build());
 
@@ -51,6 +53,8 @@ public class CreativeTabs {
                 event.accept(ModItems.SEAT_WITHOUT_COLLISION_ITEM.get());
                 event.accept(ModItems.TENT_MAIN_BLOCK_BLUE_ITEM.get());
                 event.accept(ModItems.TENT_MAIN_BLOCK_RED_ITEM.get());
+                event.accept(ModItems.VEHICLE_PURCHASE_BLOCK_ITEM.get());
+                event.accept(ModItems.CLASS_ASSIGNER_BLOCK_ITEM.get());
             }
         }
     }
