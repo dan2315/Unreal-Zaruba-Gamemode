@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=north": { "model": "minecraft:block/fletcher_table" },
-    "facing=east": { "model": "minecraft:block/fletcher_table", "y": 90 },
-    "facing=south": { "model": "minecraft:block/fletcher_table", "y": 180 },
-    "facing=west": { "model": "minecraft:block/fletcher_table", "y": 270 }
+    "facing=north": { "model": "unrealzaruba:block/class_assigner_block" },
+    "facing=east": { "model": "unrealzaruba:block/class_assigner_block", "y": 90 },
+    "facing=south": { "model": "unrealzaruba:block/class_assigner_block", "y": 180 },
+    "facing=west": { "model": "unrealzaruba:block/class_assigner_block", "y": 270 }
   }
 } 

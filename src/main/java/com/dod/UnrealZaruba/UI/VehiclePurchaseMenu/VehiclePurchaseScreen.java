@@ -207,7 +207,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
-        graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
 
         graphics.fill(x + 20, y + 20, x + 140, y + 20 + DROPDOWN_HEIGHT, 0xFFCCCCCC);
         graphics.fill(x + 21, y + 21, x + 139, y + 20 + DROPDOWN_HEIGHT - 1, 0xFFFFFFFF);
