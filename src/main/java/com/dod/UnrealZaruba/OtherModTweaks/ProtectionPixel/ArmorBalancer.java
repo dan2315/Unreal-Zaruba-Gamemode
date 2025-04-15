@@ -151,12 +151,17 @@ public class ArmorBalancer {
         
         if (value > 0) {
             event.addModifier(attribute, new AttributeModifier(
-                UUID.randomUUID(),
+                getConsistentUUID(attribute, event.getSlotType()),
                 attribute.getDescriptionId(),
                 value,
                 AttributeModifier.Operation.ADDITION
             ));
         }
+    }
+
+    private static UUID getConsistentUUID(Attribute attribute, EquipmentSlot slot) {
+        String seed = attribute.getDescriptionId() + "_" + slot.getName();
+        return UUID.nameUUIDFromBytes(seed.getBytes());
     }
 
     private static class ArmorStats {
