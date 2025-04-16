@@ -25,16 +25,14 @@ public class VehicleRegistry {
     }
 
     public static void init() {
-        register(new VehicleData("pt", "Vehicle 1")
-        .addItemRequirement(new ResourceLocation("minecraft:gold_ingot"), 8));
+        register(new VehicleData("pt", "vehicle.unrealzaruba.pt")
+        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 3));
 
-        register(new VehicleData("pt1", "Tarahtelka")
-        .addItemRequirement(new ResourceLocation("minecraft:iron_ingot"), 16)
-        .addItemRequirement(new ResourceLocation("minecraft:oak_planks"), 16));
+        register(new VehicleData("car", "vehicle.unrealzaruba.car")
+        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 2));
 
-        register(new VehicleData("pt2", "Lobster")
-        .addItemRequirement(new ResourceLocation("minecraft:diamond"), 8)
-        .addItemRequirement(new ResourceLocation("minecraft:netherite_ingot"), 1));
+        register(new VehicleData("kamikaze", "vehicle.unrealzaruba.kamikaze")
+        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 1));
     }
 
     public static ResourceLocation GetLocation(String vehicleName) {

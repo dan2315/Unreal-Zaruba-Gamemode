@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ProgressbarForObjective implements IProgressDisplay {
     private final ServerBossEvent bossBar;
@@ -28,12 +30,14 @@ public class ProgressbarForObjective implements IProgressDisplay {
     
     @Override
     public void updateProgress(float progress) {
-//        UnrealZaruba.LOGGER.info("Updating progress for objective: {}", objective.GetName());
         bossBar.setProgress(progress);
     }
     
     @Override
     public void updatePlayerVisibility(ServerPlayer player) {
+        if (player.level() != WorldManager.gameLevel)
+            return;
+
         boolean isNearTarget = isPlayerNearTarget(player, objective.getPosition());
         
         if (isNearTarget && !playersWithBossBar.contains(player.getUUID())) {
@@ -42,7 +46,7 @@ public class ProgressbarForObjective implements IProgressDisplay {
             removePlayerFromBossBar(player);
         }
     }
-    
+
     private boolean isPlayerNearTarget(ServerPlayer player, BlockPos pos) {
         double distance = player.blockPosition().distSqr(pos);
         return distance <= activationDistance;
@@ -65,6 +69,15 @@ public class ProgressbarForObjective implements IProgressDisplay {
     
     @Override
     public void clear() {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        Set<UUID> playersToRemove = new HashSet<>(playersWithBossBar);
+        for (UUID playerId : playersToRemove) {
+            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
+            if (player != null) {
+                bossBar.removePlayer(player);
+            }
+        }
         playersWithBossBar.clear();
+        updateProgress(0);
     }
 } 

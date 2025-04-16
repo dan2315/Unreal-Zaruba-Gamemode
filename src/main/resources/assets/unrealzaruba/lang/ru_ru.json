@@ -11,6 +11,11 @@
 
     "item.unrealzaruba.hand_assembler": "Ручной сборщик",
     "item.unrealzaruba.tent": "Палатка",
+    "item.unrealzaruba.skull": "Череп",
+
+    "vehicle.unrealzaruba.car": "Грузовик",
+    "vehicle.unrealzaruba.pt": "Бублик",
+    "vehicle.unrealzaruba.kamikaze": "Камикадзе",
 
     "container.vehicle_purchase": "Покупка транспорта",
     "button.unrealzaruba.deploy": "Разместить",

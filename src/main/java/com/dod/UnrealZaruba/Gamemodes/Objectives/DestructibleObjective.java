@@ -129,6 +129,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     }
 
     public void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player) {
+        if (IsCompleted()) return;
         UUID playerId = player.getUUID();
         
         playerVisibilityTicks.putIfAbsent(playerId, 0);
@@ -146,6 +147,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         for (IObjectiveNotifier notifier : notificationRecipients) {
             notifier.onObjectiveCompleted(this);
         }
+        progressDisplay.clear();
 
         String border = "==================================";
         String paddedName = String.format("||           §b%s§r был уничтожен           ", name);
@@ -184,6 +186,5 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     @Override
     public void reset() {
         Reset();
-        trackedBlocks = InitializeTrackedBlocks(volume);
     }
 }

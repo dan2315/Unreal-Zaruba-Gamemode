@@ -65,9 +65,15 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
             BlockEntityType<T> type) {
-                return level.isClientSide ? 
-                createTickerHelper(type, ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), 
-                    (world, pos, blockState, be) -> be.clientTick()) : null;
+                if (level.isClientSide) {
+                    return createTickerHelper(type, ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), 
+                        (world, pos, blockState, be) -> be.clientTick());
+                }
+                else {
+                    return type == ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get() ? 
+                    (BlockEntityTicker<T>) (world, pos, blockState, be) ->
+                    ((VehiclePurchaseBlockEntity) be).serverTick() : null; 
+                }
     }
 
     @SuppressWarnings("unchecked")

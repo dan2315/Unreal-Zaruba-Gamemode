@@ -136,6 +136,7 @@ public class ClassAssignerScreen extends Screen {
                 String displayName = classData != null ? classData.getDisplayName() : classId;
                 
                 Button button = Button.builder(Component.literal(displayName), btn -> {
+                    System.out.println("Selected class: " + classId);
                     selectedClassId = classId;
                     dropdownOpen = false;
                     updateDropdown();
@@ -223,21 +224,21 @@ public class ClassAssignerScreen extends Screen {
         }
     }
     
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (dropdownOpen) {
-            int x = (width - 176) / 2;
-            int y = (height - 166) / 2;
+    // @Override
+    // public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    //     if (dropdownOpen) {
+    //         int x = (width - 176) / 2;
+    //         int y = (height - 166) / 2;
             
-            boolean clickedInDropdown = mouseX >= x + 20 && mouseX <= x + 20 + DROPDOWN_WIDTH && 
-                mouseY >= y + 20 && mouseY <= y + 20 + DROPDOWN_HEIGHT * (classIds.size() + 1);
+    //         boolean clickedInDropdown = mouseX >= x + 20 && mouseX <= x + 20 + DROPDOWN_WIDTH && 
+    //             mouseY >= y + 20 && mouseY <= y + 20 + DROPDOWN_HEIGHT * (classIds.size() + 1);
                 
-            if (!clickedInDropdown) {
-                dropdownOpen = false;
-                updateDropdown();
-                return true;
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
+    //         if (!clickedInDropdown) {
+    //             dropdownOpen = false;
+    //             updateDropdown();
+    //             return true;
+    //         }
+    //     }
+    //     return super.mouseClicked(mouseX, mouseY, button);
+    // }
 }

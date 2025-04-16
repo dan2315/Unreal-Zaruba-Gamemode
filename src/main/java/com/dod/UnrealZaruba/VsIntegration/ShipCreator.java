@@ -41,11 +41,11 @@ public class ShipCreator {
                 UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
             });
             Quaterniond rotation = Utils.getQuatFromDir(direction);
-            BlockPos offsetedPosition = position.relative(direction, 3);
-            Vector3d positionVec = new Vector3d( // TODO: Make this a function
-                offsetedPosition.getX() + schematic.getInfo().getMaxObjectPos().x,
+            BlockPos offsetedPosition = position.relative(direction, -(int)schematic.getInfo().getMaxObjectPos().z);
+            Vector3d positionVec = new Vector3d(
+                offsetedPosition.getX(),
                 offsetedPosition.getY() + schematic.getInfo().getMaxObjectPos().y,
-                offsetedPosition.getZ() + schematic.getInfo().getMaxObjectPos().z);
+                offsetedPosition.getZ());
             VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player.getUUID(),
                     positionVec, rotation,
                     ships -> Unit.INSTANCE);

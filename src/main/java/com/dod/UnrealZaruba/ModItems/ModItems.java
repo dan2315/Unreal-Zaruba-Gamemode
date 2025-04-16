@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 
 /**
- * <p>Main mod's items DeferredRegisterer</p>
+ * <h1>Main mod's items DeferredRegisterer</h1>
  */
 public class ModItems {
 
@@ -24,6 +24,8 @@ public class ModItems {
             () -> new HandTent(new Item.Properties().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> HAND_ASSEMBLER = ModItems.ITEMS.register("hand_assembler",
             () -> new HandAssembler(new Item.Properties()));
+    public static final RegistryObject<Item> SKULL = ModItems.ITEMS.register("skull",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> RED_BLOCK_ITEM = ModItems.ITEMS.register("red_block",
             () -> new BlockItem(ModBlocks.RED_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> BLUE_BLOCK_ITEM = ModItems.ITEMS.register("blue_block",

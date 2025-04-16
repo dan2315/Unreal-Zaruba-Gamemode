@@ -25,6 +25,11 @@ public class GamePhase extends AbstractGamePhase {
     @Override
     public void OnTick(int ticks) {
     }
+
+    @Override
+    public void Clear() {
+        
+    }
     
     
 }

@@ -15,6 +15,8 @@ public class WeaponConstants {
             public static final String BOOMSTICK = "scguns:boomstick";  
             public static final String ROCKET_RIFLE = "scguns:rocket_rifle";
             public static final String BOMB_LANCE = "scguns:bomb_lance";
+            public static final String NIAMI = "scguns:niami";
+            public static final String CRUSADER = "scguns:crusader";
         }
 
         public static class Attachments {

@@ -107,7 +107,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
 
             for (int i = 0; i < vehicleKeys.size(); i++) {
                 String vehicleKey = vehicleKeys.get(i);
-                String vehicleName = VehicleRegistry.getVehicle(vehicleKey).getName();
+                String vehicleName = Component.translatable(VehicleRegistry.getVehicle(vehicleKey).getName()).getString();
                 Button button = Button.builder(Component.literal(vehicleName), btn -> {
                     menu.setSelectedVehicle(vehicleKey);
                     dropdownOpen = false;
@@ -143,7 +143,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
 
         VehicleData selectedVehicle = VehicleRegistry.getVehicle(menu.getSelectedVehicle());
         if (selectedVehicle != null) {
-            graphics.drawString(font, selectedVehicle.getName(), x + 25, y + 25, 0x404040, false);
+            graphics.drawString(font, Component.translatable(selectedVehicle.getName()), x + 25, y + 25, 0x404040, false);
         }
 
         if (!dropdownOpen) {

@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.ProtectionPixel;
 import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.WeaponConstants;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import net.minecraft.resources.ResourceLocation;
 import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.VanillaItems;
@@ -54,12 +57,14 @@ public class CharacterClassRegistry {
         CharacterClassData redClass = new CharacterClassData(classId, displayName);
         commonItems.accept(redClass);
         redArmor.accept(redClass);
+        redClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
         registerCharacterClass(TeamColor.RED, redClass);
         
         // Create BLUE team class
         CharacterClassData blueClass = new CharacterClassData(classId, displayName);
         commonItems.accept(blueClass);
         blueArmor.accept(blueClass);
+        blueClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
         registerCharacterClass(TeamColor.BLUE, blueClass);
     }
 
@@ -215,6 +220,36 @@ public class CharacterClassRegistry {
                 .addKitItem(new ResourceLocation("minecraft:tnt"), 16),
             redArmorSet("lancer"),
             blueArmorSet("lancer")
+        );
+
+        // Medic =========================================================================
+        var crossbow = new WeaponBuilder(WeaponConstants.ScorchedGuns.Weapons.NIAMI)
+            .ammoCount(7)
+            .build();
+
+        var healingCrossbow = new WeaponBuilder(WeaponConstants.ScorchedGuns.Weapons.CRUSADER)
+            .ammoCount(3)
+            .build();
+
+        registerForBothTeams(
+            "medic",
+            "Medic",
+            classData -> classData
+                .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
+                .addKitItem(crossbow)
+                .addKitItem(healingCrossbow)
+                .addKitItem(new ResourceLocation("scguns:syringe"), 32)
+                .addKitItem(new ResourceLocation("minecraft:apple"), 64)
+                .addKitItem((new Supplier<ItemStack>() {
+                    @Override
+                    public ItemStack get() {
+                        ItemStack stack = new ItemStack(Items.SPLASH_POTION, 6);
+                        stack.getOrCreateTag().putString("Potion", "minecraft:strong_regeneration");
+                        return stack;
+                    }
+                }).get()),
+            redArmorSet("plague"),
+            blueArmorSet("plague")
         );
     }
 }

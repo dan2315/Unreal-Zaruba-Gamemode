@@ -28,12 +28,7 @@ public class TimedGamePhase extends AbstractGamePhase {
 
     @Override
     public void OnCompleted() {
-        if (timer != null) {
-            timer.dispose(false);
-        }
-        if (phaseHolder != null) { // TODO: Assign phase holder when AddPhase is called
-            phaseHolder.CompletePhase(this.phaseId);
-        }
+        Clear();
         onCompleted.run();
     }
 
@@ -41,5 +36,14 @@ public class TimedGamePhase extends AbstractGamePhase {
     public void OnTick(int ticks) {
         onTick.accept(ticks);
     }
-    
+
+    @Override
+    public void Clear() {
+        if (timer != null) {
+            timer.dispose(false);
+        }
+        if (phaseHolder != null) { // TODO: Assign phase holder when AddPhase is called
+            phaseHolder.CompletePhase(this.phaseId);
+        }
+    }
 }

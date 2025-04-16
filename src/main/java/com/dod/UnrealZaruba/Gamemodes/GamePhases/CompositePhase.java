@@ -84,5 +84,10 @@ public class CompositePhase extends AbstractGamePhase implements IPhaseHolder {
     public void OnTick(int ticks) {
         currentPhase.OnTick(ticks);
     }
+
+    @Override
+    public void Clear() {
+        phases.forEach(phase -> phase.Clear());
+    }
     
 }

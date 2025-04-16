@@ -15,16 +15,18 @@ import net.minecraftforge.fml.common.Mod;
 public class DestructibleObjectivesHandler extends ObjectivesHandler implements IResettable {
     private final List<DestructibleObjective> objectives = new ArrayList<>();
     
-    private boolean allCompleted = false;
+    private boolean allCompleted;
 
 
     public DestructibleObjectivesHandler() {
+        allCompleted = true;
     }
 
     public void onServerTick() {
         objectives.forEach(objective -> objective.Update());
         if (allCompleted) return;
         if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
+            UnrealZaruba.LOGGER.info("All objectives completed");
             allCompleted = true;
             onCompleted.run();
         }
@@ -62,6 +64,7 @@ public class DestructibleObjectivesHandler extends ObjectivesHandler implements 
     public DestructibleObjective[] load() {
         DestructibleObjective[] loadedObjectives = DestructibleObjectivesConfig.getInstance().loadObjectives();
         if (loadedObjectives != null && loadedObjectives.length > 0) {
+            allCompleted = false;
             clear();
             for (DestructibleObjective objective : loadedObjectives) {
                 this.add(objective);

@@ -11,6 +11,11 @@
 
     "item.unrealzaruba.hand_assembler": "Hand Assembler",
     "item.unrealzaruba.tent": "Revive Tent",
+    "item.unrealzaruba.skull": "Skull",
+
+    "vehicle.unrealzaruba.car": "Truck",
+    "vehicle.unrealzaruba.pt": "Bublik",
+    "vehicle.unrealzaruba.kamikaze": "Kamikaze",
 
     "container.vehicle_purchase": "Vehicle Purchase",
     "button.unrealzaruba.deploy": "Deploy",

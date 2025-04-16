@@ -69,12 +69,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         objectivesHandler = new DestructibleObjectivesHandler();
-        var objectives = objectivesHandler.load();
-        for (var objective : objectives) {
-            for (Map.Entry<TeamColor, TeamContext> team : TeamManager.GetTeams().entrySet()) {
-                objective.addNotificationRecipient(team.getValue());
-            }
-        }
     }
 
     @Override
@@ -141,7 +135,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         var players = server.getPlayerList().getPlayers();
         for (ServerPlayer player : players) {
             if (!TeamManager.IsInTeam(player)) {
-                TeamManager.AssignToTeam(TeamManager.GetWithMinimumMembers().Color(), player);
+                var team = TeamManager.GetWithMinimumMembers();
+                if (team != null) {
+                    UnrealZaruba.LOGGER.info("[UnrealZaruba] Player not in team {} joined team {}", player.getName().getString(), team.Color());
+                    TeamManager.AssignToTeam(team.Color(), player);
+                }
             }
 
             TeamManager.teleportToSpawn(player);
@@ -149,6 +147,12 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
+        var objectives = objectivesHandler.load();
+        for (var objective : objectives) {
+            for (Map.Entry<TeamColor, TeamContext> team : TeamManager.GetTeams().entrySet()) {
+                objective.addNotificationRecipient(team.getValue());
+            }
+        }
     }
 
     public void StartStrategyTime() {
@@ -268,6 +272,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         startCondition.ResetCondition();
         objectivesHandler.reset();
         TeamManager.reset();
+        GetCurrentPhase().Clear();
         ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
     }
 

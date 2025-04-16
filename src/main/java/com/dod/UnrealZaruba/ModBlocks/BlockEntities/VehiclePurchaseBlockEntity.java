@@ -28,9 +28,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.io.InputStream;
 
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import javax.annotation.Nullable;
 
 import net.minecraft.network.Connection;
@@ -42,7 +39,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.network.chat.Component;
 
-@Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvider {
 
     private ResourceLocation schematicLocation;
@@ -229,12 +225,9 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         }
     }
 
-    @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            if (cooldownTicks > 0) { //TODO: Didnt work
-                cooldownTicks--;
-            }
+    public void serverTick() {
+        if (cooldownTicks > 0) {
+            cooldownTicks--;
         }
     }
 }

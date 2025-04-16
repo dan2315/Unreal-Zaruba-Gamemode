@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Utils.Gamerules; // It needs to be imported
+import com.dod.UnrealZaruba.Title.TitleMessage; // I fucked the NoClassDefFound
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.CreativeTabs;
@@ -69,5 +70,7 @@ public class UnrealZaruba {
 }
 
 // TODO: 
+// Spawn vehicle in right place
 // Reset teams on game restart
 // Reset destructible objectives on game restart
+// Save skull on death

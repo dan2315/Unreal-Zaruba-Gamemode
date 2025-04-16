@@ -18,4 +18,5 @@ public abstract class AbstractGamePhase {
     public abstract void OnStart();
     public abstract void OnCompleted();
     public abstract void OnTick(int ticks);
+    public abstract void Clear();
 }   

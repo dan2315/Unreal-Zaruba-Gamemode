@@ -133,7 +133,7 @@ public class PowerEngineProvider {
         MinecraftServer server = player.getServer();
         if (server == null) return false;
         
-        String playerName = player.getScoreboardName();
+        String playerName = player.getDisplayName().getString();
         
         if (!ensureTemplateExists(server)) {
             UnrealZaruba.LOGGER.warn("[PowerEngineProvider] Could not ensure template exists for " + playerName);

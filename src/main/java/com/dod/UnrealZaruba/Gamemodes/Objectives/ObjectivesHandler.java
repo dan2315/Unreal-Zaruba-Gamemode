@@ -22,10 +22,10 @@ public class ObjectivesHandler {
     }
 
     public void onServerTick() {
-        objectives.forEach(objective -> objective.Update());
-        if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
-            allCompleted = true;
-            onCompleted.run();
-        }
+        // objectives.forEach(objective -> objective.Update());
+        // if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
+        //     allCompleted = true;
+        //     onCompleted.run();
+        // }
     }
 }

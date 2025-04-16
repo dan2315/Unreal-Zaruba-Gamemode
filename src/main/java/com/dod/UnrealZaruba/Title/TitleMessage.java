@@ -26,10 +26,6 @@ public class TitleMessage {
         player.connection.send(new ClientboundSetTitleTextPacket(Component.literal(title)) {
         });
         player.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7)); // fade in, stay, fade out
-//        if (!subtitle.isEmpty()) {
-//            player.connection.send(new ClientboundSetTitleTextPacket(new TextComponent(subtitle)));
-//            player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 70, 20));
-//        }
     }
 
     /**

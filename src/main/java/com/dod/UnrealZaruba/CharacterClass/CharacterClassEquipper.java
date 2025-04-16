@@ -75,11 +75,11 @@ public class CharacterClassEquipper {
                 boolean success = PowerEngineProvider.equipPlayerWithPowerEngine(player, steamReactor);
                 
                 if (success) {
-                    UnrealZaruba.LOGGER.info("[Class Equipper] Successfully equipped " + player.getScoreboardName() + 
+                    UnrealZaruba.LOGGER.info("[Class Equipper] Successfully equipped " + player.getDisplayName() + 
                                              " with Power Engine using the PowerEngineProvider");
                 } else {
                     UnrealZaruba.LOGGER.warn("[Class Equipper] PowerEngineProvider failed to equip " + 
-                                             player.getScoreboardName() + ", but fallback was provided");
+                                             player.getDisplayName() + ", but fallback was provided");
                 }
             } catch (Exception e) {
                 UnrealZaruba.LOGGER.error("[Class Equipper] Error equipping Power Engine: " + e.getMessage(), e);

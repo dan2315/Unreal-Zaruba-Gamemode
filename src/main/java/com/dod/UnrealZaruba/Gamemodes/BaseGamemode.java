@@ -12,10 +12,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
-
+import com.dod.UnrealZaruba.ModItems.ModItems;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.TickEvent;
 import net.minecraft.resources.ResourceKey;
@@ -125,6 +128,8 @@ public abstract class BaseGamemode implements IPhaseHolder {
         player.setGameMode(GameType.SURVIVAL);
         player.setInvulnerable(false);
         CharacterClassEquipper.equipPlayerWithSelectedClass(player);
+        int skulls = NBT.readEntityTag(player, "skulls");
+        player.getInventory().add(new ItemStack(ModItems.SKULL.get(), skulls));
         NBT.addEntityTag(player, "isPlayerDead", 0);
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
@@ -145,7 +150,16 @@ public abstract class BaseGamemode implements IPhaseHolder {
         player.getInventory().clearContent();
         event.setCanceled(true);
 
+        var killingEntity = event.getSource().getEntity();
+        if (killingEntity instanceof ServerPlayer serverPlayer) {
+            Inventory killerInventory = serverPlayer.getInventory();
+            killerInventory.add(new ItemStack(ModItems.SKULL.get()));
+            serverPlayer.displayClientMessage(
+                Component.literal("You have killed " + player.getDisplayName() + ", got 1 SKULL"), true);
+        }
+
         NBT.addEntityTag(player, "isPlayerDead", 1);
+        NBT.addEntityTag(player, "skulls", player.getInventory().countItem(ModItems.SKULL.get()));
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
 
         startRespawnTimer(player);

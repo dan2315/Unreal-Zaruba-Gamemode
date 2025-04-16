@@ -96,7 +96,6 @@ public class ArmorBalancer {
     }
 
     public static void onItemAttributeModifier(ItemAttributeModifierEvent event) {
-        UnrealZaruba.LOGGER.info("onItemAttributeModifier event: {}", event.getSlotType());
         ItemStack stack = event.getItemStack();
         Item item = stack.getItem();
         ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item);
