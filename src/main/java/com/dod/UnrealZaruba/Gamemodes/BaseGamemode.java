@@ -146,6 +146,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
         player.setHealth(20);
         player.getFoodData().setFoodLevel(20);
+        NBT.addEntityTag(player, "skulls", player.getInventory().countItem(ModItems.SKULL.get()));
         player.setInvulnerable(true);
         player.getInventory().clearContent();
         event.setCanceled(true);
@@ -159,7 +160,6 @@ public abstract class BaseGamemode implements IPhaseHolder {
         }
 
         NBT.addEntityTag(player, "isPlayerDead", 1);
-        NBT.addEntityTag(player, "skulls", player.getInventory().countItem(ModItems.SKULL.get()));
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
 
         startRespawnTimer(player);
