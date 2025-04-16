@@ -38,8 +38,8 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
         int x = screenWidth / 2 - font.width(displayable_text) / 2;
         int y = 10;
 
-        guiGraphics.renderItem(new ItemStack(Items.CLOCK), x - 20, y - 3);
-        guiGraphics.drawString(font, displayable_text, x, y, 0xFFFFFF, true);
+        guiGraphics.renderItem(new ItemStack(Items.CLOCK), 20, y - 3);
+        guiGraphics.drawString(font, displayable_text, 40, y, 0xFFFFFF, true);
     }
 
     @Override

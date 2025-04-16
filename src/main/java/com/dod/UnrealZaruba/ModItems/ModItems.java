@@ -11,7 +11,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-
 /**
  * <h1>Main mod's items DeferredRegisterer</h1>
  */
@@ -44,7 +43,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.VEHICLE_PURCHASE_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> CLASS_ASSIGNER_BLOCK_ITEM = ModItems.ITEMS.register("class_assigner_block",
             () -> new BlockItem(ModBlocks.CLASS_ASSIGNER_BLOCK.get(), new Item.Properties()));
-
 
     public static void register(IEventBus eventBus) {
         ModItems.ITEMS.register(eventBus);
