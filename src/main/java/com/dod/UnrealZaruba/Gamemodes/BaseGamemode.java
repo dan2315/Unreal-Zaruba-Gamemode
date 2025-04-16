@@ -133,7 +133,8 @@ public abstract class BaseGamemode implements IPhaseHolder {
         NBT.addEntityTag(player, "isPlayerDead", 0);
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
-    
+
+    // Помянем усопших
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         if (currentPhase.GetPhaseId() == PhaseId.TEAM_SELECTION) {
             player.setHealth(20);
@@ -151,11 +152,11 @@ public abstract class BaseGamemode implements IPhaseHolder {
         event.setCanceled(true);
 
         var killingEntity = event.getSource().getEntity();
-        if (killingEntity instanceof ServerPlayer serverPlayer) {
-            Inventory killerInventory = serverPlayer.getInventory();
+        if (killingEntity instanceof ServerPlayer killer) {
+            Inventory killerInventory = killer.getInventory();
             killerInventory.add(new ItemStack(ModItems.SKULL.get()));
-            serverPlayer.displayClientMessage(
-                Component.literal("You have killed " + player.getDisplayName() + ", got 1 SKULL"), true);
+            killer.displayClientMessage(Component.literal("You have killed " + player.getDisplayName().getString() + ", got 1 SKULL"), true);
+            player.displayClientMessage(Component.literal("You have been killed by " + killer.getDisplayName().getString()), true);
         }
 
         NBT.addEntityTag(player, "isPlayerDead", 1);
