@@ -8,7 +8,11 @@ import java.util.List;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Config.TeamsConfig;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -46,7 +50,6 @@ public class TeamManager implements IResettable {
             }
         }
     }
-
 
     public void Initialize() {
         for (TeamContext team : teams.values()) {
@@ -230,14 +233,14 @@ public class TeamManager implements IResettable {
         }
         data.setTeamSpawns(teamSpawns);
         
-        TeamsConfig.getInstance().saveTeamData(data);
-        UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved teams configuration");
+        GamemodeDataManager.getDataHandler(TeamData.class, TeamDataHandler.class).setData(data);
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved teams data");
     }
 
     public TeamData Load() {
-        TeamData loadedData = TeamsConfig.getInstance().loadTeamData();
+        TeamData loadedData = GamemodeDataManager.getDataHandler(TeamData.class, TeamDataHandler.class).getData();
         if (loadedData != null) {
-            UnrealZaruba.LOGGER.info("[UnrealZaruba] Loaded teams configuration");
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] Loaded teams data");
         } else {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] No team data found, using empty team data");
             loadedData = new TeamData();

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModBlocks.BlockEntities;
+package com.dod.UnrealZaruba.ModBlocks.VehiclePurchase;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;

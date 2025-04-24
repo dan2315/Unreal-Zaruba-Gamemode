@@ -1,6 +1,6 @@
 package com.dod.UnrealZaruba.Gamemodes.StartCondition;
 
-public abstract class StartCondition {
+public abstract class Condition {
     protected Runnable onConditionMet;
     protected boolean conditionMet = false;
 

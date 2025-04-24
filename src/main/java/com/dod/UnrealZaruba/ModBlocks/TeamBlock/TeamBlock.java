@@ -38,7 +38,7 @@ public class TeamBlock extends Block {
             ServerPlayer player = (ServerPlayer) entity;
             if (player.isCrouching()) {
                 
-                BaseGamemode gamemode = GamemodeManager.Get(level.dimension());
+                BaseGamemode gamemode = GamemodeManager.instance.GetActiveGamemode();
                 if (gamemode == null) {
                     UnrealZaruba.LOGGER.warn("No gamemode found for level");
                     return;

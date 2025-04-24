@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.AbstractGamePhase;
+import com.dod.UnrealZaruba.Gamemodes.GamePhases.ConditionalPhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.IPhaseHolder;
@@ -13,6 +14,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.UnrealZaruba.ModItems.ModItems;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
+import com.dod.UnrealZaruba.TeamLogic.TeamDataHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,15 +32,29 @@ import java.util.Optional;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.network.PacketDistributor;
 import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
-
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesData;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.server.ServerLifecycleHooks;
 public abstract class BaseGamemode implements IPhaseHolder {
-    protected static BaseGamemode currentGamemode;
     private static final int RESPAWN_DURATION_SECONDS = 10;
+    protected final ObjectivesHandler objectivesHandler = new ObjectivesHandler();
     protected ResourceKey<Level> lobbyDimension;
     protected ResourceKey<Level> gameDimension;
     protected AbstractGamePhase currentPhase;
     protected List<AbstractGamePhase> phases = new ArrayList<>();
     protected int currentPhaseIndex = 0;
+    protected VehicleSpawnDataHandler vehicleSpawnDataHandler;
+    protected ObjectivesData objectivesData;
+    protected TeamDataHandler teamDataHandler;
+    protected MinecraftServer server;
+    // Smotri, kakuyu huinyu ya pridumal
+    protected ConditionalPhase conditionalPhase;
+    private boolean isConditionalPhase = false;
+
+    public BaseGamemode() {
+        this.server = ServerLifecycleHooks.getCurrentServer();
+    }
 
     public AbstractGamePhase GetCurrentPhase() {
         return currentPhase;
@@ -48,10 +65,6 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
     public abstract void HandleConnectedPlayer(Player player);
     public abstract void CheckObjectives();
-
-    public void SetCurrentGamemode(BaseGamemode gamemode) {
-        currentGamemode = gamemode;
-    }
 
     public IPhaseHolder AddPhase(AbstractGamePhase phase) {
         phases.add(phase);
@@ -65,6 +78,18 @@ public abstract class BaseGamemode implements IPhaseHolder {
     public void BeginPhase(AbstractGamePhase phase) {
         UnrealZaruba.LOGGER.info("Beginning phase " + phase.GetPhaseId());
         currentPhase = phase;
+        if (phase instanceof ConditionalPhase conditionalPhase) {
+            conditionalPhase.SetOnConditionMet(() -> {
+                CompletePhase();
+            });
+            isConditionalPhase = true;
+            this.conditionalPhase = conditionalPhase;
+        }
+        else {
+            isConditionalPhase = false;
+            conditionalPhase = null;
+        }
+
         currentPhase.OnStart();
     }
 
@@ -97,7 +122,6 @@ public abstract class BaseGamemode implements IPhaseHolder {
         }
     }
     
-    
     public Optional<AbstractGamePhase> GetPhaseById(PhaseId phaseId) {
         return phases.stream()
                 .filter(phase -> phase.GetPhaseId() == phaseId)
@@ -121,8 +145,16 @@ public abstract class BaseGamemode implements IPhaseHolder {
         return 1;
     }
     
-    public abstract void onServerTick(TickEvent.ServerTickEvent event);
-    public abstract void onPlayerTick(TickEvent.PlayerTickEvent event);
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        objectivesHandler.onServerTick();
+        if (isConditionalPhase) { // По сути тикают помимо этой фазы ещё ТаймедФазы, но по внутреннему таймеру
+            conditionalPhase.OnTick(0);
+        }
+    }
+
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        objectivesHandler.onPlayerTick(event);
+    }
 
     public void HandleRespawn(ServerPlayer player) {
         player.setGameMode(GameType.SURVIVAL);

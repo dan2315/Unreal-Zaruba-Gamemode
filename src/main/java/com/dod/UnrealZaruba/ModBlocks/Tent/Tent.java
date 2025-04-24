@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.ModBlocks.Tent;
 
+import com.dod.UnrealZaruba.Gamemodes.IRespawnPoint;
 import net.minecraft.core.BlockPos;
 
 public class Tent {

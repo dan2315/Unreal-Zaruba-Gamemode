@@ -1,31 +1,95 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.Comparator;
+import com.dod.UnrealZaruba.Player.PlayerContext;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class GamemodeManager {
-    public static HashMap<ResourceKey<Level>, BaseGamemode> worldToGamemode = new HashMap<>();
+    public static GamemodeManager instance;
+    private BaseGamemode activeGamemode;
 
+    private HashMap<UUID, String> playerVotes = new HashMap<>();
+    private boolean isVoting = true;
 
-    public static void InitializeGamemode(Pair<ResourceKey<Level>, ResourceKey<Level>> dimensions, BaseGamemode gamemode) {
-        gamemode.Initialize();
-        worldToGamemode.put(dimensions.getLeft(), gamemode); // It was suggested by Deepseek, it kinda works
-        worldToGamemode.put(dimensions.getRight(), gamemode);
+    public BaseGamemode GetActiveGamemode() {
+        return activeGamemode;
     }
 
-    public static BaseGamemode Get(ResourceKey<Level> level) {
-        return worldToGamemode.get(level);
-    }
-
-    public static <T extends BaseGamemode> T Get(Level level, Class<T> gamemodeClass) {
-        BaseGamemode gamemode = worldToGamemode.get(level);
-        if (gamemodeClass.isInstance(gamemode)) {
-            return gamemodeClass.cast(gamemode);
-        } else {
-            return null;
+    public void ForGamemode(Consumer<BaseGamemode> action) {
+        if (activeGamemode != null) {
+            action.accept(activeGamemode);
         }
     }
+
+    public GamemodeManager() {
+    }
+
+    public void StartVoting() {
+        isVoting = true;
+    }
+
+    public void Vote(UUID playerId, String vote) {
+        if (isVoting) {
+            playerVotes.put(playerId, vote);
+        }
+    }
+
+    public void Tick() {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            return;
+        }
+        
+        var players = server.getPlayerList().getPlayers();
+        if (players.size() == 0) {
+            return;
+        }
+
+        boolean allPlayersReady = true;
+        List<String> notReadyPlayers = new ArrayList<>();
+        
+        for (ServerPlayer player : players) {
+            PlayerContext playerContext = PlayerContext.Get(player.getUUID());
+            if (playerContext == null || !playerContext.IsReady()) {
+                allPlayersReady = false;
+                notReadyPlayers.add(player.getName().getString());
+            }
+        }
+
+        if (allPlayersReady) {
+            StopVoting();
+        }
+    }
+
+    public void StopVoting() {
+        isVoting = false;
+        HashMap<String, Integer> votes = new HashMap<>();
+        playerVotes.forEach((playerId, vote) -> {
+            votes.put(vote, votes.getOrDefault(vote, 0) + 1);
+        });
+
+        String mostVoted = votes.keySet().stream()
+            .max(Comparator.comparingInt(votes::get))
+            .orElse("ships");
+
+        if (mostVoted != null) {
+            BaseGamemode gamemode = GamemodeFactory.createGamemode(mostVoted);
+            SetActiveGamemode(gamemode);
+        }
+
+        playerVotes.clear();
+    }
+
+    public void SetActiveGamemode(BaseGamemode gamemode) {
+        activeGamemode = gamemode;
+    }
+
+
 }

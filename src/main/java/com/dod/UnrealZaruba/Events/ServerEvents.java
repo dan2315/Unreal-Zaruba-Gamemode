@@ -35,49 +35,51 @@ import static com.dod.UnrealZaruba.UnrealZaruba.*;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 
-/**
- * Все сервер-side ивенты сюда епт
- * // TODO: Ubrat' nahui annotation i replace with instance init
- */
-@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
+
 public class ServerEvents {
-    private static BaseGamemode gamemode;
-    private static GameStatisticsService GameStatisticsService;
+    private GamemodeManager gamemodeManager;
+    private GameStatisticsService GameStatisticsService;
     private static boolean isDevMode = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV;
 
+    public ServerEvents(GameStatisticsService gameStatisticsService, GamemodeManager gamemodeManager) {
+        GameStatisticsService = gameStatisticsService;
+        this.gamemodeManager = gamemodeManager;
+    }
+
     @SubscribeEvent
-    public static void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event) {
         MinecraftServer server = event.getServer();
         if (!server.isDedicatedServer())
             return;
 
         UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, server);
-        gamemode = new DestroyObjectivesGamemode(event.getServer(), GameStatisticsService, new NetworkedTimer());
-        GamemodeManager.InitializeGamemode(WorldManager.getDimensions(), gamemode);
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
+    public void onServerTick(TickEvent.ServerTickEvent event) {
         MinecraftServer server = event.getServer();
         if (!server.isDedicatedServer())
             return;
 
         if (event.phase.equals(TickEvent.Phase.START)) {
-            if (!isDevMode) gamemode.onServerTick(event);
             TimerManager.updateAll();
+            if (!isDevMode) {
+                gamemodeManager.Tick();
+                gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
+            }
         }
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         MinecraftServer server = event.player.getServer();
         if (server == null || !server.isDedicatedServer()) return;
 
-        if (!isDevMode) gamemode.onPlayerTick(event);
+        if (!isDevMode) gamemodeManager.ForGamemode(gamemode -> gamemode.onPlayerTick(event));
     }
 
     @SubscribeEvent
-    public static void onServerStopped(ServerStoppedEvent event) {
+    public void onServerStopped(ServerStoppedEvent event) {
         MinecraftServer server = event.getServer();
         if (!server.isDedicatedServer())
             return;
@@ -85,13 +87,12 @@ public class ServerEvents {
             return;
 
         LOGGER.info("Server has stopped. Finalizing...");
-        // TODO: DestructibleObjectivesHandler.Save();
-        gamemode.Cleanup();
+        gamemodeManager.ForGamemode(gamemode -> gamemode.Cleanup());
     }
 
 
     @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         ServerPlayer player = (ServerPlayer) event.getEntity();
         PlayerContext playerContext = TeamPlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
@@ -100,13 +101,11 @@ public class ServerEvents {
         if (isDevMode)
             return;
 
-        playerContext.SetGamemode(gamemode);
-
-        gamemode.HandleConnectedPlayer(event.getEntity());
+        gamemodeManager.ForGamemode(gamemode -> gamemode.HandleConnectedPlayer(event.getEntity()));
     }
 
     @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event) {
+    public void onPlayerDeath(LivingDeathEvent event) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (!server.isDedicatedServer())
             return;
@@ -115,23 +114,18 @@ public class ServerEvents {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer))
             return;
 
-        BaseGamemode gamemode = GamemodeManager.Get(WorldManager.GAME_DIMENSION);
-        if (gamemode == null) {
-            return;
-        }
-
-        gamemode.HandleDeath(serverPlayer, event);
+        gamemodeManager.ForGamemode(gamemode -> gamemode.HandleDeath(serverPlayer, event));
     }
 
     @SubscribeEvent
-    public static void onItemSpawn(EntityJoinLevelEvent event) {
+    public void onItemSpawn(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ItemEntity itemEntity) {
             itemEntity.lifespan = 200;
         }
     }
 
     @SubscribeEvent
-    public static void onItemAttributeModifier(ItemAttributeModifierEvent event) {
+    public void onItemAttributeModifier(ItemAttributeModifierEvent event) {
         ArmorBalancer.onItemAttributeModifier(event);
     }
 }

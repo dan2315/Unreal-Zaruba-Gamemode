@@ -23,7 +23,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class DestructibleObjective extends PositionedGameobjective implements IResettable {
+public class DestructibleObjective extends PositionedGameobjective implements IResettable, IPlayerTickAware {
     private static final int PROGRESS_UPDATE_INTERVAL = 40;
     private static final int VISIBILITY_UPDATE_INTERVAL = 40;
     private static final int NOTIFY_BLOCK_THRESHOLD = 10;
@@ -39,27 +39,16 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     transient int notifyBlockCounter = 0;
     
     private final transient Map<UUID, Integer> playerVisibilityTicks = new HashMap<>();
-    private final transient List<IObjectiveNotifier> notificationRecipients = new ArrayList<>();
 
     public DestructibleObjective(BlockVolume volume, String name) {
-        super(volume.GetCenter());
+        super(name, "destructible", volume.GetCenter());
         this.volume = volume;
-        this.name = name;
         this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
         this.progressDisplay = new ProgressbarForObjective(this, name);
     }
     
 
-    public void addNotificationRecipient(IObjectiveNotifier recipient) {
-        if (recipient != null && !notificationRecipients.contains(recipient)) {
-            notificationRecipients.add(recipient);
-        }
-    }
-    
-    public void removeNotificationRecipient(IObjectiveNotifier recipient) {
-        notificationRecipients.remove(recipient);
-    }
     
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
         UnrealZaruba.LOGGER.info("Начал прогружать: {}", name);
@@ -120,9 +109,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
 
         notifyBlockCounter += counter;
         if (notifyBlockCounter >= NOTIFY_BLOCK_THRESHOLD) {
-            for (IObjectiveNotifier notifier : notificationRecipients) {
-                notifier.onObjectiveStateChanged(this); 
-            }
+            this.sendObjectiveChanged(this);
             notifyBlockCounter = 0;
         }
         return false;
@@ -144,9 +131,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     @Override
     public void OnCompleted() {
         UnrealZaruba.LOGGER.info("Objective {} completed", name);
-        for (IObjectiveNotifier notifier : notificationRecipients) {
-            notifier.onObjectiveCompleted(this);
-        }
+        this.sendObjectiveCompleted(this);
         progressDisplay.clear();
 
         String border = "==================================";

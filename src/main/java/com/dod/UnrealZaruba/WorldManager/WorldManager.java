@@ -150,9 +150,9 @@ public class WorldManager {
         vsCore.deleteShips(shipWorld, ships);
     }
 
-    public static void TeleportAllPlayersToLobby(MinecraftServer server) {
+    public static void TeleportAllPlayersTo(MinecraftServer server, ResourceKey<Level> dimensionKey) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            teleportPlayerToDimension(player, LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
+            teleportPlayerToDimension(player, dimensionKey, MainConfig.getInstance().getLobbySpawnPoint());
         }
     }
 

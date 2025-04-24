@@ -3,9 +3,12 @@ package com.dod.UnrealZaruba.ModBlocks;
 import com.dod.UnrealZaruba.ModBlocks.TeamBlock.SpawnBlock;
 import com.dod.UnrealZaruba.ModBlocks.TeamBlock.TeamBlock;
 import com.dod.UnrealZaruba.ModBlocks.Tent.TentMainBlock;
+import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlock;
+import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlock;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.ModBlocks.BlockEntities.VehiclePurchaseBlockEntity;
 
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
@@ -45,6 +48,8 @@ public class ModBlocks {
             () -> new VehiclePurchaseBlock());
     public static final RegistryObject<Block> CLASS_ASSIGNER_BLOCK = ModBlocks.BLOCKS.register("class_assigner_block",
             () -> new ClassAssignerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)));
+    public static final RegistryObject<Block> VEHICLE_SPAWN_BLOCK = ModBlocks.BLOCKS.register("vehicle_spawn_block",
+            () -> new VehicleSpawnBlock());
 
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES 
@@ -55,6 +60,9 @@ public class ModBlocks {
 
     public static final RegistryObject<BlockEntityType<ClassAssignerBlockEntity>> CLASS_ASSIGNER_BLOCK_ENTITY = BLOCK_ENTITIES.register("class_assigner_block_entity",
             () -> BlockEntityType.Builder.of(ClassAssignerBlockEntity::new, ModBlocks.CLASS_ASSIGNER_BLOCK.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<VehicleSpawnBlockEntity>> VEHICLE_SPAWN_BLOCK_ENTITY = BLOCK_ENTITIES.register("vehicle_spawn_block_entity",
+            () -> BlockEntityType.Builder.of(VehicleSpawnBlockEntity::new, ModBlocks.VEHICLE_SPAWN_BLOCK.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {

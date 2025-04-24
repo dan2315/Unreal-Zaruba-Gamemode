@@ -25,14 +25,13 @@ public class VehicleRegistry {
     }
 
     public static void init() {
-        register(new VehicleData("pt", "vehicle.unrealzaruba.pt")
-        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 3));
+        register(new VehicleData("pt", "vehicle.unrealzaruba.pt"));
 
-        register(new VehicleData("car", "vehicle.unrealzaruba.car")
-        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 2));
+        register(new VehicleData("car", "vehicle.unrealzaruba.car"));
 
-        register(new VehicleData("kamikaze", "vehicle.unrealzaruba.kamikaze")
-        .addItemRequirement(new ResourceLocation("unrealzaruba:skull"), 1));
+        register(new VehicleData("kamikaze", "vehicle.unrealzaruba.kamikaze"));
+
+        register(new VehicleData("ship", "vehicle.unrealzaruba.ship"));
     }
 
     public static ResourceLocation GetLocation(String vehicleName) {

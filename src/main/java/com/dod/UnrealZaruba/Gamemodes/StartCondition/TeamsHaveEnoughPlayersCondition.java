@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class TeamsHaveEnoughPlayersCondition extends StartCondition implements IDelayedCondition {
+public class TeamsHaveEnoughPlayersCondition extends Condition implements IDelayedCondition {
     private final int requiredPlayersPerTeam;
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;

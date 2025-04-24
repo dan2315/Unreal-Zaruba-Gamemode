@@ -31,6 +31,29 @@ public class ShipCreator {
     private static final ResourceLocation LECTERN_CONTROLLER_ID = new ResourceLocation("create:lectern_controller");
     private static final Block LECTERN_CONTROLLER_BLOCK = ForgeRegistries.BLOCKS.getValue(LECTERN_CONTROLLER_ID);
 
+
+    public static boolean CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level) {
+        try {
+            IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
+            IShipSchematicDataV1 schematicV1 = (IShipSchematicDataV1) schematic;
+
+            schematic.getInfo().getShipsInfo().forEach(shipData -> {
+                UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
+            });
+            Quaterniond rotation = new Quaterniond();
+            Vector3d positionVec = new Vector3d(
+                position.getX(),
+                position.getY() + schematic.getInfo().getMaxObjectPos().y,
+                position.getZ());
+            VModShipSchematicV1Kt.placeAt(schematicV1, level, null, null, positionVec, rotation, ships -> Unit.INSTANCE);
+            return true;
+        } catch (Exception e) {
+            UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level,
             ServerPlayer player, Direction direction) {
         try {
@@ -46,7 +69,7 @@ public class ShipCreator {
                 offsetedPosition.getX(),
                 offsetedPosition.getY() + schematic.getInfo().getMaxObjectPos().y,
                 offsetedPosition.getZ());
-            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player.getUUID(),
+            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player != null ? player.getUUID() : null,
                     positionVec, rotation,
                     ships -> Unit.INSTANCE);
             return true;

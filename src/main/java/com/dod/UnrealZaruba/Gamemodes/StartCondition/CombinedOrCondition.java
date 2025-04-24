@@ -4,14 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
-public class CombinedOrCondition extends StartCondition implements IDelayedCondition {
-    private final List<StartCondition> conditions;
+public class CombinedOrCondition extends Condition implements IDelayedCondition {
+    private final List<Condition> conditions;
 
-    public CombinedOrCondition(StartCondition... conditions) {
+    public CombinedOrCondition(Condition... conditions) {
         this.conditions = new ArrayList<>(Arrays.asList(conditions));
     }
 
-    public CombinedOrCondition(List<StartCondition> conditions) {
+    public CombinedOrCondition(List<Condition> conditions) {
         this.conditions = new ArrayList<>(conditions);
     }
     
@@ -19,7 +19,7 @@ public class CombinedOrCondition extends StartCondition implements IDelayedCondi
     public boolean isMet() {
         if (conditionMet) return true;
         
-        for (StartCondition condition : conditions) {
+        for (Condition condition : conditions) {
             if (condition.isMet()) {
                 conditionMet = true;
                 return true;
@@ -33,7 +33,7 @@ public class CombinedOrCondition extends StartCondition implements IDelayedCondi
     public void ResetCondition() {
         conditionMet = false;
         
-        for (StartCondition condition : conditions) {
+        for (Condition condition : conditions) {
             condition.ResetCondition();
         }
     }
@@ -42,7 +42,7 @@ public class CombinedOrCondition extends StartCondition implements IDelayedCondi
     public void Update() {
         if (conditionMet) return;
         
-        for (StartCondition condition : conditions) {
+        for (Condition condition : conditions) {
             condition.Update();
         }
         
@@ -51,18 +51,18 @@ public class CombinedOrCondition extends StartCondition implements IDelayedCondi
         }
     }
     
-    public void addCondition(StartCondition condition) {
+    public void addCondition(Condition condition) {
         conditions.add(condition);
     }
     
-    public boolean removeCondition(StartCondition condition) {
+    public boolean removeCondition(Condition condition) {
         return conditions.remove(condition);
     }
 
     @Override
     public int getSustainedTicks() {
         int minTicks = Integer.MAX_VALUE;
-        for (StartCondition condition : conditions) {
+        for (Condition condition : conditions) {
             if (condition instanceof IDelayedCondition delayedCondition) {
                 minTicks = Math.min(minTicks, delayedCondition.getSustainedTicks());
             }

@@ -44,8 +44,7 @@ public class NetworkHandler {
                 VotePlayerPacket::decode,
                 VotePlayerPacket::handle);
 
-        CHANNEL.registerMessage(packetId++,
-                UpdateDeathTimerPacket.class,
+        CHANNEL.registerMessage(packetId++, UpdateDeathTimerPacket.class,
                 UpdateDeathTimerPacket::encode,
                 UpdateDeathTimerPacket::decode,
                 UpdateDeathTimerPacket::handle);

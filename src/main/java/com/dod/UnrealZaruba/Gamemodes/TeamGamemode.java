@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
@@ -18,14 +19,17 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import java.util.HashMap;
 
 public class TeamGamemode extends BaseGamemode {
-    
     protected TeamManager TeamManager;
     public HashMap<TeamColor, StartGameText> startGameTexts = new HashMap<>();
     
     public TeamManager GetTeamManager() { return TeamManager; }
     public void SetTeamManager(TeamManager teamManager) { TeamManager = teamManager; }
     
-    
+    public TeamGamemode() {
+        TeamManager = new TeamManager();
+        TeamManager.Initialize();
+    }
+
     @Override
     protected void Initialize() {
         TeamManager.Initialize();

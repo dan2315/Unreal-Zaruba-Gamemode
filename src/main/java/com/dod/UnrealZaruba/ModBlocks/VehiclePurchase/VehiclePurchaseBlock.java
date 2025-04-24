@@ -1,10 +1,9 @@
-package com.dod.UnrealZaruba.ModBlocks;
+package com.dod.UnrealZaruba.ModBlocks.VehiclePurchase;
 
 import javax.annotation.Nullable;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModBlocks.BlockEntities.VehiclePurchaseBlockEntity;
-//import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
+import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

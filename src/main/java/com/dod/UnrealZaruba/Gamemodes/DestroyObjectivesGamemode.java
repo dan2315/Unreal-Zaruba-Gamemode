@@ -8,7 +8,8 @@ import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
 import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjectivesHandler;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -28,32 +29,24 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.StartCondition;
+import com.dod.UnrealZaruba.Gamemodes.StartCondition.Condition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
-
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
 public class DestroyObjectivesGamemode extends TeamGamemode {
+    public static final String GAMEMODE_NAME = "destroyobjectives";
     private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
     private static final int GAME_DURATION_MS = 10 * 60 * 1000; // 10 minutes
     private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 5 seconds
     
     private GameStatisticsService gameStatistics;
     private IGameTimer gameTimer;
-    private MinecraftServer server;
 
-    private DestructibleObjectivesHandler objectivesHandler;
-    private StartCondition startCondition;
-
-    public DestroyObjectivesGamemode(MinecraftServer server, GameStatisticsService leaderboardService, IGameTimer gameTimer) {
-        this.gameStatistics = leaderboardService;
+    public DestroyObjectivesGamemode(GameStatisticsService gameStatisticsService, IGameTimer gameTimer) {
+        super();
+        this.gameStatistics = gameStatisticsService;
         this.gameTimer = gameTimer;
-        currentGamemode = this;
-        this.server = server;
-
-        TeamManager teamManager = new TeamManager();
-        teamManager.Initialize();
-        SetTeamManager(teamManager);
         gameTimer.setup();
 
         TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
@@ -68,7 +61,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         // TODO: Utils.LoadChunksInArea(server.getLevel(Level.OVERWORLD), -1024, -512, 1024, 512);
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
-        objectivesHandler = new DestructibleObjectivesHandler();
+        objectivesHandler.OnObjectivesCompleted(() -> {
+            CompleteGame(server, TeamColor.RED);
+        });
+        Initialize();
     }
 
     @Override
@@ -78,13 +74,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         MainConfig.Mode mode = MainConfig.getInstance().getMode();
         if (mode != MainConfig.Mode.GAME) return;
 
-
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
 
-        // TODO: Replace manual phase completion with automatic
         AddPhase(
             new GamePhase(
-                PhaseId.TEAM_SELECTION, 
+                PhaseId.TEAM_SELECTION,
                 this::StartTeamSelection,
                 this::CompleteTeamSelection
             )   
@@ -110,9 +104,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             )
         );
 
-        ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
-
-        startCondition = new CombinedOrCondition(
+        var startCondition = new CombinedOrCondition(
             new TeamsHaveEnoughPlayersCondition(TeamManager, 5, 10),
             new AllPlayersReadyCondition(10)
         );
@@ -147,12 +139,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
-        var objectives = objectivesHandler.load();
-        for (var objective : objectives) {
-            for (Map.Entry<TeamColor, TeamContext> team : TeamManager.GetTeams().entrySet()) {
-                objective.addNotificationRecipient(team.getValue());
-            }
-        }
+        objectivesHandler.load();
+        objectivesHandler.addRecipients(TeamManager.GetTeams());
     }
 
     public void StartStrategyTime() {
@@ -183,10 +171,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 startGameTexts.get(team.Color()).GetSubtitle());
         }
 
-        // var success = TeamManager.DeleteBarriersAtSpawn();
-        // if (!success) {
-        //     UnrealZaruba.LOGGER.error("Спавны команд ещё не готовы");
-        // }
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Triggering vehicle spawn blocks");
+
+        GamemodeDataManager
+        .getDataHandler(this.getClass(), VehicleSpawnDataHandler.class)
+        .triggerVehicleSpawns(server);
     }
 
     public void UpdateBattle(int ticks) {
@@ -196,17 +185,12 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         gameTimer.update(secondsRemaining % 60, secondsRemaining / 60, true);
     }
 
-
-
     @Override
     public void onServerTick(TickEvent.ServerTickEvent serverTickEvent) {
-        startCondition.Update();
-        objectivesHandler.onServerTick();
     }
 
     @Override
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        objectivesHandler.onPlayerTick(event);
     }
 
     public void HandleConnectedPlayer(Player player) {
@@ -263,13 +247,13 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void CompleteGameDelayed(MinecraftServer server) {
         var players = server.getPlayerList().getPlayers();
-        WorldManager.TeleportAllPlayersToLobby(server);
+        WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
         WorldManager.ResetGameWorldDelayed();
         for (ServerPlayer player : players) {
             player.setGameMode(GameType.SPECTATOR);
             player.getInventory().clearContent();
         }
-        startCondition.ResetCondition();
+        
         objectivesHandler.reset();
         TeamManager.reset();
         GetCurrentPhase().Clear();

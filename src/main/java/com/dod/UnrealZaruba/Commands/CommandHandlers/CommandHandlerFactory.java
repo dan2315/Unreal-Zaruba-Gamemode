@@ -23,6 +23,12 @@ public class CommandHandlerFactory {
         handlers.add(new ResetGameWorldCommand());
         handlers.add(new SetReadyCommand());
         
+        // Add the vehicle spawn commands
+        handlers.add(new RegisterVehicleSpawnCommand());
+        handlers.add(new ListVehicleSpawnsCommand());
+        handlers.add(new RemoveVehicleSpawnCommand());
+        handlers.add(new TriggerVehicleSpawnsCommand());
+        
         return handlers;
     }
 } 

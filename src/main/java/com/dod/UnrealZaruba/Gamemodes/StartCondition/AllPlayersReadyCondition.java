@@ -12,7 +12,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AllPlayersReadyCondition extends StartCondition implements IDelayedCondition {
+public class AllPlayersReadyCondition extends Condition implements IDelayedCondition {
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;
     private final int minimumPlayers;

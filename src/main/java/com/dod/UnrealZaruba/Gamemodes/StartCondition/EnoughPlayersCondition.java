@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class EnoughPlayersCondition extends StartCondition {
+public class EnoughPlayersCondition extends Condition {
     private final int requiredPlayers;
     private final int requiredDurationTicks;
     private int sustainedTicks = 0;

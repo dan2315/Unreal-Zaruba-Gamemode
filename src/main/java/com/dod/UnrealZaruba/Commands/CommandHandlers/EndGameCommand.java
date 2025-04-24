@@ -14,7 +14,7 @@ public class EndGameCommand implements ICommandHandler {
                 .executes(context -> {
                     ServerLevel level = context.getSource().getLevel();
                     if (level instanceof ServerLevel) {
-                        GamemodeManager.Get(level.dimension()).EndGame();
+                        GamemodeManager.instance.GetActiveGamemode().EndGame();
                     }
                     return 0;
                 }));

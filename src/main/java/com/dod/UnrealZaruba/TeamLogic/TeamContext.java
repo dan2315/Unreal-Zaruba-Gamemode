@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.IObjectiveNotifier;
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
@@ -31,10 +31,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundSource;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.sounds.SoundEvent;
+import com.dod.UnrealZaruba.Gamemodes.IRespawnPoint;
 /**
  * Team core data.
  */
-public class TeamContext implements IObjectiveNotifier, IResettable {
+public class TeamContext extends ObjectiveOwner implements IResettable {
     private final TeamManager batya;
     private final ResourceLocation tentTemplate;
     private final SoundEvent hornSound;
@@ -43,11 +44,13 @@ public class TeamContext implements IObjectiveNotifier, IResettable {
     private final MinecraftServer server;
     
     private BlockPos spawn;
+    public List<IRespawnPoint> respawnPoints; // Пригодится в будущем
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     private UUID commander;
     private String commanderName;
     private Tent active_tent;
     private PlayerTeam minecraftTeam;
+    
     
     private Function<GameObjective, String> notificationMessageGenerator;
     private Function<GameObjective, String> objectiveCompletedMessageGenerator;

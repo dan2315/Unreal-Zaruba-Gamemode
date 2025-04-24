@@ -7,6 +7,8 @@ import java.io.FileWriter;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 
 /**
  * Abstract base class for configuration handling.

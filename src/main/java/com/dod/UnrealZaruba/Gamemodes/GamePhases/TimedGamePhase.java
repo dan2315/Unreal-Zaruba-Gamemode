@@ -12,6 +12,7 @@ public class TimedGamePhase extends AbstractGamePhase {
     public ITimer timer;
     public IPhaseHolder phaseHolder;
 
+    @Deprecated //("Use ConditionalPhase with TimePassedCondition instead")
     public TimedGamePhase(PhaseId phaseId, int duration, Runnable onStart, Consumer<Integer> onTick, Runnable onCompleted) {
         super(phaseId);
         this.duration = duration;
