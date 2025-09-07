@@ -13,11 +13,6 @@ import java.util.Map;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveFactory;
-import com.dod.UnrealZaruba.TeamLogic.TeamData;
-import com.dod.UnrealZaruba.TeamLogic.TeamDataHandler;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,31 +23,33 @@ import com.google.gson.GsonBuilder;
  */
 public class GamemodeDataManager {
     private static final String BASE_PATH = "unrealzaruba" + File.separator + "gamemodedata";
-    private static final Map<Class<?>, Object> dataHandlers = new HashMap<>();
+    private static final Map<Class<? extends BaseGamemode>, Map<Class<? extends GamemodeData<?>>, GamemodeData<?>>> dataRegistry = new HashMap<>();
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObjective.class, new ObjectiveFactory())
             .setPrettyPrinting()
             .create();
+    
+    public static <T extends GamemodeData<?>> void registerHandler(Class<? extends BaseGamemode> gamemodeClass, T data) {
+        Map<Class<? extends GamemodeData<?>>, GamemodeData<?>> gamemodeMap = dataRegistry.computeIfAbsent(gamemodeClass, k -> new HashMap<>());
+        gamemodeMap.put((Class<? extends GamemodeData<?>>) data.getClass(), data);
+    }
 
-    static {
-        registerDataHandler(TeamData.class, new TeamDataHandler(BaseGamemode.class));
-        registerDataHandler(VehicleSpawnData.class, new VehicleSpawnDataHandler(BaseGamemode.class));
-        registerDataHandler(GameObjective[].class, new ObjectivesData(BaseGamemode.class));
-    }
-    
-    public static <T> void registerDataHandler(Class<T> dataClass, Object handler) {
-        dataHandlers.put(dataClass, handler);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static <T, H> H getDataHandler(Class<T> dataClass, Class<H> handlerClass) {
-        Object handler = dataHandlers.get(dataClass);
-        if (handler != null && handlerClass.isInstance(handler)) {
-            return (H) handler;
+    public static <T , D> D getHandler(Class<? extends BaseGamemode> gamemodeClass, Class<D> dataClass) {
+        Map<Class<? extends GamemodeData<?>>, GamemodeData<?>> gamemodeMap = dataRegistry.get(gamemodeClass);
+        UnrealZaruba.LOGGER.info("[GamemodeDataManager] Getting handler for " + gamemodeClass.getSimpleName() + " and " + dataClass.getSimpleName());
+        for (var entry : gamemodeMap.entrySet()) {
+            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Entry: " + entry.getKey().getSimpleName());
+        }
+        if (gamemodeMap != null) {
+            GamemodeData<?> data = gamemodeMap.get(dataClass);
+            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Data: " + data);
+            if (data != null) {
+                return (D) data;
+            }
         }
         return null;
     }
-    
+
     public static String getGamemodeDataPath(Class<? extends BaseGamemode> gamemodeClass) {
         return BASE_PATH + File.separator + gamemodeClass.getSimpleName();
     }

@@ -46,7 +46,6 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
         
         if (sustainedTicks % 20 == 0) { // Once per second
             int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-            UnrealZaruba.LOGGER.info("Time passed condition: " + remainingSeconds + " seconds remaining");
             
             for (var player : server.getPlayerList().getPlayers()) {
                 TitleMessage.sendActionbar(player, Component.literal(

@@ -9,13 +9,12 @@ import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
 import com.dod.UnrealZaruba.Utils.NBT;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.UnrealZaruba.ModItems.ModItems;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
-import com.dod.UnrealZaruba.TeamLogic.TeamDataHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,26 +33,31 @@ import net.minecraftforge.network.PacketDistributor;
 import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesData;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
+
 public abstract class BaseGamemode implements IPhaseHolder {
     private static final int RESPAWN_DURATION_SECONDS = 10;
-    protected final ObjectivesHandler objectivesHandler = new ObjectivesHandler();
+    protected final ObjectivesHandler objectivesHandler;
     protected ResourceKey<Level> lobbyDimension;
     protected ResourceKey<Level> gameDimension;
     protected AbstractGamePhase currentPhase;
-    protected List<AbstractGamePhase> phases = new ArrayList<>();
-    protected int currentPhaseIndex = 0;
-    protected VehicleSpawnDataHandler vehicleSpawnDataHandler;
-    protected ObjectivesData objectivesData;
-    protected TeamDataHandler teamDataHandler;
-    protected MinecraftServer server;
     // Smotri, kakuyu huinyu ya pridumal
     protected ConditionalPhase conditionalPhase;
+    protected List<AbstractGamePhase> phases = new ArrayList<>();
+    protected int currentPhaseIndex = 0;
+    protected ObjectivesData objectivesData;
+    protected MinecraftServer server;
     private boolean isConditionalPhase = false;
 
     public BaseGamemode() {
+        GamemodeManager.instance.SetActiveGamemode(this);
+        GamemodeDataFactory.initializeGamemodeData(this.getClass());
+        objectivesHandler = new ObjectivesHandler();
         this.server = ServerLifecycleHooks.getCurrentServer();
+        WorldManager.ReloadGameWorldDelayed(this);
     }
 
     public AbstractGamePhase GetCurrentPhase() {
@@ -137,7 +141,9 @@ public abstract class BaseGamemode implements IPhaseHolder {
     }
 
     public void EndGame() {
-        ProceedToPhaseForced(PhaseId.TEAM_SELECTION);
+        if (currentPhase.GetPhaseId() == PhaseId.GAME) {
+            CompletePhase();
+        }
     }
 
     public int StartGame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

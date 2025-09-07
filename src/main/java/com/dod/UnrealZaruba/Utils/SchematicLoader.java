@@ -32,6 +32,7 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();
     private static final Map<ResourceLocation, StructureTemplate> TEMPLATE_CACHE = new HashMap<>();
+    private static final Map<ResourceLocation, IShipSchematic> VSCHEM_CACHE = new HashMap<>();
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static CompoundTag GetSchematicNbt(ResourceLocation location) {
@@ -135,6 +136,10 @@ public class SchematicLoader {
 
     // VSCHEM
     public static IShipSchematic GetVSchem(ResourceLocation location) {
+        if (VSCHEM_CACHE.containsKey(location)) {
+            return VSCHEM_CACHE.get(location);
+        }
+
         try {
             byte[] bytes;
             String source;
@@ -163,6 +168,7 @@ public class SchematicLoader {
                 UnrealZaruba.LOGGER.info("VSCHEM version 1 detected");
                 var instance = new VModShipSchematicV1();
                 instance.deserialize(new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes)));
+                VSCHEM_CACHE.put(location, instance);
                 return instance;
             }
             else {
@@ -175,6 +181,7 @@ public class SchematicLoader {
                         var instance = new VModShipSchematicV1();
                         boolean result = instance.deserialize(buf);
                         UnrealZaruba.LOGGER.info("Result: {}", result);
+                        VSCHEM_CACHE.put(location, instance);
                         return instance;
                     }
                     else {

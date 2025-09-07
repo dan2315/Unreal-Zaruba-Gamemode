@@ -29,6 +29,8 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.RED_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> BLUE_BLOCK_ITEM = ModItems.ITEMS.register("blue_block",
             () -> new BlockItem(ModBlocks.BLUE_BLOCK.get(), new Item.Properties()));
+    public static final RegistryObject<Item> YELLOW_BLOCK_ITEM = ModItems.ITEMS.register("yellow_block",
+            () -> new BlockItem(ModBlocks.YELLOW_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> RED_SPAWN_ITEM = ModItems.ITEMS.register("red_spawn_block",
             () -> new BlockItem(ModBlocks.RED_SPAWN_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<Item> BLUE_SPAWN_ITEM = ModItems.ITEMS.register("blue_spawn_block",

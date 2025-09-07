@@ -66,4 +66,16 @@ public class Utils {
         
         return quaternion;
     }
+
+    public static float getYRotForDirection(Direction direction) {
+        float yRotation = 0;
+        switch (direction) {
+            case NORTH: yRotation = 180; break;
+            case SOUTH: yRotation = 0; break;
+            case WEST: yRotation = 90; break;
+            case EAST: yRotation = 270; break;
+            default: yRotation = 0; break;
+        }
+        return yRotation;
+    }
 }

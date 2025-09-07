@@ -31,6 +31,8 @@ public class ModBlocks {
             () -> new TeamBlock(TeamColor.RED,  Block.Properties.of().mapColor(MapColor.WOOL)));
     public static final RegistryObject<Block> BLUE_BLOCK = ModBlocks.BLOCKS.register("blue_block",
             () -> new TeamBlock(TeamColor.BLUE,  Block.Properties.of().mapColor(MapColor.WOOL)));
+    public static final RegistryObject<Block> YELLOW_BLOCK = ModBlocks.BLOCKS.register("yellow_block",
+            () -> new TeamBlock(TeamColor.YELLOW,  Block.Properties.of().mapColor(MapColor.WOOL)));
     public static final RegistryObject<Block> RED_SPAWN_BLOCK = ModBlocks.BLOCKS.register("red_spawn_block",
             () -> new SpawnBlock(TeamColor.RED, Block.Properties.of().mapColor(MapColor.WOOL)));
     public static final RegistryObject<Block> BLUE_SPAWN_BLOCK = ModBlocks.BLOCKS.register("blue_spawn_block",

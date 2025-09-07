@@ -8,11 +8,9 @@ import net.minecraftforge.network.PacketDistributor;
 
 public class NetworkedTimer implements IGameTimer {
 
-    private final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-
     @Override
     public void setup() {
-        server.getPlayerList().getPlayers().forEach(player -> {
+        ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, true)
                 );
@@ -21,7 +19,7 @@ public class NetworkedTimer implements IGameTimer {
 
     @Override
     public void update(int seconds, int minutes, boolean isVisible) {
-        server.getPlayerList().getPlayers().forEach(player -> {
+        ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player), new TimerPacket(seconds, minutes, true)
                 );
@@ -30,7 +28,7 @@ public class NetworkedTimer implements IGameTimer {
 
     @Override
     public void reset() {
-        server.getPlayerList().getPlayers().forEach(player -> {
+        ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, false)
                 );

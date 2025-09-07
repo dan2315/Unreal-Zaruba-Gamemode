@@ -1,26 +1,30 @@
 package com.dod.UnrealZaruba.ModBlocks.VehicleSpawn;
 
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.UnrealZaruba.Vehicles.Vehicle;
 import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import org.apache.commons.lang3.tuple.Pair;
+import java.util.List;
+import org.valkyrienskies.core.api.ships.ServerShip;
+import java.util.ArrayList;
 
 /**
  * Block entity for the VehicleSpawnBlock that stores vehicle type and other data.
  */
 public class VehicleSpawnBlockEntity extends BlockEntity {
-    private String vehicleType = "default"; // Type of vehicle to spawn
-    private TeamColor teamColor = TeamColor.RED; // Team color for the vehicle
+    private String vehicleType = "default";
+    private TeamColor teamColor = TeamColor.RED;
     
     public VehicleSpawnBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.VEHICLE_SPAWN_BLOCK_ENTITY.get(), pos, state);
@@ -48,32 +52,18 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
         return teamColor;
     }
     
-    public void onPlaced() {
-        if (level != null && !level.isClientSide) {
-            registerWithDataHandler();
-        }
-    }
-    
-    public void onRemoved() {
-        if (level != null) {
-            VehicleSpawnDataHandler handler = getDataHandler();
-            if (handler != null) {
-                handler.unregisterBlock(worldPosition, level.dimension());
-            }
-        }
-    }
-    
     private void registerWithDataHandler() {
         if (level != null && !level.isClientSide) {
-            VehicleSpawnDataHandler handler = getDataHandler();
+            VehicleSpawnData handler = getDataHandler();
             if (handler != null) {
-                handler.registerBlock(worldPosition, level.dimension(), vehicleType, teamColor);
+                handler.addLocation(worldPosition, level.dimension(), vehicleType, teamColor);
             }
         }
     }
 
-    private VehicleSpawnDataHandler getDataHandler() {
-        return GamemodeDataManager.getDataHandler(VehicleSpawnData.class, VehicleSpawnDataHandler.class);
+    private VehicleSpawnData getDataHandler() {
+        BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
+        return GamemodeDataManager.getHandler(activeGamemode.getClass(), VehicleSpawnData.class);
     }
 
     public void spawnVehicle() {
@@ -82,9 +72,13 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
                                     " for team: " + teamColor + " at " + worldPosition);
             
             if (level instanceof ServerLevel serverLevel) {
-                boolean success = ShipCreator.CreateShipFromTemplate(worldPosition, new ResourceLocation(vehicleType), serverLevel);
+                List<Runnable> delayedTasks = new ArrayList<>();
+                Pair<Boolean, List<ServerShip>> result = ShipCreator.CreateShipFromTemplate(worldPosition, new ResourceLocation(vehicleType), serverLevel, delayedTasks);
+                UnrealZaruba.vehicleManager.addVehicle(new Vehicle(vehicleType, teamColor, result.getRight(), () -> {
+                    delayedTasks.forEach(Runnable::run);
+                }));
                 
-                if (!success) {
+                if (!result.getLeft()) {
                     UnrealZaruba.LOGGER.error("[VehicleSpawnBlockEntity] Failed to spawn vehicle of type: " + vehicleType);
                 }
             } else {

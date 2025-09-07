@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
+import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -12,35 +14,41 @@ import net.minecraftforge.network.NetworkEvent;
 public class SelectTentPacket {
     
     private final UUID playerID;
-    private final boolean chosen;
+    private final int respawnPointIndex;
 
-    public SelectTentPacket(UUID playerID, boolean chosen) {
+    public SelectTentPacket(UUID playerID, int respawnPointIndex) {
         this.playerID = playerID;
-        this.chosen = chosen;
+        this.respawnPointIndex = respawnPointIndex;
     }
 
     public UUID getPlayerID() {
         return playerID;
     }
 
-    public boolean isChosen() {
-        return chosen;
+    public int getRespawnPointIndex() {
+        return respawnPointIndex;
     }
 
     public static void encode(SelectTentPacket packet, FriendlyByteBuf buffer) {
         buffer.writeUUID(packet.getPlayerID());
-        buffer.writeBoolean(packet.isChosen());
+        buffer.writeInt(packet.getRespawnPointIndex());
     }
 
     public static SelectTentPacket decode(FriendlyByteBuf buffer) {
         UUID playerID = buffer.readUUID();
-        boolean chosen = buffer.readBoolean();
-        return new SelectTentPacket(playerID, chosen);
+        int respawnPointIndex = buffer.readInt();
+        return new SelectTentPacket(playerID, respawnPointIndex);
     }
 
     public static void handle(SelectTentPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ((TeamPlayerContext)PlayerContext.Get(packet.getPlayerID())).SelectTent(packet.isChosen());
+            TeamPlayerContext player = ((TeamPlayerContext)PlayerContext.Get(packet.getPlayerID()));
+            if (player == null) return;
+            TeamContext team = player.Team();
+            if (team == null) return;
+            IRespawnPoint respawnPoint = team.RespawnPoints().get(packet.getRespawnPointIndex());
+            if (respawnPoint == null) return;
+            player.SelectRespawnPoint(respawnPoint);
         });
         ctx.get().setPacketHandled(true);
     }

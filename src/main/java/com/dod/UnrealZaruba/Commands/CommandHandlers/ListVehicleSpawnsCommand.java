@@ -1,8 +1,10 @@
 package com.dod.UnrealZaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeData;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 
@@ -24,14 +26,15 @@ public class ListVehicleSpawnsCommand implements ICommandHandler {
         CommandSourceStack source = context.getSource();
         
         // Get the data handler
-        VehicleSpawnDataHandler handler = GamemodeDataManager.getDataHandler(VehicleSpawnData.class, VehicleSpawnDataHandler.class);
+        BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
+        VehicleSpawnData handler = GamemodeDataManager.getHandler(activeGamemode.getClass(), VehicleSpawnData.class);
         
         if (handler == null) {
             source.sendFailure(Component.literal("Failed to get vehicle spawn data handler"));
             return 0;
         }
         
-        VehicleSpawnData data = handler.getData();
+        VehicleSpawnData.VehicleSpawnPayload data = handler.getData();
         if (data == null || data.getLocations().isEmpty()) {
             source.sendSuccess(() -> Component.literal("No vehicle spawn points are registered"), false);
             return 1;

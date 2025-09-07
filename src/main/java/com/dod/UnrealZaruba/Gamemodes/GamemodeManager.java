@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.Comparator;
 import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -42,6 +43,11 @@ public class GamemodeManager {
     }
 
     public void Tick() {
+
+        if (!isVoting) {
+            return;
+        }
+
         var server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) {
             return;
@@ -80,8 +86,7 @@ public class GamemodeManager {
             .orElse("ships");
 
         if (mostVoted != null) {
-            BaseGamemode gamemode = GamemodeFactory.createGamemode(mostVoted);
-            SetActiveGamemode(gamemode);
+            GamemodeFactory.createGamemode(mostVoted);
         }
 
         playerVotes.clear();

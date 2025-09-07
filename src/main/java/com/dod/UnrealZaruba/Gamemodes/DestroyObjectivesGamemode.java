@@ -33,7 +33,7 @@ import com.dod.UnrealZaruba.Gamemodes.StartCondition.Condition;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 public class DestroyObjectivesGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "destroyobjectives";
     private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
@@ -134,7 +134,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 }
             }
 
-            TeamManager.teleportToSpawn(player);
+            TeamManager.teleportToSpawnByPriority(player);
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
@@ -174,7 +174,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Triggering vehicle spawn blocks");
 
         GamemodeDataManager
-        .getDataHandler(this.getClass(), VehicleSpawnDataHandler.class)
+        .getHandler(this.getClass(), VehicleSpawnData.class)
         .triggerVehicleSpawns(server);
     }
 
@@ -223,7 +223,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
-        TeamManager.teleportToSpawn(serverPlayer);
+        TeamManager.teleportToSpawnByPriority(serverPlayer);
         serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 
@@ -248,9 +248,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void CompleteGameDelayed(MinecraftServer server) {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
-        WorldManager.ResetGameWorldDelayed();
+        WorldManager.ReloadGameWorldDelayed(this);
         for (ServerPlayer player : players) {
-            player.setGameMode(GameType.SPECTATOR);
+            player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();
         }
         

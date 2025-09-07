@@ -26,6 +26,7 @@ public class TeamGamemode extends BaseGamemode {
     public void SetTeamManager(TeamManager teamManager) { TeamManager = teamManager; }
     
     public TeamGamemode() {
+        super();
         TeamManager = new TeamManager();
         TeamManager.Initialize();
     }
@@ -49,21 +50,17 @@ public class TeamGamemode extends BaseGamemode {
     public void HandleRespawn(ServerPlayer player) {
         super.HandleRespawn(player);
         TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(player.getUUID());
-        if (!(playerContext.Team().Tent() == null)) {
-            if (playerContext.TentChosen()) {
-                TeamManager.teleportToTent(player);
+            if (playerContext.RespawnPointChosen()) {
+                TeamManager.teleportToSelectedPoint(player);
             } else {
-                TeamManager.teleportToSpawn(player);
+                TeamManager.teleportToSpawnByPriority(player);
             }
-        } else {
-            TeamManager.teleportToSpawn(player);
-        }
     }
     
     @Override
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         super.HandleDeath(player, event);
-        NetworkHandler.Screens.openDeathScreen(player, TeamManager.GetPlayersTeam(player).Tent() != null);
+        NetworkHandler.Screens.openDeathScreen(player, false); // TODO: Render list of respawn points
     }
 
     @Override
@@ -72,9 +69,11 @@ public class TeamGamemode extends BaseGamemode {
     }
     @Override
     public void onServerTick(TickEvent.ServerTickEvent event) {
+        super.onServerTick(event);
     }
 
     @Override
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        super.onPlayerTick(event);
     }
 }

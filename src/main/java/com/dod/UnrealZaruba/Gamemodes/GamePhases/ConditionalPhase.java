@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes.GamePhases;
 
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.Condition;
+import com.dod.UnrealZaruba.UnrealZaruba;
 
 public class ConditionalPhase extends AbstractGamePhase {
     private Condition condition;

@@ -9,7 +9,6 @@ import org.valkyrienskies.core.impl.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ContraptionManager.ContraptionManager;
 
 import com.ibm.icu.text.DecimalFormat;
 
@@ -36,7 +35,6 @@ public class HandAssembler extends Item {
         BlockPos blockPos = useContext.getClickedPos();
         var block = useContext.getLevel().getBlockState(blockPos);
         
-
         DenseBlockPosSet denseBlockPosSet = new DenseBlockPosSet();
         denseBlockPosSet.add(new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
         ServerShip createdShip = ShipAssemblyKt.createNewShipWithBlocks(blockPos, denseBlockPosSet,
@@ -52,9 +50,8 @@ public class HandAssembler extends Item {
         BlockState blockState = Blocks.STONE.defaultBlockState();
         level.setBlock(new BlockPos((int)shipPos.x(), level.getMinBuildHeight(), (int)shipPos.z()), blockState, 3);
 
-        ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos((int)shipPos.x(), (int)shipPos.y(), (int)shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
+        //ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos((int)shipPos.x(), (int)shipPos.y(), (int)shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
 
         return InteractionResult.SUCCESS;
     };
-
 }

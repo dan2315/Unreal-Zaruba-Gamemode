@@ -2,19 +2,21 @@ package com.dod.UnrealZaruba.Player;
 
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Utils.IResettable;
 import net.minecraft.world.level.GameType;
 
 public class TeamPlayerContext extends PlayerContext implements IResettable {
     private TeamContext team;
-    private boolean tentChosen;
+    private IRespawnPoint selectedRespawnPoint;
     private String selectedClassId = "soldier";
 
     public TeamContext Team() { return team; }
     public void SetTeam(TeamContext team) { this.team = team; }
-    public boolean TentChosen() { return tentChosen; }
-    public void SelectTent(boolean tentChosen) { this.tentChosen = tentChosen; }
+    public boolean RespawnPointChosen() { return selectedRespawnPoint != null; }
+    public void SelectRespawnPoint(IRespawnPoint respawnPoint) { this.selectedRespawnPoint = respawnPoint; }
+    public IRespawnPoint RespawnPoint() { return selectedRespawnPoint; }
     
     public String SelectedClassId() { return selectedClassId; }
     public void SetSelectedClassId(String classId) { this.selectedClassId = classId; }
@@ -33,7 +35,7 @@ public class TeamPlayerContext extends PlayerContext implements IResettable {
     @Override
     public void reset() {
         team = null;
-        tentChosen = false;
+        selectedRespawnPoint = null;
         isReady = false;
     }
 }

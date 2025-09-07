@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock;
 
+import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -12,6 +13,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -56,5 +59,25 @@ public class ClassAssignerBlock extends Block implements EntityBlock {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return type == ModBlocks.CLASS_ASSIGNER_BLOCK_ENTITY.get() ? 
+            (level1, pos, state1, blockEntity) -> ClassAssignerBlockEntity.tick(level1, pos, state1, (ClassAssignerBlockEntity) blockEntity) : null;
+    }
+    
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof ClassAssignerBlockEntity classAssignerBlockEntity) {
+                classAssignerBlockEntity.removeArmorStand();
+            }
+            super.onRemove(state, level, pos, newState, isMoving);
+        } else {
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
     }
 }

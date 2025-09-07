@@ -6,17 +6,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.List;
 
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
+import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
 import com.dod.UnrealZaruba.Utils.Utils;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
-
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import java.util.Comparator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -40,11 +42,11 @@ public class TeamManager implements IResettable {
     }
 
     public TeamManager() {
-        var teamData = Load();
+        TeamData teamData = Load();
         if (teamData != null) {
-            for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.getTeamSpawns().entrySet()) {
+            for (Map.Entry<TeamColor, TeamDataEntry> data : teamData.getTeams().entrySet()) {
                 UnrealZaruba.LOGGER.info("[UnrealZaruba] Loading team: " + data.getKey());
-                var teamContext = AddTeam(data.getKey(), data.getValue().getBlockPos(), data.getValue().getBarrierVolumes());
+                var teamContext = AddTeam(data.getKey(), data.getValue().getBlockPos());
                 StructureTemplateManager structureManager = ServerLifecycleHooks.getCurrentServer().overworld().getStructureManager();
                 tent_templates.put(data.getKey(), teamContext.GetTentTemplate(structureManager));
             }
@@ -63,26 +65,25 @@ public class TeamManager implements IResettable {
         }
     } 
 
-    public TeamContext AddTeam(TeamColor teamColor, BlockPos spawn, List<BlockVolume> baseVolume) {
+    public TeamContext AddTeam(TeamColor teamColor, BlockPos spawn) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        var teamContext = new TeamContext(this ,spawn, teamColor, baseVolume);
+        var teamContext = new TeamContext(this ,spawn, teamColor);
         teams.put(teamColor, teamContext);
         return teamContext;
     }
 
-    @Deprecated
-    public void AddTeam(TeamColor teamColor, BlockPos spawn) {
+    public TeamContext AddTeam(TeamColor teamColor) {
         if (teams.containsKey(teamColor)) teams.remove(teamColor);
-        teams.put(teamColor, new TeamContext(this, spawn, teamColor));
-    }
-
-    public void SetSpawn(TeamColor color, BlockPos spawn) {
-        teams.get(color).SetSpawn(spawn);
+        var teamContext = new TeamContext(this ,new BlockPos(0, 0, 0), teamColor);
+        teams.put(teamColor, teamContext);
+        return teamContext;
     }
 
     public boolean IsInTeam(Player player) {
         for (TeamContext team : teams.values()) {
-            return team.members.contains(player.getUUID());
+            if (team.members.contains(player.getUUID())) {
+                return true;
+            }
         }
         return false;
     }
@@ -117,22 +118,6 @@ public class TeamManager implements IResettable {
         return teams.values().stream()
             .min((a, b) -> a.MembersCount() - b.MembersCount())
             .orElse(null);
-    }
-
-    public boolean DeleteBarriersAtSpawn() {
-        for (TeamContext team : teams.values()) {
-            if (team.Spawn() == null) {
-                return false;
-            }
-            UnrealZaruba.LOGGER.warn("[Во, бля] Во бля");
-
-            List<BlockVolume> barriers = team.BarrierVolumes();
-            if (barriers == null) return false;
-            for (BlockVolume volume : barriers) {
-                Utils.deleteBarriers(volume);
-            }
-        }
-        return true;
     }
 
     public boolean AreTeamsBalanced(TeamColor dyeColor) {
@@ -190,31 +175,30 @@ public class TeamManager implements IResettable {
         }
     }
 
-    public void teleportToSpawn(ServerPlayer serverPlayer) {
+    public void teleportToSpawnByPriority(ServerPlayer serverPlayer) {
         TeamContext team = GetPlayersTeam(serverPlayer);
         if (team == null) {
             serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
             return;
         }
         
-        BlockPos Spawn = team.Spawn();
+        BlockPos Spawn = team.RespawnPoints()
+        .stream().sorted(Comparator.comparingInt(IRespawnPoint::getPriority))
+        .findFirst().orElse(null).getSpawnPosition();
+
         double x = Spawn.getX() + 0.5d;
         double y = Spawn.getY() + 1.1d;
         double z = Spawn.getZ() + 0.5d;
         serverPlayer.teleportTo(WorldManager.gameLevel, x, y, z, 0, 0);
     }
 
-    public void teleportToTent(ServerPlayer serverPlayer) {
-        TeamContext team = GetPlayersTeam(serverPlayer);
-        if (team == null) {
-            serverPlayer.sendSystemMessage(Component.literal("Вы не присоединены ни к одной команде"));
-            return;
-        }
+    public void teleportToSelectedPoint(ServerPlayer serverPlayer) {
+        TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(serverPlayer.getUUID());
 
-        BlockPos Spawn = team.Tent().spawn_point;
-        double x = Spawn.getX() + 0.5d;
-        double y = Spawn.getY() + 1.1d;
-        double z = Spawn.getZ() + 0.5d;
+        BlockPos spawnPosition = playerContext.RespawnPoint().getSpawnPosition();
+        double x = spawnPosition.getX() + 0.5d;
+        double y = spawnPosition.getY() + 1.1d;
+        double z = spawnPosition.getZ() + 0.5d;
         serverPlayer.teleportTo(WorldManager.gameLevel, x, y, z, 0, 0);
     }
 
@@ -226,24 +210,26 @@ public class TeamManager implements IResettable {
     }
 
     public void Save() {
-        TeamData data = new TeamData(); 
+        BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
+        TeamData.TeamDataPayload data = GamemodeDataManager.getHandler(activeGamemode.getClass(), TeamData.class).getData();
         HashMap<TeamColor, TeamDataEntry> teamSpawns = new HashMap<>();
         for (Map.Entry<TeamColor, TeamContext> team : teams.entrySet()) {
-            teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().Spawn(), team.getValue().BarrierVolumes()));
+            teamSpawns.put(team.getKey(), new TeamDataEntry(team.getValue().MainSpawn()));
         }
-        data.setTeamSpawns(teamSpawns);
+        data.setTeams(teamSpawns);
         
-        GamemodeDataManager.getDataHandler(TeamData.class, TeamDataHandler.class).setData(data);
+        GamemodeDataManager.getHandler(activeGamemode.getClass(), TeamData.class).setData(data);
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved teams data");
     }
 
     public TeamData Load() {
-        TeamData loadedData = GamemodeDataManager.getDataHandler(TeamData.class, TeamDataHandler.class).getData();
+        BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
+        TeamData loadedData = GamemodeDataManager.getHandler(activeGamemode.getClass(), TeamData.class);
         if (loadedData != null) {
             UnrealZaruba.LOGGER.info("[UnrealZaruba] Loaded teams data");
         } else {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] No team data found, using empty team data");
-            loadedData = new TeamData();
+            loadedData = new TeamData(activeGamemode.getClass());
         }
         return loadedData;
     }

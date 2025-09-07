@@ -10,6 +10,9 @@ import com.dod.UnrealZaruba.Utils.IResettable;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import java.util.HashMap;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
@@ -91,10 +94,10 @@ public class ObjectivesHandler implements IResettable {
     }
 
     public List<GameObjective> load() {
-        ObjectivesData objectivesData = GamemodeDataManager.getDataHandler(
-            GameObjective[].class, ObjectivesData.class
-            );
-        objectives = new ArrayList<>(Arrays.asList(objectivesData.loadData()));
+        BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
+        ObjectivesData objectivesData = GamemodeDataManager.getHandler(activeGamemode.getClass(), ObjectivesData.class);
+        objectives = Arrays.asList(objectivesData.getObjectives());
+        
         return objectives;
     }
 

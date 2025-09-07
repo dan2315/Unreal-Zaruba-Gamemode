@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.UnrealZaruba.Gamemodes.RespawnPoints;
 
 import net.minecraft.core.BlockPos;
 
 public interface IRespawnPoint {
     String getDisplayName();
-    BlockPos getSpawnPoint();
+    BlockPos getSpawnPosition();
     int getPriority();
 }

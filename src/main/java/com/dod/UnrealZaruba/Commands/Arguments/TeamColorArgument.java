@@ -12,6 +12,7 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,12 +40,17 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
     @Override
     public TeamColor parse(StringReader reader) throws CommandSyntaxException {
+        // Read the input string, handle both uppercase and lowercase inputs
         String colorName = reader.readString();
-        try {
-            return TeamColor.valueOf(colorName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().create(e);
+        TeamColor result = TeamColor.fromString(colorName);
+        
+        if (result == TeamColor.UNDEFINED && !colorName.equalsIgnoreCase("UNDEFINED")) {
+            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException()
+                .create("Invalid team color: " + colorName + ". Valid values are: " + 
+                        String.join(", ", "RED", "BLUE", "PURPLE", "YELLOW", "UNDEFINED"));
         }
+        
+        return result;
     }
 
     public static class Info implements ArgumentTypeInfo<TeamColorArgument, Info.Template> {

@@ -4,11 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.dod.UnrealZaruba.Config.AbstractConfig;
-import com.dod.UnrealZaruba.Config.DestructibleObjectiveDeserializer;
-import com.dod.UnrealZaruba.Config.DestructibleObjectivesConfig;
 import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.Config.ObjectivesConfig;
-import com.dod.UnrealZaruba.Config.TeamsConfig;
 import com.dod.UnrealZaruba.Config.MainConfig.MainConfigData;
 import com.dod.UnrealZaruba.Config.MainConfig.Mode;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
@@ -23,8 +19,6 @@ public class ConfigManager {
     private static final Map<Class<?>, AbstractConfig<?>> configInstances = new HashMap<>();
     
     private static final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(DestructibleObjective.class, new DestructibleObjectiveDeserializer())
-            .registerTypeAdapter(GameObjective.class, new ObjectiveFactory())
             .setPrettyPrinting()
             .create();
     
@@ -45,9 +39,6 @@ public class ConfigManager {
     public static void init() {
         // Initialize all configs
         MainConfig.getInstance();
-        DestructibleObjectivesConfig.getInstance();
-        ObjectivesConfig.getInstance();
-        TeamsConfig.getInstance();
         
         // Create default configurations if they don't exist
         getMainConfig().createDefaultIfNotExist();
@@ -57,18 +48,6 @@ public class ConfigManager {
 
     public static MainConfig getMainConfig() {
         return MainConfig.getInstance();
-    }
-
-    public static DestructibleObjectivesConfig getObjectivesConfig() {
-        return DestructibleObjectivesConfig.getInstance();
-    }
-    
-    public static ObjectivesConfig getGeneralObjectivesConfig() {
-        return ObjectivesConfig.getInstance();
-    }
-
-    public static TeamsConfig getTeamsConfig() {
-        return TeamsConfig.getInstance();
     }
 
     public static boolean isDevMode() {
@@ -88,11 +67,6 @@ public class ConfigManager {
             // Save main config
             MainConfig.MainConfigData mainConfigData = getMainConfig().loadMainConfig();
             getMainConfig().saveMainConfig(mainConfigData);
-            
-            // Save objectives and teams if available using their handlers
-            getObjectivesConfig().loadObjectives();
-            getGeneralObjectivesConfig().loadObjectives();
-            getTeamsConfig().loadTeamData();
             
             UnrealZaruba.LOGGER.info("[UnrealZaruba] All configurations saved successfully");
         } catch (Exception e) {

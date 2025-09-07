@@ -9,6 +9,8 @@ import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.api.IMinecraftServerExtended;
 import com.dod.UnrealZaruba.Config.MainConfig;
+import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -59,46 +61,46 @@ public class WorldManager {
 
     public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
         WorldManager.server = server;
-        prepareWorldStorage();
-        ResetGameWorld();
-
-        ShipObjectServerWorld shipObjectServerWorld;
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
         return Pair.of(GAME_DIMENSION, LOBBY_DIMENSION);
     }
 
-    public static void ResetGameWorld() {
+    public static void ReloadGameWorld(BaseGamemode gamemode) {
+        var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
         deleteGameWorld();
-        createGameWorld();
+        prepareWorldStorage(gamemodeName);
+        createGameWorld(gamemodeName);
     }
     
-    public static void ResetGameWorldDelayed() {
+    public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
+            var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
             UnrealZaruba.LOGGER.info("Deleting ships in game world");
             clearShipsInDimension(gameLevel);
             
             // Idunno why, but it works
-            TimerManager.createRealTimeTimer(10000 /*10s*/, () -> {
+            TimerManager.createRealTimeTimer(7500 /*7.5s*/, () -> {
                 UnrealZaruba.LOGGER.info("Deleting game world");
                 deleteGameWorld();
                 
                 TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
                     UnrealZaruba.LOGGER.info("Creating game world");
-                    createGameWorld();
+                    prepareWorldStorage(gamemodeName);
+                    createGameWorld(gamemodeName);
                 }, null);
         }, null);
     }
 
-    private static void prepareWorldStorage() {
-        File file = new File("universe");
+    private static void prepareWorldStorage(String gamemodeName) {
+        File file = new File("game_worlds");
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
         try {
             if (access != null) {
                 access.close();
             }
             // TODO: Manage how and why to use try with resource
-            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
+            access = levelStorageSource.validateAndCreateAccess(gamemodeName);
         } catch (IOException | ContentValidationException e) {
             throw new RuntimeException(e);
         }
@@ -123,15 +125,15 @@ public class WorldManager {
         gameLevel = null;
     }
 
-    public static void createGameWorld() {
-        File file = new File("universe");
+    public static void createGameWorld(String gamemodeName) {
+        File file = new File("game_worlds");
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
         try {
             if (access != null) {
                 access.close();
             }
             // TODO: Manage how and why to use try with resource
-            access = levelStorageSource.validateAndCreateAccess("zaruba_world");
+            access = levelStorageSource.validateAndCreateAccess(gamemodeName);
         } catch (IOException | ContentValidationException e) {
             throw new RuntimeException(e);
         }
@@ -153,6 +155,12 @@ public class WorldManager {
     public static void TeleportAllPlayersTo(MinecraftServer server, ResourceKey<Level> dimensionKey) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             teleportPlayerToDimension(player, dimensionKey, MainConfig.getInstance().getLobbySpawnPoint());
+        }
+    }
+
+    public static void TeleportAllPlayersTo(MinecraftServer server, ResourceKey<Level> dimensionKey, BlockPos spawnPos) {
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            teleportPlayerToDimension(player, dimensionKey, spawnPos);
         }
     }
 

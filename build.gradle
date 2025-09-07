@@ -173,6 +173,7 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:util:$vs_core_version")
     implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
+    implementation fg.deobf("org.valkyrienskies.eureka:eureka-1201-forge:1.5.2-beta.3+6a8f7ebb44")
 
     implementation fg.deobf("curse.maven:curios-309927:5367944") // That shit is not working, sad face
 

@@ -44,28 +44,9 @@ public class VehicleSpawnBlock extends HorizontalDirectionalBlock implements Ent
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof VehicleSpawnBlockEntity blockEntity) {
-            blockEntity.onPlaced();
-        }
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != newState.getBlock()) {
-            if (!level.isClientSide() && level.getBlockEntity(pos) instanceof VehicleSpawnBlockEntity blockEntity) {
-                blockEntity.onRemoved();
-            }
-            super.onRemove(state, level, pos, newState, isMoving);
-        }
-    }
-
-    @Override
     public void trigger(Level level, BlockPos pos, BlockState state) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof VehicleSpawnBlockEntity blockEntity) {
             blockEntity.spawnVehicle();
         }
     }
 }
-

@@ -7,6 +7,7 @@ import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
 import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
 import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
 
+
 import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.content.schematics.client.SchematicRenderer;
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.apache.commons.lang3.tuple.Pair;
+import java.util.List;
+import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.io.InputStream;
 
@@ -211,10 +215,10 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         
     
         if (level instanceof ServerLevel serverLevel) {
-            boolean success = ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), 
-                serverLevel, player, getBlockState().getValue(BlockStateProperties.FACING));
+            boolean success = ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), serverLevel, player, getBlockState().getValue(BlockStateProperties.FACING));
             if (success) {
                 cooldownTicks = 200;
+                
                 vehicleData.consumeRequiredItems(player.getInventory());
                 return new Tuple<>(true, "Vehicle deployed successfully");
             } else {

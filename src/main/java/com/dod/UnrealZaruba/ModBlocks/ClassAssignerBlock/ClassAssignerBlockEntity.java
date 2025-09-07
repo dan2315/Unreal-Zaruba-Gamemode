@@ -3,6 +3,7 @@ package com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
+import com.dod.UnrealZaruba.Utils.Geometry.Utils;
 
 import net.minecraft.world.item.Equipable;
 import com.dod.UnrealZaruba.UnrealZaruba;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.item.ArmorItem;
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +70,14 @@ public class ClassAssignerBlockEntity extends BlockEntity {
         if (tag.contains("armorStandUUID")) {
             armorStandUUID = tag.getUUID("armorStandUUID");
         }
+        if (level != null && !level.isClientSide && armorStandUUID != null) {
+            level.getServer().execute(() -> {
+                Entity entity = ((ServerLevel)level).getEntity(armorStandUUID);
+                if (entity == null) {
+                    updateArmorStand();
+                }
+            });
+        }
     }
 
     public void openGui(Player player) {
@@ -99,6 +109,10 @@ public class ClassAssignerBlockEntity extends BlockEntity {
         if (level != null && !level.isClientSide) {
             ArmorStand armorStand = new ArmorStand(EntityType.ARMOR_STAND, level);
             armorStand.setPos(worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5);
+            var facing = this.getBlockState().getValue(ClassAssignerBlock.FACING);
+            var y = Utils.getYRotForDirection(facing);
+            UnrealZaruba.LOGGER.info("Y: {}", y);
+            armorStand.setYRot((float)y);
             armorStand.setCustomName(Component.literal(classData.getDisplayName()));
             armorStand.setCustomNameVisible(true);
             armorStand.setInvisible(false);
@@ -147,7 +161,7 @@ public class ClassAssignerBlockEntity extends BlockEntity {
                itemId.contains("bore");
     }
 
-    private void removeArmorStand() {
+    public void removeArmorStand() {
         if (armorStandUUID != null && level != null && !level.isClientSide) {
             Entity entity = ((ServerLevel)level).getEntity(armorStandUUID);
             if (entity != null) {
@@ -158,11 +172,35 @@ public class ClassAssignerBlockEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, ClassAssignerBlockEntity blockEntity) {
-        if (!level.isClientSide && blockEntity.armorStandUUID != null) {
-            Entity entity = ((ServerLevel)level).getEntity(blockEntity.armorStandUUID);
-            if (entity == null) {
+        if (!level.isClientSide) {
+            // Check if we need to create a new armor stand
+            if (blockEntity.classId != null && blockEntity.armorStandUUID == null) {
+                // No armor stand exists but we have a class ID, create one
                 blockEntity.updateArmorStand();
+            } 
+            // Check if an existing armor stand has disappeared
+            else if (blockEntity.armorStandUUID != null) {
+                Entity entity = ((ServerLevel)level).getEntity(blockEntity.armorStandUUID);
+                if (entity == null) {
+                    blockEntity.updateArmorStand();
+                }
             }
         }
     }
 }
+// [06:28:54] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [BaseGamemode] onServerTick in BaseGamemode
+// [06:28:54] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [ConditionalPhase] OnTick: 0
+// [06:28:54] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7714 has a mass of 0.0, not creating a ShipObject
+// [06:28:54] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7715 has a mass of 0.0, not creating a ShipObject
+// [06:28:54] [Server thread/WARN] [Burger Factory/]: Too many game frames in the game frame queue. Is the physics stage broken?
+// [06:28:55] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [BaseGamemode] onServerTick in BaseGamemode
+// [06:28:55] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [ConditionalPhase] OnTick: 0
+// [06:28:55] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7714 has a mass of 0.0, not creating a ShipObject
+// [06:28:55] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7715 has a mass of 0.0, not creating a ShipObject
+// [06:28:55] [Server thread/WARN] [Burger Factory/]: Too many game frames in the game frame queue. Is the physics stage broken?
+// [06:28:56] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [BaseGamemode] onServerTick in BaseGamemode
+// [06:28:56] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [ConditionalPhase] OnTick: 0
+// [06:28:56] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7714 has a mass of 0.0, not creating a ShipObject
+// [06:28:56] [Server thread/WARN] [or.va.co.im.ne.NetworkChannel/]: Ship with ID 7715 has a mass of 0.0, not creating a ShipObject
+// [06:28:56] [Server thread/WARN] [Burger Factory/]: Too many game frames in the game frame queue. Is the physics stage broken?
+// [06:28:57] [Server thread/INFO] [co.do.Un.UnrealZaruba/]: [BaseGamemode] onServerTick in BaseGamemod

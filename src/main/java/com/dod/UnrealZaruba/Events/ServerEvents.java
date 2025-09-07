@@ -1,26 +1,19 @@
 package com.dod.UnrealZaruba.Events;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.DestroyObjectivesGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.NetworkedTimer;
 import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.UI.TimerOverlay;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -28,12 +21,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.server.ServerLifecycleHooks;
-
-import static com.dod.UnrealZaruba.UnrealZaruba.*;
-
 import com.dod.UnrealZaruba.UnrealZaruba;
+import static com.dod.UnrealZaruba.UnrealZaruba.*;
 
 
 public class ServerEvents {
@@ -58,7 +48,7 @@ public class ServerEvents {
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
         MinecraftServer server = event.getServer();
-        if (!server.isDedicatedServer())
+        if (server == null || !server.isDedicatedServer())
             return;
 
         if (event.phase.equals(TickEvent.Phase.START)) {
@@ -101,7 +91,14 @@ public class ServerEvents {
         if (isDevMode)
             return;
 
-        gamemodeManager.ForGamemode(gamemode -> gamemode.HandleConnectedPlayer(event.getEntity()));
+        var activeGamemode = gamemodeManager.GetActiveGamemode();
+        if (activeGamemode != null) {
+            activeGamemode.HandleConnectedPlayer(event.getEntity());
+        }
+        else {
+            WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
+            player.setGameMode(GameType.ADVENTURE);
+        }
     }
 
     @SubscribeEvent

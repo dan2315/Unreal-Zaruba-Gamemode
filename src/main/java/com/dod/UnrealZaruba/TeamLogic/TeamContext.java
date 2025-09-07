@@ -6,6 +6,8 @@ import java.util.function.Function;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.RespawnPoint;
 import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
@@ -31,7 +33,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundSource;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.sounds.SoundEvent;
-import com.dod.UnrealZaruba.Gamemodes.IRespawnPoint;
 /**
  * Team core data.
  */
@@ -43,12 +44,10 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     private final TeamColor color;
     private final MinecraftServer server;
     
-    private BlockPos spawn;
-    public List<IRespawnPoint> respawnPoints; // Пригодится в будущем
+    private List<IRespawnPoint> respawnPoints = new ArrayList<>();
     private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     private UUID commander;
     private String commanderName;
-    private Tent active_tent;
     private PlayerTeam minecraftTeam;
     
     
@@ -57,31 +56,17 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     
     public final List<UUID> members = new ArrayList<>();
     public TeamColor Color() {return color;}
-    public BlockPos Spawn() {return spawn;}
     public UUID Commander() {return commander;}
     public String CommanderName() {return commanderName;}
     public List<UUID> Members() {return members;}
-    public List<BlockVolume> BarrierVolumes() {return barrierVolumes;}
-    public Tent Tent() {return active_tent;}
+    public BlockPos MainSpawn() {return respawnPoints.get(0).getSpawnPosition();}
+    public List<IRespawnPoint> RespawnPoints() {return respawnPoints;}
 
-    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color, List<BlockVolume> barrierVolumes) {
+    public TeamContext(TeamManager teamManager, BlockPos spawnPosition, TeamColor color) {
         this.batya = teamManager;
-        this.spawn = spawn;
-        this.color = color;
-        this.barrierVolumes = barrierVolumes;
-        server = ServerLifecycleHooks.getCurrentServer();
-        
-        TeamAssets assets = TeamAssets.getByTeamColor(color);
-        this.tentTemplate = assets.getTentTemplate();
-        this.hornSound = assets.getHornSound();
-    }
-
-    public TeamContext(TeamManager teamManager, BlockPos spawn, TeamColor color) {
-        this.batya = teamManager;
-        this.spawn = spawn;
+        AddRespawnPoint(new RespawnPoint(spawnPosition, "База", 0));
         this.color = color;
         server = ServerLifecycleHooks.getCurrentServer();
-        this.barrierVolumes = new ArrayList<>();
         
         TeamAssets assets = TeamAssets.getByTeamColor(color);
         this.tentTemplate = assets.getTentTemplate();
@@ -104,10 +89,6 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         barrierVolumes.add(barrierVolume);
     }
 
-    public void setActiveTent(Tent active_tent) {
-        this.active_tent = active_tent;
-    }
-
     public void GiveVote(Player player ,PlayerContext playerContext) {
         playerContext.AddVote();
     }
@@ -123,6 +104,18 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         });
 
         return members;
+    }
+
+    public void AddRespawnPoint(IRespawnPoint respawnPoint) {
+        respawnPoints.add(respawnPoint);
+    }
+
+    public void RemoveRespawnPointByBlockPos(BlockPos blockPos) {
+        if (respawnPoints.removeIf(respawnPoint -> respawnPoint.getSpawnPosition().equals(blockPos))) {
+            UnrealZaruba.LOGGER.info("Respawn point removed");
+        } else {
+            UnrealZaruba.LOGGER.info("Respawn point not found");
+        }
     }
 
     public void setCommander(MinecraftServer server, Player player) {
@@ -165,7 +158,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         UnrealZaruba.LOGGER.info("Assigning player to team: ");
         Scoreboard scoreboard = player.getServer().getScoreboard();
 
-        if (spawn == null) {
+        if (respawnPoints.isEmpty()) {
             player.sendSystemMessage(Component.literal("Скажи Доду, что он забыл спавн поставить))"));
         } else {
             members.add(player.getUUID());
@@ -176,7 +169,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
                     Component.literal("Вы присоединились к команде " + color.getDisplayName() + "!")
                             .withStyle(color.getChatFormatting()),
                     true);
-            player.setRespawnPosition(player.level().dimension(), spawn, 0, false, false);
+            player.setRespawnPosition(player.level().dimension(), MainSpawn(), 0, false, false);
             player.getInventory().clearContent();
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             // batya.GiveArmorKitTo(server, player);
@@ -193,10 +186,14 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         return members.size();
     }
 
-    public void SetSpawn(BlockPos pos) {
-        spawn = pos;
+    public void TeleportAll(BlockPos pos) {
+        for (UUID playerId : members) {
+            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
+            if (player != null) {
+                player.teleportTo(pos.getX(), pos.getY(), pos.getZ());
+            }
+        }
     }
-
     public StructureTemplate GetTentTemplate(StructureTemplateManager structureManager) {
         return structureManager.getOrCreate(tentTemplate);
     }
@@ -211,15 +208,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
 
     public void PlayBattleSound() {
         ServerLevel serverLevel = server.getLevel(WorldManager.GAME_DIMENSION);
-        SoundHandler.playSoundFromPosition(serverLevel, spawn, hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
-    }
-
-    public void TeleportToSpawn() {
-        for (UUID playerId : members) {
-            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
-            if (player == null) return;
-            player.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
-        }
+        SoundHandler.playSoundFromPosition(serverLevel, respawnPoints.get(0).getSpawnPosition(), hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
     }
 
     @Override
@@ -248,7 +237,6 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         server.getScoreboard().removePlayerTeam(minecraftTeam); // I hope that would work
         SetupMinecraftTeam(server);
         members.clear();
-        active_tent = null;
         commander = null;
         commanderName = null;
     }

@@ -1,7 +1,9 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.UnrealZaruba.Commands;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.dod.UnrealZaruba.Commands.CommandHandlers.*;
 
 public class CommandHandlerFactory {
  
@@ -22,6 +24,11 @@ public class CommandHandlerFactory {
         handlers.add(new CreateObjectiveCommand());
         handlers.add(new ResetGameWorldCommand());
         handlers.add(new SetReadyCommand());
+        handlers.add(new EndGameCommand());
+        
+        // Add team data management commands
+        handlers.add(new SetGamemodeCommand());
+        handlers.add(new AddTeamDataCommand());
         
         // Add the vehicle spawn commands
         handlers.add(new RegisterVehicleSpawnCommand());

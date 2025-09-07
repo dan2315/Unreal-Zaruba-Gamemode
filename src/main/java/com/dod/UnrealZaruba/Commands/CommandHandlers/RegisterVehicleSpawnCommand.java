@@ -3,8 +3,9 @@ package com.dod.UnrealZaruba.Commands.CommandHandlers;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
 import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnDataHandler;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData.BlockLocation;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.UnrealZaruba.Gamemodes.ShipsGamemode;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -50,9 +51,10 @@ public class RegisterVehicleSpawnCommand implements ICommandHandler {
         ServerLevel level = source.getLevel();
         
         // Get the data handler
-        VehicleSpawnDataHandler handler = GamemodeDataManager.getDataHandler(VehicleSpawnData.class, VehicleSpawnDataHandler.class);
+        VehicleSpawnData handler = GamemodeDataManager.getHandler(ShipsGamemode.class, VehicleSpawnData.class);
+        VehicleSpawnData.VehicleSpawnPayload data = handler.getData();
         
-        if (handler == null) {
+        if (data == null) {
             source.sendFailure(Component.literal("Failed to get vehicle spawn data handler"));
             return 0;
         }
@@ -63,7 +65,7 @@ public class RegisterVehicleSpawnCommand implements ICommandHandler {
             blockEntity.setVehicleType(vehicleType);
             
             // Register the block with the data handler
-            handler.registerBlock(pos, level.dimension(), vehicleType, teamColor);
+            handler.addLocation(pos, level.dimension(), vehicleType, teamColor);
             
             source.sendSuccess(() -> Component.literal(
                     "Registered vehicle spawn at " + pos.toShortString() + 
@@ -73,7 +75,7 @@ public class RegisterVehicleSpawnCommand implements ICommandHandler {
             return 1;
         } else {
             // Register the block in the data handler even if there's no block entity
-            handler.registerBlock(pos, level.dimension(), vehicleType, teamColor);
+            handler.addLocation(pos, level.dimension(), vehicleType, teamColor);
             
             source.sendSuccess(() -> Component.literal(
                     "Registered virtual vehicle spawn at " + pos.toShortString() + 

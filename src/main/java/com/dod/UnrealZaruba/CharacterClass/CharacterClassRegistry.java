@@ -86,9 +86,6 @@ public class CharacterClassRegistry {
         };
     }
 
-    // TODO: Не регает одежду, гранаты и патроны в List<ItemStack>,
-    //  из-за чего не получается засетапить армор стенды в ClassAssignerBlockEntity.java,
-    //  но не смотря на это без проблем их выдает. Даня блять ты колдун ебучий
     static {
         // Vegetable Warrior =========================================================================
         registerForBothTeams(
@@ -250,6 +247,62 @@ public class CharacterClassRegistry {
                 }).get()),
             redArmorSet("plague"),
             blueArmorSet("plague")
+        );
+
+
+        // For ships
+        var blunderbuss = new WeaponBuilder(WeaponConstants.ScorchedGuns.Weapons.BLUNDERBUSS)
+            .stock(WeaponConstants.ScorchedGuns.Attachments.WOODEN_STOCK)
+            .ammoCount(1)
+            .build();
+
+        var musket = new WeaponBuilder(WeaponConstants.ScorchedGuns.Weapons.MUSKET)
+            .scope(WeaponConstants.ScorchedGuns.Attachments.MEDIUM_SCOPE)
+            .ammoCount(1)
+            .build();
+
+        var repeatingMusket = new WeaponBuilder(WeaponConstants.ScorchedGuns.Weapons.REPEATING_MUSKET)
+            .underBarrel(WeaponConstants.ScorchedGuns.Attachments.VERTICAL_GRIP)
+            .ammoCount(4)
+            .build();
+
+        registerForBothTeams(
+            "blunderbuss",
+            "Blunderbuss",
+            classData -> classData
+                .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
+                .addKitItem(blunderbuss)
+                .addKitItem(new ResourceLocation("scguns:grapeshot"), 32)
+                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
+                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+            redArmorSet(""),
+            blueArmorSet("")
+        );
+
+        registerForBothTeams(
+            "musket",
+            "Musket",
+            classData -> classData
+                .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
+                .addKitItem(musket)
+                .addKitItem(new ResourceLocation("scguns:powder_and_ball"), 32)
+                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
+                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+            redArmorSet(""),
+            blueArmorSet("")
+        );
+
+        registerForBothTeams(
+            "repeating_musket",
+            "Repeating Musket",
+            classData -> classData
+                .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
+                .addKitItem(repeatingMusket)
+                .addKitItem(new ResourceLocation("scguns:powder_and_ball"), 64)
+                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
+                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+            redArmorSet(""),
+            blueArmorSet("")
         );
     }
 }

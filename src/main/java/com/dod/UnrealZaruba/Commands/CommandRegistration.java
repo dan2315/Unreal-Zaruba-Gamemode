@@ -1,6 +1,5 @@
 package com.dod.UnrealZaruba.Commands;
 
-import com.dod.UnrealZaruba.Commands.CommandHandlers.CommandHandlerFactory;
 import com.dod.UnrealZaruba.Commands.CommandHandlers.ICommandHandler;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.mojang.brigadier.CommandDispatcher;

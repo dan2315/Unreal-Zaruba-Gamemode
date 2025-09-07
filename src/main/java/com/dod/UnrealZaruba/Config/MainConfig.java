@@ -16,12 +16,20 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
         DEV,    // Mode to change map in many ways
         GAME    // Mode to enable for game
     }
-    
 
     public static class MainConfigData {
+        private boolean isZarubaServer = false;
         private Mode mode = Mode.GAME;
         private BlockPos lobbySpawnPoint = new BlockPos(0, 65, 0);
-        
+
+        public boolean getIsZarubaServer() {
+            return isZarubaServer;
+        }
+
+        public void setIsZarubaServer(boolean isZarubaServer) {
+            this.isZarubaServer = isZarubaServer;
+        }
+
         public Mode getMode() {
             return mode;
         }
@@ -86,6 +94,10 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     
     public Mode getMode() {
         return loadMainConfig().getMode();
+    }
+
+    public boolean isZarubaServer() {
+        return loadMainConfig().isZarubaServer;
     }
     
     public void setMode(Mode mode) {
