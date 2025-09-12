@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.LoggerChunkProgressListener;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.valkyrienskies.core.api.ships.ServerShip;
@@ -61,6 +63,7 @@ public class WorldManager {
 
     public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
         WorldManager.server = server;
+        clearShipsInDimension(gameLevel);
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
@@ -73,23 +76,27 @@ public class WorldManager {
         prepareWorldStorage(gamemodeName);
         createGameWorld(gamemodeName);
     }
-    
-    public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
-            var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
-            UnrealZaruba.LOGGER.info("Deleting ships in game world");
-            clearShipsInDimension(gameLevel);
-            
-            // Idunno why, but it works
-            TimerManager.createRealTimeTimer(7500 /*7.5s*/, () -> {
-                UnrealZaruba.LOGGER.info("Deleting game world");
-                deleteGameWorld();
-                
-                TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
-                    UnrealZaruba.LOGGER.info("Creating game world");
-                    prepareWorldStorage(gamemodeName);
-                    createGameWorld(gamemodeName);
-                }, null);
+
+    public static void ReloadGameWorldDelayed(String gamemodeName) {
+        UnrealZaruba.LOGGER.info("Deleting ships in game world");
+        clearShipsInDimension(gameLevel);
+
+        // Idunno why, but it works
+        TimerManager.createRealTimeTimer(7500 /*7.5s*/, () -> {
+            UnrealZaruba.LOGGER.info("Deleting game world");
+            deleteGameWorld();
+
+            TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
+                UnrealZaruba.LOGGER.info("Creating game world");
+                prepareWorldStorage(gamemodeName);
+                createGameWorld(gamemodeName);
+            }, null);
         }, null);
+    }
+
+    public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
+        var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
+        ReloadGameWorldDelayed(gamemodeName);
     }
 
     private static void prepareWorldStorage(String gamemodeName) {

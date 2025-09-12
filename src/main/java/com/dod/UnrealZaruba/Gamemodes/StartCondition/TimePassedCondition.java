@@ -6,13 +6,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+import java.util.function.Consumer;
+
 /**
  * A condition that is met after a specified time has passed
  */
 public class TimePassedCondition extends Condition implements IDelayedCondition {
     private final int requiredDurationSeconds;
     private final int requiredDurationTicks;
+    private Consumer<Integer> onEverySecond;
     private int sustainedTicks = 0;
+
 
     /**
      * Creates a new time-based condition
@@ -46,26 +50,12 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
         
         if (sustainedTicks % 20 == 0) { // Once per second
             int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-            
-            for (var player : server.getPlayerList().getPlayers()) {
-                TitleMessage.sendActionbar(player, Component.literal(
-                    "Starting in " + remainingSeconds + " seconds"
-                ));
-            }
+            if (onEverySecond != null) onEverySecond.accept(remainingSeconds);
         }
         
         if (sustainedTicks >= requiredDurationTicks) {
             conditionMet = true;
-            UnrealZaruba.LOGGER.info("Time passed condition met: " + requiredDurationSeconds + " seconds elapsed");
-            
-            for (var player : server.getPlayerList().getPlayers()) {
-                TitleMessage.showTitle(player, 
-                    Component.literal("Time's up!"),
-                    Component.literal("Starting next phase..."),
-                    60
-                );
-            }
-            
+
             if (onConditionMet != null) {
                 onConditionMet.run();
             }
@@ -76,7 +66,12 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
     public int getSustainedTicks() {
         return sustainedTicks;
     }
-    
+
+    public TimePassedCondition OnEverySecond(Consumer<Integer> onEverySecond) {
+        this.onEverySecond = onEverySecond;
+        return this;
+    }
+
     public int getRequiredDurationTicks() {
         return requiredDurationTicks;
     }

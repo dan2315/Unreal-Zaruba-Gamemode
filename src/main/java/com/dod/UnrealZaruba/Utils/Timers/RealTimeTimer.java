@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.Utils.Timers;
 
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.TimerCompletedCallback;
 import com.dod.UnrealZaruba.Utils.TimerUpdatedCallback;
 
@@ -7,25 +8,17 @@ import com.dod.UnrealZaruba.Utils.TimerUpdatedCallback;
  * A timer implementation based on real-world time
  */
 public class RealTimeTimer implements ITimer {
-    private final long duration; // Duration in milliseconds
-    private long startTime; // System time when timer started
-    private long pausedAt; // System time when timer was paused
-    private long totalPausedTime; // Total time spent in paused state
+    private final long duration;
+    private long startTime;
+    private long pausedAt;
+    private long totalPausedTime;
     private boolean running;
     private boolean completed;
     private boolean paused;
     
     private final TimerCompletedCallback completedCallback;
     private final TimerUpdatedCallback updatedCallback;
-    
-    /**
-     * Creates a new real-time timer
-     * 
-     * @param durationMs Duration in milliseconds
-     * @param completedCallback Callback when timer completes
-     * @param updatedCallback Callback when timer updates
-     * @param autoStart Whether to start the timer immediately
-     */
+
     public RealTimeTimer(long durationMs, TimerCompletedCallback completedCallback, 
                          TimerUpdatedCallback updatedCallback, boolean autoStart) {
         this.duration = durationMs;
@@ -39,11 +32,27 @@ public class RealTimeTimer implements ITimer {
             start();
         }
     }
+
+    public RealTimeTimer(int durationSeconds, long startTime, TimerUpdatedCallback updatedCallback) {
+        this.duration = durationSeconds * 1000L;
+        this.completedCallback = null;
+        this.updatedCallback = updatedCallback;
+        start(startTime);
+    }
     
     @Override
     public void start() {
         if (!running && !completed) {
             startTime = System.currentTimeMillis();
+            running = true;
+            paused = false;
+        }
+    }
+
+    private void start(long startTime) {
+        if (!running && !completed) {
+            UnrealZaruba.LOGGER.warn("Starting RealTime timer");
+            this.startTime = startTime;
             running = true;
             paused = false;
         }
@@ -56,7 +65,7 @@ public class RealTimeTimer implements ITimer {
             long elapsedTime = currentTime - startTime - totalPausedTime;
             
             int elapsedTicks = (int)(elapsedTime / 50);
-            
+
             if (updatedCallback != null) {
                 updatedCallback.run(elapsedTicks);
             }
@@ -107,7 +116,12 @@ public class RealTimeTimer implements ITimer {
         
         TimerManager.disposeTimer(this);
     }
-    
+
+    @Override
+    public long getDuration() {
+        return duration;
+    }
+
     @Override
     public float getProgress() {
         if (!running) {

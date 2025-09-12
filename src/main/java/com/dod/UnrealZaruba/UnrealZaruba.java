@@ -5,9 +5,7 @@ import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Mobs.AttributesRegistration;
-import com.dod.UnrealZaruba.Utils.Gamerules; // It needs to be imported
-import com.dod.UnrealZaruba.Title.TitleMessage; // I fucked the NoClassDefFound
-import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer; // fucked twice
+import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
 import com.dod.UnrealZaruba.ModItems.CreativeTabs;
@@ -24,7 +22,6 @@ import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -57,25 +54,21 @@ public class UnrealZaruba {
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         CreativeTabs.register(modEventBus);
+        TeamColorArgument.RegisterArgument();
+        ModSounds.register(modEventBus);
+        ModMobs.register(modEventBus);
+        ModMenus.register(modEventBus);
 
         if (FMLEnvironment.dist.isDedicatedServer() && !ConfigManager.getMainConfig().isZarubaServer()) {
             return;
         }
 
-        // Initialize Gamerules with default settings
         Gamerules.DO_LINKS_SAFE = true;
-        // Force class loading for TitleMessage and ArmorBalancer to prevent NoClassDefFoundError
-        Class<?> titleMessageClass = TitleMessage.class;
-        Class<?> armorBalancerClass = ArmorBalancer.class;
+
 
         httpClientService = new HttpClientService();
         gameStatisticsService = new GameStatisticsService(httpClientService);
 
-        TeamColorArgument.RegisterArgument();
-
-        ModSounds.register(modEventBus);
-        ModMobs.register(modEventBus);
-        ModMenus.register(modEventBus);
         modEventBus.addListener(ModSetupEvents::onClientSetup);
         modEventBus.addListener(ModSetupEvents::registerGuiOverlays);
 
@@ -87,7 +80,7 @@ public class UnrealZaruba {
         var serverEvents = new ServerEvents(gameStatisticsService, GamemodeManager.instance);
         MinecraftForge.EVENT_BUS.register(serverEvents);
 
-        var clientEvents = new ClientEvents();
+        var clientEvents = new ClientEvents(GamemodeManager.instance);
         MinecraftForge.EVENT_BUS.register(clientEvents);
 
         MinecraftForge.EVENT_BUS.register(AttributesRegistration.class);

@@ -74,10 +74,15 @@ public class NetworkHandler {
                 AssignClassToPlayerPacket::decode,
                 AssignClassToPlayerPacket::handle);
 
-        CHANNEL.registerMessage(packetId++, TimerPacket.class,
-                TimerPacket::encode,
-                TimerPacket::decode,
-                TimerPacket::handle);
+        CHANNEL.registerMessage(packetId++, StartHudTimerPacket.class,
+                StartHudTimerPacket::encode,
+                StartHudTimerPacket::decode,
+                StartHudTimerPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, StopHudTimerPacket.class,
+                StopHudTimerPacket::encode,
+                StopHudTimerPacket::decode,
+                StopHudTimerPacket::handle);
     }
 
     public class Screens {

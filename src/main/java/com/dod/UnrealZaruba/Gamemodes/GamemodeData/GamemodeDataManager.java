@@ -24,27 +24,25 @@ import com.google.gson.GsonBuilder;
 public class GamemodeDataManager {
     private static final String BASE_PATH = "unrealzaruba" + File.separator + "gamemodedata";
     private static final Map<Class<? extends BaseGamemode>, Map<Class<? extends GamemodeData<?>>, GamemodeData<?>>> dataRegistry = new HashMap<>();
-    private static final Gson GSON = new GsonBuilder()
+    public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObjective.class, new ObjectiveFactory())
             .setPrettyPrinting()
             .create();
     
-    public static <T extends GamemodeData<?>> void registerHandler(Class<? extends BaseGamemode> gamemodeClass, T data) {
+    public static <T extends GamemodeData<?>> void registerHandler(Class<? extends BaseGamemode> gamemodeClass, T dataHandler) {
         Map<Class<? extends GamemodeData<?>>, GamemodeData<?>> gamemodeMap = dataRegistry.computeIfAbsent(gamemodeClass, k -> new HashMap<>());
-        gamemodeMap.put((Class<? extends GamemodeData<?>>) data.getClass(), data);
+        gamemodeMap.put((Class<? extends GamemodeData<?>>) dataHandler.getClass(), dataHandler);
+        dataHandler.loadData();
     }
 
-    public static <T , D> D getHandler(Class<? extends BaseGamemode> gamemodeClass, Class<D> dataClass) {
+    public static <D> D getHandler(Class<? extends BaseGamemode> gamemodeClass, Class<D> dataClass) {
         Map<Class<? extends GamemodeData<?>>, GamemodeData<?>> gamemodeMap = dataRegistry.get(gamemodeClass);
         UnrealZaruba.LOGGER.info("[GamemodeDataManager] Getting handler for " + gamemodeClass.getSimpleName() + " and " + dataClass.getSimpleName());
-        for (var entry : gamemodeMap.entrySet()) {
-            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Entry: " + entry.getKey().getSimpleName());
-        }
         if (gamemodeMap != null) {
-            GamemodeData<?> data = gamemodeMap.get(dataClass);
-            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Data: " + data);
-            if (data != null) {
-                return (D) data;
+            GamemodeData<?> dataHandler = gamemodeMap.get(dataClass);
+            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Data: " + dataHandler);
+            if (dataHandler != null) {
+                return (D) dataHandler;
             }
         }
         return null;

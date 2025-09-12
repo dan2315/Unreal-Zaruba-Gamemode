@@ -52,11 +52,7 @@ public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
     public void setData(T data) {
         if (data != null) {
             this.data = data;
-            try {
-                saveData();
-            } catch (IOException e) {
-                UnrealZaruba.LOGGER.error("[" + getClass().getSimpleName() + "] Failed to save data after update", e);
-            }
+            saveData();
         }
     }
     
@@ -64,6 +60,7 @@ public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
     public T loadData() {
         T loadedData = GamemodeDataManager.loadData(gamemodeClass, dataName, dataClass);
         if (loadedData != null) {
+            UnrealZaruba.LOGGER.warn("Loaded data: {}", loadedData);
             this.data = loadedData;
             return loadedData;
         }
@@ -71,8 +68,12 @@ public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
     }
     
     @Override
-    public void saveData() throws IOException {
-        GamemodeDataManager.saveData(gamemodeClass, dataName, data);
-        UnrealZaruba.LOGGER.info("[" + getClass().getSimpleName() + "] Saved data");
+    public void saveData()  {
+        try {
+            GamemodeDataManager.saveData(gamemodeClass, dataName, data);
+            UnrealZaruba.LOGGER.info("[" + getClass().getSimpleName() + "] Saved data");
+        } catch (IOException e) {
+            UnrealZaruba.LOGGER.error("[" + getClass().getSimpleName() + "] Failed to save data after update", e);
+        }
     }
 } 

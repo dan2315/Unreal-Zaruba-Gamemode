@@ -14,6 +14,7 @@ import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 
 
+import com.mojang.datafixers.types.templates.Check;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,15 +39,7 @@ public class ObjectivesHandler implements IResettable {
     }
 
     public void onServerTick() {
-        objectives.forEach(objective -> objective.Update());
-        if (allCompleted) return;
-        if (objectives.stream().allMatch(GameObjective::IsCompleted)) {
-            UnrealZaruba.LOGGER.info("[UnrealZaruba] All objectives completed");
-            allCompleted = true;
-            if (onCompleted != null) {
-                onCompleted.run();
-            }
-        }
+        objectives.forEach(GameObjective::Update);
     }
 
     public void addObjective(GameObjective objective) {
@@ -84,6 +77,11 @@ public class ObjectivesHandler implements IResettable {
         }
     }
 
+    public void CheckIfAllCompleted(GameObjective currentObjective) {
+        var allCompleted = objectives.stream().allMatch(GameObjective::IsCompleted);
+        if (allCompleted) onCompleted.run();
+    }
+
     public void save(String configName) {
         GameObjective[] objectivesArray = objectives.toArray(new GameObjective[0]);
         for (GameObjective objective : objectivesArray) {
@@ -97,7 +95,8 @@ public class ObjectivesHandler implements IResettable {
         BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
         ObjectivesData objectivesData = GamemodeDataManager.getHandler(activeGamemode.getClass(), ObjectivesData.class);
         objectives = Arrays.asList(objectivesData.getObjectives());
-        
+        objectives.forEach(gameObjective -> gameObjective.SubscribeOnCompleted(this::CheckIfAllCompleted));
+
         return objectives;
     }
 

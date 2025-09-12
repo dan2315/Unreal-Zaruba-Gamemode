@@ -17,7 +17,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.TickEvent;
@@ -38,7 +37,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     transient int updateCounter = 0;
     transient int notifyBlockCounter = 0;
     
-    private final transient Map<UUID, Integer> playerVisibilityTicks = new HashMap<>();
+    private transient Map<UUID, Integer> playerVisibilityTicks = new HashMap<>();
 
     public DestructibleObjective(BlockVolume volume, String name) {
         super(name, "destructible", volume.GetCenter());
@@ -47,9 +46,17 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         this.trackedBlocks = InitializeTrackedBlocks(volume);
         this.progressDisplay = new ProgressbarForObjective(this, name);
     }
-    
 
-    
+    @Override
+    public void InitializeAfterSerialization() {
+        super.InitializeAfterSerialization();
+        playerVisibilityTicks = new HashMap<>();
+        this.world = WorldManager.gameLevel;
+        this.trackedBlocks = InitializeTrackedBlocks(volume);
+        this.progressDisplay = new ProgressbarForObjective(this, name);
+        UnrealZaruba.LOGGER.warn("Objective {} was initialized", name);
+    }
+
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
         UnrealZaruba.LOGGER.info("Начал прогружать: {}", name);
         Set<BlockPos> solidBlocks = new HashSet<>();

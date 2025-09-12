@@ -47,7 +47,6 @@ public class ShipsGamemode extends TeamGamemode {
         TEAM_PREPARATION_POINTS.put(TeamColor.BLUE, new BlockPos(-147, 54, -121));
         TEAM_PREPARATION_POINTS.put(TeamColor.YELLOW, new BlockPos(-147, 54, 79));
         
-        gameTimer.setup();
         Initialize();
     }
 

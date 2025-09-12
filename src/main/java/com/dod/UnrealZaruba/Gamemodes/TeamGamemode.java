@@ -28,12 +28,10 @@ public class TeamGamemode extends BaseGamemode {
     public TeamGamemode() {
         super();
         TeamManager = new TeamManager();
-        TeamManager.Initialize();
     }
 
     @Override
     protected void Initialize() {
-        TeamManager.Initialize();
     }
     @Override
     public void HandleConnectedPlayer(Player player) {}
@@ -66,10 +64,6 @@ public class TeamGamemode extends BaseGamemode {
     @Override
     public void Cleanup() {
         TeamManager.Cleanup();
-    }
-    @Override
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        super.onServerTick(event);
     }
 
     @Override

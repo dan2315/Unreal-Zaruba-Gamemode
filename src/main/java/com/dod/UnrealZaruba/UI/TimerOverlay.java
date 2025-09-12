@@ -2,6 +2,8 @@ package com.dod.UnrealZaruba.UI;
 
 import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.Utils.Timers.RealTimeTimer;
+import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 
@@ -17,8 +19,11 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
     public int minutes;
     public int seconds;
 
+    private RealTimeTimer timer;
+    private int durationSeconds;
     public static IGuiOverlay INSTANCE = new TimerOverlay();
     public static TimerOverlay OVERLAY_INSTANCE = (TimerOverlay) INSTANCE;
+
 
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
@@ -42,23 +47,23 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
         guiGraphics.drawString(font, displayable_text, 40, y, 0xFFFFFF, true);
     }
 
+
     @Override
-    public void setup() {
-        UnrealZaruba.LOGGER.info("Засетапился.");
-        this.is_visible = true;
+    public void startCountDown(long startTime, int durationSeconds) {
+        is_visible = true;
+        this.durationSeconds = durationSeconds;
+        timer = TimerManager.createRealTimeTimer(durationSeconds, startTime, this::updateTime);
     }
 
     @Override
-    public void update(int seconds, int minutes, boolean isVisible) {
-        UnrealZaruba.LOGGER.info("Обновился");
-        this.seconds = seconds;
-        this.minutes = minutes;
-        this.is_visible = isVisible;
+    public void stop() {
+        is_visible = false;
+        timer.dispose(true);
     }
 
-    @Override
-    public void reset() {
-        UnrealZaruba.LOGGER.info("Сброс.");
-        this.is_visible = false;
+    private void updateTime(int ticks) {
+        var remainingSeconds = durationSeconds - ticks / 20;
+        this.minutes = remainingSeconds / 60;
+        this.seconds = remainingSeconds % 60;
     }
 }

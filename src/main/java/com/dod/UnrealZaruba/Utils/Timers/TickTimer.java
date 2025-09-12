@@ -99,7 +99,12 @@ public class TickTimer implements ITimer {
         
         TimerManager.disposeTimer(this);
     }
-    
+
+    @Override
+    public long getDuration() {
+        return durationTicks;
+    }
+
     @Override
     public float getProgress() {
         if (!running) {

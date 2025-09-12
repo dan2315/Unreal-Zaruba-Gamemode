@@ -14,7 +14,7 @@ public class BlockVolume {
         return center;
     }
 
-    public BlockVolume(BlockPos pos1, BlockPos pos2, boolean countBlocks) {
+    public BlockVolume(BlockPos pos1, BlockPos pos2) {
         this.minPos = new BlockPos(
                 Math.min(pos1.getX(), pos2.getX()),
                 Math.min(pos1.getY(), pos2.getY()),
@@ -34,6 +34,14 @@ public class BlockVolume {
         return pos.getX() >= minPos.getX() && pos.getX() <= maxPos.getX() &&
                pos.getY() >= minPos.getY() && pos.getY() <= maxPos.getY() &&
                pos.getZ() >= minPos.getZ() && pos.getZ() <= maxPos.getZ();
+    }
+
+    public BlockPos getMinPos() {
+        return minPos;
+    }
+
+    public BlockPos getMaxPos() {
+        return maxPos;
     }
 
     public void ForEachBlock(Consumer<BlockPos> event) {

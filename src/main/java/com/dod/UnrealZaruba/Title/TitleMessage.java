@@ -1,6 +1,7 @@
 package com.dod.UnrealZaruba.Title;
 
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
@@ -28,31 +29,22 @@ public class TitleMessage {
         player.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7)); // fade in, stay, fade out
     }
 
-    /**
-     * Send subtitle.
-     *
-     * @param serverPlayer the server player
-     * @param subtitle     the subtitle
-     */
     public static void sendSubtitle(ServerPlayer serverPlayer, Component subtitle) {
         serverPlayer.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
         serverPlayer.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7));
     }
 
-    /**
-     * Send actionbar.
-     *
-     * @param serverPlayer the server player
-     * @param action       the action
-     */
-    public static void sendActionbar(ServerPlayer serverPlayer, Component action) {
-        serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(action));
+    public static void sendActionbar(ServerPlayer serverPlayer, Component message) {
+        serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(message));
         serverPlayer.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7));
     }
 
-    /**
-     * @implSpec utility method that being used by another method
-     */
+    public static void sendActionbarToEveryone(MinecraftServer server, Component message) {
+        for(var player : server.getPlayerList().getPlayers()) {
+            sendActionbar(player, message);
+        }
+    }
+
     public static void showTitle(ServerPlayer player, Component title, Component subtitle) {
         showTitle(player, title, subtitle, 60);
     }

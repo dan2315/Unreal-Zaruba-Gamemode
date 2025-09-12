@@ -45,7 +45,6 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     private final MinecraftServer server;
     
     private List<IRespawnPoint> respawnPoints = new ArrayList<>();
-    private List<BlockVolume> barrierVolumes = new ArrayList<BlockVolume>();
     private UUID commander;
     private String commanderName;
     private PlayerTeam minecraftTeam;
@@ -83,10 +82,6 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         if (generator != null) {
             this.objectiveCompletedMessageGenerator = generator;
         }
-    }
-
-    public void AddBarrierVolume(BlockVolume barrierVolume) {
-        barrierVolumes.add(barrierVolume);
     }
 
     public void GiveVote(Player player ,PlayerContext playerContext) {

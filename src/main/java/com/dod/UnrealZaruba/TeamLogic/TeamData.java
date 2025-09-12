@@ -128,6 +128,13 @@ public class TeamData extends AbstractGamemodeData<TeamData.TeamDataPayload> {
         public void setTeams(HashMap<TeamColor, TeamDataEntry> teams) {
             this.teams = teams;
         }
+
+        @Override
+        public String toString() {
+            return "TeamDataPayload{" +
+                    "teams=" + teams +
+                    '}';
+        }
     }
 }
 

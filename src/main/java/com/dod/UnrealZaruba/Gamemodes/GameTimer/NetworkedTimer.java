@@ -1,38 +1,29 @@
 package com.dod.UnrealZaruba.Gamemodes.GameTimer;
 
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.TimerPacket;
-import net.minecraft.server.MinecraftServer;
+import com.dod.UnrealZaruba.NetworkPackets.StartHudTimerPacket;
+import com.dod.UnrealZaruba.NetworkPackets.StopHudTimerPacket;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraftforge.network.PacketDistributor;
 
 public class NetworkedTimer implements IGameTimer {
-
     @Override
-    public void setup() {
+    public void startCountDown(long startTime, int durationSeconds) {
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
+            UnrealZaruba.LOGGER.warn("SENDING TIMER START PACKET TO " + player.getName());
             NetworkHandler.CHANNEL.send(
-                PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, true)
-                );
+                    PacketDistributor.PLAYER.with(() -> player), new StartHudTimerPacket(startTime, durationSeconds)
+            );
         });
     }
 
     @Override
-    public void update(int seconds, int minutes, boolean isVisible) {
+    public void stop() {
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
             NetworkHandler.CHANNEL.send(
-                PacketDistributor.PLAYER.with(() -> player), new TimerPacket(seconds, minutes, true)
-                );
+                    PacketDistributor.PLAYER.with(() -> player), new StopHudTimerPacket()
+            );
         });
     }
-
-    @Override
-    public void reset() {
-        ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
-            NetworkHandler.CHANNEL.send(
-                PacketDistributor.PLAYER.with(() -> player), new TimerPacket(0, 0, false)
-                );
-        });
-    }
-    
 }

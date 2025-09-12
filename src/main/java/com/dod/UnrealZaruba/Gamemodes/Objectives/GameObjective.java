@@ -2,20 +2,26 @@ package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class GameObjective {
     String name;
-    String type; // Used to determine objective type during deserialization
+    String type;
     public float progress;
     private boolean isCompleted = false;
-    protected IProgressDisplay progressDisplay;
+    protected transient IProgressDisplay progressDisplay;
+    private transient Consumer<GameObjective> onCompleted;
     
-    private final transient List<ObjectiveOwner> notificationRecipients = new ArrayList<>();
+    private transient List<ObjectiveOwner> notificationRecipients = new ArrayList<>();
 
     public GameObjective() {
         // Default constructor needed for deserialization
     }
-    
+
+    public void InitializeAfterSerialization() {
+        notificationRecipients = new ArrayList<>();
+    }
+
     public GameObjective(String name, String type) {
         this.name = name;
         this.type = type;
@@ -73,10 +79,15 @@ public abstract class GameObjective {
     public void Complete() {
         isCompleted = true;
         OnCompleted();
+        this.onCompleted.accept(this);
     }
 
     public void Reset() {
         isCompleted = false;
+    }
+
+    public void SubscribeOnCompleted(Consumer<GameObjective> onCompleted) {
+        this.onCompleted = onCompleted;
     }
 
     protected abstract void OnCompleted();

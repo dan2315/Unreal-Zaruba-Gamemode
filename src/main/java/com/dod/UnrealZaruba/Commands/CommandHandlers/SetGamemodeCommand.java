@@ -15,6 +15,8 @@ import net.minecraft.network.chat.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+import static com.dod.UnrealZaruba.Commands.CommandHandlers.Suggestions.GamemodeSuggestions.GAMEMODE_SUGGESTIONS;
+
 public class SetGamemodeCommand implements ICommandHandler {
 
     @Override
@@ -46,23 +48,6 @@ public class SetGamemodeCommand implements ICommandHandler {
                             
                             return 1;
                         })));
-    }
-    
-    private static final SuggestionProvider<CommandSourceStack> GAMEMODE_SUGGESTIONS = 
-            (context, builder) -> suggestGamemodes(builder);
-    
-    private static CompletableFuture<Suggestions> suggestGamemodes(SuggestionsBuilder builder) {
-        String input = builder.getRemaining().toLowerCase();
-        
-        // Ensure we only suggest lowercase gamemode names to comply with Minecraft resource standards
-        for (String gamemodeName : GamemodeFactory.gamemodes.keySet()) {
-            String lowercaseGamemodeName = gamemodeName.toLowerCase();
-            if (lowercaseGamemodeName.startsWith(input)) {
-                builder.suggest(lowercaseGamemodeName);
-            }
-        }
-        
-        return builder.buildFuture();
     }
 
     @Override

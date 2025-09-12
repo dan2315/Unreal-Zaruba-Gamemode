@@ -51,6 +51,7 @@ public class TeamManager implements IResettable {
                 tent_templates.put(data.getKey(), teamContext.GetTentTemplate(structureManager));
             }
         }
+        Initialize();
     }
 
     public void Initialize() {

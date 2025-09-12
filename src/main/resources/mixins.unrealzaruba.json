@@ -12,7 +12,8 @@
     "LecternControllerBlockMixin",
     "LinkHandlerMixin",
     "MinecraftServerMixin",
-    "RedstoneLinkBlockMixin"
+    "RedstoneLinkBlockMixin",
+    "ServerLevelMixin"
   ],
   "client": [
     "ClientPacketListenerMixin"

@@ -30,7 +30,7 @@ public class PlayerContext {
     protected boolean isDead;
     protected boolean isReady;
 
-    public boolean sosal;
+    public boolean sosal = true;
 
     protected BaseGamemode gamemode;
 

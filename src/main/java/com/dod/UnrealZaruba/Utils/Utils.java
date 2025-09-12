@@ -33,23 +33,6 @@ public class Utils {
         }
     }
 
-    public static void deleteBarriers(BlockVolume volume) {
-        ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-        if (world == null) {
-            UnrealZaruba.LOGGER.warn("[Ай, бля] World not found");
-            return;
-        }
-
-        UnrealZaruba.LOGGER.warn("[Во, бля] Удаляю барьеры " + volume.GetCenter());
-
-        volume.ForEachBlock(pos -> {
-            BlockState blockState = world.getBlockState(pos);
-            if (blockState.getBlock() == Blocks.BARRIER) {
-                world.removeBlock(pos, false);
-            }
-        });
-    }
-
     public static void SetGamemodeAllExcludeOP(PlayerList playerList, GameType gameType) {
         for (ServerPlayer player : playerList.getPlayers()) {
 

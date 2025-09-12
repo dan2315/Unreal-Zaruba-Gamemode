@@ -20,11 +20,13 @@ public class CommandHandlerFactory {
         handlers.add(new VoteCommand());
         handlers.add(new CreateNPCCommand());
         // handlers.add(new SetTeamBaseCommand());
-        handlers.add(new StartBattleCommand());
         handlers.add(new CreateObjectiveCommand());
         handlers.add(new ResetGameWorldCommand());
         handlers.add(new SetReadyCommand());
-        handlers.add(new EndGameCommand());
+        handlers.add(new SkipPhaseCommand());
+        handlers.add(new AddBarrierVolumeCommand());
+        handlers.add(new VoteForGamemodeCommand());
+        handlers.add(new OpenGamemodeMapCommand());
         
         // Add team data management commands
         handlers.add(new SetGamemodeCommand());

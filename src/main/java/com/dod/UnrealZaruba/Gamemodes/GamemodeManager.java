@@ -36,10 +36,13 @@ public class GamemodeManager {
         isVoting = true;
     }
 
-    public void Vote(UUID playerId, String vote) {
-        if (isVoting) {
-            playerVotes.put(playerId, vote);
+    public int Vote(UUID playerId, String vote) {
+        if (!isVoting) {
+            return 0;
         }
+
+        playerVotes.put(playerId, vote);
+        return 1;
     }
 
     public void Tick() {
@@ -71,10 +74,19 @@ public class GamemodeManager {
 
         if (allPlayersReady) {
             StopVoting();
+            ResetPlayersReady(players);
+        }
+    }
+
+    private void ResetPlayersReady(List<ServerPlayer> players) {
+        for (ServerPlayer player : players) {
+            PlayerContext playerContext = PlayerContext.Get(player.getUUID());
+            playerContext.SetReady(false);
         }
     }
 
     public void StopVoting() {
+        UnrealZaruba.LOGGER.warn("Stop Voting has been called");
         isVoting = false;
         HashMap<String, Integer> votes = new HashMap<>();
         playerVotes.forEach((playerId, vote) -> {
@@ -84,6 +96,8 @@ public class GamemodeManager {
         String mostVoted = votes.keySet().stream()
             .max(Comparator.comparingInt(votes::get))
             .orElse("ships");
+
+        UnrealZaruba.LOGGER.warn("Voting: {} has won", mostVoted);
 
         if (mostVoted != null) {
             GamemodeFactory.createGamemode(mostVoted);
@@ -96,5 +110,8 @@ public class GamemodeManager {
         activeGamemode = gamemode;
     }
 
-
+    public void CleanupCurrentGamemode() {
+        activeGamemode = null;
+        StartVoting();
+    }
 }

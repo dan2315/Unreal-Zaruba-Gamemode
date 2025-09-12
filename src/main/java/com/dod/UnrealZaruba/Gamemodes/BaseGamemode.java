@@ -1,12 +1,15 @@
 package com.dod.UnrealZaruba.Gamemodes;
 
+import com.dod.UnrealZaruba.Gamemodes.Barriers.BarrierVolumesData;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.AbstractGamePhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.ConditionalPhase;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.Gamemodes.GamePhases.IPhaseHolder;
 import com.dod.UnrealZaruba.SoundHandler.ModSounds;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;
+import com.dod.UnrealZaruba.TeamLogic.TeamData;
 import com.dod.UnrealZaruba.Utils.NBT;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -33,14 +36,13 @@ import net.minecraftforge.network.PacketDistributor;
 import com.dod.UnrealZaruba.NetworkPackets.UpdateDeathTimerPacket;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesData;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 
 public abstract class BaseGamemode implements IPhaseHolder {
     private static final int RESPAWN_DURATION_SECONDS = 10;
-    protected final ObjectivesHandler objectivesHandler;
+    protected ObjectivesHandler objectivesHandler;
     protected ResourceKey<Level> lobbyDimension;
     protected ResourceKey<Level> gameDimension;
     protected AbstractGamePhase currentPhase;
@@ -54,10 +56,16 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
     public BaseGamemode() {
         GamemodeManager.instance.SetActiveGamemode(this);
-        GamemodeDataFactory.initializeGamemodeData(this.getClass());
-        objectivesHandler = new ObjectivesHandler();
+        new TeamData(this.getClass());
+        new VehicleSpawnData(this.getClass());
+        new BarrierVolumesData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
         WorldManager.ReloadGameWorldDelayed(this);
+    }
+
+    public void LateInitialize() {
+        new ObjectivesData(this.getClass());
+        objectivesHandler = new ObjectivesHandler();
     }
 
     public AbstractGamePhase GetCurrentPhase() {
@@ -99,8 +107,14 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
     public void TransitToNextPhase() {
         currentPhaseIndex++;
-        int loopedIndex = currentPhaseIndex % phases.size();
-        BeginPhase(phases.get(loopedIndex));
+        if (currentPhaseIndex < phases.size())
+        {
+            BeginPhase(phases.get(currentPhaseIndex));
+        }
+        else
+        {
+            UnrealZaruba.LOGGER.warn("NO MORE PHASES LEFT");
+        }
     }
 
     public void CompletePhase() {
@@ -150,16 +164,16 @@ public abstract class BaseGamemode implements IPhaseHolder {
         StartGame();
         return 1;
     }
-    
+
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        objectivesHandler.onServerTick();
+        if (objectivesHandler != null) objectivesHandler.onServerTick();
         if (isConditionalPhase) { // По сути тикают помимо этой фазы ещё ТаймедФазы, но по внутреннему таймеру
             conditionalPhase.OnTick(0);
         }
     }
 
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        objectivesHandler.onPlayerTick(event);
+        if (objectivesHandler != null) objectivesHandler.onPlayerTick(event);
     }
 
     public void HandleRespawn(ServerPlayer player) {
