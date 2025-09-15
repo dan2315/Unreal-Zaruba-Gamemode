@@ -43,14 +43,11 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public abstract class BaseGamemode implements IPhaseHolder {
     private static final int RESPAWN_DURATION_SECONDS = 10;
     protected ObjectivesHandler objectivesHandler;
-    protected ResourceKey<Level> lobbyDimension;
-    protected ResourceKey<Level> gameDimension;
     protected AbstractGamePhase currentPhase;
     // Smotri, kakuyu huinyu ya pridumal
     protected ConditionalPhase conditionalPhase;
     protected List<AbstractGamePhase> phases = new ArrayList<>();
     protected int currentPhaseIndex = 0;
-    protected ObjectivesData objectivesData;
     protected MinecraftServer server;
     private boolean isConditionalPhase = false;
 

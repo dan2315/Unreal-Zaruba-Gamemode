@@ -7,8 +7,9 @@ import java.util.function.Consumer;
 public abstract class GameObjective {
     String name;
     String type;
-    public float progress;
+    public float progress; // should be from 0.0 to 1.0
     private boolean isCompleted = false;
+
     protected transient IProgressDisplay progressDisplay;
     private transient Consumer<GameObjective> onCompleted;
     
@@ -82,6 +83,10 @@ public abstract class GameObjective {
         this.onCompleted.accept(this);
     }
 
+    protected void SetCompleted(boolean value) {
+        isCompleted = value;
+    }
+
     public void Reset() {
         isCompleted = false;
     }
@@ -92,7 +97,7 @@ public abstract class GameObjective {
 
     protected abstract void OnCompleted();
 
-    protected abstract boolean UpdateImplementation();
+    protected abstract boolean UpdateImplementation();  // returning true means that objective is completed
 
     public void Update() {
         if (isCompleted) return;

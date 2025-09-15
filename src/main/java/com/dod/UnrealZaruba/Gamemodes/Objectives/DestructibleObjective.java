@@ -23,7 +23,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class DestructibleObjective extends PositionedGameobjective implements IResettable, IPlayerTickAware {
-    private static final int PROGRESS_UPDATE_INTERVAL = 40;
+    private static final int PROGRESS_UPDATE_INTERVAL = 30;
     private static final int VISIBILITY_UPDATE_INTERVAL = 40;
     private static final int NOTIFY_BLOCK_THRESHOLD = 10;
 

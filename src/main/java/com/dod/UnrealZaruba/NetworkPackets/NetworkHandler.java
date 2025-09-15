@@ -83,6 +83,11 @@ public class NetworkHandler {
                 StopHudTimerPacket::encode,
                 StopHudTimerPacket::decode,
                 StopHudTimerPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, RenderableZonesPacket.class,
+                RenderableZonesPacket::encode,
+                RenderableZonesPacket::decode,
+                RenderableZonesPacket::handle);
     }
 
     public class Screens {

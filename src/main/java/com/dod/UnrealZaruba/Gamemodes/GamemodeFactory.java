@@ -11,6 +11,7 @@ public class GamemodeFactory {
 
     public static void Initialize(VehicleManager vehicleManager, GameStatisticsService gameStatisticsService, IGameTimer gameTimer) {
         gamemodes.put(DestroyObjectivesGamemode.GAMEMODE_NAME, () -> new DestroyObjectivesGamemode(gameStatisticsService, gameTimer));
+        gamemodes.put(CapturePointsGamemode.GAMEMODE_NAME, () -> new CapturePointsGamemode(gameStatisticsService, gameTimer));
         gamemodes.put(ShipsGamemode.GAMEMODE_NAME, () -> new ShipsGamemode(vehicleManager, gameStatisticsService, gameTimer));
     }
 

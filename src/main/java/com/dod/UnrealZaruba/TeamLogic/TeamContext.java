@@ -72,6 +72,23 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         this.hornSound = assets.getHornSound();
     }
 
+    public int GetIntColor() {
+        switch (color) {
+            case RED -> {
+                return 0xFF0000;
+            }
+            case BLUE -> {
+                return 0x0000FF;
+            }
+            case YELLOW -> {
+                return  0x00FFFF;
+            }
+            default -> {
+                return 0xFFFFFF;
+            }
+        }
+    }
+
     public void setNotificationMessage(Function<GameObjective, String> generator) {
         if (generator != null) {
             this.notificationMessageGenerator = generator;
@@ -234,5 +251,13 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         members.clear();
         commander = null;
         commanderName = null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TeamContext teamContext) {
+            return this.Color() == teamContext.Color();
+        }
+        return super.equals(obj);
     }
 }

@@ -28,12 +28,17 @@ public class ObjectiveFactory implements JsonDeserializer<GameObjective> {
             objective.InitializeAfterSerialization();
             return objective;
         });
+        registerObjectiveType("capturepoint", json -> {
+            var objective = GSON.fromJson(json, CapturePointObjective.class);
+            objective.InitializeAfterSerialization();
+            return objective;
+        });
     }
 
     public static void registerObjectiveType(String type, Function<JsonObject, GameObjective> creator) {
         OBJECTIVE_CREATORS.put(type, creator);
     }
-    
+
     @Override
     public GameObjective deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();

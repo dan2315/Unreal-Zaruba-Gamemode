@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Mobs.AttributesRegistration;
+import com.dod.UnrealZaruba.Renderers.GeometryRenderer;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
@@ -24,6 +25,7 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.dod.UnrealZaruba.Commands.CommandRegistration;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeFactory;
@@ -44,6 +46,7 @@ public class UnrealZaruba {
     private static GameStatisticsService gameStatisticsService;
     public static WorldManager worldManager;
     public static VehicleManager vehicleManager;
+    public static GeometryRenderer geometryRenderer;
 
     public UnrealZaruba() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
