@@ -1,11 +1,14 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedHudElement;
+import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -32,11 +35,14 @@ public class CapturePointObjective extends PositionedGameobjective {
         super(name, "capturepoint", volume.GetCenter());
         captureArea = volume;
         captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
+        setProgressDisplay(new NetworkedHudElement(this));
     }
 
     @Override
     public void InitializeAfterSerialization() {
+        super.InitializeAfterSerialization();
         captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
+        setProgressDisplay(new NetworkedHudElement(this));
     }
 
     public ObjectiveOwner GetOwner() {
@@ -61,7 +67,6 @@ public class CapturePointObjective extends PositionedGameobjective {
             var playerContext = (TeamPlayerContext) PlayerContext.Get(player.getUUID());
             teamsInArea.merge(playerContext.Team(), 1, Integer::sum);
         });
-        UnrealZaruba.LOGGER.warn("Teams in area are: {}", teamsInArea);
 
         if (teamsInArea.size() >= 2) {
             captureStatus = CaptureStatus.Blocked;
@@ -74,39 +79,49 @@ public class CapturePointObjective extends PositionedGameobjective {
         }
 
         var team = teamsInArea.entrySet().iterator().next();
-        UnrealZaruba.LOGGER.warn("Capturing team is: {}, amount: {}", team.getKey().Color().getDisplayName(), team.getValue());
         return AdvanceCapturingProgress(team.getKey(), team.getValue());
     }
 
-    private boolean AdvanceCapturingProgress(TeamContext team, Integer playerAmount) {
-        if (team == null && progress >= 0.0f) {                     // ticks back, while no players in area
-            progress -= 0.005F;
-            if (progress < 0) progress = 0;
-            beingCapturedBy = null;
+    private boolean AdvanceCapturingProgress(TeamContext team, int playerAmount) {
+        double factor = Math.log(playerAmount + 1); // shared scaling
+        float delta = 0;
+        var progress = GetProgress();
+
+        if (team == null) {                         // decay when no players
+            delta = -0.005F;
             captureStatus = CaptureStatus.None;
-        }
-        if (owner != null && team == owner && progress >= 0.0f) {   // being restored by owner
-            progress -= (float) (0.01 * Math.log(playerAmount + 1));
-            if (progress < 0) progress = 0;
-            beingCapturedBy = null;
-            captureStatus = CaptureStatus.None;
-        }
-        else {                                  // being captured by opponent
-            progress += (float) (0.01 * Math.log(playerAmount + 1));
-            beingCapturedBy = team;
-            captureStatus = CaptureStatus.Capturing;
-            if (progress >= 1) {
-                return true;
+            if (progress + delta <= 0) {
+                beingCapturedBy = null;
             }
         }
-//        progressDisplay.updateProgress(progress);
-        UnrealZaruba.LOGGER.warn("Advancing progress: {}", progress);
-        return false;
+        else if (team.equals(owner)) {              // restore by owner
+            delta = (float) (-0.01 * factor);
+            captureStatus = CaptureStatus.None;
+            if (progress + delta <= 0) {
+                beingCapturedBy = null;
+            }
+        }
+        else if (!team.equals(beingCapturedBy)) {   // new opponent contesting
+            delta = (float) (-0.1 * factor);
+            captureStatus = CaptureStatus.Capturing;
+            if (progress + delta <= 0) {
+                beingCapturedBy = team;
+                SendUpdateHudElement();
+            }
+        }
+        else {                                      // being captured by current opponent
+            delta = (float) (0.1 * factor);
+            captureStatus = CaptureStatus.Capturing;
+        }
+
+        AddProgress(delta);
+        return progress >= 1;
     }
 
     @Override
     protected void OnCompleted() {
         Capture();
+        SendUpdateHudElement();
         MakeItPossibleToCaptureAgain();
     }
 
@@ -122,7 +137,24 @@ public class CapturePointObjective extends PositionedGameobjective {
 
     private void MakeItPossibleToCaptureAgain() {
         SetCompleted(false);
-        progress = 0;
+        SetProgress(0);
+    }
+
+    public ObjectiveOwner GetBeingCapturedBy() {
+        return beingCapturedBy;
+    }
+
+    public void SendUpdateHudElement() {
+        var ownerTeam = (TeamContext) GetOwner();
+        int ownerColor = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
+        var beingCapturedBy = (TeamContext) GetBeingCapturedBy();
+        int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
+        var players = server.getPlayerList().getPlayers();
+        for (var player : players) {
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(
+                    List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress()))
+            ));
+        }
     }
 
     public enum CaptureStatus {

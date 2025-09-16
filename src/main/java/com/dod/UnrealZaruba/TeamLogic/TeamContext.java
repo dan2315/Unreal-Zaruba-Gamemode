@@ -1,18 +1,16 @@
 package com.dod.UnrealZaruba.TeamLogic;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
 import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.RespawnPoint;
-import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Utils.IResettable;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import com.dod.UnrealZaruba.SoundHandler.SoundHandler;  
 
@@ -29,7 +27,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
-import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundSource;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.sounds.SoundEvent;
@@ -49,9 +46,8 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     private String commanderName;
     private PlayerTeam minecraftTeam;
     
-    
-    private Function<GameObjective, String> notificationMessageGenerator;
-    private Function<GameObjective, String> objectiveCompletedMessageGenerator;
+    private BiConsumer<GameObjective, ObjectiveOwner> onObjectiveChangedNotification;
+    private BiConsumer<GameObjective, ObjectiveOwner> onObjectiveCompletedNotification;
     
     public final List<UUID> members = new ArrayList<>();
     public TeamColor Color() {return color;}
@@ -89,15 +85,15 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         }
     }
 
-    public void setNotificationMessage(Function<GameObjective, String> generator) {
-        if (generator != null) {
-            this.notificationMessageGenerator = generator;
+    public void setOnObjectiveChangedNotification(BiConsumer<GameObjective, ObjectiveOwner> consumer) {
+        if (consumer != null) {
+            this.onObjectiveChangedNotification = consumer;
         }
     }
 
-    public void setObjectiveCompletedMessageGenerator(Function<GameObjective, String> generator) {
-        if (generator != null) {
-            this.objectiveCompletedMessageGenerator = generator;
+    public void setOnObjectiveCompletedNotification(BiConsumer<GameObjective, ObjectiveOwner> consumer) {
+        if (consumer != null) {
+            this.onObjectiveCompletedNotification = consumer;
         }
     }
 
@@ -138,7 +134,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         }
     }
 
-    public void SendMessage(MinecraftServer server, String message) {
+    public void SendMessage(String message) {
         this.members.forEach(element -> {
             ServerPlayer player = server.getPlayerList().getPlayer(element);
             if (player != null) {
@@ -226,19 +222,17 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     @Override
     public void onObjectiveStateChanged(GameObjective objective) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null || notificationMessageGenerator == null) return;
+        if (server == null || onObjectiveChangedNotification == null) return;
         
-        String message = notificationMessageGenerator.apply(objective);
-        SendMessage(server, message);
+        onObjectiveChangedNotification.accept(objective, this);
     }
 
     @Override
     public void onObjectiveCompleted(GameObjective objective) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null || objectiveCompletedMessageGenerator == null) return;
+        if (server == null || onObjectiveCompletedNotification == null) return;
         
-        String message = objectiveCompletedMessageGenerator.apply(objective);
-        SendMessage(server, message);
+        onObjectiveCompletedNotification.accept(objective, this);
     }
 
     @Override
@@ -260,4 +254,5 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         }
         return super.equals(obj);
     }
+
 }

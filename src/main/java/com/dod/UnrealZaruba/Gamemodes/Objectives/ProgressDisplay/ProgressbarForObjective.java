@@ -1,9 +1,10 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.dod.UnrealZaruba.Gamemodes.Objectives.PositionedGameobjective;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.BlockPos;
@@ -60,11 +61,6 @@ public class ProgressbarForObjective implements IProgressDisplay {
     private void removePlayerFromBossBar(ServerPlayer player) {
         bossBar.removePlayer(player);
         playersWithBossBar.remove(player.getUUID());
-    }
-    
-    @Override
-    public void setActivationDistance(float distance) {
-        this.activationDistance = distance;
     }
     
     @Override

@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.ProgressbarForObjective;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.FireworkLauncher;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
@@ -44,7 +45,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         this.volume = volume;
         this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
-        this.progressDisplay = new ProgressbarForObjective(this, name);
+        setProgressDisplay(new ProgressbarForObjective(this, name));
     }
 
     @Override
@@ -53,7 +54,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         playerVisibilityTicks = new HashMap<>();
         this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
-        this.progressDisplay = new ProgressbarForObjective(this, name);
+        setProgressDisplay(new ProgressbarForObjective(this, name));
         UnrealZaruba.LOGGER.warn("Objective {} was initialized", name);
     }
 
@@ -104,15 +105,14 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         trackedBlocks.removeAll(toRemove);
         remainingBlockAmount -= counter;
 
-        progress = GetProgress();
-        float degreeOfDestruction = 1 - progress;
+        var destructionProgress = GetProgress();
+        float degreeOfDestruction = 1 - destructionProgress;
         if (degreeOfDestruction >= requiredDegreeOfDestruction) {
             return true; // It means that objective is completed
         }
 
-        progress = 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
-        
-        updateProgressDisplay();
+        destructionProgress = 1 - (degreeOfDestruction/requiredDegreeOfDestruction);
+        SetProgress(destructionProgress);
 
         notifyBlockCounter += counter;
         if (notifyBlockCounter >= NOTIFY_BLOCK_THRESHOLD) {
@@ -157,7 +157,8 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         return name;
     }
 
-    private float GetProgress() {
+    @Override
+    public float GetProgress() {
         return ((float) (remainingBlockAmount)) / blockAmount;
     }
 
@@ -166,14 +167,6 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
             progressDisplay.updatePlayerVisibility(player);
         }
     }
-
-
-    public void setProgressBarActivationDistance(float distance) {
-        if (progressDisplay != null) {
-            progressDisplay.setActivationDistance(distance);
-        }
-    }
-
 
     @Override
     public void reset() {

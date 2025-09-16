@@ -45,8 +45,12 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         this.gameStatistics = gameStatisticsService;
         this.gameTimer = gameTimer;
 
-        TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
-        TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
+        TeamManager.Get(TeamColor.RED)
+                .setOnObjectiveChangedNotification((objective, team) ->
+                        ((TeamContext) team).SendMessage("Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!"));
+        TeamManager.Get(TeamColor.BLUE)
+                .setOnObjectiveChangedNotification((objective, team) ->
+                        ((TeamContext) team).SendMessage("Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r"));
         
         startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",

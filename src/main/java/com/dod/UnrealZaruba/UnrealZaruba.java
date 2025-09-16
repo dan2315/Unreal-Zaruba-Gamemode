@@ -6,6 +6,7 @@ import com.dod.UnrealZaruba.Events.ClientEvents;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Mobs.AttributesRegistration;
 import com.dod.UnrealZaruba.Renderers.GeometryRenderer;
+import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
 import com.dod.UnrealZaruba.Utils.Gamerules;
 import com.dod.UnrealZaruba.Mobs.ModMobs;
 import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
@@ -68,7 +69,6 @@ public class UnrealZaruba {
 
         Gamerules.DO_LINKS_SAFE = true;
 
-
         httpClientService = new HttpClientService();
         gameStatisticsService = new GameStatisticsService(httpClientService);
 
@@ -79,6 +79,7 @@ public class UnrealZaruba {
         vehicleManager = new VehicleManager();
         GamemodeFactory.Initialize(vehicleManager, gameStatisticsService, new NetworkedTimer());
         GamemodeManager.instance = new GamemodeManager();
+        HudObjective.InitializeAllHudObjectiveTypes();
 
         var serverEvents = new ServerEvents(gameStatisticsService, GamemodeManager.instance);
         MinecraftForge.EVENT_BUS.register(serverEvents);

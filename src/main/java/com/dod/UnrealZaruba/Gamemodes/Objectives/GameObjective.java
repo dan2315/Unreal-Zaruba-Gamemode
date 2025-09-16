@@ -1,5 +1,7 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -7,19 +9,22 @@ import java.util.function.Consumer;
 public abstract class GameObjective {
     String name;
     String type;
-    public float progress; // should be from 0.0 to 1.0
+    private float progress; // should be from 0.0 to 1.0
     private boolean isCompleted = false;
 
+    private transient float previousProgress;
     protected transient IProgressDisplay progressDisplay;
     private transient Consumer<GameObjective> onCompleted;
-    
     private transient List<ObjectiveOwner> notificationRecipients = new ArrayList<>();
+    private transient byte runtimeId;
+    public static byte LastRuntimeId = 0;
 
     public GameObjective() {
         // Default constructor needed for deserialization
     }
 
     public void InitializeAfterSerialization() {
+        runtimeId = LastRuntimeId++;
         notificationRecipients = new ArrayList<>();
     }
 
@@ -33,8 +38,32 @@ public abstract class GameObjective {
         return name;
     }
     
-    public String getType() {
+    public String GetType() {
         return type;
+    }
+    
+    public float GetProgress() {
+        return progress;
+    }
+    
+    public void SetProgress(float value) {
+        progress = value;
+        PostProcessProgressChange();
+    }
+
+    public void AddProgress(float value) {
+        progress += value;
+        PostProcessProgressChange();
+    }
+
+    private void PostProcessProgressChange() {
+        if (progress < 0) {
+            progress = 0;
+        }
+        if (progress != previousProgress) {
+            updateProgressDisplay();
+        }
+        previousProgress = progress;
     }
 
     public IProgressDisplay getProgressDisplay() {
@@ -105,4 +134,8 @@ public abstract class GameObjective {
             Complete();
         }
     }
-} 
+
+    public Byte GetRuntimeId() {
+        return runtimeId;
+    }
+}

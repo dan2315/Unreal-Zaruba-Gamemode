@@ -1,9 +1,9 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.UnrealZaruba.Utils.IResettable;
@@ -14,7 +14,6 @@ import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 
 
-import com.mojang.datafixers.types.templates.Check;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.Mod;

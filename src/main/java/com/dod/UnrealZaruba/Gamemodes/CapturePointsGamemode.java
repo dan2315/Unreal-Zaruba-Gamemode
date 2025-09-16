@@ -11,12 +11,16 @@ import com.dod.UnrealZaruba.Gamemodes.Objectives.CapturePointObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.*;
+import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
 import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
 import com.dod.UnrealZaruba.Services.GameStatisticsService;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
+import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
+import com.dod.UnrealZaruba.UI.Objectives.HudStringObjective;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -33,7 +37,8 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BooleanSupplier;
+
+import static com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective.LastRuntimeId;
 
 public class CapturePointsGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "capturepoints";
@@ -46,8 +51,11 @@ public class CapturePointsGamemode extends TeamGamemode {
         this.gameStatistics = gameStatisticsService;
         this.gameTimer = gameTimer;
 
-        TeamManager.Get(TeamColor.RED).setNotificationMessage(objective -> "Ваша §l§4команда§r атакует точку §b" + objective.GetName() + "§r. Гойда!");
-        TeamManager.Get(TeamColor.BLUE).setNotificationMessage(objective -> "Ваша точка §b" + objective.GetName() + "§r атакована §l§4противниками§r");
+        TeamManager.GetTeams().forEach((teamColor, teamContext) -> {
+            teamContext.setOnObjectiveChangedNotification((objective, team) -> {
+                ((CapturePointObjective) objective).SendUpdateHudElement();
+            });
+        });
 
         startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",
@@ -55,7 +63,6 @@ public class CapturePointsGamemode extends TeamGamemode {
         startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
                 "Продержитесь до конца раунда"));
-        // TODO: Utils.LoadChunksInArea(server.getLevel(Level.OVERWORLD), -1024, -512, 1024, 512);
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         Initialize();
@@ -99,14 +106,26 @@ public class CapturePointsGamemode extends TeamGamemode {
         LateInitialize();
 
         List<ColoredSquareZone> zones = new ArrayList<>();
+        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+        hudObjectives.add(new HudStringObjective("Захватите все точки"));
         for (GameObjective objective : objectivesHandler.getObjectives()) {
             if (objective instanceof CapturePointObjective capturePointObjective) {
                 var ownerTeam = (TeamContext) capturePointObjective.GetOwner();
-                int color = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
-                zones.add(new ColoredSquareZone(capturePointObjective.GetCaptureAreaAABB(), color));
+                int ownerColor = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
+                var beingCapturedBy = (TeamContext) capturePointObjective.GetBeingCapturedBy();
+                int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
+                zones.add(new ColoredSquareZone(capturePointObjective.GetCaptureAreaAABB(), ownerColor));
+
+                hudObjectives.add(new HudCapturePointObjective(
+                        capturePointObjective.GetRuntimeId(),
+                        capturePointObjective.GetName(),
+                        ownerColor,
+                        capturedByColor,
+                        capturePointObjective.GetProgress()));
             }
             for(var player : server.getPlayerList().getPlayers()) {
                 NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
+                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
             }
 
             objective.SubscribeOnCompleted(completedObjective -> {

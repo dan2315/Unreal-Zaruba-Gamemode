@@ -88,6 +88,22 @@ public class NetworkHandler {
                 RenderableZonesPacket::encode,
                 RenderableZonesPacket::decode,
                 RenderableZonesPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, ClientboundObjectivesPacket.class,
+                ClientboundObjectivesPacket::encode,
+                ClientboundObjectivesPacket::decode,
+                ClientboundObjectivesPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, ClientboundUpdateObjectivePacket.class,
+                ClientboundUpdateObjectivePacket::encode,
+                ClientboundUpdateObjectivePacket::decode,
+                ClientboundUpdateObjectivePacket::handle);
+
+        CHANNEL.registerMessage(packetId++, ClientboundUpdateObjectivesPacket.class,
+                ClientboundUpdateObjectivesPacket::encode,
+                ClientboundUpdateObjectivesPacket::decode,
+                ClientboundUpdateObjectivesPacket::handle);
+
     }
 
     public class Screens {
