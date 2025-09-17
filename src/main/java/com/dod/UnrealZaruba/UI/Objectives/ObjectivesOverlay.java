@@ -5,6 +5,7 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,5 +67,11 @@ public class ObjectivesOverlay implements IGuiOverlay {
 
     public void Clear() {
         objectivesMap.clear();
+    }
+
+    public void RemoveById(ArrayList<Byte> runtimeIds) {
+        for (var id : runtimeIds) {
+            objectivesMap.remove(id);
+        }
     }
 }

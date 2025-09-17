@@ -37,7 +37,7 @@ public class HandTent extends Item {
 
     @Override
     public int getUseDuration(ItemStack stack) {
-        return 100;  // 5 seconds (100 ticks)
+        return 40;  // 5 seconds (100 ticks)
     }
 
     @Override
@@ -54,7 +54,7 @@ public class HandTent extends Item {
         // This will be called after the 5-second duration
         if (!world.isClientSide) {
             if (livingEntity instanceof Player player) {
-                TeamGamemode gamemode = PlayerContext.Get(player.getUUID()).Gamemode(TeamGamemode.class);
+                TeamGamemode gamemode = (TeamGamemode) GamemodeManager.instance.GetActiveGamemode();
                 TeamContext playerTeam = gamemode.GetTeamManager().GetPlayersTeam(player);
                 if (playerTeam.RespawnPoints().stream().noneMatch(respawnPoint -> respawnPoint instanceof Tent)) {
                     ServerLevel serverLevel = (ServerLevel) world;

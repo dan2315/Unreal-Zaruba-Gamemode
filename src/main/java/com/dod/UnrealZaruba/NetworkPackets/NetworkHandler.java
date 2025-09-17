@@ -49,10 +49,10 @@ public class NetworkHandler {
                 UpdateDeathTimerPacket::decode,
                 UpdateDeathTimerPacket::handle);
 
-        CHANNEL.registerMessage(packetId++, SelectTentPacket.class,
-                SelectTentPacket::encode,
-                SelectTentPacket::decode,
-                SelectTentPacket::handle);
+        CHANNEL.registerMessage(packetId++, SelectRespawnPointPacket.class,
+                SelectRespawnPointPacket::encode,
+                SelectRespawnPointPacket::decode,
+                SelectRespawnPointPacket::handle);
 
         CHANNEL.registerMessage(packetId++, PurchaseVehiclePacket.class,
                 PurchaseVehiclePacket::encode,
@@ -103,6 +103,11 @@ public class NetworkHandler {
                 ClientboundUpdateObjectivesPacket::encode,
                 ClientboundUpdateObjectivesPacket::decode,
                 ClientboundUpdateObjectivesPacket::handle);
+
+        CHANNEL.registerMessage(packetId++, GamemodeVotePacket.class,
+                GamemodeVotePacket::encode,
+                GamemodeVotePacket::decode,
+                GamemodeVotePacket::handle);
 
     }
 

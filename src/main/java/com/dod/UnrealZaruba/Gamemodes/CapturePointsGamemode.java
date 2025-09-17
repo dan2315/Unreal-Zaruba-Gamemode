@@ -10,8 +10,10 @@ import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.CapturePointObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.RespawnPoint;
 import com.dod.UnrealZaruba.Gamemodes.StartCondition.*;
 import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
+import com.dod.UnrealZaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
 import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
@@ -22,6 +24,7 @@ import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
 import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
 import com.dod.UnrealZaruba.UI.Objectives.HudStringObjective;
 import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.UnrealZaruba.Utils.NBT;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
 import net.minecraft.ChatFormatting;
@@ -30,6 +33,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -129,6 +133,11 @@ public class CapturePointsGamemode extends TeamGamemode {
             }
 
             objective.SubscribeOnCompleted(completedObjective -> {
+                if (completedObjective instanceof CapturePointObjective cpObjective) {
+                    var team = (TeamContext) cpObjective.GetOwner();
+                    team.AddRespawnPoint(new RespawnPoint(cpObjective.getPosition(), cpObjective.GetName(),1));
+                }
+
                 if (CheckIfAllPointsCaptured()) {
                     EndGame();
                 }
@@ -140,6 +149,46 @@ public class CapturePointsGamemode extends TeamGamemode {
         });
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
     }
+
+    // -- DUPLICATION TODO: Think how to reduce it
+    public void HandleConnectedPlayer(Player player) {
+        ServerPlayer serverPlayer = (ServerPlayer) player;
+        MinecraftServer server = serverPlayer.getServer();
+
+        var isInTeam = TeamManager.IsInTeam(serverPlayer);
+        var isDead = NBT.readEntityTag(serverPlayer, "isPlayerDead");
+
+        if (server == null)
+            return;
+
+        if (GetCurrentPhaseId() == PhaseId.TEAM_SELECTION) {
+            TeleportToLobby(serverPlayer, server);
+            return;
+        }
+        if (GetCurrentPhaseId() == PhaseId.BATTLE && !isInTeam) {
+            MakePlayerSpectator(serverPlayer, server);
+            return;
+        }
+        if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
+            ReturnToTeamSpawn(serverPlayer);
+        }
+    }
+
+    private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
+        WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
+    }
+
+    private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
+        TeamManager.teleportToSpawnByPriority(serverPlayer);
+        serverPlayer.setGameMode(GameType.ADVENTURE);
+    }
+
+    private void MakePlayerSpectator(ServerPlayer serverPlayer, MinecraftServer server) {
+        serverPlayer.setGameMode(GameType.SPECTATOR);
+        var spawn = server.overworld().getSharedSpawnPos();
+        serverPlayer.teleportTo(spawn.getX(), spawn.getY(), spawn.getZ());
+    }
+    // -- DUPLICATION
 
     public boolean CheckIfAllPointsCaptured() {
         ObjectiveOwner sameOwner = null;
@@ -171,6 +220,7 @@ public class CapturePointsGamemode extends TeamGamemode {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
         for (ServerPlayer player : players) {
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(()-> player), new ClientboundRemoveObjectivesPacket());
             player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();
         }
@@ -179,8 +229,9 @@ public class CapturePointsGamemode extends TeamGamemode {
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
         String colorCode = wonTeam.getColorCode();
-        Component titleText = Component.literal(
-                "Команда " + colorCode + wonTeam + ChatFormatting.RESET + " победила");
+        Component titleText = Component.literal("Команда ")
+                .append(Component.literal(wonTeam.getDisplayName()).withStyle(ChatFormatting.valueOf(colorCode)))
+                .append(Component.literal(" победила"));
         Component wonText = Component.literal("Можешь сказать оппоненту \'Сори, что трахнул\'");
         Component loseText = Component.literal("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {

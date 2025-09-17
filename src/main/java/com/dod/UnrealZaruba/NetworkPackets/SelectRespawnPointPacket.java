@@ -11,12 +11,12 @@ import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class SelectTentPacket {
+public class SelectRespawnPointPacket {
     
     private final UUID playerID;
     private final int respawnPointIndex;
 
-    public SelectTentPacket(UUID playerID, int respawnPointIndex) {
+    public SelectRespawnPointPacket(UUID playerID, int respawnPointIndex) {
         this.playerID = playerID;
         this.respawnPointIndex = respawnPointIndex;
     }
@@ -29,18 +29,18 @@ public class SelectTentPacket {
         return respawnPointIndex;
     }
 
-    public static void encode(SelectTentPacket packet, FriendlyByteBuf buffer) {
+    public static void encode(SelectRespawnPointPacket packet, FriendlyByteBuf buffer) {
         buffer.writeUUID(packet.getPlayerID());
         buffer.writeInt(packet.getRespawnPointIndex());
     }
 
-    public static SelectTentPacket decode(FriendlyByteBuf buffer) {
+    public static SelectRespawnPointPacket decode(FriendlyByteBuf buffer) {
         UUID playerID = buffer.readUUID();
         int respawnPointIndex = buffer.readInt();
-        return new SelectTentPacket(playerID, respawnPointIndex);
+        return new SelectRespawnPointPacket(playerID, respawnPointIndex);
     }
 
-    public static void handle(SelectTentPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(SelectRespawnPointPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             TeamPlayerContext player = ((TeamPlayerContext)PlayerContext.Get(packet.getPlayerID()));
             if (player == null) return;

@@ -13,19 +13,16 @@ public class Tent implements IRespawnPoint {
 
     @Override
     public String getDisplayName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDisplayName'");
+        return  "Палатка";
     }
 
     @Override
     public BlockPos getSpawnPosition() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSpawnPosition'");
+        return spawn_point;
     }
 
     @Override
     public int getPriority() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPriority'");
+        return 10;
     }
 }

@@ -3,6 +3,7 @@ package com.dod.UnrealZaruba;
 import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
 import com.dod.UnrealZaruba.Events.ClientEvents;
+import com.dod.UnrealZaruba.Events.KeyBindings;
 import com.dod.UnrealZaruba.Events.ServerEvents;
 import com.dod.UnrealZaruba.Mobs.AttributesRegistration;
 import com.dod.UnrealZaruba.Renderers.GeometryRenderer;
@@ -63,6 +64,10 @@ public class UnrealZaruba {
         ModMobs.register(modEventBus);
         ModMenus.register(modEventBus);
 
+
+        if (FMLEnvironment.dist.isClient()) {
+            modEventBus.register(KeyBindings.class);
+        }
         if (FMLEnvironment.dist.isDedicatedServer() && !ConfigManager.getMainConfig().isZarubaServer()) {
             return;
         }
@@ -84,8 +89,10 @@ public class UnrealZaruba {
         var serverEvents = new ServerEvents(gameStatisticsService, GamemodeManager.instance);
         MinecraftForge.EVENT_BUS.register(serverEvents);
 
-        var clientEvents = new ClientEvents(GamemodeManager.instance);
-        MinecraftForge.EVENT_BUS.register(clientEvents);
+        if (FMLEnvironment.dist.isClient()) {
+            var clientEvents = new ClientEvents(GamemodeManager.instance);
+            MinecraftForge.EVENT_BUS.register(clientEvents);
+        }
 
         MinecraftForge.EVENT_BUS.register(AttributesRegistration.class);
 

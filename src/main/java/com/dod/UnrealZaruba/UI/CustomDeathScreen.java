@@ -2,9 +2,7 @@ package com.dod.UnrealZaruba.UI;
 
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.SelectTentPacket;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.dod.UnrealZaruba.NetworkPackets.SelectRespawnPointPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -22,6 +20,7 @@ public class CustomDeathScreen extends Screen {
     private Boolean tentExist;
     private Button baseButton;
     private Button tentButton;
+    private int selectedRespawnPointId;
 
     public CustomDeathScreen(boolean tentExist) {
         super(Component.literal("You Died"));
@@ -50,14 +49,14 @@ public class CustomDeathScreen extends Screen {
         baseButton.active = false;
         tentButton.active = true;
 
-        respawnAtBase();
+        sendSelectRespawnPoint(0);
     }
 
     private void selectTent() {
         tentButton.active = false;
         baseButton.active = true;
 
-        respawnInTent();
+        sendSelectRespawnPoint(1);
     }
 
     public void updateRespawnTimer(int newTime) {
@@ -67,18 +66,11 @@ public class CustomDeathScreen extends Screen {
             minecraft.setScreen(null);
     }
 
-    private void respawnAtBase() {
-        var playerID = Minecraft.getInstance().player.getUUID();
-        if (playerID == null)
+    private void sendSelectRespawnPoint(int respawnPointId) {
+        var player = Minecraft.getInstance().player;
+        if (player == null)
             UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        //TODO: NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, false));
-    }
-
-    private void respawnInTent() {
-        var playerID = Minecraft.getInstance().player.getUUID();
-        if (playerID == null)
-            UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        //TODO: NetworkHandler.CHANNEL.sendToServer(new SelectTentPacket(playerID, true));
+        NetworkHandler.CHANNEL.sendToServer(new SelectRespawnPointPacket(player.getUUID(), respawnPointId));
     }
 
     @Override
