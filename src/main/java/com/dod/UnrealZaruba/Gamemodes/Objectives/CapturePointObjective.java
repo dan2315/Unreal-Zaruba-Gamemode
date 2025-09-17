@@ -9,12 +9,9 @@ import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
 import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
-import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -152,7 +149,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         var players = server.getPlayerList().getPlayers();
         for (var player : players) {
             NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(
-                    List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress()))
+                    List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress(), GetPosition()))
             ));
         }
     }
