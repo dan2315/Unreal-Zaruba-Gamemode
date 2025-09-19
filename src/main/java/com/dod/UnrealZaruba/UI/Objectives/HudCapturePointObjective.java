@@ -13,7 +13,7 @@ public class HudCapturePointObjective extends HudObjective {
     private final int ownerColor; // as background
     private final int capturedByColor; // as progress line
     private float progress;
-    private BlockPos position;
+    private final BlockPos position;
 
 
     public HudCapturePointObjective(FriendlyByteBuf buffer) {
@@ -42,7 +42,7 @@ public class HudCapturePointObjective extends HudObjective {
         buffer.writeVarInt(ownerColor);
         buffer.writeVarInt(capturedByColor);
         buffer.writeFloat(progress);
-        SerializationUtils.encodeBlockPos(buffer ,position);
+        SerializationUtils.encodeBlockPos(buffer, position);
     }
 
     @Override

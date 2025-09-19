@@ -25,12 +25,12 @@ public class SerializationUtils {
     }
 
     public static void encodeBlockPos(FriendlyByteBuf buffer, BlockPos position) {
-        buffer.writeInt(position.getX());
-        buffer.writeInt(position.getY());
-        buffer.writeInt(position.getZ());
+        buffer.writeVarInt(position.getX());
+        buffer.writeVarInt(position.getY());
+        buffer.writeVarInt(position.getZ());
     }
 
     public static BlockPos decodeBlockPos(FriendlyByteBuf buffer) {
-        return new BlockPos(buffer.readInt(), buffer.readInt(), buffer.readByte());
+        return new BlockPos(buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt());
     }
 }

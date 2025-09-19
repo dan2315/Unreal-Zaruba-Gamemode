@@ -8,7 +8,6 @@ import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectivesHandler;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
@@ -48,17 +47,20 @@ public class TeamGamemode extends BaseGamemode {
     public void HandleRespawn(ServerPlayer player) {
         super.HandleRespawn(player);
         TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(player.getUUID());
-            if (playerContext.RespawnPointChosen()) {
-                TeamManager.teleportToSelectedPoint(player);
-            } else {
-                TeamManager.teleportToSpawnByPriority(player);
-            }
+        if (playerContext.RespawnPointSelected()) {
+            TeamManager.teleportToSelectedPoint(player);
+        } else {
+            TeamManager.teleportToSpawnByPriority(player);
+        }
     }
     
     @Override
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         super.HandleDeath(player, event);
-        NetworkHandler.Screens.openDeathScreen(player, false); // TODO: Render list of respawn points
+        if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext teamPlayerContext) {
+            var respawnPoints = teamPlayerContext.Team().RespawnPoints();
+            NetworkHandler.Screens.openDeathScreen(player, respawnPoints);
+        }
     }
 
     @Override

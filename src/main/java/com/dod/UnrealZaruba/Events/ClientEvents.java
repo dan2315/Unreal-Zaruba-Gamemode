@@ -5,6 +5,7 @@ import com.dod.UnrealZaruba.Config.MainConfig;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.UI.GamemodeSelectionScreen;
 import com.dod.UnrealZaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -38,7 +39,8 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+    public void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        UnrealZaruba.LOGGER.warn("Clearing objectives overlay");
         ObjectivesOverlay.INSTANCE.Clear();
     }
 }

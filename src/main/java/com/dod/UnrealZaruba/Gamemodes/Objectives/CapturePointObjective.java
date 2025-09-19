@@ -1,6 +1,9 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedHudElement;
+import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
 import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
 import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
 import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
@@ -8,6 +11,7 @@ import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
 import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.UnrealZaruba.TeamLogic.TeamManager;
 import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
 import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
 import com.dod.UnrealZaruba.WorldManager.WorldManager;
@@ -40,6 +44,12 @@ public class CapturePointObjective extends PositionedGameobjective {
         super.InitializeAfterSerialization();
         captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
         setProgressDisplay(new NetworkedHudElement(this));
+        TeamManager teamManager = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode()).GetTeamManager();
+        if (Objects.equals(name, "Вертолётная площадка")) {
+            owner = teamManager.Get(TeamColor.RED);
+        } else if (Objects.equals(name, "Склад боеприпасов")) {
+            owner = teamManager.Get(TeamColor.BLUE);
+        }
     }
 
     public ObjectiveOwner GetOwner() {

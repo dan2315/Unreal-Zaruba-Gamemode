@@ -1,26 +1,12 @@
 package com.dod.UnrealZaruba.Gamemodes.Objectives;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
 import com.dod.UnrealZaruba.UnrealZaruba;
 
-/**
- * Handler for game objectives data, managing the saving and loading of data.
- * Supports multiple types of objectives through a type field.
- */
 public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.ObjectivesPayload> {
     private static final String DATA_NAME = "objectives";
 
-    /**
-     * Creates a new ObjectivesData for a specific gamemode
-     * 
-     * @param gamemodeClass The gamemode class
-     */
     public ObjectivesData(Class<? extends BaseGamemode> gamemodeClass) {
         super(ObjectivesPayload.class, gamemodeClass, DATA_NAME, new ObjectivesPayload());
     }
@@ -29,30 +15,18 @@ public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.Objectiv
     public Class<ObjectivesPayload> getDataClass() {
         return ObjectivesPayload.class;
     }
-    
-    /**
-     * Save the current objectives' data.
-     */
+
     @Override
     public void saveData() {
         super.saveData();
         UnrealZaruba.LOGGER.info("[ObjectivesData] Saved objectives data");
     }
     
-    /**
-     * Get the current objectives
-     * 
-     * @return The objectives array
-     */
+
     public GameObjective[] getObjectives() {
         return data.getObjectivesArray();
     }
-    
-    /**
-     * Set the objectives
-     * 
-     * @param objectives The new objectives
-     */
+
     public void setObjectives(GameObjective[] objectives) {
         data.setObjectives(objectives);
         try {
@@ -61,12 +35,7 @@ public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.Objectiv
             // Already logged in AbstractGamemodeData
         }
     }
-    
-    /**
-     * Add an objective
-     * 
-     * @param objective The objective to add
-     */
+
     public void addObjective(GameObjective objective) {
         data.addObjective(objective);
         try {
@@ -75,13 +44,7 @@ public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.Objectiv
             // Already logged in AbstractGamemodeData
         }
     }
-    
-    /**
-     * Remove an objective
-     * 
-     * @param index The index of the objective to remove
-     * @return True if removed, false if index out of bounds
-     */
+
     public boolean removeObjective(int index) {
         boolean result = data.removeObjective(index);
         if (result) {

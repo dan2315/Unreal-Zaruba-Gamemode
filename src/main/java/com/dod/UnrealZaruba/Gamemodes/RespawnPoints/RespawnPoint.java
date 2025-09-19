@@ -2,7 +2,7 @@ package com.dod.UnrealZaruba.Gamemodes.RespawnPoints;
 
 import net.minecraft.core.BlockPos;
 
-public class RespawnPoint implements IRespawnPoint {
+public class RespawnPoint extends BaseRespawnPoint {
     private BlockPos spawnPosition;
     private String displayName;
     private int priority;

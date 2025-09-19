@@ -1,22 +1,32 @@
 package com.dod.UnrealZaruba.VsIntegration;
 
+import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Utils.SchematicLoader;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.Geometry.Utils;
 import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 
 import java.util.UUID;
+
+import com.dod.UnrealZaruba.Vehicles.Vehicle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockItem;
+import net.spaceeye.valkyrien_ship_schematics.containers.v1.ChunkyBlockData;
 import org.joml.Vector3d;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Quaterniond;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.function.Consumer;
+
 import org.valkyrienskies.core.api.ships.ServerShip;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.server.MinecraftServer;
@@ -50,44 +60,16 @@ public class ShipCreator {
 
     private static final MinecraftServer SERVER = ServerLifecycleHooks.getCurrentServer();
 
-    public static Pair<Boolean, List<ServerShip>> CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level, List<Runnable> delayedTasks) {
-        try {
-            IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
-            IShipSchematicDataV1 schematicV1 = (IShipSchematicDataV1) schematic;
-
-            schematic.getInfo().getShipsInfo().forEach(shipData -> {
-                UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
-            });
-            Quaterniond rotation = new Quaterniond();
-            Vector3d positionVec = new Vector3d(
-                position.getX(),
-                position.getY() + schematic.getInfo().getMaxObjectPos().y,
-                position.getZ());
-            List<ServerShip> serverShips = new ArrayList<>();
-            VModShipSchematicV1Kt.placeAt(schematicV1, level, null, UUID.randomUUID(), positionVec, rotation, ships -> 
-            {
-                ships.forEach(ship -> {
-                    var shipControl = EurekaShipControl.Companion.getOrCreate(ship);
-                    shipControl.setPowerLinear(100);
-                    shipControl.setFloaters(shipControl.getFloaters());
-                    UnrealZaruba.LOGGER.info("Here is SHIP CONTROL floaters: {}", shipControl.getFloaters());
-                    serverShips.add(ship);
-                });
-                return Unit.INSTANCE;
-            });
-            return Pair.of(true, serverShips);
-        } catch (Exception e) {
-            UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());
-            e.printStackTrace();
-            return Pair.of(false, new ArrayList<>());
-        }
+    public static boolean CreateShipFromTemplate(ResourceLocation schematicLocation, BlockPos position, Direction direction, ServerLevel level, ServerPlayer player) {
+        return CreateShipFromTemplate(schematicLocation, position, direction, level, player, null);
     }
 
-    public static boolean CreateShipFromTemplate(BlockPos position, ResourceLocation schematicLocation, ServerLevel level,
-            ServerPlayer player, Direction direction) {
+    public static boolean CreateShipFromTemplate(ResourceLocation schematicLocation, BlockPos position, Direction direction, ServerLevel level, ServerPlayer player, Consumer<Vehicle> init) {
         try {
+            String vehicleType = schematicLocation.getPath();
             IShipSchematic schematic = SchematicLoader.GetVSchem(schematicLocation);
             IShipSchematicDataV1 schematicV1 = (IShipSchematicDataV1) schematic;
+
 
             schematic.getInfo().getShipsInfo().forEach(shipData -> {
                 UnrealZaruba.LOGGER.info("Ship data: " + shipData.getId());
@@ -98,9 +80,15 @@ public class ShipCreator {
                 offsetedPosition.getX(),
                 offsetedPosition.getY() + schematic.getInfo().getMaxObjectPos().y,
                 offsetedPosition.getZ());
-            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player != null ? player.getUUID() : UUID.randomUUID(),
-                    positionVec, rotation,
-                    ships -> Unit.INSTANCE);
+
+            List<ServerShip> serverShips = new ArrayList<>();
+            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player != null ? player.getUUID() : UUID.randomUUID(), positionVec, rotation, ships ->
+            {
+                serverShips.addAll(ships);
+                return Unit.INSTANCE;
+            });
+            var ownedTeam = player == null ? null : PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext teamPlayerContext ? teamPlayerContext.Team().Color() : null;
+            UnrealZaruba.vehicleManager.addVehicle(new Vehicle(vehicleType, ownedTeam, serverShips, schematicV1, init));
             return true;
         } catch (Exception e) {
             UnrealZaruba.LOGGER.error("Error creating ship from template: " + e.getMessage());

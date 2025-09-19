@@ -8,6 +8,7 @@ import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
 import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -19,9 +20,6 @@ import java.util.List;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import java.util.ArrayList;
 
-/**
- * Block entity for the VehicleSpawnBlock that stores vehicle type and other data.
- */
 public class VehicleSpawnBlockEntity extends BlockEntity {
     private String vehicleType = "default";
     private TeamColor teamColor = TeamColor.RED;
@@ -42,7 +40,6 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
     public void setTeamColor(TeamColor teamColor) {
         this.teamColor = teamColor;
         setChanged();
-        // When team color changes, update the registration
         if (level != null && !level.isClientSide) {
             registerWithDataHandler();
         }
@@ -72,13 +69,9 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
                                     " for team: " + teamColor + " at " + worldPosition);
             
             if (level instanceof ServerLevel serverLevel) {
-                List<Runnable> delayedTasks = new ArrayList<>();
-                Pair<Boolean, List<ServerShip>> result = ShipCreator.CreateShipFromTemplate(worldPosition, new ResourceLocation(vehicleType), serverLevel, delayedTasks);
-                UnrealZaruba.vehicleManager.addVehicle(new Vehicle(vehicleType, teamColor, result.getRight(), () -> {
-                    delayedTasks.forEach(Runnable::run);
-                }));
-                
-                if (!result.getLeft()) {
+                boolean result = ShipCreator.CreateShipFromTemplate( new ResourceLocation(vehicleType), worldPosition, Direction.NORTH,serverLevel, null); // TODO: Replace North with actual direction
+
+                if (!result) {
                     UnrealZaruba.LOGGER.error("[VehicleSpawnBlockEntity] Failed to spawn vehicle of type: " + vehicleType);
                 }
             } else {

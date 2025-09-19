@@ -14,7 +14,7 @@ public class TeamPlayerContext extends PlayerContext implements IResettable {
 
     public TeamContext Team() { return team; }
     public void SetTeam(TeamContext team) { this.team = team; }
-    public boolean RespawnPointChosen() { return selectedRespawnPoint != null; }
+    public boolean RespawnPointSelected() { return selectedRespawnPoint != null; }
     public void SelectRespawnPoint(IRespawnPoint respawnPoint) { this.selectedRespawnPoint = respawnPoint; }
     public IRespawnPoint RespawnPoint() { return selectedRespawnPoint; }
     
