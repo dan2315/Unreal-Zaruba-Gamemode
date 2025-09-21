@@ -1,12 +1,10 @@
 package com.dod.UnrealZaruba.VsIntegration;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
 import com.dod.UnrealZaruba.Player.PlayerContext;
 import com.dod.UnrealZaruba.Player.TeamPlayerContext;
 import com.dod.UnrealZaruba.Utils.SchematicLoader;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import com.dod.UnrealZaruba.Utils.Geometry.Utils;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
 
 import java.util.UUID;
 
@@ -16,12 +14,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.spaceeye.valkyrien_ship_schematics.containers.v1.BlockItem;
-import net.spaceeye.valkyrien_ship_schematics.containers.v1.ChunkyBlockData;
+import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipSchematicDataV1;
+import net.spaceeye.vmod.schematic.PasteSchematicSettings;
 import org.joml.Vector3d;
-import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Quaterniond;
 import java.util.List;
 import java.util.ArrayList;
@@ -30,20 +26,12 @@ import java.util.function.Consumer;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.block.Blocks;
-import org.valkyrienskies.core.api.ships.PhysShip;
 import kotlin.Unit;
-import org.apache.commons.lang3.tuple.Pair;
-import org.valkyrienskies.core.impl.game.ships.ShipData;
-import org.valkyrienskies.eureka.EurekaConfig;
-import org.valkyrienskies.eureka.ship.EurekaShipControl;
 
 import net.minecraft.server.level.ServerPlayer;
 
 import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipSchematicDataV1;
-import net.spaceeye.vmod.schematic.VModShipSchematicV1Kt;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import net.spaceeye.vmod.schematic.VModShipSchematicV2Kt;
 
 public class ShipCreator {
 
@@ -82,8 +70,8 @@ public class ShipCreator {
                 offsetedPosition.getZ());
 
             List<ServerShip> serverShips = new ArrayList<>();
-            VModShipSchematicV1Kt.placeAt(schematicV1, level, player, player != null ? player.getUUID() : UUID.randomUUID(), positionVec, rotation, ships ->
-            {
+            PasteSchematicSettings settings = new PasteSchematicSettings();
+            VModShipSchematicV2Kt.placeAt(schematicV1, level, player, player != null ? player.getUUID() : UUID.randomUUID(), positionVec, rotation, settings, ships -> {
                 serverShips.addAll(ships);
                 return Unit.INSTANCE;
             });

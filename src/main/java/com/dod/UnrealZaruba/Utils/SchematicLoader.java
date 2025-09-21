@@ -21,7 +21,7 @@ import java.io.DataInputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 
-import net.spaceeye.vmod.schematic.VModShipSchematicV1;
+import net.spaceeye.vmod.schematic.VModShipSchematicV2;
 import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
 import net.spaceeye.valkyrien_ship_schematics.ShipSchematic;
 import org.apache.logging.log4j.LogManager;
@@ -136,6 +136,7 @@ public class SchematicLoader {
 
     // VSCHEM
     public static IShipSchematic GetVSchem(ResourceLocation location) {
+        UnrealZaruba.LOGGER.info("GetVSchem called for {}", location.toString());
         if (VSCHEM_CACHE.containsKey(location)) {
             return VSCHEM_CACHE.get(location);
         }
@@ -145,6 +146,7 @@ public class SchematicLoader {
             String source;
             
             java.io.File file = new java.io.File("schematics/vs/" + location.getPath() + ".vschem");
+            UnrealZaruba.LOGGER.info("Trying to find file {}", file);
             if (file.exists()) {
                 source = "server directory: " + file.getAbsolutePath();
                 try (java.io.FileInputStream fileInputStream = new java.io.FileInputStream(file)) {
@@ -163,29 +165,25 @@ public class SchematicLoader {
             
             UnrealZaruba.LOGGER.info("Loading schematic from " + source);
             UnrealZaruba.LOGGER.info("Bytes: " + bytes.length);
-            
+            var buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes));
+
+
             if (bytes.length > 3 && bytes[3] == 1) {
-                UnrealZaruba.LOGGER.info("VSCHEM version 1 detected");
-                var instance = new VModShipSchematicV1();
-                instance.deserialize(new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes)));
-                VSCHEM_CACHE.put(location, instance);
-                return instance;
+                UnrealZaruba.LOGGER.error("Vschem version 1 is not supported");
+                return null;
             }
-            else {
+            else if (buf.readUtf().equals("vschem")) {
                 try {
-                    var buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes));
-                    UnrealZaruba.LOGGER.info("Falling to fallback: {}", buf.readUtf());
                     String type = buf.readUtf();
                     UnrealZaruba.LOGGER.info("Type: {}", type);
                     if (type.equals("VModShipSchematicV1")) {
-                        var instance = new VModShipSchematicV1();
-                        boolean result = instance.deserialize(buf);
-                        UnrealZaruba.LOGGER.info("Result: {}", result);
+                        UnrealZaruba.LOGGER.error("Vschem version 1 is not supported");
+                        return null;
+                    } else {
+                        IShipSchematic instance = ShipSchematic.getSchematicFromBytes(bytes);
+                        UnrealZaruba.LOGGER.info("Result: {}", instance != null);
                         VSCHEM_CACHE.put(location, instance);
                         return instance;
-                    }
-                    else {
-                        throw new Exception("Unsupported VSCHEM version");
                     }
                 }
                 catch (Exception e) {
@@ -205,5 +203,6 @@ public class SchematicLoader {
             e.printStackTrace();
             return null;
         }
+        return null;
     }
 }

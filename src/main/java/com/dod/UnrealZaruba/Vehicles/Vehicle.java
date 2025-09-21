@@ -40,9 +40,8 @@ public class Vehicle extends BaseRespawnPoint {
                 UnrealZaruba.LOGGER.warn("Iterating through presumably chunks, chunk is: {}", chunkData.getKey());
                 totalBlocks += chunkData.getValue().size();
                 for (var blockEntry : chunkData.getValue().entrySet()) {
-                    UnrealZaruba.LOGGER.warn("Going over blocks, current block position is: {}", blockEntry.getKey());
-                    UnrealZaruba.LOGGER.warn("Just want to see that block item thingy: {}", blockEntry.getValue().toString());
                     blocks.add(blockEntry.getKey());
+
                     int id = blockEntry.getValue().getPaletteId();
                     var blockState = blockStatePalette.fromId(id);
                 }
@@ -94,6 +93,7 @@ public class Vehicle extends BaseRespawnPoint {
     }
 
     public void OnBlockStateChanged(BlockStateChangedEvent event) {
+        UnrealZaruba.LOGGER.warn("OnBlock changed in vehicle");
         if (event.getLevel().equals(WorldManager.gameLevel) && blocks.contains(event.getPos()) && event.getNewState().isAir()) {
             blocks.remove(event.getPos());
             currentHP -= 1;

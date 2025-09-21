@@ -186,7 +186,7 @@ dependencies {
 
     // Valkyrien Ship Schematics dependency for 1.20.1
     // implementation fg.deobf("net.spaceeye:valkyrien-ship-schematics-forge-${minecraft_version}:1.0")
-    compileOnly fg.deobf(files("X:/Projects/Unreal-Zaruba-Gamemode/libs/VMod-Forge-1.20.1-1.0.0.jar"))
+    compileOnly fg.deobf(files("X:/Projects/Unreal-Zaruba-Gamemode/libs/VMod-Forge-1.20.1-1.6.0.jar"))
     compileOnly fg.deobf(files("X:/Projects/Unreal-Zaruba-Gamemode/Valkyrien-Ship-Schematics/forge/build/libs/valkyrien-ship-schematics-forge-1.20.1-1.0.jar"))
     compileOnly fg.deobf("sosal:advancedcompass.forge.1.20.1:1.2.15")
 

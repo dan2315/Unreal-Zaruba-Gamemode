@@ -26,8 +26,7 @@ public enum TeamColor {
     }
 
     public String getColorCode() {
-        // Ensure lowercase to comply with Minecraft resource standards
-        return this.toString().toLowerCase();
+        return this.toString().toUpperCase();
     }
     
     // Get enum value from string in a case-insensitive way

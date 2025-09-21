@@ -17,7 +17,6 @@ public class LevelMixin {
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At("TAIL"))
     public void afterSetBlock(BlockPos blockPos, BlockState blockState, int flags, int recursionLeft, CallbackInfoReturnable<Boolean> cir) {
-        UnrealZaruba.LOGGER.warn("[AAAAAAAAAAAAAAAAA] afterSetBlock: {}", blockState.getBlock().toString());
-//        MinecraftForge.EVENT_BUS.post(new BlockStateChangedEvent((Level) (Object) this, blockPos, blockState));
+        MinecraftForge.EVENT_BUS.post(new BlockStateChangedEvent((Level) (Object) this, blockPos, blockState));
     }
 }
