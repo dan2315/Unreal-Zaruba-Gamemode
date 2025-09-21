@@ -39,7 +39,7 @@ public class ProgressbarForObjective implements IProgressDisplay {
         if (player.level() != WorldManager.gameLevel)
             return;
 
-        boolean isNearTarget = isPlayerNearTarget(player, objective.getPosition());
+        boolean isNearTarget = isPlayerNearTarget(player, objective.GetPosition());
         
         if (isNearTarget && !playersWithBossBar.contains(player.getUUID())) {
             addPlayerToBossBar(player);

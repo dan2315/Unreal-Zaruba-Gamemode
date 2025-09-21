@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import com.dod.UnrealZaruba.UI.ClassAssignerScreen;
 import com.dod.UnrealZaruba.UI.CustomDeathScreen;
 import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -51,8 +51,12 @@ public class OpenScreenPacket {
                 }
                 break;
             case 2: // CustomDeathScreen
-                Boolean tentExist = (Boolean) msg.getData().get("tentExist");
-                buffer.writeBoolean(tentExist != null && tentExist);
+                var respawnPoints = (List<IRespawnPoint>) msg.getData().get("respawnPoints");
+                buffer.writeVarInt(respawnPoints.size());
+                for (var respawnPoint : respawnPoints) {
+                    buffer.writeByte(respawnPoint.getRuntimeId());
+                    buffer.writeUtf(respawnPoint.getDisplayName());
+                }
                 break;
             case 3: // ClassAssignerScreen
                 BlockPos blockPos = (BlockPos) msg.getData().get("blockPos");
@@ -89,8 +93,12 @@ public class OpenScreenPacket {
                 }
                 break;
             case 2: // CustomDeathScreen
-                Boolean tentExist = buffer.readBoolean();
-                data.put("tentExist", tentExist);
+                ArrayList<CustomDeathScreen.RespawnUiElement> respawnPoints = new ArrayList<>();
+                var size = buffer.readVarInt();
+                for (int i = 0; i < size; i++) {
+                    respawnPoints.add(new CustomDeathScreen.RespawnUiElement(buffer.readByte(), buffer.readUtf()));
+                }
+                data.put("respawnPoints", respawnPoints);
                 break;
             case 3: // ClassAssignerScreen
                 BlockPos blockPos = buffer.readBlockPos();
@@ -127,8 +135,8 @@ public class OpenScreenPacket {
                             Minecraft.getInstance().setScreen(new PlayerVoteScreen(teammates));
                             break;
                         case 2:
-                            Boolean tentExist = (Boolean) msg.getData().get("tentExist");
-                            Minecraft.getInstance().setScreen(new CustomDeathScreen(tentExist));
+                            var respawnPoints = (List<CustomDeathScreen.RespawnUiElement>) msg.getData().get("respawnPoints");
+                            Minecraft.getInstance().setScreen(new CustomDeathScreen(respawnPoints));
                             break;
                         case 3:
                             BlockPos blockPos = (BlockPos) msg.getData().get("blockPos");
@@ -142,5 +150,17 @@ public class OpenScreenPacket {
                 }
             });
         }
+    }
+
+    public enum ScreenType {
+        DEATH_SCREEN(2);
+
+        private final int id;
+
+        ScreenType(int id) {
+            this.id = id;
+        }
+
+        int id() {return id;}
     }
 }

@@ -15,7 +15,7 @@ public class PositionedGameobjective extends GameObjective {
         this.position = position;
     }
 
-    public BlockPos getPosition() {
+    public BlockPos GetPosition() {
         return position;
     }
 

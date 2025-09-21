@@ -10,6 +10,7 @@
     "ItemStackMixin",
     "LecternControllerBlockEntityMixin",
     "LecternControllerBlockMixin",
+    "LevelMixin",
     "LinkHandlerMixin",
     "MinecraftServerMixin",
     "RedstoneLinkBlockMixin",

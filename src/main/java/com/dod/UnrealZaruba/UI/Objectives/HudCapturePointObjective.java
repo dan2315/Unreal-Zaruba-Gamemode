@@ -1,7 +1,9 @@
 package com.dod.UnrealZaruba.UI.Objectives;
 
+import com.dod.UnrealZaruba.NetworkPackets.SerializationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class HudCapturePointObjective extends HudObjective {
@@ -11,6 +13,7 @@ public class HudCapturePointObjective extends HudObjective {
     private final int ownerColor; // as background
     private final int capturedByColor; // as progress line
     private float progress;
+    private final BlockPos position;
 
 
     public HudCapturePointObjective(FriendlyByteBuf buffer) {
@@ -19,14 +22,16 @@ public class HudCapturePointObjective extends HudObjective {
         this.ownerColor = buffer.readVarInt();
         this.capturedByColor = buffer.readVarInt();
         this.progress = buffer.readFloat();
+        this.position = SerializationUtils.decodeBlockPos(buffer);
     }
 
-    public HudCapturePointObjective(Byte runtimeId, String name, int ownerColor, int capturedByColor, float progress) {
+    public HudCapturePointObjective(Byte runtimeId, String name, int ownerColor, int capturedByColor, float progress, BlockPos position) {
         this.runtimeId = runtimeId;
         this.name = name;
         this.ownerColor = ownerColor;
         this.capturedByColor = capturedByColor;
         this.progress = progress;
+        this.position = position;
     }
 
     @Override
@@ -37,6 +42,7 @@ public class HudCapturePointObjective extends HudObjective {
         buffer.writeVarInt(ownerColor);
         buffer.writeVarInt(capturedByColor);
         buffer.writeFloat(progress);
+        SerializationUtils.encodeBlockPos(buffer, position);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dod.UnrealZaruba.NetworkPackets;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.AABB;
 
@@ -23,4 +24,13 @@ public class SerializationUtils {
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
+    public static void encodeBlockPos(FriendlyByteBuf buffer, BlockPos position) {
+        buffer.writeVarInt(position.getX());
+        buffer.writeVarInt(position.getY());
+        buffer.writeVarInt(position.getZ());
+    }
+
+    public static BlockPos decodeBlockPos(FriendlyByteBuf buffer) {
+        return new BlockPos(buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt());
+    }
 }

@@ -6,4 +6,5 @@ public interface IRespawnPoint {
     String getDisplayName();
     BlockPos getSpawnPosition();
     int getPriority();
+    byte getRuntimeId();
 }

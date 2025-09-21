@@ -14,9 +14,9 @@ import net.minecraftforge.network.NetworkEvent;
 public class SelectRespawnPointPacket {
     
     private final UUID playerID;
-    private final int respawnPointIndex;
+    private final byte respawnPointIndex;
 
-    public SelectRespawnPointPacket(UUID playerID, int respawnPointIndex) {
+    public SelectRespawnPointPacket(UUID playerID, byte respawnPointIndex) {
         this.playerID = playerID;
         this.respawnPointIndex = respawnPointIndex;
     }
@@ -25,18 +25,18 @@ public class SelectRespawnPointPacket {
         return playerID;
     }
 
-    public int getRespawnPointIndex() {
+    public byte getRespawnPointIndex() {
         return respawnPointIndex;
     }
 
     public static void encode(SelectRespawnPointPacket packet, FriendlyByteBuf buffer) {
         buffer.writeUUID(packet.getPlayerID());
-        buffer.writeInt(packet.getRespawnPointIndex());
+        buffer.writeByte(packet.getRespawnPointIndex());
     }
 
     public static SelectRespawnPointPacket decode(FriendlyByteBuf buffer) {
         UUID playerID = buffer.readUUID();
-        int respawnPointIndex = buffer.readInt();
+        byte respawnPointIndex = buffer.readByte();
         return new SelectRespawnPointPacket(playerID, respawnPointIndex);
     }
 
@@ -46,8 +46,7 @@ public class SelectRespawnPointPacket {
             if (player == null) return;
             TeamContext team = player.Team();
             if (team == null) return;
-            IRespawnPoint respawnPoint = team.RespawnPoints().get(packet.getRespawnPointIndex());
-            if (respawnPoint == null) return;
+            IRespawnPoint respawnPoint = team.RespawnPoints().stream().filter(point -> point.getRuntimeId() == packet.respawnPointIndex).findFirst().orElseThrow();
             player.SelectRespawnPoint(respawnPoint);
         });
         ctx.get().setPacketHandled(true);

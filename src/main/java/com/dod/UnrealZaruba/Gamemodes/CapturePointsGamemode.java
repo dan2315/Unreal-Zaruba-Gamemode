@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective.LastRuntimeId;
-
 public class CapturePointsGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "capturepoints";
 
@@ -125,7 +123,8 @@ public class CapturePointsGamemode extends TeamGamemode {
                         capturePointObjective.GetName(),
                         ownerColor,
                         capturedByColor,
-                        capturePointObjective.GetProgress()));
+                        capturePointObjective.GetProgress(),
+                        capturePointObjective.GetPosition()));
             }
             for(var player : server.getPlayerList().getPlayers()) {
                 NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
@@ -135,7 +134,7 @@ public class CapturePointsGamemode extends TeamGamemode {
             objective.SubscribeOnCompleted(completedObjective -> {
                 if (completedObjective instanceof CapturePointObjective cpObjective) {
                     var team = (TeamContext) cpObjective.GetOwner();
-                    team.AddRespawnPoint(new RespawnPoint(cpObjective.getPosition(), cpObjective.GetName(),1));
+                    team.AddRespawnPoint(new RespawnPoint(cpObjective.GetPosition(), cpObjective.GetName(),1));
                 }
 
                 if (CheckIfAllPointsCaptured()) {

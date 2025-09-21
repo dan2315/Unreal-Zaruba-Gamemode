@@ -215,7 +215,7 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         
     
         if (level instanceof ServerLevel serverLevel) {
-            boolean success = ShipCreator.CreateShipFromTemplate(worldPosition, vehicleData.getSchematicLocation(), serverLevel, player, getBlockState().getValue(BlockStateProperties.FACING));
+            boolean success = ShipCreator.CreateShipFromTemplate(vehicleData.getSchematicLocation(), worldPosition, getBlockState().getValue(BlockStateProperties.FACING), serverLevel, player);
             if (success) {
                 cooldownTicks = 200;
                 

@@ -1,7 +1,9 @@
 package com.dod.UnrealZaruba.NetworkPackets;
 
+import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import com.dod.UnrealZaruba.UnrealZaruba;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -112,11 +114,11 @@ public class NetworkHandler {
     }
 
     public class Screens {
-        public static void openDeathScreen(ServerPlayer player, boolean tentExist) {
+        public static void openDeathScreen(ServerPlayer player, List<IRespawnPoint> respawnPoints) {
             NetworkHandler.CHANNEL.send(
                 PacketDistributor.PLAYER.with(() -> player),
-                new OpenScreenPacket(2, new HashMap<String, Object>() {{
-                    put("tentExist", tentExist);
+                new OpenScreenPacket(OpenScreenPacket.ScreenType.DEATH_SCREEN.id(), new HashMap<>() {{
+                    put("respawnPoints", respawnPoints);
                 }})
             );
         }

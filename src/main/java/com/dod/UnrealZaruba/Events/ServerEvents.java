@@ -125,4 +125,9 @@ public class ServerEvents {
     public void onItemAttributeModifier(ItemAttributeModifierEvent event) {
         ArmorBalancer.onItemAttributeModifier(event);
     }
+
+    @SubscribeEvent
+    public void onBlockStateChanged(BlockStateChangedEvent event) {
+        vehicleManager.OnBlockStateChanged(event);
+    }
 }
