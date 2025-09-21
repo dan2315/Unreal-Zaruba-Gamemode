@@ -25,6 +25,7 @@ import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
 
 import com.mojang.logging.LogUtils;
 
+import dlovin.advancedcompass.AdvancedCompass;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -47,9 +48,12 @@ public class UnrealZaruba {
     public static WorldManager worldManager;
     public static VehicleManager vehicleManager;
     public static GeometryRenderer geometryRenderer;
+    public static AdvancedCompass advancedCompass;
 
     public UnrealZaruba() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        advancedCompass = AdvancedCompass.getInstance();
 
         ConfigManager.init();
         MinecraftForge.EVENT_BUS.register(new NetworkHandler());
