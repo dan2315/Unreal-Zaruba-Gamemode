@@ -9,6 +9,8 @@ import dlovin.advancedcompass.utils.Color;
 import dlovin.advancedcompass.utils.waypoints.Waypoint;
 import dlovin.advancedcompass.utils.waypoints.WaypointIcon;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -34,6 +36,14 @@ public class HudCaptureCompassUpdate {
             advancedCompassGui.addWaypoint(newWaypoint);
         }
         advancedCompassGui.addWaypoint(newWaypoint);
+    }
+
+    public Vec3 Vec3iToVec3(Vec3i position) {
+        return new Vec3(position.getX(), position.getY(), position.getZ());
+    }
+
+    public Vec3 BlockPosToVec3(BlockPos position) {
+        return new Vec3(position.getX(), position.getY(), position.getZ());
     }
 
     public Color IntToColor(int motherfuckerDodsColor) {
