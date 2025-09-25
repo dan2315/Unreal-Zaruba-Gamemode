@@ -1,11 +1,10 @@
-package com.dod.UnrealZaruba.Utils.Timers;
+package com.dod.unrealzaruba.utils.Timers;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.TimerCompletedCallback;
-import com.dod.UnrealZaruba.Utils.TimerUpdatedCallback;
+import com.dod.unrealzaruba.utils.TimerCompletedCallback;
+import com.dod.unrealzaruba.utils.TimerUpdatedCallback;
 
 /**
  * Manages all timers in the game
@@ -37,7 +36,11 @@ public class TimerManager {
         return createRealTimeTimer(durationMs, completedCallback, updatedCallback, false);
     }
 
-    public static RealTimeTimer createRealTimeTimer(int durationSeconds, long startTime,TimerUpdatedCallback updatedCallback)
+    public static RealTimeTimer createRealTimeTimer(long durationMs, TimerCompletedCallback completedCallback) {
+        return createRealTimeTimer(durationMs, completedCallback, null, false);
+    }
+
+    public static RealTimeTimer createRealTimeTimer(int durationSeconds, long startTime, TimerUpdatedCallback updatedCallback)
     {
         RealTimeTimer timer = new RealTimeTimer(durationSeconds, startTime, updatedCallback);
         activeTimers.add(timer);

@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
+import com.dod.unrealzaruba.UnrealZaruba;
 
 public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.ObjectivesPayload> {
     private static final String DATA_NAME = "objectives";

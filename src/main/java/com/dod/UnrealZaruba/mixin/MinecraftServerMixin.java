@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
 import java.util.Map;
 
@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
-import com.dod.UnrealZaruba.api.IMinecraftServerExtended;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.api.IMinecraftServerExtended;
 
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

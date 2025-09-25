@@ -1,15 +1,15 @@
-package com.dod.UnrealZaruba.ModBlocks;
+package com.dod.unrealzaruba.ModBlocks;
 
-import com.dod.UnrealZaruba.ModBlocks.TeamBlock.SpawnBlock;
-import com.dod.UnrealZaruba.ModBlocks.TeamBlock.TeamBlock;
-import com.dod.UnrealZaruba.ModBlocks.Tent.TentMainBlock;
-import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlock;
-import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlock;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.ModBlocks.TeamBlock.SpawnBlock;
+import com.dod.unrealzaruba.ModBlocks.TeamBlock.TeamBlock;
+import com.dod.unrealzaruba.ModBlocks.Tent.TentMainBlock;
+import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlock;
+import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlock;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -20,8 +20,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
-import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlock;
+import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
+import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlock;
 
 public class ModBlocks {
 

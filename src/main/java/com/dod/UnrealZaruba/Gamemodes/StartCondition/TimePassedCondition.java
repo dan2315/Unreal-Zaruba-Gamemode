@@ -1,8 +1,5 @@
-package com.dod.UnrealZaruba.Gamemodes.StartCondition;
+package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Title.TitleMessage;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 

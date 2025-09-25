@@ -1,12 +1,10 @@
-package com.dod.UnrealZaruba.ModBlocks.VehiclePurchase;
+package com.dod.unrealzaruba.ModBlocks.VehiclePurchase;
 
 import javax.annotation.Nullable;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -25,11 +23,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.world.MenuProvider;
 import net.minecraftforge.network.NetworkHooks;
-import org.joml.Vector3i;
 
 public class VehiclePurchaseBlock extends Block implements EntityBlock {
 

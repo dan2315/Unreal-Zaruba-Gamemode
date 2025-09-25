@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.Entity;

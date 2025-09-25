@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
+import com.dod.unrealzaruba.CommanderSystem.CommanderSystem;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

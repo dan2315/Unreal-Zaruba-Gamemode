@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.UI.TimerOverlay;
+import com.dod.unrealzaruba.UI.TimerOverlay;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

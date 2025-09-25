@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders;
+package com.dod.unrealzaruba.CharacterClass.ItemDataBuilders;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

@@ -1,20 +1,20 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay;
+package com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay;
 
-import com.dod.UnrealZaruba.Gamemodes.Objectives.PositionedGameobjective;
-import com.dod.UnrealZaruba.NetworkPackets.ClientboundUpdateObjectivePacket;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.UI.Objectives.HudObjectiveUpdate;
-import com.dod.UnrealZaruba.Utils.Conversion;
+import com.dod.unrealzaruba.Gamemodes.Objectives.PositionedGameobjective;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundUpdateObjectivePacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.UI.Objectives.HudObjectiveUpdate;
+import com.dod.unrealzaruba.utils.Conversion;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.PacketDistributor;
 
-import static com.dod.UnrealZaruba.WorldManager.WorldManager.server;
+import static com.dod.unrealzaruba.WorldManager.WorldManager.server;
 
-public class NetworkedHudElement implements IProgressDisplay {
+public class NetworkedSideHudListElement implements IProgressDisplay {
 
     private final PositionedGameobjective objective;
 
-    public NetworkedHudElement(PositionedGameobjective objective) {
+    public NetworkedSideHudListElement(PositionedGameobjective objective) {
         this.objective = objective;
     }
 

@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock;
+package com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock;
 
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;

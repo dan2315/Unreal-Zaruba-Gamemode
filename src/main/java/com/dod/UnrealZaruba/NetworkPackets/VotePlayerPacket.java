@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.CommanderSystem.CommanderSystem;
+import com.dod.unrealzaruba.CommanderSystem.CommanderSystem;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;

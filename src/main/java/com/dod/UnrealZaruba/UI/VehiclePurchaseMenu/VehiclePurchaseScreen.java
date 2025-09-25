@@ -1,17 +1,12 @@
-package com.dod.UnrealZaruba.UI.VehiclePurchaseMenu;
+package com.dod.unrealzaruba.UI.VehiclePurchaseMenu;
 
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.resources.ResourceLocation;
@@ -19,13 +14,11 @@ import net.minecraft.client.renderer.GameRenderer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
-import com.dod.UnrealZaruba.Vehicles.VehicleData;
+import com.dod.unrealzaruba.Vehicles.VehicleRegistry;
+import com.dod.unrealzaruba.Vehicles.VehicleData;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-
 
 
 public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurchaseMenu> {
@@ -49,7 +42,10 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
         UnrealZaruba.LOGGER.info("[UnrealZaruba] VehiclePurchaseScreen constructor called");
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Menu: {}", menu);
 
-        vehicleKeys = new ArrayList<>(VehicleRegistry.getVehicleKeys());
+        vehicleKeys = List.of(
+                VehicleRegistry.GetLocation("pt").toString(),
+                VehicleRegistry.GetLocation("car").toString()
+        );
 
         UnrealZaruba.LOGGER.info("[UnrealZaruba] Vehicle names: {}", vehicleKeys);
 

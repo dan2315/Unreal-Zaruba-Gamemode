@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.CharacterClass;
+package com.dod.unrealzaruba.CharacterClass;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -162,7 +162,6 @@ public class PowerEngineProvider {
             int copyResult = server.getCommands().performPrefixedCommand(commandSource, copyCommand);
             
             if (copyResult > 0) {
-                player.sendSystemMessage(Component.literal("§6[SYSTEM] §eA Power Engine has been equipped in your power slot with all components."));
                 UnrealZaruba.LOGGER.info("[PowerEngineProvider] Successfully equipped Power Engine for: " + playerName);
                 return true;
             } else {

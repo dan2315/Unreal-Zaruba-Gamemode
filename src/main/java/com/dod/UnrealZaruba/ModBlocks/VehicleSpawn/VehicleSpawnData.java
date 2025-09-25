@@ -1,14 +1,14 @@
-package com.dod.UnrealZaruba.ModBlocks.VehicleSpawn;
+package com.dod.unrealzaruba.ModBlocks.VehicleSpawn;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.registries.Registries;
-import com.dod.UnrealZaruba.Utils.ITriggerableBlock;
+import com.dod.unrealzaruba.utils.ITriggerableBlock;
 
 /**
  * Data class for persisting information about vehicle spawn blocks.

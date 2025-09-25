@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.simibubi.create.content.redstone.link.controller.LecternControllerBlockEntity;
 
 import net.minecraft.world.level.block.state.BlockState;

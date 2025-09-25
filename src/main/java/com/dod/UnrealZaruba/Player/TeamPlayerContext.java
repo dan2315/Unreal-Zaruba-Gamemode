@@ -1,10 +1,10 @@
-package com.dod.UnrealZaruba.Player;
+package com.dod.unrealzaruba.Player;
 
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.Utils.IResettable;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.utils.IResettable;
 import net.minecraft.world.level.GameType;
 
 public class TeamPlayerContext extends PlayerContext implements IResettable {
@@ -16,6 +16,7 @@ public class TeamPlayerContext extends PlayerContext implements IResettable {
     public void SetTeam(TeamContext team) { this.team = team; }
     public boolean RespawnPointSelected() { return selectedRespawnPoint != null; }
     public void SelectRespawnPoint(IRespawnPoint respawnPoint) { this.selectedRespawnPoint = respawnPoint; }
+    public void DeselectRespawnPoint() { selectedRespawnPoint = null; }
     public IRespawnPoint RespawnPoint() { return selectedRespawnPoint; }
     
     public String SelectedClassId() { return selectedClassId; }

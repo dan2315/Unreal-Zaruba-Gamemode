@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
 // Wtf
 public class MesilovoGamemode {

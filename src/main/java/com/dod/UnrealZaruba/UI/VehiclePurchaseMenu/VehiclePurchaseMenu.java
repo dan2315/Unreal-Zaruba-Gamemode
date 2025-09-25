@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.UI.VehiclePurchaseMenu;
+package com.dod.unrealzaruba.UI.VehiclePurchaseMenu;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -6,8 +6,8 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Inventory;
 
-import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
-import com.dod.UnrealZaruba.UI.ModMenus;
+import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
+import com.dod.unrealzaruba.UI.ModMenus;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class VehiclePurchaseMenu extends AbstractContainerMenu {

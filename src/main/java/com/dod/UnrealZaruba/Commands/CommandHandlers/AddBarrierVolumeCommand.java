@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Gamemodes.Barriers.BarrierVolumesData;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

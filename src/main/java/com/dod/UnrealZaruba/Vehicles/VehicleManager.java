@@ -1,8 +1,7 @@
-package com.dod.UnrealZaruba.Vehicles;
+package com.dod.unrealzaruba.Vehicles;
 
-import com.dod.UnrealZaruba.Events.BlockStateChangedEvent;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Events.BlockStateChangedEvent;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class VehicleManager {
     }
 
     public void OnBlockStateChanged(BlockStateChangedEvent event) {
-        for (Vehicle vehicle : vehicles) {
+        for (Vehicle vehicle : new ArrayList<>(vehicles)) {
             vehicle.OnBlockStateChanged(event);
         }
     }

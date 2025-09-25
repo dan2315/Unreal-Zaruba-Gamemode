@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.UI;
+package com.dod.unrealzaruba.UI;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.SelectRespawnPointPacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.SelectRespawnPointPacket;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;

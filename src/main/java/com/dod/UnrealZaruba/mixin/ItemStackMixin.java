@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModItems.ModItems;
+import com.dod.unrealzaruba.ModItems.ModItems;
 
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.Item;

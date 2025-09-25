@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Gamemodes.GamemodeData;
+package com.dod.unrealzaruba.Gamemodes.GamemodeData;
 
 import java.io.IOException;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 
 
 public interface GamemodeData<T> {

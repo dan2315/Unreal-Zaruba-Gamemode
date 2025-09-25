@@ -1,14 +1,14 @@
-package com.dod.UnrealZaruba.Gamemodes.StartCondition;
+package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.TeamLogic.TeamManager;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.network.chat.Component;
-import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.Title.TitleMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +74,7 @@ public class TeamsHaveEnoughPlayersCondition extends Condition implements IDelay
             sustainedTicks++;
             if (sustainedTicks % 20 == 0) {
                 int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-                UnrealZaruba.LOGGER.info("Team player count condition: all teams have at least " + 
+                UnrealZaruba.LOGGER.info("Team player count condition: all teams have at least " +
                                       requiredPlayersPerTeam + " players, " +
                                       remainingSeconds + " seconds remaining");
                 
@@ -87,7 +87,7 @@ public class TeamsHaveEnoughPlayersCondition extends Condition implements IDelay
             
             if (sustainedTicks >= requiredDurationTicks) {
                 conditionMet = true;
-                UnrealZaruba.LOGGER.info("Team player count condition met: all teams have at least " + 
+                UnrealZaruba.LOGGER.info("Team player count condition met: all teams have at least " +
                                       requiredPlayersPerTeam + " players for " +
                                       (requiredDurationTicks / 20) + " seconds");
                 

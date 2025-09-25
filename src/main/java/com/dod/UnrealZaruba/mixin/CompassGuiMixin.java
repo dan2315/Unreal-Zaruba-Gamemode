@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
 import dlovin.advancedcompass.gui.CompassGui;
 import dlovin.advancedcompass.gui.renderers.WaypointRenderer;

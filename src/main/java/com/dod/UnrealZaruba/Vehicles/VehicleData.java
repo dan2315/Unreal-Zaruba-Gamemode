@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Vehicles;
+package com.dod.unrealzaruba.Vehicles;
 
 import java.util.ArrayList;
 import java.util.HashMap;

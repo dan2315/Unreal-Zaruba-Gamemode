@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.TeamLogic;
+package com.dod.unrealzaruba.TeamLogic;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
 
 /**
  * Team data configuration class.

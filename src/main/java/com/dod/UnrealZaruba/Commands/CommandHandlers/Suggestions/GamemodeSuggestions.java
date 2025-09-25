@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers.Suggestions;
+package com.dod.unrealzaruba.Commands.CommandHandlers.Suggestions;
 
-import com.dod.UnrealZaruba.Gamemodes.GamemodeFactory;
+import com.dod.unrealzaruba.Gamemodes.GamemodeFactory;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;

@@ -1,38 +1,39 @@
-package com.dod.UnrealZaruba;
+package com.dod.unrealzaruba;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColorArgument;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
-import com.dod.UnrealZaruba.Events.ClientEvents;
-import com.dod.UnrealZaruba.Events.KeyBindings;
-import com.dod.UnrealZaruba.Events.ServerEvents;
-import com.dod.UnrealZaruba.Mobs.AttributesRegistration;
-import com.dod.UnrealZaruba.Renderers.GeometryRenderer;
-import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
-import com.dod.UnrealZaruba.Utils.Gamerules;
-import com.dod.UnrealZaruba.Mobs.ModMobs;
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import com.dod.UnrealZaruba.ModItems.CreativeTabs;
-import com.dod.UnrealZaruba.ModItems.ModItems;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.SoundHandler.ModSounds;
-import com.dod.UnrealZaruba.Services.HttpClientService;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.UI.ModMenus;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.Events.ModSetupEvents;
-import com.dod.UnrealZaruba.Vehicles.VehicleManager;
-import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColorArgument;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.Events.ClientEvents;
+import com.dod.unrealzaruba.Events.KeyBindings;
+import com.dod.unrealzaruba.Events.ServerEvents;
+import com.dod.unrealzaruba.Mobs.AttributesRegistration;
+import com.dod.unrealzaruba.Renderers.GeometryRenderer;
+import com.dod.unrealzaruba.UI.Objectives.HudObjective;
+import com.dod.unrealzaruba.utils.Gamerules;
+import com.dod.unrealzaruba.Mobs.ModMobs;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.ModItems.CreativeTabs;
+import com.dod.unrealzaruba.ModItems.ModItems;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.SoundHandler.ModSounds;
+import com.dod.unrealzaruba.Services.HttpClientService;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.UI.ModMenus;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Events.ModSetupEvents;
+import com.dod.unrealzaruba.Vehicles.VehicleManager;
+import com.dod.unrealzaruba.Vehicles.VehicleRegistry;
 
 import com.mojang.logging.LogUtils;
 
 import dlovin.advancedcompass.AdvancedCompass;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import com.dod.UnrealZaruba.Commands.CommandRegistration;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeFactory;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.NetworkedTimer;
+import com.dod.unrealzaruba.Commands.CommandRegistration;
+import com.dod.unrealzaruba.Gamemodes.GamemodeFactory;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.NetworkedTimer;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -45,6 +46,7 @@ public class UnrealZaruba {
 
     private static HttpClientService httpClientService;
     private static GameStatisticsService gameStatisticsService;
+    public static MinecraftServer server;
     public static WorldManager worldManager;
     public static VehicleManager vehicleManager;
     public static GeometryRenderer geometryRenderer;

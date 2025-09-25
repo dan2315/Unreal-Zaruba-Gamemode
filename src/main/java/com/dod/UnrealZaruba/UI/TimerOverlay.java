@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.UI;
+package com.dod.unrealzaruba.UI;
 
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Utils.Timers.RealTimeTimer;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
+import com.dod.unrealzaruba.utils.Timers.RealTimeTimer;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 

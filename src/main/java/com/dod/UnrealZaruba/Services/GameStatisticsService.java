@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Services;
+package com.dod.unrealzaruba.Services;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

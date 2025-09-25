@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ClickEvent;

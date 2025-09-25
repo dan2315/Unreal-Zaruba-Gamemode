@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay;
+package com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay;
 
 import net.minecraft.server.level.ServerPlayer;
 

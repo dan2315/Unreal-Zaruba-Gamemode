@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.NetworkPackets.CharacterClasses;
+package com.dod.unrealzaruba.NetworkPackets.CharacterClasses;
 
-import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
+import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

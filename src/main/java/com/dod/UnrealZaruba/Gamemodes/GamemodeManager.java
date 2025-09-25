@@ -1,14 +1,13 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.Comparator;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
@@ -95,7 +94,7 @@ public class GamemodeManager {
 
         String mostVoted = votes.keySet().stream()
             .max(Comparator.comparingInt(votes::get))
-            .orElse("ships");
+            .orElse(CapturePointsGamemode.GAMEMODE_NAME);
 
         UnrealZaruba.LOGGER.warn("Voting: {} has won", mostVoted);
 

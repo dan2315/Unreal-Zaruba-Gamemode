@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;

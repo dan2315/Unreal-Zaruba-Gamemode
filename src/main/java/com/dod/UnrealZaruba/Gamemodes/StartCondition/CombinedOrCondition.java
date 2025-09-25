@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.StartCondition;
+package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
 import java.util.Arrays;
 import java.util.List;

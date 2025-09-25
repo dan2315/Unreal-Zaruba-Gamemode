@@ -1,10 +1,10 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Vehicles.VehicleManager;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
+import com.dod.unrealzaruba.Vehicles.VehicleManager;
 
 public class GamemodeFactory {
     public static final HashMap<String, Supplier<BaseGamemode>> gamemodes = new HashMap<>();

@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.Commands;
+package com.dod.unrealzaruba.Commands;
 
-import com.dod.UnrealZaruba.Commands.CommandHandlers.ICommandHandler;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.Commands.CommandHandlers.ICommandHandler;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.common.MinecraftForge;

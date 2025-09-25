@@ -1,17 +1,15 @@
-package com.dod.UnrealZaruba.ModItems;
+package com.dod.unrealzaruba.ModItems;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.ModBlocks.Tent.Tent;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.ModBlocks.Tent.Tent;
+import com.dod.unrealzaruba.TeamLogic.TeamManager;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;

@@ -1,16 +1,17 @@
-package com.dod.UnrealZaruba.ModBlocks.VehiclePurchase;
+package com.dod.unrealzaruba.ModBlocks.VehiclePurchase;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import com.dod.UnrealZaruba.Vehicles.VehicleData;
-import com.dod.UnrealZaruba.Vehicles.VehicleRegistry;
-import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
-import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Vehicles.VehicleData;
+import com.dod.unrealzaruba.Vehicles.VehicleRegistry;
+import com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
+import com.dod.unrealzaruba.VsIntegration.ShipCreator;
 
 
 import com.simibubi.create.content.schematics.SchematicWorld;
 import com.simibubi.create.content.schematics.client.SchematicRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -26,9 +27,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.apache.commons.lang3.tuple.Pair;
-import java.util.List;
-import org.valkyrienskies.core.api.ships.ServerShip;
 
 import java.io.InputStream;
 
@@ -215,9 +213,11 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         
     
         if (level instanceof ServerLevel serverLevel) {
-            boolean success = ShipCreator.CreateShipFromTemplate(vehicleData.getSchematicLocation(), worldPosition, getBlockState().getValue(BlockStateProperties.FACING), serverLevel, player);
+            Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
+            BlockPos targetPos = worldPosition.relative(facing, -3);
+            boolean success = ShipCreator.CreateShipFromTemplate(vehicleData.getSchematicLocation(), targetPos, facing, serverLevel, player);
             if (success) {
-                cooldownTicks = 200;
+                cooldownTicks = 600;
                 
                 vehicleData.consumeRequiredItems(player.getInventory());
                 return new Tuple<>(true, "Vehicle deployed successfully");

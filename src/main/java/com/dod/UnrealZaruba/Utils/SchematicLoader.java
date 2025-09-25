@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.io.FileNotFoundException;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
@@ -21,13 +21,10 @@ import java.io.DataInputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 
-import net.spaceeye.vmod.schematic.VModShipSchematicV2;
 import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
 import net.spaceeye.valkyrien_ship_schematics.ShipSchematic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.dod.UnrealZaruba.UnrealZaruba;
 
 public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

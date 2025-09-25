@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Gamemodes.Barriers;
+package com.dod.unrealzaruba.Gamemodes.Barriers;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.AbstractGamemodeData;
+import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
 
 import java.util.ArrayList;
 import java.util.List;

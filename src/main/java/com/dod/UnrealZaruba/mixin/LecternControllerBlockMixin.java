@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
-import com.dod.UnrealZaruba.Utils.Gamerules;
+import com.dod.unrealzaruba.utils.Gamerules;
 import com.simibubi.create.content.redstone.link.controller.LecternControllerBlock;
 
 import net.minecraft.core.BlockPos;

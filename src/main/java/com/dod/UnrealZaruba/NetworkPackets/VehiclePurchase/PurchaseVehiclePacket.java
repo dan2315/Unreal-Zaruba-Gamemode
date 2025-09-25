@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase;
+package com.dod.unrealzaruba.NetworkPackets.VehiclePurchase;
 
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,7 +35,7 @@ public class PurchaseVehiclePacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                UnrealZaruba.LOGGER.info("[UnrealZaruba] Received purchase request for vehicle: {} at {}", 
+                UnrealZaruba.LOGGER.info("[UnrealZaruba] Received purchase request for vehicle: {} at {}",
                     msg.vehicleName, msg.blockPos);
                 try {
                     BlockEntity blockEntity = player.level().getBlockEntity(msg.blockPos);

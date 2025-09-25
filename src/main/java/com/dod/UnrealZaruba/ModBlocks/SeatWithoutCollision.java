@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModBlocks;
+package com.dod.unrealzaruba.ModBlocks;
 
 import com.simibubi.create.content.contraptions.actors.seat.SeatBlock;
 

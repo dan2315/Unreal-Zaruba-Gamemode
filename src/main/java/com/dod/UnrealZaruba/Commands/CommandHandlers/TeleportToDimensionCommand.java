@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

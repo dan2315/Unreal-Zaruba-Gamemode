@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

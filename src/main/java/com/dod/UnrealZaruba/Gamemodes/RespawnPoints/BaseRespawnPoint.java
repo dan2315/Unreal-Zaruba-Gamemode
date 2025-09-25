@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.RespawnPoints;
+package com.dod.unrealzaruba.Gamemodes.RespawnPoints;
 
 public abstract class BaseRespawnPoint implements IRespawnPoint {
     private final byte runtimeId;

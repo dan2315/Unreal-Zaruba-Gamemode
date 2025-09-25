@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.UI.Objectives;
+package com.dod.unrealzaruba.UI.Objectives;
 
 public class HudObjectiveUpdate {
     private final byte runtimeId;

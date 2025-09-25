@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Gamemodes.GameTimer;
+package com.dod.unrealzaruba.Gamemodes.GameTimer;
 
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.StartHudTimerPacket;
-import com.dod.UnrealZaruba.NetworkPackets.StopHudTimerPacket;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.StartHudTimerPacket;
+import com.dod.unrealzaruba.NetworkPackets.StopHudTimerPacket;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraftforge.network.PacketDistributor;
 

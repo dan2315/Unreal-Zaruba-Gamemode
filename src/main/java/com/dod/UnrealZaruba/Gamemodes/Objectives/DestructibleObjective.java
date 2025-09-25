@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
 import java.util.List;
 import java.util.Set;
@@ -8,12 +8,12 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.ProgressbarForObjective;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.FireworkLauncher;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.Utils.IResettable;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.ProgressbarForObjective;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.FireworkLauncher;
+import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.utils.IResettable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;

@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.TeamLogic;
+package com.dod.unrealzaruba.TeamLogic;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.SoundHandler.ModSounds;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.SoundHandler.ModSounds;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
 public class TeamObjective extends GameObjective {
 

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.TeamLogic;
+package com.dod.unrealzaruba.TeamLogic;
 
 import net.minecraft.core.BlockPos;
 

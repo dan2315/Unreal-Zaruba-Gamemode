@@ -1,8 +1,6 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
-
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -13,9 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -69,8 +64,7 @@ public class Utils {
                 if (chunk != null) {
                     BlockPos ownerPos = new BlockPos(chunkPos.x << 4, 0, chunkPos.z << 4);
 
-                    ForgeChunkManager.forceChunk(world, UnrealZaruba.MOD_ID, ownerPos, chunkPos.x, chunkPos.z, true,
-                            true);
+                    ForgeChunkManager.forceChunk(world, UnrealZaruba.MOD_ID, ownerPos, chunkPos.x, chunkPos.z, true,true);
                 }
             }
         }

@@ -1,16 +1,13 @@
-package com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock;
+package com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.Utils.Geometry.Utils;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.Geometry.Utils;
 
 import net.minecraft.world.item.Equipable;
-import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.recipes.packs.BundleRecipeProvider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,17 +18,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.item.ArmorItem;
+
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassRegistry;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassData;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
 
 
 public class ClassAssignerBlockEntity extends BlockEntity {

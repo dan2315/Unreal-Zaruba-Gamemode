@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Mobs;
+package com.dod.unrealzaruba.Mobs;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Commands;
+package com.dod.unrealzaruba.Commands;
 
 import net.minecraft.server.MinecraftServer;
 

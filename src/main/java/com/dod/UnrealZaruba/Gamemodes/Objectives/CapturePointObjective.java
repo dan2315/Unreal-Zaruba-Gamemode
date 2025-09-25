@@ -1,27 +1,26 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedHudElement;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
-import com.dod.UnrealZaruba.Utils.DataStructures.BlockVolume;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedSideHudListElement;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.RenderableZonesPacket;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.TeamLogic.TeamManager;
+import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
-
-import static com.dod.UnrealZaruba.WorldManager.WorldManager.server;
 
 public class CapturePointObjective extends PositionedGameobjective {
     private BlockVolume captureArea;
@@ -36,14 +35,14 @@ public class CapturePointObjective extends PositionedGameobjective {
         super(name, "capturepoint", volume.GetCenter());
         captureArea = volume;
         captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
-        setProgressDisplay(new NetworkedHudElement(this));
+        setProgressDisplay(new NetworkedSideHudListElement(this));
     }
 
     @Override
     public void InitializeAfterSerialization() {
         super.InitializeAfterSerialization();
         captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
-        setProgressDisplay(new NetworkedHudElement(this));
+        setProgressDisplay(new NetworkedSideHudListElement(this));
         TeamManager teamManager = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode()).GetTeamManager();
         if (Objects.equals(name, "Вертолётная площадка")) {
             owner = teamManager.Get(TeamColor.RED);
@@ -136,7 +135,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         owner = beingCapturedBy;
         var ownerTeam = (TeamContext) this.GetOwner();
         int color = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
-        for(var player : server.getPlayerList().getPlayers()) {
+        for(var player : UnrealZaruba.server.getPlayerList().getPlayers()) {
             NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
                     new RenderableZonesPacket(List.of(new ColoredSquareZone(captureAreaAABB, color))));
         }
@@ -156,7 +155,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         int ownerColor = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
         var beingCapturedBy = (TeamContext) GetBeingCapturedBy();
         int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
-        var players = server.getPlayerList().getPlayers();
+        var players = UnrealZaruba.server.getPlayerList().getPlayers();
         for (var player : players) {
             NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(
                     List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress(), GetPosition()))

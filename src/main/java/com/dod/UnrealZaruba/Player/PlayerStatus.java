@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Player;
+package com.dod.unrealzaruba.Player;
 
 public enum PlayerStatus {
     InLobby,

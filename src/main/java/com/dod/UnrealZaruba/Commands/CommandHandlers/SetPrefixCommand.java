@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Utils.Utils;
+import com.dod.unrealzaruba.utils.Utils;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;

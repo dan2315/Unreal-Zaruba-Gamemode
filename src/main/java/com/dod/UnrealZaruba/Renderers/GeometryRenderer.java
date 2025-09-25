@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Renderers;
+package com.dod.unrealzaruba.Renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;

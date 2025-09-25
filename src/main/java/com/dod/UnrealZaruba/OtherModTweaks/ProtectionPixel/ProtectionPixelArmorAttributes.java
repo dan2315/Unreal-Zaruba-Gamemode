@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel;
+package com.dod.unrealzaruba.OtherModTweaks.ProtectionPixel;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;

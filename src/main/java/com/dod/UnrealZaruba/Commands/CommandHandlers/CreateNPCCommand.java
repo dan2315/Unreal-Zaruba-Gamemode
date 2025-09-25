@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
-import com.dod.UnrealZaruba.Mobs.ModMobs;
+import com.dod.unrealzaruba.Mobs.ClickableHumanoidEntity;
+import com.dod.unrealzaruba.Mobs.ModMobs;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;

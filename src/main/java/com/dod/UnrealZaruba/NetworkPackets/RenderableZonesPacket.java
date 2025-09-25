@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

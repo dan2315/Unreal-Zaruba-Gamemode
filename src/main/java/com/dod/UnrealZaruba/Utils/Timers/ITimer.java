@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils.Timers;
+package com.dod.unrealzaruba.utils.Timers;
 
 /**
  * Common interface for all timer implementations

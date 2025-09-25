@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.WorldManager.ChunkGenerator;
+package com.dod.unrealzaruba.WorldManager.ChunkGenerator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

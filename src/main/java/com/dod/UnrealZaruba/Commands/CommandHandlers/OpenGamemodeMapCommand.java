@@ -1,13 +1,13 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Gamemodes.GamemodeFactory;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Gamemodes.GamemodeFactory;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
-import static com.dod.UnrealZaruba.Commands.CommandHandlers.Suggestions.GamemodeSuggestions.GAMEMODE_SUGGESTIONS;
+import static com.dod.unrealzaruba.Commands.CommandHandlers.Suggestions.GamemodeSuggestions.GAMEMODE_SUGGESTIONS;
 
 public class OpenGamemodeMapCommand implements ICommandHandler {
     @Override

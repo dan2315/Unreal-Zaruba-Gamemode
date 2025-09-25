@@ -1,15 +1,15 @@
-package com.dod.UnrealZaruba.WorldManager;
+package com.dod.unrealzaruba.WorldManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.api.IMinecraftServerExtended;
-import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.api.IMinecraftServerExtended;
+import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -22,7 +22,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.LoggerChunkProgressListener;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -34,15 +33,13 @@ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.apigame.VSCore;
 import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
-import org.valkyrienskies.core.impl.game.ships.ShipObjectServerWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class WorldManager {

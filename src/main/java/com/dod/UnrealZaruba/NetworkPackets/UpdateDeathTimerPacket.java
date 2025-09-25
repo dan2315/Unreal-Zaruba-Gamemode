@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
 import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import com.dod.UnrealZaruba.UI.CustomDeathScreen;
+import com.dod.unrealzaruba.UI.CustomDeathScreen;
 import net.minecraft.client.Minecraft;
 
 public class UpdateDeathTimerPacket {

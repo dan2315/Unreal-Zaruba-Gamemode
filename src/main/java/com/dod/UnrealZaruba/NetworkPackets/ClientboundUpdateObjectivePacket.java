@@ -1,7 +1,8 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.UI.Objectives.HudObjectiveUpdate;
-import com.dod.UnrealZaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
+import com.dod.unrealzaruba.UI.Objectives.HudObjectiveUpdate;
+import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

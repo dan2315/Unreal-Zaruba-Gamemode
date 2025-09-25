@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.GameText;
+package com.dod.unrealzaruba.Gamemodes.GameText;
 
 import net.minecraft.network.chat.Component;
 

@@ -1,10 +1,10 @@
-package com.dod.UnrealZaruba.Config;
+package com.dod.unrealzaruba.Config;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 
 public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {

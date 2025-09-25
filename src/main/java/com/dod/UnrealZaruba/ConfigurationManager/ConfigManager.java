@@ -1,16 +1,12 @@
-package com.dod.UnrealZaruba.ConfigurationManager;
+package com.dod.unrealzaruba.ConfigurationManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dod.UnrealZaruba.Config.AbstractConfig;
-import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.Config.MainConfig.MainConfigData;
-import com.dod.UnrealZaruba.Config.MainConfig.Mode;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.DestructibleObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveFactory;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Config.AbstractConfig;
+import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Config.MainConfig.Mode;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

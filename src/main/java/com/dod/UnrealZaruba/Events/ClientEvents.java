@@ -1,12 +1,12 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.unrealzaruba.Events;
 
 
-import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.UI.GamemodeSelectionScreen;
-import com.dod.UnrealZaruba.UI.Objectives.ObjectivesOverlay;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.UI.GamemodeSelectionScreen;
+import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;

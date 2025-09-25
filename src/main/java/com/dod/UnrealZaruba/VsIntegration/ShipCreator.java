@@ -1,14 +1,14 @@
-package com.dod.UnrealZaruba.VsIntegration;
+package com.dod.unrealzaruba.VsIntegration;
 
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.Utils.SchematicLoader;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.Geometry.Utils;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.SchematicLoader;
+import com.dod.unrealzaruba.utils.Geometry.Utils;
 
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.Vehicles.Vehicle;
+import com.dod.unrealzaruba.Vehicles.Vehicle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

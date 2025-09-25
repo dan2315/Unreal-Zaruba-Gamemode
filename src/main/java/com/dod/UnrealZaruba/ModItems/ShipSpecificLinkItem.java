@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.ModItems;
+package com.dod.unrealzaruba.ModItems;
 
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlock;
 

@@ -1,24 +1,24 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Gamemodes.Barriers.BarrierVolumesData;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.ConditionalPhase;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.CombinedOrCondition;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.TimePassedCondition;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.dod.UnrealZaruba.Utils.BarrierRemovalTask;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.Utils.NBT;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.CombinedOrCondition;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.TimePassedCondition;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.BarrierRemovalTask;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.utils.NBT;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -28,13 +28,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
-import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "destroyobjectives";
     private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
-    private static final int GAME_DURATION_S = 10 * 60; // 10 minutes
+    private static final int GAME_DURATION_S = 40 * 60; // 10 minutes
     private static final int COUNTDOWN_DURATION_MS = 5 * 1000; // 5 seconds
     
     private GameStatisticsService gameStatistics;
@@ -74,27 +74,27 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
 
         AddPhase(new ConditionalPhase(
-                PhaseId.PREPARATION,
+                PhaseId.MAP_INITIALIZATION,
                 () -> {},
                 this::AfterMapLoaded,
                 new TimePassedCondition(9)
-                .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
+                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
         ))
         .AddPhase(new ConditionalPhase(
-            PhaseId.TEAM_SELECTION,
-            this::StartTeamSelection,
-            this::CompleteTeamSelection,
-            new CombinedOrCondition(
-                    new TeamsHaveEnoughPlayersCondition(TeamManager, 10, 10),
-                    new TimePassedCondition(60)
-                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Выбор команды закончится через " + integer + " секунд")))
+                PhaseId.PREPARATION,
+                this::StartTeamSelection,
+                this::CompleteTeamSelection,
+                new CombinedOrCondition(
+                        new TeamsHaveEnoughPlayersCondition(TeamManager, 10, 10),
+                        new TimePassedCondition(60)
+                            .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Игра начнётся через " + integer + " секунд")))
         )))
         .AddPhase(new ConditionalPhase(
                 PhaseId.STRATEGY_TIME,
                 this::StartStrategyTime,
                 this::CompleteStrategyTime,
                 new TimePassedCondition(60)
-                .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Игра начнётся через " + integer + " секунд")))
+                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Этап подготовки: " + integer + " секунд")))
             )
         ).
         AddPhase(new ConditionalPhase(
@@ -138,7 +138,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
             TeamManager.teleportToSpawnByPriority(player);
         }
-        objectivesHandler.load();
+        CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         objectivesHandler.addRecipients(TeamManager.GetTeams());
     }
 
@@ -146,14 +146,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void CompleteStrategyTime() {
-        var players = server.getPlayerList().getPlayers();
-        CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
     }
 
     public void StartBattle() {
-        UnrealZaruba.LOGGER.info("[UnrealZaruba] Starting battle");
         gameTimer.startCountDown(System.currentTimeMillis(), GAME_DURATION_S);
         TeamManager.PlayBattleSound();
 

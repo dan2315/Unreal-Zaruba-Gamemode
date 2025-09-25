@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.TeamLogic.TeamManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 

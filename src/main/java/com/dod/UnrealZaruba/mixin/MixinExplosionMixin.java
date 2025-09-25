@@ -1,4 +1,4 @@
-//package com.dod.UnrealZaruba.mixin;
+//package com.dod.unrealzaruba.mixin;
 //
 //import org.joml.Vector3d;
 //import org.joml.Vector3dc;
@@ -16,7 +16,7 @@
 //import org.valkyrienskies.mod.common.util.GameTickForceApplier;
 //import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 //
-//import com.dod.UnrealZaruba.UnrealZaruba;
+//import com.dod.unrealzaruba.UnrealZaruba;
 //
 //import net.minecraft.core.BlockPos;
 //import net.minecraft.world.level.ClipContext;

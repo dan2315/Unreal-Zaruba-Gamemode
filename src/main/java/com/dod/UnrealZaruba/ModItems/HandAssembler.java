@@ -1,14 +1,13 @@
-package com.dod.UnrealZaruba.ModItems;
+package com.dod.unrealzaruba.ModItems;
 
 import javax.annotation.Nonnull;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.impl.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
-
-import com.dod.UnrealZaruba.UnrealZaruba;
 
 import com.ibm.icu.text.DecimalFormat;
 

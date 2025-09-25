@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.unrealzaruba.Events;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;

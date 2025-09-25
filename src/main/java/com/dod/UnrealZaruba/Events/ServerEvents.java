@@ -1,13 +1,14 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.unrealzaruba.Events;
 
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Config.MainConfig;
 
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -22,9 +23,8 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import static com.dod.UnrealZaruba.UnrealZaruba.*;
 
+import static com.dod.unrealzaruba.UnrealZaruba.vehicleManager;
 
 public class ServerEvents {
     private GamemodeManager gamemodeManager;
@@ -38,11 +38,11 @@ public class ServerEvents {
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        MinecraftServer server = event.getServer();
-        if (!server.isDedicatedServer())
+        UnrealZaruba.server = event.getServer();
+        if (!UnrealZaruba.server.isDedicatedServer())
             return;
 
-        UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, server);
+        UnrealZaruba.worldManager = new WorldManager(GameStatisticsService, UnrealZaruba.server);
     }
 
     @SubscribeEvent
@@ -76,7 +76,7 @@ public class ServerEvents {
         if (isDevMode)
             return;
 
-        LOGGER.info("Server has stopped. Finalizing...");
+        UnrealZaruba.LOGGER.info("Server has stopped. Finalizing...");
         gamemodeManager.ForGamemode(gamemode -> gamemode.Cleanup());
     }
 
@@ -99,6 +99,13 @@ public class ServerEvents {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
             player.setGameMode(GameType.ADVENTURE);
         }
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.isEndConquered()) return;
+
+
     }
 
     @SubscribeEvent

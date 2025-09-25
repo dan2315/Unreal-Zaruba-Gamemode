@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProgressListener;
 import org.spongepowered.asm.mixin.Mixin;

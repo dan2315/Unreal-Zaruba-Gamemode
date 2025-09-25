@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.GamePhases;
+package com.dod.unrealzaruba.Gamemodes.GamePhases;
 
 public class GamePhase extends AbstractGamePhase {
     public Runnable onStart;

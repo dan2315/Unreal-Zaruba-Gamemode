@@ -1,19 +1,16 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData.BlockLocation;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.Gamemodes.ShipsGamemode;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnBlockEntity;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.Gamemodes.ShipsGamemode;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.TeamArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

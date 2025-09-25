@@ -1,12 +1,12 @@
-package com.dod.UnrealZaruba.ModBlocks.TeamBlock;
+package com.dod.unrealzaruba.ModBlocks.TeamBlock;
 
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.TeamLogic.TeamManager;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.TeamLogic.TeamManager;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 
 import net.minecraft.core.BlockPos;

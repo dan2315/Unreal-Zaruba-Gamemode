@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay;
+package com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.Gamemodes.Objectives.PositionedGameobjective;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Gamemodes.Objectives.PositionedGameobjective;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

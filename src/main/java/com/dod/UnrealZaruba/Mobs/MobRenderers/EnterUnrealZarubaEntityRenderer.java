@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Mobs.MobRenderers;
+package com.dod.unrealzaruba.Mobs.MobRenderers;
 
 import javax.annotation.Nonnull;
 
-import com.dod.UnrealZaruba.Mobs.ClickableHumanoidEntity;
+import com.dod.unrealzaruba.Mobs.ClickableHumanoidEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Quaternionf;
 

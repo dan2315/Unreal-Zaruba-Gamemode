@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Gamemodes.StartCondition;
+package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Title.TitleMessage;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -74,7 +74,7 @@ public class AllPlayersReadyCondition extends Condition implements IDelayedCondi
             sustainedTicks++;
             if (sustainedTicks % 20 == 0) { // Every second
                 int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-                UnrealZaruba.LOGGER.info("All players ready condition: " + 
+                UnrealZaruba.LOGGER.info("All players ready condition: " +
                                       remainingSeconds + " seconds remaining");
                 
                 for (ServerPlayer player : players) {

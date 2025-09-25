@@ -1,32 +1,38 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Config.MainConfig;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.ConditionalPhase;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.GamePhase;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
-import com.dod.UnrealZaruba.Gamemodes.GameText.StartGameText;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.CapturePointObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.RespawnPoint;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.*;
-import com.dod.UnrealZaruba.NetworkPackets.ClientboundObjectivesPacket;
-import com.dod.UnrealZaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.RenderableZonesPacket;
-import com.dod.UnrealZaruba.Renderers.ColoredSquareZone;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.Title.TitleMessage;
-import com.dod.UnrealZaruba.UI.Objectives.HudCapturePointObjective;
-import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
-import com.dod.UnrealZaruba.UI.Objectives.HudStringObjective;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Utils.NBT;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.GamePhase;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.Gamemodes.Objectives.CapturePointObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectiveOwner;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedTopHud;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ScorePointsObjective;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.*;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.RenderableZonesPacket;
+import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudStringObjective;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.BarrierRemovalTask;
+import com.dod.unrealzaruba.utils.NBT;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -44,6 +50,9 @@ import java.util.Objects;
 
 public class CapturePointsGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "capturepoints";
+    private static final short REQUIRED_POINTS_TO_WIN = 200;
+    private final ScorePointsObjective scorePointsObjectiveRed;
+    private final ScorePointsObjective scorePointsObjectiveBlue;
 
     private GameStatisticsService gameStatistics;
     private IGameTimer gameTimer;
@@ -61,10 +70,22 @@ public class CapturePointsGamemode extends TeamGamemode {
 
         startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",
-                "Необходимо уничтожить вражескую базу"));
+                "Наберите 200 очков контроля точек"));
         startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
-                "Продержитесь до конца раунда"));
+                "Наберите 200 очков контроля точек"));
+
+        scorePointsObjectiveRed = new ScorePointsObjective(0, REQUIRED_POINTS_TO_WIN);
+        var topHudLeft = new NetworkedTopHud((byte) 0, REQUIRED_POINTS_TO_WIN);
+        topHudLeft.updateProgress(0);
+        scorePointsObjectiveRed.setProgressDisplay(topHudLeft);
+        scorePointsObjectiveRed.SubscribeOnCompleted(objective -> CompleteGame(server, TeamColor.RED));
+
+        scorePointsObjectiveBlue = new ScorePointsObjective(0, REQUIRED_POINTS_TO_WIN);
+        var topHudRight = new NetworkedTopHud((byte) 1, REQUIRED_POINTS_TO_WIN);
+        topHudRight.updateProgress(0);
+        scorePointsObjectiveBlue.setProgressDisplay(topHudRight);
+        scorePointsObjectiveBlue.SubscribeOnCompleted(objective -> CompleteGame(server, TeamColor.BLUE));
 
         ServerLifecycleHooks.getCurrentServer().setDifficulty(Difficulty.PEACEFUL, true);
         Initialize();
@@ -77,25 +98,30 @@ public class CapturePointsGamemode extends TeamGamemode {
         MainConfig.Mode mode = MainConfig.getInstance().getMode();
         if (mode != MainConfig.Mode.GAME) return;
 
-        UnrealZaruba.LOGGER.info("Initializing DestroyObjectivesGamemode");
-
         AddPhase(new ConditionalPhase(
-                PhaseId.PREPARATION,
+                PhaseId.MAP_INITIALIZATION,
                 () -> {},
                 this::AfterMapLoaded,
                 new TimePassedCondition(9)
                     .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
         ))
         .AddPhase(new ConditionalPhase(
-                PhaseId.STRATEGY_TIME,
-                () -> {},
-                () -> {},
+                PhaseId.PREPARATION,
+                this::StartTeamSelection,
+                this::CompleteTeamSelection,
                 new TimePassedCondition(60)
                     .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Игра начнётся через " + integer + " секунд")))
+        ))
+        .AddPhase(new ConditionalPhase(
+                PhaseId.STRATEGY_TIME,
+                this::StartStrategyTime,
+                this::CompleteStrategyTime,
+                new TimePassedCondition(60)
+                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Этап подготовки: " + integer + " секунд")))
         )).
         AddPhase(new GamePhase(
                 PhaseId.BATTLE,
-                () -> {},
+                this::StartBattle,
                 () -> { // On phase end
                     CompleteGame(server, TeamColor.BLUE);
                 }
@@ -107,9 +133,32 @@ public class CapturePointsGamemode extends TeamGamemode {
     private void AfterMapLoaded() {
         LateInitialize();
 
+        objectivesHandler.addObjective(scorePointsObjectiveRed);
+        objectivesHandler.addObjective(scorePointsObjectiveBlue);
+        UpdateScorePointObjectivesSpeed();
+
         List<ColoredSquareZone> zones = new ArrayList<>();
         ArrayList<HudObjective> hudObjectives = new ArrayList<>();
-        hudObjectives.add(new HudStringObjective("Захватите все точки"));
+        PrepareObjectiveDataToSendToClient(hudObjectives, zones);
+
+        for (GameObjective objective : objectivesHandler.getObjectives().stream().filter(obj -> obj instanceof CapturePointObjective).toList()) {
+            objective.SubscribeOnCompleted(completedObjective -> {
+                if (completedObjective instanceof CapturePointObjective cpObjective) {
+                    var team = (TeamContext) cpObjective.GetOwner();
+                }
+                UpdateScorePointObjectivesSpeed();
+            });
+        }
+
+        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
+        for(var player : server.getPlayerList().getPlayers()) {
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
+        }
+    }
+
+    private void PrepareObjectiveDataToSendToClient(ArrayList<HudObjective> hudObjectives, List<ColoredSquareZone> zones) {
+        hudObjectives.add(new HudStringObjective("Наберите 200 очков, чтобы выиграть"));
         for (GameObjective objective : objectivesHandler.getObjectives()) {
             if (objective instanceof CapturePointObjective capturePointObjective) {
                 var ownerTeam = (TeamContext) capturePointObjective.GetOwner();
@@ -126,27 +175,22 @@ public class CapturePointsGamemode extends TeamGamemode {
                         capturePointObjective.GetProgress(),
                         capturePointObjective.GetPosition()));
             }
-            for(var player : server.getPlayerList().getPlayers()) {
-                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
-                NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
-            }
-
-            objective.SubscribeOnCompleted(completedObjective -> {
-                if (completedObjective instanceof CapturePointObjective cpObjective) {
-                    var team = (TeamContext) cpObjective.GetOwner();
-                    team.AddRespawnPoint(new RespawnPoint(cpObjective.GetPosition(), cpObjective.GetName(),1));
-                }
-
-                if (CheckIfAllPointsCaptured()) {
-                    EndGame();
-                }
-            });
         }
-        objectivesHandler.OnObjectivesCompleted(() -> {
-            UnrealZaruba.LOGGER.warn("ALL OBJECTIVES COMPLETED");
-            CompleteGame(server, TeamColor.RED);
-        });
-        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
+    }
+
+    private void UpdateScorePointObjectivesSpeed() {
+        int redPoints = 0;
+        int bluePoints = 0;
+        for (var obj : objectivesHandler.getObjectives()) {
+            if (obj instanceof CapturePointObjective cpObj) {
+                if (cpObj.GetOwner() == null) continue;
+                redPoints += cpObj.GetOwner().equals(TeamManager.Get(TeamColor.RED)) ? 1 : 0;
+                bluePoints += cpObj.GetOwner().equals(TeamManager.Get(TeamColor.BLUE)) ? 1 : 0;
+            }
+        }
+
+        scorePointsObjectiveRed.SetIncrementationSpeed((float) (Math.max(0, redPoints - 1)) / 10);
+        scorePointsObjectiveBlue.SetIncrementationSpeed((float) (Math.max(0, bluePoints - 1)) / 10);
     }
 
     // -- DUPLICATION TODO: Think how to reduce it
@@ -170,6 +214,11 @@ public class CapturePointsGamemode extends TeamGamemode {
         }
         if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
             ReturnToTeamSpawn(serverPlayer);
+            List<ColoredSquareZone> zones = new ArrayList<>();
+            ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+            PrepareObjectiveDataToSendToClient(hudObjectives, zones);
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new RenderableZonesPacket(zones));
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
         }
     }
 
@@ -204,6 +253,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
+        UnrealZaruba.LOGGER.info("COMPLETING GAME");
         gameTimer.stop();
         ShowEndText(server, wonTeam);
         var players = server.getPlayerList().getPlayers();
@@ -243,5 +293,65 @@ public class CapturePointsGamemode extends TeamGamemode {
                 TitleMessage.showTitle(player, titleText, loseText);
             }
         }
+    }
+
+    public void StartTeamSelection() {
+        server.getPlayerList().getPlayers().forEach(player -> {
+            player.setGameMode(GameType.ADVENTURE);
+        });
+    }
+
+    public void CompleteTeamSelection() {
+        var players = server.getPlayerList().getPlayers();
+        for (ServerPlayer player : players) {
+            if (!TeamManager.IsInTeam(player)) {
+                var team = TeamManager.GetWithMinimumMembers();
+                if (team != null) {
+                    UnrealZaruba.LOGGER.info("[UnrealZaruba] Player not in team {} joined team {}", player.getName().getString(), team.Color());
+                    TeamManager.AssignToTeam(team.Color(), player);
+                }
+            }
+
+            TeamManager.teleportToSpawnByPriority(player);
+        }
+        CharacterClassEquipper.equipTeamWithSelectedClasses(players);
+        objectivesHandler.addRecipients(TeamManager.GetTeams());
+    }
+
+    public void StartStrategyTime() {
+    }
+
+    public void CompleteStrategyTime() {
+        TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
+        server.setDifficulty(Difficulty.NORMAL, true);
+    }
+
+    public void StartBattle() {
+        TeamManager.PlayBattleSound();
+
+        for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
+            var team = TeamManager.GetPlayersTeam(serverPlayer);
+            if (team == null) continue;
+
+            TitleMessage.showTitle(serverPlayer,
+                    startGameTexts.get(team.Color()).GetTitle(),
+                    startGameTexts.get(team.Color()).GetSubtitle());
+        }
+
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] Triggering vehicle spawn blocks");
+
+        var barriers = GamemodeDataManager
+                .getHandler(this.getClass(), BarrierVolumesData.class)
+                .getData().getBarriers();
+
+        if (barriers != null) {
+            barriers.forEach(barrier -> {
+                BarrierRemovalTask.removeBarriersAsync(WorldManager.gameLevel, barrier);
+            });
+        }
+
+        GamemodeDataManager
+                .getHandler(this.getClass(), VehicleSpawnData.class)
+                .triggerVehicleSpawns(server);
     }
 }

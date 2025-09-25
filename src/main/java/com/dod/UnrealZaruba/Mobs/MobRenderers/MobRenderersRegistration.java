@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Mobs.MobRenderers;
+package com.dod.unrealzaruba.Mobs.MobRenderers;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Mobs.ModMobs;
+import com.dod.unrealzaruba.Mobs.ModMobs;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

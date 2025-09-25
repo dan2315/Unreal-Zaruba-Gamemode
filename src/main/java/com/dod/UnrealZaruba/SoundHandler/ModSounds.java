@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.SoundHandler;
+package com.dod.unrealzaruba.SoundHandler;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

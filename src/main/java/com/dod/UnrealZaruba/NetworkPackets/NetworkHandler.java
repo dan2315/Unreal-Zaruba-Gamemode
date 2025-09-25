@@ -1,20 +1,22 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.PacketDistributor;
-import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
-import com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
-import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.SetClassPacket;
-import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
+import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
+import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
+import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.SetClassPacket;
+import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -23,14 +25,6 @@ public class NetworkHandler {
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);
-
-    public static final ResourceLocation VELOCITY_CHANNEL_LOCATION = new ResourceLocation("velocity", "main");
-    public static final SimpleChannel VELOCITY_CHANNEL = NetworkRegistry.newSimpleChannel(
-        VELOCITY_CHANNEL_LOCATION,
-        () -> PROTOCOL_VERSION,
-        PROTOCOL_VERSION::equals,
-        PROTOCOL_VERSION::equals
-    );
 
     private static int packetId = 0;
 
@@ -106,10 +100,20 @@ public class NetworkHandler {
                 ClientboundUpdateObjectivesPacket::decode,
                 ClientboundUpdateObjectivesPacket::handle);
 
+        CHANNEL.registerMessage(packetId++, ClientboundRemoveObjectivesPacket.class,
+                ClientboundRemoveObjectivesPacket::encode,
+                ClientboundRemoveObjectivesPacket::decode,
+                ClientboundRemoveObjectivesPacket::handle);
+
         CHANNEL.registerMessage(packetId++, GamemodeVotePacket.class,
                 GamemodeVotePacket::encode,
                 GamemodeVotePacket::decode,
                 GamemodeVotePacket::handle);
+
+        CHANNEL.registerMessage(packetId++, ClientboundUpdateTopScorePacket.class,
+                ClientboundUpdateTopScorePacket::encode,
+                ClientboundUpdateTopScorePacket::decode,
+                ClientboundUpdateTopScorePacket::handle);
 
     }
 

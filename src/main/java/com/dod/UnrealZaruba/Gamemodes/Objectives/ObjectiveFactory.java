@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager.GSON;
+import static com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager.GSON;
 
 /**
  * Factory class for creating objectives from JSON based on their type.

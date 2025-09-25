@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.api;
+package com.dod.unrealzaruba.api;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;

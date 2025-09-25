@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.UI;
+package com.dod.unrealzaruba.UI;
 
-import com.dod.UnrealZaruba.NetworkPackets.GamemodeVotePacket;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.GamemodeVotePacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.client.Minecraft;

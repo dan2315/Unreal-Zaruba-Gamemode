@@ -1,8 +1,9 @@
-package com.dod.UnrealZaruba.Gamemodes.GamePhases;
+package com.dod.unrealzaruba.Gamemodes.GamePhases;
 
 
 public enum PhaseId {
     // Common game phases
+    MAP_INITIALIZATION("MapInitialization"),
     TEAM_SELECTION("TeamSelection"),
     GAME("Game"),
 

@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.ModBlocks.Tent;
+package com.dod.unrealzaruba.ModBlocks.Tent;
 
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 
 import net.minecraft.core.BlockPos;
 

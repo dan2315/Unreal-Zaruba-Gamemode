@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.CharacterClass;
+package com.dod.unrealzaruba.CharacterClass;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.ProtectionPixel;
-import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.WeaponConstants;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.ProtectionPixel;
+import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.WeaponConstants;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import net.minecraft.resources.ResourceLocation;
-import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.VanillaItems;
-import com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders.WeaponBuilder;
+import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.VanillaItems;
+import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.WeaponBuilder;
 
 public class CharacterClassRegistry {
 

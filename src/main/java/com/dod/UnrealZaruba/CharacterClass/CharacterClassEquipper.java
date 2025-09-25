@@ -1,12 +1,12 @@
-package com.dod.UnrealZaruba.CharacterClass;
+package com.dod.unrealzaruba.CharacterClass;
 
 import java.util.List;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -51,7 +51,7 @@ public class CharacterClassEquipper {
             Item itemType = item.getItem();
             
             if (itemType.toString().contains("powerengine")) {
-                UnrealZaruba.LOGGER.info("Found power engine: " + itemType.getDescription().toString());
+                UnrealZaruba.LOGGER.info("Found power engine: {}", itemType.getDescription().toString());
                 steamReactor = item.copy();
                 continue;
             }
@@ -63,7 +63,7 @@ public class CharacterClassEquipper {
             }
             else if (itemType.toString().contains("pumpkin")) {
                 player.setItemSlot(EquipmentSlot.HEAD, item.copy());
-                UnrealZaruba.LOGGER.info("Found pumpkin: " + itemType.getDescriptionId());
+                UnrealZaruba.LOGGER.info("Found pumpkin: {}", itemType.getDescriptionId());
             }
             else if (!player.getInventory().add(item.copy())) {
                 player.drop(item.copy(), false);
@@ -75,10 +75,10 @@ public class CharacterClassEquipper {
                 boolean success = PowerEngineProvider.equipPlayerWithPowerEngine(player, steamReactor);
                 
                 if (success) {
-                    UnrealZaruba.LOGGER.info("[Class Equipper] Successfully equipped " + player.getDisplayName() + 
+                    UnrealZaruba.LOGGER.info("[Class Equipper] Successfully equipped " + player.getDisplayName() +
                                              " with Power Engine using the PowerEngineProvider");
                 } else {
-                    UnrealZaruba.LOGGER.warn("[Class Equipper] PowerEngineProvider failed to equip " + 
+                    UnrealZaruba.LOGGER.warn("[Class Equipper] PowerEngineProvider failed to equip " +
                                              player.getDisplayName() + ", but fallback was provided");
                 }
             } catch (Exception e) {
@@ -90,7 +90,7 @@ public class CharacterClassEquipper {
             }
         }
         
-        player.sendSystemMessage(Component.literal("You are now equipped as a " + classData.getDisplayName() + "!"));
+        player.sendSystemMessage(Component.literal("Вы экипированы снаряженим класса: " + classData.getDisplayName() + "!"));
         return true;
     }
 

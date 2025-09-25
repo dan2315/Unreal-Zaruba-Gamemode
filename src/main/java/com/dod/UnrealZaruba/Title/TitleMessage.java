@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Title;
+package com.dod.unrealzaruba.Title;
 
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.MinecraftServer;

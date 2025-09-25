@@ -1,7 +1,6 @@
-package com.dod.UnrealZaruba.Mobs;
+package com.dod.unrealzaruba.Mobs;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;

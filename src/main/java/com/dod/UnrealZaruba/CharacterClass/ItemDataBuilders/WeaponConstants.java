@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.CharacterClass.ItemDataBuilders;
+package com.dod.unrealzaruba.CharacterClass.ItemDataBuilders;
 
 public class WeaponConstants {
     public static final String WEAPON_ID = "protection_pixel:weapon";

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
 public enum ProxyCommunicationType {
     SERVER_STATUS

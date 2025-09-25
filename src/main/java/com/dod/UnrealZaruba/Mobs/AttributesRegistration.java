@@ -1,13 +1,11 @@
-package com.dod.UnrealZaruba.Mobs;
+package com.dod.unrealzaruba.Mobs;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 public class AttributesRegistration {
 

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +21,7 @@ public class Explosions {
      * @param pos
      * @param strength
      */
-    public void createExplosionNoBlockDamage(Level world, Entity sourceEntity, BlockPos pos, float strength) {
+    public static void createExplosionNoBlockDamage(Level world, Entity sourceEntity, BlockPos pos, float strength) {
         // Create the explosion with custom parameters
         world.explode(
                 sourceEntity,       // The entity that caused the explosion, can be null

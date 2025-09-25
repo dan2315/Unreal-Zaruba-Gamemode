@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.UI.Objectives;
+package com.dod.unrealzaruba.UI.Objectives;
 
-import com.dod.UnrealZaruba.NetworkPackets.SerializationUtils;
+import com.dod.unrealzaruba.NetworkPackets.SerializationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
@@ -69,5 +69,17 @@ public class HudCapturePointObjective extends HudObjective {
     @Override
     public void Update(byte progress) {
         this.progress = (progress - Byte.MIN_VALUE) / (float)(Byte.MAX_VALUE - Byte.MIN_VALUE);
+    }
+
+    public int getOwnerColor() {
+        return ownerColor;
+    }
+
+    public String GetName() {
+        return name;
+    }
+
+    public BlockPos GetPosition() {
+        return position;
     }
 }

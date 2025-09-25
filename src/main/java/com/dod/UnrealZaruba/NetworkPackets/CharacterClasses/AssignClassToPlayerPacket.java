@@ -1,23 +1,20 @@
-package com.dod.UnrealZaruba.NetworkPackets.CharacterClasses;
+package com.dod.unrealzaruba.NetworkPackets.CharacterClasses;
 
-import com.dod.UnrealZaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.ConfigurationManager.ConfigManager;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassData;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassRegistry;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 public class AssignClassToPlayerPacket {
@@ -64,10 +61,9 @@ public class AssignClassToPlayerPacket {
                             // Store the selected class in the player context instead of giving items immediately
                             if (playerContext instanceof TeamPlayerContext teamPlayerContext) {
                                 teamPlayerContext.SetSelectedClassId(classId);
-                                player.sendSystemMessage(Component.literal("Selected class: " + classData.getDisplayName() + ". You'll receive your items when the game starts."));
+                                player.sendSystemMessage(Component.literal("Выбранный класс: " + classData.getDisplayName() + ". Экипировка будет выдана по началу игры."));
                                 
                                 if (ConfigManager.isDevMode()) {
-                                    player.sendSystemMessage(Component.literal("§6[TEST] §eEquipping you with your selected class immediately..."));
                                     boolean success = CharacterClassEquipper.equipPlayerWithSelectedClass(player);
                                 if (!success) {
                                         player.sendSystemMessage(Component.literal("§c[TEST] §eEquipping failed. Check server logs for details."));

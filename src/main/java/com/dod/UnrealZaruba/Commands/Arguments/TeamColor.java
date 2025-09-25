@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Commands.Arguments;
+package com.dod.unrealzaruba.Commands.Arguments;
 
 import net.minecraft.ChatFormatting;
 

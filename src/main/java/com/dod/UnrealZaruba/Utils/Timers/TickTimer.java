@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.Utils.Timers;
+package com.dod.unrealzaruba.utils.Timers;
 
-import com.dod.UnrealZaruba.Utils.TimerCompletedCallback;
-import com.dod.UnrealZaruba.Utils.TimerUpdatedCallback;
+import com.dod.unrealzaruba.utils.TimerCompletedCallback;
+import com.dod.unrealzaruba.utils.TimerUpdatedCallback;
 
 /**
  * A timer implementation based on game ticks

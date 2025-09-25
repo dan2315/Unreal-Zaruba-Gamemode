@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils.DataStructures;
+package com.dod.unrealzaruba.utils.DataStructures;
 
 import java.util.function.Consumer;
 

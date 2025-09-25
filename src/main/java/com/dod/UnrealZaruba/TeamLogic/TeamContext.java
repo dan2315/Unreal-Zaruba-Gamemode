@@ -1,18 +1,20 @@
-package com.dod.UnrealZaruba.TeamLogic;
+package com.dod.unrealzaruba.TeamLogic;
 
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveOwner;
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.RespawnPoint;
-import com.dod.UnrealZaruba.Player.PlayerContext;
-import com.dod.UnrealZaruba.Player.TeamPlayerContext;
-import com.dod.UnrealZaruba.Utils.IResettable;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.SoundHandler.SoundHandler;  
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectiveOwner;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPoint;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.IResettable;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.SoundHandler.SoundHandler;  
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -28,7 +30,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team.Visibility;
 import net.minecraft.sounds.SoundSource;
-import com.dod.UnrealZaruba.UnrealZaruba;
 import net.minecraft.sounds.SoundEvent;
 /**
  * Team core data.
@@ -119,11 +120,31 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
     }
 
     public void RemoveRespawnPointByBlockPos(BlockPos blockPos) {
-        if (respawnPoints.removeIf(respawnPoint -> respawnPoint.getSpawnPosition().equals(blockPos))) {
-            UnrealZaruba.LOGGER.info("Respawn point removed");
-        } else {
-            UnrealZaruba.LOGGER.info("Respawn point not found");
+        var point = respawnPoints.stream().filter(rPoint -> rPoint.getSpawnPosition().equals(blockPos)).findFirst();
+        if (point.isEmpty()) {
+            UnrealZaruba.LOGGER.info("Respawn point by position is not found");
+            return;
         }
+        RemoveRespawnPoint(point.get());
+    }
+
+    public <T extends BaseRespawnPoint> void RemoveWaypointByType(Class<T> type) {
+        var point = respawnPoints.stream().filter(type::isInstance).findFirst();
+        if (point.isEmpty()) {
+            UnrealZaruba.LOGGER.info("Respawn point by type is not found");
+            return;
+        }
+        RemoveRespawnPoint(point.get());
+    }
+
+    private void RemoveRespawnPoint(IRespawnPoint point) {
+        UnrealZaruba.LOGGER.info("Respawn point removed");
+        for (var uuid : members) {
+            if (PlayerContext.Get(uuid) instanceof TeamPlayerContext tPlayer) {
+                tPlayer.DeselectRespawnPoint();
+            }
+        }
+        respawnPoints.remove(point);
     }
 
     public void setCommander(MinecraftServer server, Player player) {

@@ -1,14 +1,13 @@
-package com.dod.UnrealZaruba.UI;
+package com.dod.unrealzaruba.UI;
 
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassData;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassRegistry;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.NetworkPackets.NetworkHandler;
-import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.SetClassPacket;
-import com.dod.UnrealZaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassData;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassRegistry;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.SetClassPacket;
+import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;

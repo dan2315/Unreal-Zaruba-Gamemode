@@ -1,7 +1,6 @@
-package com.dod.UnrealZaruba.UI;
+package com.dod.unrealzaruba.UI;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -9,7 +8,7 @@ import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
-import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
+import com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
 
 public class ModMenus {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, UnrealZaruba.MOD_ID);

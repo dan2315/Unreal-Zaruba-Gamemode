@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.RespawnPoints;
+package com.dod.unrealzaruba.Gamemodes.RespawnPoints;
 
 import net.minecraft.core.BlockPos;
 

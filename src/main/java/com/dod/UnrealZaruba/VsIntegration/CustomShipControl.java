@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.VsIntegration;
+package com.dod.unrealzaruba.VsIntegration;
 
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.impl.api.ShipForcesInducer;

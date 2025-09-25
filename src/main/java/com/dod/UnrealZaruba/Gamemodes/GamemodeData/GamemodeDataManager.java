@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.GamemodeData;
+package com.dod.unrealzaruba.Gamemodes.GamemodeData;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,10 +10,10 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective;
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ObjectiveFactory;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectiveFactory;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

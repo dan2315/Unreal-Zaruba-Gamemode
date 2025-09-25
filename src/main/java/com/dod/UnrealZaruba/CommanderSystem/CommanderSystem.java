@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.CommanderSystem;
+package com.dod.unrealzaruba.CommanderSystem;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.Player.PlayerContext;
 
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;

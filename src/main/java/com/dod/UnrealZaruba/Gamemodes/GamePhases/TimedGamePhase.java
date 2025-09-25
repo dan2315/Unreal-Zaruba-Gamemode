@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.Gamemodes.GamePhases;
+package com.dod.unrealzaruba.Gamemodes.GamePhases;
 
-import com.dod.UnrealZaruba.Utils.Timers.ITimer;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.unrealzaruba.utils.Timers.ITimer;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import java.util.function.Consumer;
 
 public class TimedGamePhase extends AbstractGamePhase {

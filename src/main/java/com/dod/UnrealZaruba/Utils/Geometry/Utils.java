@@ -1,7 +1,6 @@
-package com.dod.UnrealZaruba.Utils.Geometry;
+package com.dod.unrealzaruba.utils.Geometry;
 
 import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
 import org.valkyrienskies.core.impl.game.ships.ShipTransformImpl;
 import org.joml.Quaterniondc;
@@ -40,30 +39,30 @@ public class Utils {
 
     public static Quaterniond getQuatFromDir(Direction direction) {
         Quaterniond quaternion = new Quaterniond();
-        
+
         switch (direction) {
             case UP:
-                quaternion.identity();
+                quaternion.rotationY(Math.PI); // was identity
                 break;
             case DOWN:
-                quaternion.rotationY(Math.PI);
+                quaternion.identity(); // was π
                 break;
             case NORTH:
-                quaternion.rotationY((Math.PI / 2) * 2);
+                quaternion.rotationY((Math.PI / 2) * 2 + Math.PI); // was π
                 break;
             case SOUTH:
-                quaternion.rotationY((Math.PI / 2) * 0);
+                quaternion.rotationY(Math.PI); // was 0
                 break;
             case EAST:
-                quaternion.rotationY(Math.PI / 2);
+                quaternion.rotationY(Math.PI / 2 + Math.PI); // was π/2
                 break;
             case WEST:
-                quaternion.rotationY(-Math.PI / 2);
+                quaternion.rotationY(-Math.PI / 2 + Math.PI); // was -π/2
                 break;
             default:
-                quaternion.identity();
+                quaternion.rotationY(Math.PI); // was identity
         }
-        
+
         return quaternion;
     }
 

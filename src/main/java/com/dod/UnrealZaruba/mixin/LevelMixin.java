@@ -1,7 +1,6 @@
-package com.dod.UnrealZaruba.mixin;
+package com.dod.unrealzaruba.mixin;
 
-import com.dod.UnrealZaruba.Events.BlockStateChangedEvent;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Events.BlockStateChangedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;

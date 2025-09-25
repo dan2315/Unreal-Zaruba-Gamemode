@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Utils;
+package com.dod.unrealzaruba.utils;
 
 /**
  * The interface Timer updated callback.

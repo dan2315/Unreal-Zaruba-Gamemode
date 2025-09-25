@@ -1,7 +1,7 @@
-package com.dod.UnrealZaruba.Gamemodes.StartCondition;
+package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -40,7 +40,7 @@ public class EnoughPlayersCondition extends Condition {
             sustainedTicks++;
             if (sustainedTicks % 20 == 0) { // Every second
                 int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
-                UnrealZaruba.LOGGER.info("Player count condition: " + server.getPlayerCount() + 
+                UnrealZaruba.LOGGER.info("Player count condition: " + server.getPlayerCount() +
                                         "/" + requiredPlayers + " players, " +
                                         remainingSeconds + " seconds remaining");
                 
@@ -54,7 +54,7 @@ public class EnoughPlayersCondition extends Condition {
             
             if (sustainedTicks >= requiredDurationTicks) {
                 conditionMet = true;
-                UnrealZaruba.LOGGER.info("Player count condition met: " + 
+                UnrealZaruba.LOGGER.info("Player count condition met: " +
                                        server.getPlayerCount() + "/" + requiredPlayers + 
                                        " players for " + (requiredDurationTicks / 20) + " seconds");
                 

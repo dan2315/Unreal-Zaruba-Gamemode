@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Commands;
+package com.dod.unrealzaruba.Commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dod.UnrealZaruba.Commands.CommandHandlers.*;
+import com.dod.unrealzaruba.Commands.CommandHandlers.*;
 
 public class CommandHandlerFactory {
  

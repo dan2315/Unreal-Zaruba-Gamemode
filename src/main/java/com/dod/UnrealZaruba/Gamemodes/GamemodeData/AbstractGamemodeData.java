@@ -1,9 +1,9 @@
-package com.dod.UnrealZaruba.Gamemodes.GamemodeData;
+package com.dod.unrealzaruba.Gamemodes.GamemodeData;
 
 import java.io.IOException;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.UnrealZaruba;
 
 /**
  * Abstract base implementation of GamemodeData.

@@ -1,32 +1,32 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.unrealzaruba.Events;
 
-import com.dod.UnrealZaruba.Renderers.GeometryRenderer;
-import com.dod.UnrealZaruba.UI.Objectives.ObjectivesOverlay;
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Renderers.GeometryRenderer;
+import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.UI.ScoreOverlay;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import com.dod.UnrealZaruba.UI.ModMenus;
+import com.dod.unrealzaruba.UI.ModMenus;
 
-import static com.dod.UnrealZaruba.UnrealZaruba.LOGGER;
-import static com.dod.UnrealZaruba.UnrealZaruba.geometryRenderer;
+import static com.dod.unrealzaruba.UnrealZaruba.geometryRenderer;
 
-import com.dod.UnrealZaruba.UI.TimerOverlay;
-import com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseScreen;
+import com.dod.unrealzaruba.UI.TimerOverlay;
+import com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 
 
 public class ModSetupEvents {
     
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
-        LOGGER.info("[UnrealZaruba] Рисуюсь нахуй");
         event.registerAboveAll("gametimer", TimerOverlay.INSTANCE);
         event.registerAboveAll("objectives", ObjectivesOverlay.INSTANCE);
+        event.registerAboveAll("score", ScoreOverlay.INSTANCE);
     }
 
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            LOGGER.info("[UnrealZaruba] Client setup");
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] Client setup");
             geometryRenderer = new GeometryRenderer();
             MinecraftForge.EVENT_BUS.register(geometryRenderer);
             MenuScreens.register(ModMenus.VEHICLE_PURCHASE_MENU.get(), VehiclePurchaseScreen::new);

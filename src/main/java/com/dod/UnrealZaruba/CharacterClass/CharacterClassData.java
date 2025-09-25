@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.CharacterClass;
+package com.dod.unrealzaruba.CharacterClass;
 
 import java.util.ArrayList;
 import java.util.List;

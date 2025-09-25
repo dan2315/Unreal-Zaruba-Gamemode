@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Events;
+package com.dod.unrealzaruba.Events;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

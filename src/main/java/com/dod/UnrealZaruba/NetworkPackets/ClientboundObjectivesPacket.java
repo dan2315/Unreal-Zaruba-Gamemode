@@ -1,7 +1,9 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.UnrealZaruba.UI.Objectives.HudObjective;
-import com.dod.UnrealZaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
+import com.dod.unrealzaruba.UI.Objectives.HudObjective;
+import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -35,7 +37,12 @@ public class ClientboundObjectivesPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> context) {
-        context.get().enqueueWork(() -> ObjectivesOverlay.INSTANCE.SetObjectives(objectives));
+        context.get().enqueueWork(() -> {
+            ObjectivesOverlay.INSTANCE.SetObjectives(objectives);
+            TimerManager.createRealTimeTimer(2000, () -> {
+                WaypointManager.INSTANCE.SetupWaypoints(objectives);
+            });
+        });
         context.get().setPacketHandled(true);
     }
 }

@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Services;
+package com.dod.unrealzaruba.Services;
 
 import java.net.http.HttpClient;
 

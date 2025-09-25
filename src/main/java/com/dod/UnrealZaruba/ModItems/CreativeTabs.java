@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.ModItems;
+package com.dod.unrealzaruba.ModItems;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;

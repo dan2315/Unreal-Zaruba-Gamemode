@@ -1,12 +1,11 @@
-package com.dod.UnrealZaruba.ModBlocks.VehicleSpawn;
+package com.dod.unrealzaruba.ModBlocks.VehicleSpawn;
 
-import com.dod.UnrealZaruba.ModBlocks.ModBlocks;
-import com.dod.UnrealZaruba.Vehicles.Vehicle;
-import com.dod.UnrealZaruba.VsIntegration.ShipCreator;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.ModBlocks.ModBlocks;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.VsIntegration.ShipCreator;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,11 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import org.apache.commons.lang3.tuple.Pair;
-import java.util.List;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import java.util.ArrayList;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 
 public class VehicleSpawnBlockEntity extends BlockEntity {
     private String vehicleType = "default";
@@ -65,7 +60,7 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
 
     public void spawnVehicle() {
         if (level != null && !level.isClientSide) {
-            UnrealZaruba.LOGGER.info("[VehicleSpawnBlockEntity] Spawning vehicle of type: " + vehicleType + 
+            UnrealZaruba.LOGGER.info("[VehicleSpawnBlockEntity] Spawning vehicle of type: " + vehicleType +
                                     " for team: " + teamColor + " at " + worldPosition);
             
             if (level instanceof ServerLevel serverLevel) {

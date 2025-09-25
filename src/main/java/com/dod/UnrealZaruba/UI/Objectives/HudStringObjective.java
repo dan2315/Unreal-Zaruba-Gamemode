@@ -1,11 +1,11 @@
-package com.dod.UnrealZaruba.UI.Objectives;
+package com.dod.unrealzaruba.UI.Objectives;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 
-import static com.dod.UnrealZaruba.Gamemodes.Objectives.GameObjective.LastRuntimeId;
+import static com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective.LastRuntimeId;
 
 public class HudStringObjective extends HudObjective {
     public static final int TYPE_ID = 2;

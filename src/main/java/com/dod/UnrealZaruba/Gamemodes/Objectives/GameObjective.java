@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
 
 import java.util.ArrayList;
 import java.util.List;

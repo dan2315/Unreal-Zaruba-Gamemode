@@ -1,5 +1,5 @@
-package com.dod.UnrealZaruba.ModBlocks.ShipSpecificRedstoneLink;
-// package com.dod.UnrealZaruba.ModBlocks.ShipSpecificRestoneLink;
+package com.dod.unrealzaruba.ModBlocks.ShipSpecificRedstoneLink;
+// package com.dod.unrealzaruba.ModBlocks.ShipSpecificRestoneLink;
 
 // import java.util.HashMap;
 // import java.util.IdentityHashMap;

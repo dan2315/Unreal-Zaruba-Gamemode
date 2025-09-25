@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.Gamemodes.GamePhases;
+package com.dod.unrealzaruba.Gamemodes.GamePhases;
 
 import java.util.ArrayList;
 import java.util.List;

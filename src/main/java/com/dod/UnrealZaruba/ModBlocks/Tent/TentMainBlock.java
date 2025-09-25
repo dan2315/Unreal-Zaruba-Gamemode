@@ -1,10 +1,11 @@
-package com.dod.UnrealZaruba.ModBlocks.Tent;
+package com.dod.unrealzaruba.ModBlocks.Tent;
 
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
-import com.dod.UnrealZaruba.Gamemodes.TeamGamemode;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
 
+import com.dod.unrealzaruba.utils.Explosions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -46,10 +47,9 @@ public class TentMainBlock extends Block {
             TeamGamemode gamemode = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode());
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(), Component.literal("§4Палатка команды "
                     + gamemode.GetTeamManager().Get(teamColor).Color().toString() + " была разрушена!"));
-            gamemode.GetTeamManager().Get(teamColor).RemoveRespawnPointByBlockPos(pos);
+            gamemode.GetTeamManager().Get(teamColor).RemoveWaypointByType(Tent.class);
         }
-        // Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),
-        // 6.0F);
+         Explosions.createExplosionNoBlockDamage(level, null, pos.offset(0, 4, 0),6.0F);
         super.onBlockExploded(state, level, pos, explosion);
     }
 
@@ -77,10 +77,9 @@ public class TentMainBlock extends Block {
 
             sendGlobalMessage(ServerLifecycleHooks.getCurrentServer(),
                     Component.literal("§4Палатка команды " + team.Color().toString() + " была разрушена!"));
-            team.RemoveRespawnPointByBlockPos(pos);
+            team.RemoveWaypointByType(Tent.class);
         }
-        // Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),
-        // 6.0F);
+         Explosions.createExplosionNoPlayerDamage(level, null, pos.offset(0, 4, 0),6.0F);
         return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
     }
 

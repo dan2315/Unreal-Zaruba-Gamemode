@@ -1,17 +1,18 @@
-package com.dod.UnrealZaruba.Gamemodes.Objectives;
+package com.dod.unrealzaruba.Gamemodes.Objectives;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.dod.UnrealZaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.Utils.IResettable;
-import com.dod.UnrealZaruba.TeamLogic.TeamContext;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.IProgressDisplay;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.utils.IResettable;
+import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import java.util.HashMap;
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 
 
 import net.minecraft.server.level.ServerPlayer;
@@ -93,7 +94,7 @@ public class ObjectivesHandler implements IResettable {
     public List<GameObjective> load() {
         BaseGamemode activeGamemode = GamemodeManager.instance.GetActiveGamemode();
         ObjectivesData objectivesData = GamemodeDataManager.getHandler(activeGamemode.getClass(), ObjectivesData.class);
-        objectives = Arrays.asList(objectivesData.getObjectives());
+        objectives = new ArrayList<>(Arrays.asList(objectivesData.getObjectives()));
         objectives.forEach(gameObjective -> gameObjective.SubscribeOnCompleted(this::CheckIfAllCompleted));
 
         return objectives;

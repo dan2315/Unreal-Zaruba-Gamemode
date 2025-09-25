@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Commands.CommandHandlers;
+package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.UnrealZaruba.Gamemodes.ShipsGamemode;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.Gamemodes.ShipsGamemode;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 

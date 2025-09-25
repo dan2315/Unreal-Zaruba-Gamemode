@@ -1,6 +1,6 @@
-package com.dod.UnrealZaruba.NetworkPackets.VehiclePurchase;
+package com.dod.unrealzaruba.NetworkPackets.VehiclePurchase;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,10 +30,10 @@ public class PurchaseResultPacket {
     public static void handle(PurchaseResultPacket msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                UnrealZaruba.LOGGER.info("[UnrealZaruba] Received purchase result: success={}, message={}", 
+                UnrealZaruba.LOGGER.info("[UnrealZaruba] Received purchase result: success={}, message={}",
                     msg.success, msg.message);
                 
-                if (Minecraft.getInstance().screen instanceof com.dod.UnrealZaruba.UI.VehiclePurchaseMenu.VehiclePurchaseScreen screen) {
+                if (Minecraft.getInstance().screen instanceof com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseScreen screen) {
                     if (msg.success) {
                         Minecraft.getInstance().setScreen(null);
                     } else {

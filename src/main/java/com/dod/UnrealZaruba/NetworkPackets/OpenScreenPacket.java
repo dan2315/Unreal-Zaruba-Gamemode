@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.NetworkPackets;
+package com.dod.unrealzaruba.NetworkPackets;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.dod.UnrealZaruba.Gamemodes.RespawnPoints.IRespawnPoint;
-import com.dod.UnrealZaruba.UI.ClassAssignerScreen;
-import com.dod.UnrealZaruba.UI.CustomDeathScreen;
-import com.dod.UnrealZaruba.UI.PlayerVoteScreen;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.unrealzaruba.UI.ClassAssignerScreen;
+import com.dod.unrealzaruba.UI.CustomDeathScreen;
+import com.dod.unrealzaruba.UI.PlayerVoteScreen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

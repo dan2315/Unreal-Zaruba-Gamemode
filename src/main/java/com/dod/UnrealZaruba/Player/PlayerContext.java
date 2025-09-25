@@ -1,8 +1,8 @@
-package com.dod.UnrealZaruba.Player;
+package com.dod.unrealzaruba.Player;
 
 import java.util.UUID;
 
-import com.dod.UnrealZaruba.Gamemodes.BaseGamemode;
+import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 
 import java.util.HashMap;
 

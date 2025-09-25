@@ -1,4 +1,4 @@
-package com.dod.UnrealZaruba.UI.Objectives;
+package com.dod.unrealzaruba.UI.Objectives;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;

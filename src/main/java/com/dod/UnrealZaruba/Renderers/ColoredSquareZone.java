@@ -1,6 +1,5 @@
-package com.dod.UnrealZaruba.Renderers;
+package com.dod.unrealzaruba.Renderers;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;

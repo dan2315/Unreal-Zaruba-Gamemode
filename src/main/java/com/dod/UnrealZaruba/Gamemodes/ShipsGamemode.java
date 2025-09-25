@@ -1,29 +1,28 @@
-package com.dod.UnrealZaruba.Gamemodes;
+package com.dod.unrealzaruba.Gamemodes;
 
-import com.dod.UnrealZaruba.UnrealZaruba;
-import com.dod.UnrealZaruba.Services.GameStatisticsService;
-import com.dod.UnrealZaruba.Gamemodes.GameTimer.IGameTimer;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.ConditionalPhase;
-import com.dod.UnrealZaruba.WorldManager.WorldManager;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.TimePassedCondition;
-import com.dod.UnrealZaruba.Gamemodes.GamePhases.PhaseId;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.CombinedOrCondition;
+import com.dod.unrealzaruba.Services.GameStatisticsService;
+import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
+import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.TimePassedCondition;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.CombinedOrCondition;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
-import com.dod.UnrealZaruba.CharacterClass.CharacterClassEquipper;
+import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.nbt.CompoundTag;
-import com.dod.UnrealZaruba.Utils.NBT;
-import com.dod.UnrealZaruba.Utils.Timers.TimerManager;
+import com.dod.unrealzaruba.utils.NBT;
+import com.dod.unrealzaruba.utils.Timers.TimerManager;
 
 import net.minecraft.world.entity.player.Player;
-import com.dod.UnrealZaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
-import com.dod.UnrealZaruba.Gamemodes.GamemodeData.GamemodeDataManager;
-import com.dod.UnrealZaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.UnrealZaruba.Vehicles.VehicleManager;
-import com.dod.UnrealZaruba.Commands.Arguments.TeamColor;
-import com.dod.UnrealZaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
+import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
+import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+import com.dod.unrealzaruba.Vehicles.VehicleManager;
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Config.MainConfig;
 
 import net.minecraft.core.BlockPos;
 import java.util.HashMap;
