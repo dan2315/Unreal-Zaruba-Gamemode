@@ -107,7 +107,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             )
         );
 
-        ProceedToPhaseForced(PhaseId.PREPARATION);
+        ProceedToPhaseForced(PhaseId.MAP_INITIALIZATION);
     }
 
     private void AfterMapLoaded() {
