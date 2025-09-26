@@ -13,7 +13,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 public class TimerOverlay implements IGuiOverlay, IGameTimer {
-    public boolean isVisible = false;
+    public boolean isVisible = true;
 
     public int minutes;
     public int seconds;
@@ -39,11 +39,12 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
         Font font = mc.font;
 
         var displayableText = String.format("%02d:%02d", this.minutes, this.seconds);
-        int x = screenWidth / 2 - font.width(displayableText) / 2;
-        int y = 10;
+//        int x = screenWidth / 2 - font.width(displayableText) / 2;
+        int x = (int) (screenWidth * 0.81);
+        int y = (int) (screenHeight * 0.95);
 
-        guiGraphics.renderItem(new ItemStack(Items.CLOCK), 20, y - 3);
-        guiGraphics.drawString(font, displayableText, 40, y, 0xFFFFFF, true);
+        guiGraphics.renderItem(new ItemStack(Items.CLOCK),  x - 20, y - 3);
+        guiGraphics.drawString(font, displayableText, x, y, 0xFFFFFF, true);
     }
 
 

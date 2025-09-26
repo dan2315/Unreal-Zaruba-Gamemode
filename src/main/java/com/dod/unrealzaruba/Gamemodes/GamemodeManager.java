@@ -40,6 +40,8 @@ public class GamemodeManager {
             return 0;
         }
 
+//        var players = UnrealZaruba.ser.getPlayerList().getPlayers();
+
         playerVotes.put(playerId, vote);
         return 1;
     }
