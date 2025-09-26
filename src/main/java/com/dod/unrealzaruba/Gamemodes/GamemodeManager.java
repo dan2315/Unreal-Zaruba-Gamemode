@@ -45,21 +45,6 @@ public class GamemodeManager {
             return 0;
         }
 
-        var players = UnrealZaruba.server.getPlayerList().getPlayers();
-
-        int playersReady = 0;
-
-        for (ServerPlayer player : players) {
-            PlayerContext playerContext = PlayerContext.Get(player.getUUID());
-            if (playerContext != null && playerContext.IsReady()) {
-                playersReady++;
-            }
-        }
-
-        for (ServerPlayer player : players) {
-            TitleMessage.sendActionbar(player, Component.literal("§6Игроков готово " + playersReady + "/" + players.size()));
-        }
-
         playerVotes.put(playerId, vote);
         return 1;
     }

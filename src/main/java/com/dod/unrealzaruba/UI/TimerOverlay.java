@@ -13,7 +13,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 public class TimerOverlay implements IGuiOverlay, IGameTimer {
-    public boolean isVisible = true;
+    public boolean isVisible = false;
 
     public int minutes;
     public int seconds;
