@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.Comparator;
-import com.dod.unrealzaruba.Player.PlayerContext;
-import com.dod.unrealzaruba.UnrealZaruba;
+
+import com.dod.unrealzaruba.Title.TitleMessage;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.UnrealZaruba;
+
 
 public class GamemodeManager {
     public static GamemodeManager instance;
@@ -40,7 +45,20 @@ public class GamemodeManager {
             return 0;
         }
 
-//        var players = UnrealZaruba.ser.getPlayerList().getPlayers();
+        var players = UnrealZaruba.server.getPlayerList().getPlayers();
+
+        int playersReady = 0;
+
+        for (ServerPlayer player : players) {
+            PlayerContext playerContext = PlayerContext.Get(player.getUUID());
+            if (playerContext != null && playerContext.IsReady()) {
+                playersReady++;
+            }
+        }
+
+        for (ServerPlayer player : players) {
+            TitleMessage.sendActionbar(player, Component.literal("§6Игроков готово " + playersReady + "/" + players.size()));
+        }
 
         playerVotes.put(playerId, vote);
         return 1;
