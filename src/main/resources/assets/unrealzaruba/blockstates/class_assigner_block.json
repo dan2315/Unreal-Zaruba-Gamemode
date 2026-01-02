@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "unrealzaruba:block/class_assigner_block" },
+    "facing=east": { "model": "unrealzaruba:block/class_assigner_block", "y": 90 },
+    "facing=south": { "model": "unrealzaruba:block/class_assigner_block", "y": 180 },
+    "facing=west": { "model": "unrealzaruba:block/class_assigner_block", "y": 270 }
+  }
+} 

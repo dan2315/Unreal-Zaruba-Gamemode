@@ -1,0 +1,29 @@
+package com.dod.unrealzaruba.ModBlocks.Tent;
+
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+
+import net.minecraft.core.BlockPos;
+
+public class Tent extends BaseRespawnPoint {
+    public BlockPos spawn_point;
+
+    public Tent(BlockPos spawn_point) {
+        this.spawn_point = spawn_point;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return  "Палатка";
+    }
+
+    @Override
+    public BlockPos getSpawnPosition() {
+        return spawn_point;
+    }
+
+    @Override
+    public int getPriority() {
+        return 10;
+    }
+}

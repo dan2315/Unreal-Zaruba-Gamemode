@@ -1,0 +1,30 @@
+{
+  "objectives": [
+    {
+      "type": "destructible",
+      "name": "Red Base",
+      "requiredDegreeOfDestruction": 0.2,
+      "volume": {
+        "x1": 100,
+        "y1": 64,
+        "z1": 100,
+        "x2": 120,
+        "y2": 80,
+        "z2": 120
+      }
+    },
+    {
+      "type": "destructible",
+      "name": "Blue Base",
+      "requiredDegreeOfDestruction": 0.2,
+      "volume": {
+        "x1": -100,
+        "y1": 64,
+        "z1": -100,
+        "x2": -120,
+        "y2": 80,
+        "z2": -120
+      }
+    }
+  ]
+} 

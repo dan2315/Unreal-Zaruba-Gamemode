@@ -1,11 +1,31 @@
 {
-    "block.unrealzaruba.red_block": "Red Team Block",
-    "block.unrealzaruba.blue_block": "Blue Team Block",
+    "block.minecraft.team_block.hint": "Press SHIFT to join team",
+    "block.unrealzaruba.red_block": "Red Team Assigner",
+    "block.unrealzaruba.red_spawn_block": "Red Team Spawn",
+    "block.unrealzaruba.tent_main_block_red": "Red Tent Main Block",
+    "block.unrealzaruba.blue_block": "Blue Team Assigner",
+    "block.unrealzaruba.blue_spawn_block": "Blue Team Spawn",
+    "block.unrealzaruba.tent_main_block_blue": "Blue Tent Main Block",
+    "block.unrealzaruba.yellow_block": "Yellow Team Assigner",
+    "block.unrealzaruba.yellow_spawn_block": "Yellow Team Spawn",
+    "block.unrealzaruba.tent_main_block_yellow": "Yellow Tent Main Block",
+    "block.unrealzaruba.vehicle_purchase_block": "Vehicle Purchaser",
+    "block.unrealzaruba.vehicle_spawn_block": "Vehicle Spawn Point",
+    "block.unrealzaruba.class_assigner_block" : "Super MEGA Class Definer 2000™",
+    "block.unrealzaruba.seat_without_collision": "Seat Without Collision",
 
+    "item.unrealzaruba.hand_assembler": "Hand Assembler",
+    "item.unrealzaruba.tent": "Revive Tent",
+    "item.unrealzaruba.skull": "Skull",
 
-    "item.unrealzaruba.red_block": "Red Team Assigner",
-    "item.unrealzaruba.blue_block": "Blue Team Assigner",
-    "item.unrealzaruba.red_spawn_block": "Blue Team Spawn",
-    "item.unrealzaruba.blue_spawn_block": "Blue Team Spawn",
-    "item.unrealzaruba.hand_assembler": "Hand Assembler"
+    "vehicle.unrealzaruba.car": "Truck",
+    "vehicle.unrealzaruba.pt": "Bublik",
+    "vehicle.unrealzaruba.kamikaze": "Kamikaze",
+
+    "container.vehicle_purchase": "Vehicle Purchase",
+    "button.unrealzaruba.deploy": "Deploy",
+    "button.unrealzaruba.missing_items": "Missing Items",
+    "label.unrealzaruba.required_items": "Required Items:",
+    "container.vehicle_purchase.missing_items": "Missing Items",
+    "container.vehicle_purchase.cooldown": "Vehicle purchase is on cooldown:"
   }
