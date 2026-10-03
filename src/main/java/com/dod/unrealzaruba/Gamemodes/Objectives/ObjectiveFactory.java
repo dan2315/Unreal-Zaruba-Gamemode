@@ -24,7 +24,7 @@ public class ObjectiveFactory implements JsonDeserializer<GameObjective> {
     
     static {
         registerObjectiveType("destructible", json -> {
-            var objective = GSON.fromJson(json, DestructibleObjective.class);
+            var objective = GSON.fromJson(json, DestroyObjective.class);
             objective.InitializeAfterSerialization();
             return objective;
         });

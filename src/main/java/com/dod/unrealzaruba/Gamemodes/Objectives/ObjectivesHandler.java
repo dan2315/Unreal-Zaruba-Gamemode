@@ -107,7 +107,7 @@ public class ObjectivesHandler implements IResettable {
                 progressDisplay.clear();
             }
         }
-        objectives.clear();
+//        objectives.clear(); // TODO: Caused concurrent modification
         allCompleted = true;
     }
     

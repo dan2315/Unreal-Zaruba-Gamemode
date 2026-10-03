@@ -25,4 +25,8 @@ public class GeometryRenderer {
             renderable.Render(poseStack, camera);
         });
     }
+
+    public void Remove(Integer id) {
+        renderableMap.remove(id);
+    }
 }

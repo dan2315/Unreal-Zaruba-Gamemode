@@ -26,6 +26,7 @@ public class CommandHandlerFactory {
         handlers.add(new AddBarrierVolumeCommand());
         handlers.add(new VoteForGamemodeCommand());
         handlers.add(new OpenGamemodeMapCommand());
+        handlers.add(new ForceStartGameCommand());
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());

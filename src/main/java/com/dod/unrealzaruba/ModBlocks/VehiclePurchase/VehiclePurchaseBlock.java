@@ -33,7 +33,7 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
         super(
         BlockBehaviour.Properties.of()
         .mapColor(MapColor.METAL)
-        .strength(2.0f, 3.0f)
+        .strength(-1.0F, 3600000.0F)
         .sound(SoundType.METAL));
 
         this.registerDefaultState(this.stateDefinition.any().setValue(BlockStateProperties.FACING, Direction.NORTH));

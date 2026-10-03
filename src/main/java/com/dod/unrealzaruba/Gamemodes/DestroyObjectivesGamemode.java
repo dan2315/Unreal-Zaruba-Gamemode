@@ -2,17 +2,27 @@ package com.dod.unrealzaruba.Gamemodes;
 
 import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
 import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
+import com.dod.unrealzaruba.Gamemodes.Objectives.DestroyObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.unrealzaruba.Gamemodes.StartCondition.CombinedOrCondition;
 import com.dod.unrealzaruba.Gamemodes.StartCondition.TeamsHaveEnoughPlayersCondition;
 import com.dod.unrealzaruba.Gamemodes.StartCondition.TimePassedCondition;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
 import com.dod.unrealzaruba.Gamemodes.GameTimer.IGameTimer;
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.unrealzaruba.TeamLogic.TeamContext;
 import com.dod.unrealzaruba.Title.TitleMessage;
+import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudStringObjective;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.BarrierRemovalTask;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
@@ -22,6 +32,7 @@ import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,6 +41,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
+
+import java.util.ArrayList;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
     public static final String GAMEMODE_NAME = "destroyobjectives";
@@ -119,6 +132,22 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
     }
 
+    private void SendObjectivesDataToClients() {
+        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+        PrepareObjectiveDataToSendToClient(hudObjectives);
+        for(var player : server.getPlayerList().getPlayers()) {
+            if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext tPlayerContext) {
+                if (tPlayerContext.Team() != null) {
+                    switch (tPlayerContext.Team().Color()) {
+                        case RED -> hudObjectives.add(new HudStringObjective("Уничтожьте все цели"));
+                        case BLUE -> hudObjectives.add(new HudStringObjective("Защищайте цели до конца таймера"));
+                    }
+                }
+            }
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
+        }
+    }
+
     public void StartTeamSelection() {
         server.getPlayerList().getPlayers().forEach(player -> {
             player.setGameMode(GameType.ADVENTURE);
@@ -143,6 +172,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void StartStrategyTime() {
+        SendObjectivesDataToClients();
     }
 
     public void CompleteStrategyTime() {
@@ -188,6 +218,19 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         var isInTeam = TeamManager.IsInTeam(serverPlayer);
         var isDead = NBT.readEntityTag(serverPlayer, "isPlayerDead");
 
+        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+        PrepareObjectiveDataToSendToClient(hudObjectives);
+        if (PlayerContext.Get(serverPlayer.getUUID()) instanceof TeamPlayerContext tPlayerContext) { // TODO: blyat, again ebuchi duplication
+            var team = tPlayerContext.Team();
+            if (team != null) {
+                switch (team.Color()) {
+                    case RED -> hudObjectives.add(new HudStringObjective("Уничтожьте все цели"));
+                    case BLUE -> hudObjectives.add(new HudStringObjective("Защищайте цели до конца таймера"));
+                }
+            }
+        }
+        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
+
         if (server == null)
             return;
 
@@ -223,6 +266,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void CompleteGame(MinecraftServer server, TeamColor wonTeam) {
         gameTimer.stop();
+        objectivesHandler.clear();
         ShowEndText(server, wonTeam);
         var players = server.getPlayerList().getPlayers();
         for (ServerPlayer player : players) {
@@ -238,20 +282,26 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
         for (ServerPlayer player : players) {
+            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(()-> player), new ClientboundRemoveObjectivesPacket());
             player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();
+            if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext tPlayerContext) {
+                tPlayerContext.DeselectRespawnPoint();
+            }
         }
+
 //        Blyaaaa, я изначально думал, что один и тот же объект будет жить всё время, но когда появилось множество режимов, оно пошло нахуй, как же мне обидно
-//        objectivesHandler.reset();
 //        TeamManager.reset();
+//        objectivesHandler.reset();
 //        GetCurrentPhase().Clear();
         GamemodeManager.instance.CleanupCurrentGamemode();
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
         String colorCode = wonTeam.getColorCode();
-        Component titleText = Component.literal(
-                "Команда " + colorCode + wonTeam.toString() + ChatFormatting.RESET + " победила");
+        Component titleText = Component.literal("Команда ")
+                .append(Component.literal(wonTeam.getDisplayName()).withStyle(ChatFormatting.valueOf(colorCode)))
+                .append(Component.literal(" победила"));
         Component wonText = Component.literal("Можешь сказать оппоненту \'Сори, что трахнул\'");
         Component loseText = Component.literal("Что могу сказать? Старайся лучше");
         for (var player : server.getPlayerList().getPlayers()) {
@@ -262,6 +312,21 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 TitleMessage.showTitle(player, titleText, wonText);
             } else {
                 TitleMessage.showTitle(player, titleText, loseText);
+            }
+        }
+    }
+
+    private void PrepareObjectiveDataToSendToClient(ArrayList<HudObjective> hudObjectives) {
+
+        for (GameObjective objective : objectivesHandler.getObjectives()) {
+            if (objective instanceof DestroyObjective destructibleObjective) {
+                var obj = new HudDestroyObjective(
+                        destructibleObjective.GetRuntimeId(),
+                        destructibleObjective.GetName(),
+                        destructibleObjective.GetProgress(),
+                        destructibleObjective.GetPosition()
+                );
+                hudObjectives.add(obj);
             }
         }
     }

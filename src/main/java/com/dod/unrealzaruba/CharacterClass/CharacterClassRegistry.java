@@ -58,6 +58,7 @@ public class CharacterClassRegistry {
         commonItems.accept(redClass);
         redArmor.accept(redClass);
         redClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
+        redClass.addKitItem(new ResourceLocation("walkietalkie:netherite_walkietalkie"), 1);
         registerCharacterClass(TeamColor.RED, redClass);
         
         // Create BLUE team class
@@ -65,6 +66,7 @@ public class CharacterClassRegistry {
         commonItems.accept(blueClass);
         blueArmor.accept(blueClass);
         blueClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
+        blueClass.addKitItem(new ResourceLocation("walkietalkie:netherite_walkietalkie"), 1);
         registerCharacterClass(TeamColor.BLUE, blueClass);
     }
 

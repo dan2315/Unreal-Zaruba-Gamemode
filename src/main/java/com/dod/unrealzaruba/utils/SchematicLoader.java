@@ -30,7 +30,6 @@ public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();
     private static final Map<ResourceLocation, StructureTemplate> TEMPLATE_CACHE = new HashMap<>();
     private static final Map<ResourceLocation, IShipSchematic> VSCHEM_CACHE = new HashMap<>();
-    private static final Logger LOGGER = LogManager.getLogger();
 
     public static CompoundTag GetSchematicNbt(ResourceLocation location) {
         if (SCHEMATIC_CACHE.containsKey(location)) {

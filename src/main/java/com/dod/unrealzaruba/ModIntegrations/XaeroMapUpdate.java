@@ -1,11 +1,13 @@
 package com.dod.unrealzaruba.ModIntegrations;
 
 import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudObjective;
 import com.dod.unrealzaruba.utils.Conversion;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
+import xaero.hud.minimap.waypoint.WaypointColor;
 import xaero.hud.minimap.waypoint.WaypointPurpose;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
 
@@ -44,6 +46,19 @@ public class XaeroMapUpdate {
                     capturePointObjective.GetName(),
                     capturePointObjective.GetName().substring(0, 1).toUpperCase(),
                     Conversion.IntColorToXaeroColor(capturePointObjective.getOwnerColor()),
+                    WaypointPurpose.NORMAL,
+                    true
+            );
+            waypointSet.add(wp);
+            return wp;
+        } else if (objective instanceof HudDestroyObjective hudDestroyObjective) {
+            var wp = new Waypoint(
+                    hudDestroyObjective.GetPosition().getX(),
+                    hudDestroyObjective.GetPosition().getY(),
+                    hudDestroyObjective.GetPosition().getZ(),
+                    hudDestroyObjective.GetName(),
+                    hudDestroyObjective.GetName().substring(0, 1).toUpperCase(),
+                    WaypointColor.BLUE,
                     WaypointPurpose.NORMAL,
                     true
             );

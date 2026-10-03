@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.dod.unrealzaruba.Gamemodes.Objectives.PositionedGameobjective;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.BlockPos;
@@ -68,6 +69,7 @@ public class ProgressbarForObjective implements IProgressDisplay {
         var server = ServerLifecycleHooks.getCurrentServer();
         Set<UUID> playersToRemove = new HashSet<>(playersWithBossBar);
         for (UUID playerId : playersToRemove) {
+            UnrealZaruba.LOGGER.warn("Removing player {} from bossbar", playerId);
             ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player != null) {
                 bossBar.removePlayer(player);

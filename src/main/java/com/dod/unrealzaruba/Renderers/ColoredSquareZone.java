@@ -12,7 +12,7 @@ public class ColoredSquareZone implements Renderable {
     AABB zone;
     int color;
     static float START_FADE_VALUE = 0.3f;
-    static int RenderableIDShift = 1;
+    public static int RenderableIDShift = 1;
 
     public ColoredSquareZone(AABB zone, int color) {
         this.zone = zone;

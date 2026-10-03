@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.CombinedProgressDisplay;
+import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedSideHudListElement;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.ProgressbarForObjective;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.FireworkLauncher;
@@ -23,7 +25,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class DestructibleObjective extends PositionedGameobjective implements IResettable, IPlayerTickAware {
+public class DestroyObjective extends PositionedGameobjective implements IResettable, IPlayerTickAware {
     private static final int PROGRESS_UPDATE_INTERVAL = 30;
     private static final int VISIBILITY_UPDATE_INTERVAL = 40;
     private static final int NOTIFY_BLOCK_THRESHOLD = 10;
@@ -40,12 +42,15 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
     
     private transient Map<UUID, Integer> playerVisibilityTicks = new HashMap<>();
 
-    public DestructibleObjective(BlockVolume volume, String name) {
+    public DestroyObjective(BlockVolume volume, String name) {
         super(name, "destructible", volume.GetCenter());
         this.volume = volume;
         this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
-        setProgressDisplay(new ProgressbarForObjective(this, name));
+        setProgressDisplay(new CombinedProgressDisplay(List.of(
+                new ProgressbarForObjective(this, name),
+                new NetworkedSideHudListElement(this)
+        )));
     }
 
     @Override
@@ -54,7 +59,10 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
         playerVisibilityTicks = new HashMap<>();
         this.world = WorldManager.gameLevel;
         this.trackedBlocks = InitializeTrackedBlocks(volume);
-        setProgressDisplay(new ProgressbarForObjective(this, name));
+        setProgressDisplay(new CombinedProgressDisplay(List.of(
+                new ProgressbarForObjective(this, name),
+                new NetworkedSideHudListElement(this)
+        )));
         UnrealZaruba.LOGGER.warn("Objective {} was initialized", name);
     }
 
@@ -170,6 +178,7 @@ public class DestructibleObjective extends PositionedGameobjective implements IR
 
     @Override
     public void reset() {
+        progressDisplay.clear();
         Reset();
     }
 }

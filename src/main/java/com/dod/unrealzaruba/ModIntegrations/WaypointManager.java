@@ -1,6 +1,7 @@
 package com.dod.unrealzaruba.ModIntegrations;
 
 import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
+import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudObjective;
 import com.dod.unrealzaruba.utils.Conversion;
 
@@ -25,6 +26,13 @@ public class WaypointManager {
                          hudCapturePointObjective.GetName(),
                          Conversion.BlockPosToVec3(hudCapturePointObjective.GetPosition()),
                          hudCapturePointObjective.getOwnerColor()
+                 );
+             } else if (objective instanceof HudDestroyObjective hudDestroyObjective) {
+                 compassUpdate.UpdateOrCreateCompassWaypoints(
+                         hudDestroyObjective.GetRuntimeId(),
+                         hudDestroyObjective.GetName(),
+                         Conversion.BlockPosToVec3(hudDestroyObjective.GetPosition()),
+                         0x0000FF
                  );
              }
         }

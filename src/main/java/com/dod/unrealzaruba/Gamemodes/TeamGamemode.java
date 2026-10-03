@@ -58,6 +58,7 @@ public class TeamGamemode extends BaseGamemode {
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         super.HandleDeath(player, event);
         if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext teamPlayerContext) {
+            if (teamPlayerContext.Team() == null) return;
             var respawnPoints = teamPlayerContext.Team().RespawnPoints();
             NetworkHandler.Screens.openDeathScreen(player, respawnPoints);
         }

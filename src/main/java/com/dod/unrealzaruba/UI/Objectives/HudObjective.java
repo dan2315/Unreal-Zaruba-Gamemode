@@ -27,6 +27,7 @@ public abstract class HudObjective {
     public static void InitializeAllHudObjectiveTypes() {
         HudObjective.RegisterFactoryMethod(HudCapturePointObjective.TYPE_ID, HudCapturePointObjective::new);
         HudObjective.RegisterFactoryMethod(HudStringObjective.TYPE_ID, HudStringObjective::new);
+        HudObjective.RegisterFactoryMethod(HudDestroyObjective.TYPE_ID, HudDestroyObjective::new);
     }
 
     public abstract void Update(byte progress);

@@ -85,7 +85,7 @@ public class CustomDeathScreen extends Screen {
         guiGraphics.pose().popPose();
 
         if (respawnPoints.size() > 1) {
-            guiGraphics.drawCenteredString(this.font, "Выбери точку респавна:", scaledWidth, scaledHeight + 16, 0xFFFFFF);
+            guiGraphics.drawCenteredString(this.font, "Выбери точку респавна:", this.width, this.height + 16, 0xFFFFFF);
         }
 
         super.render(guiGraphics, mouseX, mouseY, delta);

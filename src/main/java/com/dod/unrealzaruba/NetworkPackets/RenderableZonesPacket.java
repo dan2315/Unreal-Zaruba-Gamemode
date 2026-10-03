@@ -40,7 +40,6 @@ public class RenderableZonesPacket {
         return packet;
     }
 
-
     public static void handle(RenderableZonesPacket packet, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() ->
                 packet.squareZones.forEach(zone ->

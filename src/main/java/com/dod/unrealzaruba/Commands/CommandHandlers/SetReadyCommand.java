@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.Commands.CommandHandlers;
 
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Title.TitleMessage;
 import com.dod.unrealzaruba.UnrealZaruba;
@@ -37,9 +38,13 @@ public class SetReadyCommand implements ICommandHandler {
                         }
                     }
 
-                    for (ServerPlayer pl : players) {
-                        TitleMessage.sendActionbar(pl, Component.literal("§6Игроков готово " + playersReady + "/" + players.size()));
-                    }
+                        if (players.size() < GamemodeManager.MINIMUM_PLAYERS_TO_START) {
+                            TitleMessage.sendActionbar(player, Component.literal("§6Чтобы начать игру, нужно минимум "+ GamemodeManager.MINIMUM_PLAYERS_TO_START +" игроков"));
+                        } else {
+                            for (ServerPlayer pl : players) {
+                                TitleMessage.sendActionbar(pl, Component.literal("§6Игроков готово [" + playersReady + "/" + players.size() + "]"));
+                            }
+                        }
                     return 1;
                 }));
     }

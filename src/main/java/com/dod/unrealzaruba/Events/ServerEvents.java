@@ -17,6 +17,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -91,6 +92,7 @@ public class ServerEvents {
         if (isDevMode)
             return;
 
+        player.getInventory().clearContent();
         var activeGamemode = gamemodeManager.GetActiveGamemode();
         if (activeGamemode != null) {
             activeGamemode.HandleConnectedPlayer(event.getEntity());
@@ -104,6 +106,14 @@ public class ServerEvents {
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.isEndConquered()) return;
+
+
+    }
+
+    @SubscribeEvent
+    public void onLivingAttacked(LivingAttackEvent event) {
+        var attacker = event.getSource().getEntity();
+        var victim = event.getEntity();
 
 
     }

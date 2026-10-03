@@ -17,6 +17,8 @@ import com.dod.unrealzaruba.UnrealZaruba;
 
 
 public class GamemodeManager {
+    public static final int MINIMUM_PLAYERS_TO_START = 6;
+
     public static GamemodeManager instance;
     private BaseGamemode activeGamemode;
 
@@ -33,8 +35,7 @@ public class GamemodeManager {
         }
     }
 
-    public GamemodeManager() {
-    }
+    public GamemodeManager() {}
 
     public void StartVoting() {
         isVoting = true;
@@ -76,14 +77,18 @@ public class GamemodeManager {
             }
         }
 
-        if (allPlayersReady) {
-            StopVoting();
-            ResetPlayersReady(players);
+        if (allPlayersReady && players.size() > MINIMUM_PLAYERS_TO_START) { // TODO: Make it configurable
+            StartGame();
         }
     }
 
-    private void ResetPlayersReady(List<ServerPlayer> players) {
-        for (ServerPlayer player : players) {
+    public void StartGame() {
+        StopVoting();
+        ResetPlayersReady();
+    }
+
+    private void ResetPlayersReady() {
+        for (ServerPlayer player : UnrealZaruba.server.getPlayerList().getPlayers()) {
             PlayerContext playerContext = PlayerContext.Get(player.getUUID());
             playerContext.SetReady(false);
         }

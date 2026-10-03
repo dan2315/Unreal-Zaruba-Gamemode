@@ -2,6 +2,7 @@ package com.dod.unrealzaruba.Gamemodes;
 
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Commands.CommandHandlers.RemoveVehicleSpawnCommand;
 import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
 import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
@@ -17,10 +18,9 @@ import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedTopHud
 import com.dod.unrealzaruba.Gamemodes.Objectives.ScorePointsObjective;
 import com.dod.unrealzaruba.Gamemodes.StartCondition.*;
 import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
-import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
-import com.dod.unrealzaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
-import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
-import com.dod.unrealzaruba.NetworkPackets.RenderableZonesPacket;
+import com.dod.unrealzaruba.NetworkPackets.*;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
 import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.dod.unrealzaruba.TeamLogic.TeamContext;
@@ -137,9 +137,6 @@ public class CapturePointsGamemode extends TeamGamemode {
         objectivesHandler.addObjective(scorePointsObjectiveBlue);
         UpdateScorePointObjectivesSpeed();
 
-        List<ColoredSquareZone> zones = new ArrayList<>();
-        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
-        PrepareObjectiveDataToSendToClient(hudObjectives, zones);
 
         for (GameObjective objective : objectivesHandler.getObjectives().stream().filter(obj -> obj instanceof CapturePointObjective).toList()) {
             objective.SubscribeOnCompleted(completedObjective -> {
@@ -151,6 +148,10 @@ public class CapturePointsGamemode extends TeamGamemode {
         }
 
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
+
+        List<ColoredSquareZone> zones = new ArrayList<>();
+        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+        PrepareObjectiveDataToSendToClient(hudObjectives, zones);
         for(var player : server.getPlayerList().getPlayers()) {
             NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
             NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
@@ -201,6 +202,12 @@ public class CapturePointsGamemode extends TeamGamemode {
         var isInTeam = TeamManager.IsInTeam(serverPlayer);
         var isDead = NBT.readEntityTag(serverPlayer, "isPlayerDead");
 
+        List<ColoredSquareZone> zones = new ArrayList<>();
+        ArrayList<HudObjective> hudObjectives = new ArrayList<>();
+        PrepareObjectiveDataToSendToClient(hudObjectives, zones);
+        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new RenderableZonesPacket(zones));
+        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
+
         if (server == null)
             return;
 
@@ -214,11 +221,6 @@ public class CapturePointsGamemode extends TeamGamemode {
         }
         if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
             ReturnToTeamSpawn(serverPlayer);
-            List<ColoredSquareZone> zones = new ArrayList<>();
-            ArrayList<HudObjective> hudObjectives = new ArrayList<>();
-            PrepareObjectiveDataToSendToClient(hudObjectives, zones);
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new RenderableZonesPacket(zones));
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
         }
     }
 
@@ -260,6 +262,18 @@ public class CapturePointsGamemode extends TeamGamemode {
         for (ServerPlayer player : players) {
             player.setGameMode(GameType.SPECTATOR);
             player.getInventory().clearContent();
+            if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext tPlayerContext) {
+                tPlayerContext.DeselectRespawnPoint();
+            }
+            NetworkHandler.CHANNEL.send(
+                    PacketDistributor.PLAYER.with(() -> player),
+                    new DeleteRenderableZonesPacket(
+                            objectivesHandler.getObjectives().stream()
+                                    .filter(obj -> obj instanceof CapturePointObjective)
+                                    .map(obj -> ((CapturePointObjective) obj).GetCaptureAreaAABB().hashCode() + ColoredSquareZone.RenderableIDShift)
+                                    .toList()
+                    )
+            );
         }
         if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
         TimerManager.createRealTimeTimer(3 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);

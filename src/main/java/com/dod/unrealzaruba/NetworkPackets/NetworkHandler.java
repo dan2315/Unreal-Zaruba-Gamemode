@@ -85,6 +85,11 @@ public class NetworkHandler {
                 RenderableZonesPacket::decode,
                 RenderableZonesPacket::handle);
 
+        CHANNEL.registerMessage(packetId++, DeleteRenderableZonesPacket.class,
+                DeleteRenderableZonesPacket::encode,
+                DeleteRenderableZonesPacket::decode,
+                DeleteRenderableZonesPacket::handle);
+
         CHANNEL.registerMessage(packetId++, ClientboundObjectivesPacket.class,
                 ClientboundObjectivesPacket::encode,
                 ClientboundObjectivesPacket::decode,

@@ -2,7 +2,7 @@ package com.dod.unrealzaruba.Commands.CommandHandlers;
 
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
-import com.dod.unrealzaruba.Gamemodes.Objectives.DestructibleObjective;
+import com.dod.unrealzaruba.Gamemodes.Objectives.DestroyObjective;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectivesData;
 import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
 import com.mojang.brigadier.CommandDispatcher;
@@ -28,7 +28,7 @@ public class CreateObjectiveCommand implements ICommandHandler {
                     BlockPos pos2 = BlockPosArgument.getLoadedBlockPos(context, "pos2");
 
                     BlockVolume volume = new BlockVolume(pos1, pos2);
-                    DestructibleObjective objective = new DestructibleObjective(volume, name);
+                    DestroyObjective objective = new DestroyObjective(volume, name);
 
                     var gm = GamemodeManager.instance.GetActiveGamemode();
                     var dataHandler = GamemodeDataManager.getHandler(gm.getClass(), ObjectivesData.class);
