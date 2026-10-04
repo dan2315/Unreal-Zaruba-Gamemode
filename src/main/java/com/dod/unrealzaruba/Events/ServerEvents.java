@@ -120,12 +120,13 @@ public class ServerEvents {
 
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (!server.isDedicatedServer())
+        // In 1.21 this also fires on clients (entity death packets call die()), where there's no server
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer))
+            return;
+        MinecraftServer server = serverPlayer.getServer();
+        if (server == null || !server.isDedicatedServer())
             return;
         if (isDevMode)
-            return;
-        if (!(event.getEntity() instanceof ServerPlayer serverPlayer))
             return;
 
         gamemodeManager.ForGamemode(gamemode -> gamemode.HandleDeath(serverPlayer, event));
