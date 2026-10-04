@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.UI;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.CharacterClass.CharacterClassData;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassRegistry;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassAssignerScreen extends Screen {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(UnrealZaruba.MOD_ID, "textures/gui/class_assigner.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "textures/gui/class_assigner.png");
     private static final int DROPDOWN_HEIGHT = 20;
     private static final int DROPDOWN_WIDTH = 120;
     
@@ -98,7 +99,7 @@ public class ClassAssignerScreen extends Screen {
         // Apply button (for admins to set the block's class) - only visible for admins
         if (isAdmin) {
             applyButton = addRenderableWidget(Button.builder(Component.literal("Apply"), button -> {
-                NetworkHandler.CHANNEL.sendToServer(new SetClassPacket(blockPos, selectedClassId));
+                PacketDistributor.sendToServer(new SetClassPacket(blockPos, selectedClassId));
                 onClose();
             }).pos(x + 300, y + 130).size(60, 20).build());
         }
@@ -106,7 +107,7 @@ public class ClassAssignerScreen extends Screen {
         // Position the select button based on whether the admin button is shown
         // Select button (for players to select the class)
         selectButton = addRenderableWidget(Button.builder(Component.literal("Select Class"), button -> {
-            NetworkHandler.CHANNEL.sendToServer(new AssignClassToPlayerPacket(blockPos));
+            PacketDistributor.sendToServer(new AssignClassToPlayerPacket(blockPos));
             onClose();
         }).pos(x + 50, y + 130).size(80, 20).build());
         
@@ -149,8 +150,8 @@ public class ClassAssignerScreen extends Screen {
     }
     
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -183,10 +184,15 @@ public class ClassAssignerScreen extends Screen {
             graphics.drawString(font, "Class Items:", x + 20, y + 75, 0x404040, false);
             renderClassItems(graphics, x, y, mouseX, mouseY);
         }
-        
+    }
+
+    @Override
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
         
         // Render tooltips
+        int x = (width - 176) / 2;
+        int y = (height - 166) / 2;
         if (!dropdownOpen) {
             renderTooltips(graphics, mouseX, mouseY, x, y);
         }

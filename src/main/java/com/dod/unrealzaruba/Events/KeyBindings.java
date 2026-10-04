@@ -2,8 +2,8 @@ package com.dod.unrealzaruba.Events;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class KeyBindings {
     public static final String CATEGORY = "key.categories.unrealzaruba";

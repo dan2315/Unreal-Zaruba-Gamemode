@@ -1,8 +1,7 @@
 package com.dod.unrealzaruba.Vehicles;
 
 import com.dod.unrealzaruba.Events.BlockStateChangedEvent;
-import com.dod.unrealzaruba.WorldManager.WorldManager;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import com.dod.unrealzaruba.SableIntegration.SableShips;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +22,8 @@ public class VehicleManager {
     }
 
     public void removeVehicle(Vehicle vehicle) {
-        var shipsToDelete = vehicle.getShips();
-        for (var ship : shipsToDelete) {
-            VSGameUtilsKt.getShipObjectWorld(WorldManager.server).deleteShip(ship);
+        for (var subLevelId : vehicle.getSubLevelIds()) {
+            SableShips.remove(vehicle.getLevel(), subLevelId);
         }
         vehicles.remove(vehicle);
     }

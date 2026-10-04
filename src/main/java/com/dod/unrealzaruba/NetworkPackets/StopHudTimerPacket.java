@@ -2,11 +2,11 @@ package com.dod.unrealzaruba.NetworkPackets;
 
 import com.dod.unrealzaruba.UI.TimerOverlay;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class StopHudTimerPacket {
+public class StopHudTimerPacket implements ModPacket {
 
     public static void encode(StopHudTimerPacket packet, FriendlyByteBuf buffer) {
 
@@ -18,7 +18,7 @@ public class StopHudTimerPacket {
     }
 
 
-    public static void handle(StopHudTimerPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(StopHudTimerPacket packet, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             TimerOverlay.OVERLAY_INSTANCE.stop();
         });

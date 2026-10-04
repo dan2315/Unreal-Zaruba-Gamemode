@@ -289,7 +289,7 @@ public class VehicleSpawnData extends AbstractGamemodeData<VehicleSpawnData.Vehi
         }
         
         public ResourceKey<Level> getDimension() {
-            return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
+            return ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(dimension));
         }
         
         public String getVehicleType() {

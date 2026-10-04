@@ -1,15 +1,16 @@
 package com.dod.unrealzaruba.NetworkPackets.CharacterClasses;
+import com.dod.unrealzaruba.NetworkPackets.ModPacket;
 
 import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class SetClassPacket {
+public class SetClassPacket implements ModPacket {
     private final BlockPos blockPos;
     private final String classId;
 
@@ -30,8 +31,8 @@ public class SetClassPacket {
         );
     }
 
-    public static void handle(SetClassPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
+    public static void handle(SetClassPacket packet, Supplier<PacketContext> contextSupplier) {
+        PacketContext context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null && player.hasPermissions(2)) { // Only OPs can set class

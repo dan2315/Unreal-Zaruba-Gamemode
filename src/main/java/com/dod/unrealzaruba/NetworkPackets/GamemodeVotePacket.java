@@ -4,11 +4,11 @@ import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class GamemodeVotePacket {
+public class GamemodeVotePacket implements ModPacket {
     private final String gamemodeId;
 
     public GamemodeVotePacket(String gamemodeId) {
@@ -23,7 +23,7 @@ public class GamemodeVotePacket {
         return new GamemodeVotePacket(buf.readUtf());
     }
 
-    public static void handle(GamemodeVotePacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(GamemodeVotePacket msg, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {

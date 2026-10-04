@@ -1,15 +1,15 @@
 package com.dod.unrealzaruba.NetworkPackets.VehiclePurchase;
+import com.dod.unrealzaruba.NetworkPackets.ModPacket;
 
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.api.distmarker.Dist;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class PurchaseResultPacket {
+public class PurchaseResultPacket implements ModPacket {
     private final boolean success;
     private final String message;
 
@@ -27,9 +27,9 @@ public class PurchaseResultPacket {
         return new PurchaseResultPacket(buf.readBoolean(), buf.readUtf());
     }
 
-    public static void handle(PurchaseResultPacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(PurchaseResultPacket msg, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            
                 UnrealZaruba.LOGGER.info("[UnrealZaruba] Received purchase result: success={}, message={}",
                     msg.success, msg.message);
                 
@@ -40,7 +40,6 @@ public class PurchaseResultPacket {
                         screen.setErrorMessage(msg.message);
                     }
                 }
-            });
         });
         ctx.get().setPacketHandled(true);
     }

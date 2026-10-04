@@ -1,4 +1,7 @@
 package com.dod.unrealzaruba.CharacterClass;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,34 +60,34 @@ public class CharacterClassRegistry {
         CharacterClassData redClass = new CharacterClassData(classId, displayName);
         commonItems.accept(redClass);
         redArmor.accept(redClass);
-        redClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
-        redClass.addKitItem(new ResourceLocation("walkietalkie:netherite_walkietalkie"), 1);
+        redClass.addKitItem(ResourceLocation.parse("minecraft:cooked_beef"), 16);
+        redClass.addKitItem(ResourceLocation.parse("walkietalkie:netherite_walkietalkie"), 1);
         registerCharacterClass(TeamColor.RED, redClass);
         
         // Create BLUE team class
         CharacterClassData blueClass = new CharacterClassData(classId, displayName);
         commonItems.accept(blueClass);
         blueArmor.accept(blueClass);
-        blueClass.addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16);
-        blueClass.addKitItem(new ResourceLocation("walkietalkie:netherite_walkietalkie"), 1);
+        blueClass.addKitItem(ResourceLocation.parse("minecraft:cooked_beef"), 16);
+        blueClass.addKitItem(ResourceLocation.parse("walkietalkie:netherite_walkietalkie"), 1);
         registerCharacterClass(TeamColor.BLUE, blueClass);
     }
 
     private static Consumer<CharacterClassData> redArmorSet(String helmetType) {
         return classData -> {
-            classData.addKitItem(new ResourceLocation("protection_pixel:socks_boots"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:anchorpoint_leggings"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:breaker_chestplate"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:" + helmetType + "_helmet"), 1);
+            classData.addKitItem(ResourceLocation.parse("protection_pixel:socks_boots"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:anchorpoint_leggings"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:breaker_chestplate"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:" + helmetType + "_helmet"), 1);
         };
     }
 
     private static Consumer<CharacterClassData> blueArmorSet(String helmetType) {
         return classData -> {
-            classData.addKitItem(new ResourceLocation("protection_pixel:socks_boots"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:anchorpointas_leggings"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:breakeras_chestplate"), 1)
-                    .addKitItem(new ResourceLocation("protection_pixel:" + helmetType + "as_helmet"), 1);
+            classData.addKitItem(ResourceLocation.parse("protection_pixel:socks_boots"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:anchorpointas_leggings"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:breakeras_chestplate"), 1)
+                    .addKitItem(ResourceLocation.parse("protection_pixel:" + helmetType + "as_helmet"), 1);
         };
     }
 
@@ -95,11 +98,11 @@ public class CharacterClassRegistry {
             "Vegetable Warrior",
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
-                .addKitItem(new ResourceLocation("minecraft:melon"), 64)
-                .addKitItem(new ResourceLocation("minecraft:golden_carrot"), 64)
-                .addKitItem(new ResourceLocation("create:potato_cannon"), 1)
-                .addKitItem(new ResourceLocation("tfmg:advanced_potato_cannon"), 1)
-                .addKitItem(new ResourceLocation("tfmg:napalm_potato"), 1),
+                .addKitItem(ResourceLocation.parse("minecraft:melon"), 64)
+                .addKitItem(ResourceLocation.parse("minecraft:golden_carrot"), 64)
+                .addKitItem(ResourceLocation.parse("create:potato_cannon"), 1)
+                .addKitItem(ResourceLocation.parse("tfmg:advanced_potato_cannon"), 1)
+                .addKitItem(ResourceLocation.parse("tfmg:napalm_potato"), 1),
             redArmorSet("hunter"),
             blueArmorSet("hunter")
         );
@@ -111,10 +114,10 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(VanillaItems.getStickyPumpkin())
-                .addKitItem(new ResourceLocation(WeaponConstants.ScorchedGuns.Weapons.BIG_BORE), 1)
-                .addKitItem(new ResourceLocation("scguns:osborne_slug"), 4)
-                .addKitItem(new ResourceLocation("minecraft:netherite_axe"), 1)
-                .addKitItem(new ResourceLocation("scguns:stun_grenade"), 4),
+                .addKitItem(ResourceLocation.parse(WeaponConstants.ScorchedGuns.Weapons.BIG_BORE), 1)
+                .addKitItem(ResourceLocation.parse("scguns:osborne_slug"), 4)
+                .addKitItem(ResourceLocation.parse("minecraft:netherite_axe"), 1)
+                .addKitItem(ResourceLocation.parse("scguns:stun_grenade"), 4),
             redArmorSet(""),  // Just base armor with no special helmet
             blueArmorSet("")  // Just base armor with no special helmet
         );
@@ -139,9 +142,9 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(gaussRifle)
-                .addKitItem(new ResourceLocation("scguns:energy_cell"), 64)
+                .addKitItem(ResourceLocation.parse("scguns:energy_cell"), 64)
                 .addKitItem(soulDrummer)
-                .addKitItem(new ResourceLocation("scguns:compact_advanced_round"), 128),
+                .addKitItem(ResourceLocation.parse("scguns:compact_advanced_round"), 128),
             redArmorSet("closed"),
             blueArmorSet("closed")
         );
@@ -163,9 +166,9 @@ public class CharacterClassRegistry {
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(laserMusket)
                 .addKitItem(miningLaser)
-                .addKitItem(new ResourceLocation("scguns:energy_core"), 64)
-                .addKitItem(new ResourceLocation("tfmg:cast_iron_frame"), 32)
-                .addKitItem(new ResourceLocation("create:industrial_iron_block"), 32),
+                .addKitItem(ResourceLocation.parse("scguns:energy_core"), 64)
+                .addKitItem(ResourceLocation.parse("tfmg:cast_iron_frame"), 32)
+                .addKitItem(ResourceLocation.parse("create:industrial_iron_block"), 32),
             redArmorSet("bloodprisoner"),
             blueArmorSet("bloodprisoner")
         );
@@ -189,10 +192,10 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(prushGun)
-                .addKitItem(new ResourceLocation("scguns:compact_advanced_round"), 128)
+                .addKitItem(ResourceLocation.parse("scguns:compact_advanced_round"), 128)
                 .addKitItem(boomStick)
-                .addKitItem(new ResourceLocation("scguns:shotgun_shell"), 32)
-                .addKitItem(new ResourceLocation("tfmg:thermite_grenade"), 8),
+                .addKitItem(ResourceLocation.parse("scguns:shotgun_shell"), 32)
+                .addKitItem(ResourceLocation.parse("tfmg:thermite_grenade"), 8),
             redArmorSet("hammer"),
             blueArmorSet("hammer")
         );
@@ -212,11 +215,11 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(rocketRifle)
-                .addKitItem(new ResourceLocation("scguns:rocket"), 8)
+                .addKitItem(ResourceLocation.parse("scguns:rocket"), 8)
                 .addKitItem(bombLance)
-                .addKitItem(new ResourceLocation("scguns:microject"), 64)
-                .addKitItem(new ResourceLocation("minecraft:flint_and_steel"), 1)
-                .addKitItem(new ResourceLocation("minecraft:tnt"), 16),
+                .addKitItem(ResourceLocation.parse("scguns:microject"), 64)
+                .addKitItem(ResourceLocation.parse("minecraft:flint_and_steel"), 1)
+                .addKitItem(ResourceLocation.parse("minecraft:tnt"), 16),
             redArmorSet("lancer"),
             blueArmorSet("lancer")
         );
@@ -237,13 +240,13 @@ public class CharacterClassRegistry {
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(crossbow)
                 .addKitItem(healingCrossbow)
-                .addKitItem(new ResourceLocation("scguns:syringe"), 32)
-                .addKitItem(new ResourceLocation("minecraft:apple"), 64)
+                .addKitItem(ResourceLocation.parse("scguns:syringe"), 32)
+                .addKitItem(ResourceLocation.parse("minecraft:apple"), 64)
                 .addKitItem((new Supplier<ItemStack>() {
                     @Override
                     public ItemStack get() {
                         ItemStack stack = new ItemStack(Items.SPLASH_POTION, 6);
-                        stack.getOrCreateTag().putString("Potion", "minecraft:strong_regeneration");
+                        stack.set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.STRONG_REGENERATION));
                         return stack;
                     }
                 }).get()),
@@ -274,9 +277,9 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(blunderbuss)
-                .addKitItem(new ResourceLocation("scguns:grapeshot"), 32)
-                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
-                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+                .addKitItem(ResourceLocation.parse("scguns:grapeshot"), 32)
+                .addKitItem(ResourceLocation.parse("minecraft:iron_sword"), 1)
+                .addKitItem(ResourceLocation.parse("minecraft:cooked_beef"), 16),
             redArmorSet(""),
             blueArmorSet("")
         );
@@ -287,9 +290,9 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(musket)
-                .addKitItem(new ResourceLocation("scguns:powder_and_ball"), 32)
-                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
-                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+                .addKitItem(ResourceLocation.parse("scguns:powder_and_ball"), 32)
+                .addKitItem(ResourceLocation.parse("minecraft:iron_sword"), 1)
+                .addKitItem(ResourceLocation.parse("minecraft:cooked_beef"), 16),
             redArmorSet(""),
             blueArmorSet("")
         );
@@ -300,9 +303,9 @@ public class CharacterClassRegistry {
             classData -> classData
                 .addKitItem(ProtectionPixel.CreatePowerEngineWithWaterTank())
                 .addKitItem(repeatingMusket)
-                .addKitItem(new ResourceLocation("scguns:powder_and_ball"), 64)
-                .addKitItem(new ResourceLocation("minecraft:iron_sword"), 1)
-                .addKitItem(new ResourceLocation("minecraft:cooked_beef"), 16),
+                .addKitItem(ResourceLocation.parse("scguns:powder_and_ball"), 64)
+                .addKitItem(ResourceLocation.parse("minecraft:iron_sword"), 1)
+                .addKitItem(ResourceLocation.parse("minecraft:cooked_beef"), 16),
             redArmorSet(""),
             blueArmorSet("")
         );

@@ -24,8 +24,7 @@ public class TitleMessage {
      */
     @Deprecated
     public static void sendTitle(ServerPlayer player, String title) {
-        player.connection.send(new ClientboundSetTitleTextPacket(Component.literal(title)) {
-        });
+        player.connection.send(new ClientboundSetTitleTextPacket(Component.literal(title)));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(7, 7, 7)); // fade in, stay, fade out
     }
 

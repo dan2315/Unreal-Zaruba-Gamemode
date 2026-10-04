@@ -22,12 +22,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class DestroyObjective extends PositionedGameobjective implements IResettable, IPlayerTickAware {
     private static final int PROGRESS_UPDATE_INTERVAL = 30;
-    private static final int VISIBILITY_UPDATE_INTERVAL = 40;
+    private static final int VISIBILITY_UPDATE_INTERVAL = 20; // player ticks (Forge fired twice per tick, NeoForge once)
     private static final int NOTIFY_BLOCK_THRESHOLD = 10;
 
     BlockVolume volume;
@@ -130,7 +131,7 @@ public class DestroyObjective extends PositionedGameobjective implements IResett
         return false;
     }
 
-    public void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player) {
+    public void onPlayerTick(PlayerTickEvent.Post event, ServerPlayer player) {
         if (IsCompleted()) return;
         UUID playerId = player.getUUID();
         

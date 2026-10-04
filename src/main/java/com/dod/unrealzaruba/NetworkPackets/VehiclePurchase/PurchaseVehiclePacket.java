@@ -1,4 +1,6 @@
 package com.dod.unrealzaruba.NetworkPackets.VehiclePurchase;
+import com.dod.unrealzaruba.NetworkPackets.ModPacket;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity;
@@ -9,11 +11,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class PurchaseVehiclePacket {
+public class PurchaseVehiclePacket implements ModPacket {
     private final BlockPos blockPos;
     private final String vehicleName;
 
@@ -31,7 +33,7 @@ public class PurchaseVehiclePacket {
         return new PurchaseVehiclePacket(buf.readBlockPos(), buf.readUtf());
     }
 
-    public static void handle(PurchaseVehiclePacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(PurchaseVehiclePacket msg, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
@@ -44,9 +46,7 @@ public class PurchaseVehiclePacket {
                         vehiclePurchaseBlockEntity.setSelectedVehicle(msg.vehicleName);
                         Tuple<Boolean, String> result = vehiclePurchaseBlockEntity.purchaseVehicle(player);
                         
-                        NetworkHandler.CHANNEL.send(
-                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                            new PurchaseResultPacket(result.getA(), result.getB())
+                        PacketDistributor.sendToPlayer(player, new PurchaseResultPacket(result.getA(), result.getB())
                         );
                     }
                 } catch (Exception e) {

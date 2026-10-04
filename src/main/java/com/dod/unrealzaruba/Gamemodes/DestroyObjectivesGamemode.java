@@ -32,8 +32,8 @@ import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
@@ -144,7 +144,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                     }
                 }
             }
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
+            PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(hudObjectives));
         }
     }
 
@@ -229,7 +229,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 }
             }
         }
-        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
+        PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
 
         if (server == null)
             return;
@@ -282,7 +282,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
         for (ServerPlayer player : players) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(()-> player), new ClientboundRemoveObjectivesPacket());
+            PacketDistributor.sendToPlayer(player, new ClientboundRemoveObjectivesPacket());
             player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();
             if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext tPlayerContext) {

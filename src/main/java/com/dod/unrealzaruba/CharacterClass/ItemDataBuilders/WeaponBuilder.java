@@ -1,9 +1,12 @@
 package com.dod.unrealzaruba.CharacterClass.ItemDataBuilders;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 public class WeaponBuilder {
     private final String weaponId;
@@ -57,7 +60,7 @@ public class WeaponBuilder {
 
     public ItemStack build() {
         ItemStack weaponStack = new ItemStack(
-            ForgeRegistries.ITEMS.getValue(new ResourceLocation(weaponId)), 1);
+            BuiltInRegistries.ITEM.get(ResourceLocation.parse(weaponId)), 1);
         
         CompoundTag mainTag = new CompoundTag();
         
@@ -93,7 +96,8 @@ public class WeaponBuilder {
         
         mainTag.put("Attachments", attachmentsTag);
         
-        weaponStack.setTag(mainTag);
+        // TODO(1.21): this mod item still uses its pre-1.20.5 NBT layout; check the mod's 1.21 data components
+        weaponStack.set(DataComponents.CUSTOM_DATA, CustomData.of(mainTag));
         return weaponStack;
     }
     

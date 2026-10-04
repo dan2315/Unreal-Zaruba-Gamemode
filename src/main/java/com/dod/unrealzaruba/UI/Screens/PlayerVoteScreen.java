@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.UI;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -20,8 +21,7 @@ import java.util.UUID;
 
 public class PlayerVoteScreen extends Screen {
 
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(UnrealZaruba.MOD_ID,
-            "textures/gui/player_vote_screen.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "textures/gui/player_vote_screen.png");
 
     private EditBox searchField;
     private PlayerListWidget playerList;
@@ -85,16 +85,20 @@ public class PlayerVoteScreen extends Screen {
     private void voteForSelectedPlayer() {
         if (this.selectedPlayer != null) {
             UnrealZaruba.LOGGER.warn("Кликнул на проголосовать за " + selectedPlayer.getName().toString());
-            //TODO: NetworkHandler.CHANNEL.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
+            //TODO: PacketDistributor.sendToServer(new VotePlayerPacket(selectedPlayer.getUUID()));
             this.onClose();
         }
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        super.renderBackground(guiGraphics, mouseX, mouseY, delta);
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
         guiGraphics.blit(BACKGROUND_TEXTURE, 0, 0, 0, 0, this.width, this.height);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
         this.searchField.render(guiGraphics, mouseX, mouseY, delta);
         // this.playerList.render(matrices, mouseX, mouseY, delta);
@@ -112,7 +116,7 @@ public class PlayerVoteScreen extends Screen {
 
     private class PlayerListWidget extends ObjectSelectionList<PlayerListEntry> {
         public PlayerListWidget(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, height, top, bottom, itemHeight);
+            super(mc, width, bottom - top, top, itemHeight);
         }
     }
 

@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.UI;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.NetworkPackets.GamemodeVotePacket;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
@@ -14,8 +15,8 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class GamemodeSelectionScreen extends Screen {
         this.addRenderableWidget(Button.builder(Component.literal("Проголосовать"),
                 btn -> {
                     if (selectedGamemodeId != null) {
-                        NetworkHandler.CHANNEL.sendToServer(new GamemodeVotePacket(selectedGamemodeId));
+                        PacketDistributor.sendToServer(new GamemodeVotePacket(selectedGamemodeId));
                         Minecraft.getInstance().setScreen(null);
                     }
                 }).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build());
@@ -76,14 +77,12 @@ public class GamemodeSelectionScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
-        this.gamemodeList.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         var mc = Minecraft.getInstance();
 
         // pick block face texture (particle = usually side)
@@ -118,7 +117,7 @@ public class GamemodeSelectionScreen extends Screen {
 
     public class GamemodeList extends AbstractSelectionList<GamemodeList.GamemodeListEntry> {
         public GamemodeList(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, height, top, bottom, itemHeight);
+            super(mc, width, bottom - top, top, itemHeight);
         }
 
         @Override
@@ -136,7 +135,7 @@ public class GamemodeSelectionScreen extends Screen {
         }
 
         @Override
-        public void updateNarration(@NotNull NarrationElementOutput narrationElementOutput) {}
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         public class GamemodeListEntry extends AbstractSelectionList.Entry<GamemodeListEntry> {
             private final String id;
@@ -148,7 +147,7 @@ public class GamemodeSelectionScreen extends Screen {
                 this.name = name;
                 this.description = description;
                 this.id = id;
-                this.icon = new ResourceLocation("unrealzaruba", "textures/gui/gamemodethumbnails/default.png");
+                this.icon = ResourceLocation.fromNamespaceAndPath("unrealzaruba", "textures/gui/gamemodethumbnails/default.png");
             }
 
             @Override

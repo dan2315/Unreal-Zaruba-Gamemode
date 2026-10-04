@@ -34,7 +34,6 @@ public class ColoredSquareZone implements Renderable {
         float b = (color & 0xFF) / 255f;
 
         Matrix4f matrix = poseStack.last().pose();
-        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
 
         Vec3 camPos = camera.getPosition();
         double camX = camPos.x;
@@ -55,40 +54,40 @@ public class ColoredSquareZone implements Renderable {
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
 
         // --- Bottom (full) ---
-        buffer.vertex(matrix, minX, minY, minZ).color(r, g, b, 0.3f).endVertex();
-        buffer.vertex(matrix, maxX, minY, minZ).color(r, g, b, 0.3f).endVertex();
-        buffer.vertex(matrix, maxX, minY, maxZ).color(r, g, b, 0.3f).endVertex();
-        buffer.vertex(matrix, minX, minY, maxZ).color(r, g, b, 0.3f).endVertex();
+        buffer.addVertex(matrix, minX, minY, minZ).setColor(r, g, b, 0.3f);
+        buffer.addVertex(matrix, maxX, minY, minZ).setColor(r, g, b, 0.3f);
+        buffer.addVertex(matrix, maxX, minY, maxZ).setColor(r, g, b, 0.3f);
+        buffer.addVertex(matrix, minX, minY, maxZ).setColor(r, g, b, 0.3f);
 
         // --- North border (minZ) ---
-        buffer.vertex(matrix, minX, minY, minZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, minY, minZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, maxY, minZ).color(r, g, b, 0.0f).endVertex();
-        buffer.vertex(matrix, minX, maxY, minZ).color(r, g, b, 0.0f).endVertex();
+        buffer.addVertex(matrix, minX, minY, minZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, minY, minZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, maxY, minZ).setColor(r, g, b, 0.0f);
+        buffer.addVertex(matrix, minX, maxY, minZ).setColor(r, g, b, 0.0f);
 
         // --- South border (maxZ) ---
-        buffer.vertex(matrix, minX, minY, maxZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, minY, maxZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(r, g, b, 0.0f).endVertex();
-        buffer.vertex(matrix, minX, maxY, maxZ).color(r, g, b, 0.0f).endVertex();
+        buffer.addVertex(matrix, minX, minY, maxZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, minY, maxZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, maxY, maxZ).setColor(r, g, b, 0.0f);
+        buffer.addVertex(matrix, minX, maxY, maxZ).setColor(r, g, b, 0.0f);
 
         // --- West border (minX) ---
-        buffer.vertex(matrix, minX, minY, minZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, minX, minY, maxZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, minX, maxY, maxZ).color(r, g, b, 0.0f).endVertex();
-        buffer.vertex(matrix, minX, maxY, minZ).color(r, g, b, 0.0f).endVertex();
+        buffer.addVertex(matrix, minX, minY, minZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, minX, minY, maxZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, minX, maxY, maxZ).setColor(r, g, b, 0.0f);
+        buffer.addVertex(matrix, minX, maxY, minZ).setColor(r, g, b, 0.0f);
 
         // --- East border (maxX) ---
-        buffer.vertex(matrix, maxX, minY, minZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, minY, maxZ).color(r, g, b, START_FADE_VALUE).endVertex();
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(r, g, b, 0.0f).endVertex();
-        buffer.vertex(matrix, maxX, maxY, minZ).color(r, g, b, 0.0f).endVertex();
+        buffer.addVertex(matrix, maxX, minY, minZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, minY, maxZ).setColor(r, g, b, START_FADE_VALUE);
+        buffer.addVertex(matrix, maxX, maxY, maxZ).setColor(r, g, b, 0.0f);
+        buffer.addVertex(matrix, maxX, maxY, minZ).setColor(r, g, b, 0.0f);
 
-        Tesselator.getInstance().end();
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.enableDepthTest();
         RenderSystem.enableCull();

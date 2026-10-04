@@ -12,6 +12,11 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
@@ -89,12 +94,18 @@ public class TeamColorArgument implements ArgumentType<TeamColor> {
 
             @Override
             public ArgumentTypeInfo<TeamColorArgument, ?> type() {
-                return new Info();
+                return INFO.get();
             }
         }
     }
 
-    public static void RegisterArgument() {
-        ArgumentTypeInfos.registerByClass(TeamColorArgument.class, new Info());
+    private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES =
+            DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, UnrealZaruba.MOD_ID);
+
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, Info> INFO = ARGUMENT_TYPES.register(PropertyName,
+            () -> ArgumentTypeInfos.registerByClass(TeamColorArgument.class, new Info()));
+
+    public static void RegisterArgument(IEventBus modEventBus) {
+        ARGUMENT_TYPES.register(modEventBus);
     }
 }

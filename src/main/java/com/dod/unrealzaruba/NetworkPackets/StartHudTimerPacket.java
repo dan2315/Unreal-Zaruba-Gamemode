@@ -5,9 +5,9 @@ import java.util.function.Supplier;
 import com.dod.unrealzaruba.UI.TimerOverlay;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
-public class StartHudTimerPacket {
+public class StartHudTimerPacket implements ModPacket {
     
     private long startTime;
     private int durationSeconds;
@@ -37,7 +37,7 @@ public class StartHudTimerPacket {
     }
 
 
-    public static void handle(StartHudTimerPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(StartHudTimerPacket packet, Supplier<PacketContext> ctx) {
         UnrealZaruba.LOGGER.warn("HANDLING START TIMER PACKET");
         TimerOverlay.OVERLAY_INSTANCE.startCountDown(packet.getStartTime(), packet.getDurationSeconds());
         ctx.get().setPacketHandled(true);

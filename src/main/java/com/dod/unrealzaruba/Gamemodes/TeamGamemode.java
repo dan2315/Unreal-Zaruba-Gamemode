@@ -12,8 +12,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 import java.util.HashMap;
 
@@ -70,7 +71,7 @@ public class TeamGamemode extends BaseGamemode {
     }
 
     @Override
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent.Post event) {
         super.onPlayerTick(event);
     }
 }

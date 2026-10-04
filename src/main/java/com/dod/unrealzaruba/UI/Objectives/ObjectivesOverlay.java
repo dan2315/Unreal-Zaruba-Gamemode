@@ -2,21 +2,21 @@ package com.dod.unrealzaruba.UI.Objectives;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.gui.Gui;
+import com.dod.unrealzaruba.UI.ZarubaOverlay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ObjectivesOverlay implements IGuiOverlay {
+public class ObjectivesOverlay implements ZarubaOverlay {
     public boolean isVisible = true;
     HashMap<Byte, HudObjective> objectivesMap = new HashMap<>();
 
     public static ObjectivesOverlay INSTANCE = new ObjectivesOverlay();
 
     @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!isVisible || objectivesMap.isEmpty()) return;
         int baseHeight = 1080;
         float scale = (float) screenHeight / baseHeight;

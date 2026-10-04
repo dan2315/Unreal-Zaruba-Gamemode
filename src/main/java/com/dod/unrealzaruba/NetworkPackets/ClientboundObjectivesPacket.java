@@ -5,13 +5,13 @@ import com.dod.unrealzaruba.UI.Objectives.HudObjective;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class ClientboundObjectivesPacket {
+public class ClientboundObjectivesPacket implements ModPacket {
     int objectivesToUpdate;
     List<HudObjective> objectives;
 
@@ -36,7 +36,7 @@ public class ClientboundObjectivesPacket {
         return new ClientboundObjectivesPacket(objectives);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
+    public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
             ObjectivesOverlay.INSTANCE.SetObjectives(objectives);
             TimerManager.createRealTimeTimer(2000, () -> {

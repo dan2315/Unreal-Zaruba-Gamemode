@@ -4,9 +4,9 @@ import com.dod.unrealzaruba.Commands.CommandHandlers.ICommandHandler;
 import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -16,7 +16,7 @@ public class CommandRegistration {
     private static final Logger LOGGER = Logger.getLogger(CommandRegistration.class.getName());
 
     public static void registerEventSubscribers() {
-        MinecraftForge.EVENT_BUS.register(CommandRegistration.class);
+        NeoForge.EVENT_BUS.register(CommandRegistration.class);
     }
 
     @SubscribeEvent

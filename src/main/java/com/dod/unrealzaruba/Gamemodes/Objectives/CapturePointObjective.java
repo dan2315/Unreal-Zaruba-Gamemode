@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.Gamemodes.Objectives;
 
+import net.minecraft.world.phys.Vec3;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedSideHudListElement;
@@ -18,7 +19,7 @@ import com.dod.unrealzaruba.utils.DataStructures.BlockVolume;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.*;
 
@@ -34,14 +35,14 @@ public class CapturePointObjective extends PositionedGameobjective {
     public CapturePointObjective(String name, BlockVolume volume) {
         super(name, "capturepoint", volume.GetCenter());
         captureArea = volume;
-        captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
+        captureAreaAABB = new AABB(Vec3.atLowerCornerOf(captureArea.getMinPos()), Vec3.atLowerCornerOf(captureArea.getMaxPos()));
         setProgressDisplay(new NetworkedSideHudListElement(this));
     }
 
     @Override
     public void InitializeAfterSerialization() {
         super.InitializeAfterSerialization();
-        captureAreaAABB = new AABB(captureArea.getMinPos(), captureArea.getMaxPos());
+        captureAreaAABB = new AABB(Vec3.atLowerCornerOf(captureArea.getMinPos()), Vec3.atLowerCornerOf(captureArea.getMaxPos()));
         setProgressDisplay(new NetworkedSideHudListElement(this));
         TeamManager teamManager = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode()).GetTeamManager();
         if (Objects.equals(name, "Вертолётная площадка")) {
@@ -136,8 +137,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         var ownerTeam = (TeamContext) this.GetOwner();
         int color = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
         for(var player : UnrealZaruba.server.getPlayerList().getPlayers()) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                    new RenderableZonesPacket(List.of(new ColoredSquareZone(captureAreaAABB, color))));
+            PacketDistributor.sendToPlayer(player, new RenderableZonesPacket(List.of(new ColoredSquareZone(captureAreaAABB, color))));
         }
     }
 
@@ -157,7 +157,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
         var players = UnrealZaruba.server.getPlayerList().getPlayers();
         for (var player : players) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(
+            PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(
                     List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress(), GetPosition()))
             ));
         }

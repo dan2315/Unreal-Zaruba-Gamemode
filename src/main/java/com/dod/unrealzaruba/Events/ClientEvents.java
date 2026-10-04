@@ -9,11 +9,12 @@ import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+
+import net.neoforged.bus.api.SubscribeEvent;
 
 /**
  * Все клиент-side ивенты сюда наъуй
@@ -27,14 +28,14 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public void OnClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase.equals(TickEvent.Phase.START)) {
-            TimerManager.updateAll();
-        }
-        if (event.phase.equals(TickEvent.Phase.END)) {
-            while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
-                Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
-            }
+    public void OnClientTickPre(ClientTickEvent.Pre event) {
+        TimerManager.updateAll();
+    }
+
+    @SubscribeEvent
+    public void OnClientTickPost(ClientTickEvent.Post event) {
+        while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
+            Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
         }
     }
 

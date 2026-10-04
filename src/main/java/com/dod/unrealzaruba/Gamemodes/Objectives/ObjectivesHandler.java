@@ -16,10 +16,9 @@ import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-@Mod.EventBusSubscriber(modid = UnrealZaruba.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+
 public class ObjectivesHandler implements IResettable {
     private List<GameObjective> objectives;
     
@@ -67,8 +66,8 @@ public class ObjectivesHandler implements IResettable {
         allCompleted = objectives.isEmpty();
     }
 
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (!(event.player instanceof ServerPlayer player)) return;
+    public void onPlayerTick(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
         
         for (GameObjective objective : objectives) {
             if (objective instanceof IPlayerTickAware playerTickAware) {

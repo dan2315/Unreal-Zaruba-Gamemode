@@ -11,19 +11,21 @@ import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.dod.unrealzaruba.Config.MainConfig;
 
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import static com.dod.unrealzaruba.UnrealZaruba.vehicleManager;
 
@@ -47,23 +49,21 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
+    public void onServerTick(ServerTickEvent.Pre event) {
         MinecraftServer server = event.getServer();
         if (server == null || !server.isDedicatedServer())
             return;
 
-        if (event.phase.equals(TickEvent.Phase.START)) {
-            TimerManager.updateAll();
-            if (!isDevMode) {
-                gamemodeManager.Tick();
-                gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
-            }
+        TimerManager.updateAll();
+        if (!isDevMode) {
+            gamemodeManager.Tick();
+            gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }
     }
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        MinecraftServer server = event.player.getServer();
+    public void onPlayerTick(PlayerTickEvent.Post event) {
+        MinecraftServer server = event.getEntity().getServer();
         if (server == null || !server.isDedicatedServer()) return;
 
         if (!isDevMode) gamemodeManager.ForGamemode(gamemode -> gamemode.onPlayerTick(event));
@@ -111,7 +111,7 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public void onLivingAttacked(LivingAttackEvent event) {
+    public void onLivingAttacked(LivingIncomingDamageEvent event) {
         var attacker = event.getSource().getEntity();
         var victim = event.getEntity();
 

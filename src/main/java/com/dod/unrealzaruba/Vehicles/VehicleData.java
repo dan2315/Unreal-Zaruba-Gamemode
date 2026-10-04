@@ -9,7 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 public class VehicleData {
     private final ResourceLocation schematicLocation;
@@ -43,7 +44,7 @@ public class VehicleData {
         List<ItemStack> result = new ArrayList<>();
         
         for (Map.Entry<ResourceLocation, Integer> entry : requiredItems.entrySet()) {
-            Item item = ForgeRegistries.ITEMS.getValue(entry.getKey());
+            Item item = BuiltInRegistries.ITEM.get(entry.getKey());
             if (item != null) {
                 result.add(new ItemStack(item, entry.getValue()));
             }
@@ -54,7 +55,7 @@ public class VehicleData {
     
     public boolean hasRequiredItems(Inventory inventory) {
         for (Map.Entry<ResourceLocation, Integer> entry : requiredItems.entrySet()) {
-            Item item = ForgeRegistries.ITEMS.getValue(entry.getKey());
+            Item item = BuiltInRegistries.ITEM.get(entry.getKey());
             if (item == null || inventory.countItem(item) < entry.getValue()) {
                 return false;
             }
@@ -68,7 +69,7 @@ public class VehicleData {
         }
         
         for (Map.Entry<ResourceLocation, Integer> entry : requiredItems.entrySet()) {
-            Item item = ForgeRegistries.ITEMS.getValue(entry.getKey());
+            Item item = BuiltInRegistries.ITEM.get(entry.getKey());
             if (item != null) {
                 inventory.clearOrCountMatchingItems(stack -> stack.is(item), entry.getValue(), inventory.player.inventoryMenu.getCraftSlots());
             }

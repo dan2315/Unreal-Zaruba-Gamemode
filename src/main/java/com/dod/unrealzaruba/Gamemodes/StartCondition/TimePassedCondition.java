@@ -1,7 +1,7 @@
 package com.dod.unrealzaruba.Gamemodes.StartCondition;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.function.Consumer;
 

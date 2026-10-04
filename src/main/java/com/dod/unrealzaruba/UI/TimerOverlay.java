@@ -9,10 +9,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.gui.Gui;
+import com.dod.unrealzaruba.UI.ZarubaOverlay;
 
-public class TimerOverlay implements IGuiOverlay, IGameTimer {
+public class TimerOverlay implements ZarubaOverlay, IGameTimer {
     public boolean isVisible = false;
 
     public int minutes;
@@ -20,12 +20,12 @@ public class TimerOverlay implements IGuiOverlay, IGameTimer {
 
     private RealTimeTimer timer;
     private int durationSeconds;
-    public static IGuiOverlay INSTANCE = new TimerOverlay();
+    public static ZarubaOverlay INSTANCE = new TimerOverlay();
     public static TimerOverlay OVERLAY_INSTANCE = (TimerOverlay) INSTANCE;
 
 
     @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
 
         if (!isVisible) {

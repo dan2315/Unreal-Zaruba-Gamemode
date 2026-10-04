@@ -13,6 +13,13 @@ import java.util.Map;
 
 // Убейте меня нахуй
 public class PowerEngineProvider {
+    // Commands no longer return a result in 1.21; capture it through the source callback
+    private static int runCommand(MinecraftServer server, CommandSourceStack source, String command) {
+        int[] result = {0};
+        server.getCommands().performPrefixedCommand(source.withCallback((success, value) -> result[0] = success ? Math.max(value, 1) : 0), command);
+        return result[0];
+    }
+
     private static final String TEMPLATE_TAG = "power_engine_template";
     private static final double TEMPLATE_HEIGHT_OFFSET = 300.0; // Far above world height to be out of sight
     private static final Map<MinecraftServer, Boolean> templateInitialized = new HashMap<>();
@@ -27,7 +34,7 @@ public class PowerEngineProvider {
             
             try {
                 String testCommand = "execute if entity @e[tag=" + TEMPLATE_TAG + ",limit=1] run say found";
-                int result = server.getCommands().performPrefixedCommand(commandSource, testCommand);
+                int result = runCommand(server, commandSource, testCommand);
                 if (result > 0) {
                     return true;
                 }
@@ -82,7 +89,7 @@ public class PowerEngineProvider {
                 );
                 
                 UnrealZaruba.LOGGER.info("[PowerEngineProvider] Creating Power Engine template: " + summonCommand);
-                int result = server.getCommands().performPrefixedCommand(commandSource, summonCommand);
+                int result = runCommand(server, commandSource, summonCommand);
                 
                 if (result > 0) {
                     // Add ForgeCaps data to the item frame
@@ -102,7 +109,7 @@ public class PowerEngineProvider {
                     );
                     
                     UnrealZaruba.LOGGER.info("[PowerEngineProvider] FORGECAPS COMMAND: " + setForgeCapsCommand);
-                    int forgeCapsResult = server.getCommands().performPrefixedCommand(commandSource, setForgeCapsCommand);
+                    int forgeCapsResult = runCommand(server, commandSource, setForgeCapsCommand);
                     
                     if (forgeCapsResult > 0) {
                         UnrealZaruba.LOGGER.info("[PowerEngineProvider] ForgeCaps set successfully");
@@ -159,7 +166,7 @@ public class PowerEngineProvider {
             
             UnrealZaruba.LOGGER.info("[PowerEngineProvider] COMMAND: " + copyCommand);
             UnrealZaruba.LOGGER.info("[PowerEngineProvider] Copying Power Engine to " + playerName + " curios slot");
-            int copyResult = server.getCommands().performPrefixedCommand(commandSource, copyCommand);
+            int copyResult = runCommand(server, commandSource, copyCommand);
             
             if (copyResult > 0) {
                 UnrealZaruba.LOGGER.info("[PowerEngineProvider] Successfully equipped Power Engine for: " + playerName);
@@ -172,7 +179,7 @@ public class PowerEngineProvider {
                 );
                 
                 UnrealZaruba.LOGGER.info("[PowerEngineProvider] Trying fallback command: " + fallbackCommand);
-                int fallbackResult = server.getCommands().performPrefixedCommand(commandSource, fallbackCommand);
+                int fallbackResult = runCommand(server, commandSource, fallbackCommand);
                 
                 if (fallbackResult > 0) {
                     player.sendSystemMessage(Component.literal("§6[SYSTEM] §eA Power Engine has been equipped in your power slot with all components."));
@@ -186,7 +193,7 @@ public class PowerEngineProvider {
                     );
                     
                     UnrealZaruba.LOGGER.info("[PowerEngineProvider] Trying last resort command: " + lastResortCommand);
-                    int lastResortResult = server.getCommands().performPrefixedCommand(commandSource, lastResortCommand);
+                    int lastResortResult = runCommand(server, commandSource, lastResortCommand);
                     
                     if (lastResortResult > 0) {
                         player.sendSystemMessage(Component.literal("§6[SYSTEM] §eA Power Engine has been equipped in your power slot with all components."));

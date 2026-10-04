@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.UI;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.NetworkPackets.SelectRespawnPointPacket;
@@ -15,8 +16,7 @@ import java.util.List;
 
 public class CustomDeathScreen extends Screen {
 
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(UnrealZaruba.MOD_ID,
-            "textures/gui/death_screen.png");
+    private static final ResourceLocation BACKGROUND_TEXTURE = ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "textures/gui/death_screen.png");
     private static final int TIMER_DURATION = 10; // Example respawn timer in seconds
     private int respawnTimer = TIMER_DURATION * 20; // Convert seconds to ticks (20 ticks per second)
     private final Minecraft minecraft;
@@ -62,12 +62,12 @@ public class CustomDeathScreen extends Screen {
         var player = Minecraft.getInstance().player;
         if (player == null)
             UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        NetworkHandler.CHANNEL.sendToServer(new SelectRespawnPointPacket(player.getUUID(), respawnPointId));
+        PacketDistributor.sendToServer(new SelectRespawnPointPacket(player.getUUID(), respawnPointId));
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        super.renderBackground(guiGraphics, mouseX, mouseY, delta);
 
         guiGraphics.blit(BACKGROUND_TEXTURE,this.width / 2 - 128, this.height / 2 - 128, 0, 0, 256, 256, 256, 256); // Draw the background
 
@@ -87,7 +87,10 @@ public class CustomDeathScreen extends Screen {
         if (respawnPoints.size() > 1) {
             guiGraphics.drawCenteredString(this.font, "Выбери точку респавна:", this.width, this.height + 16, 0xFFFFFF);
         }
+    }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         super.render(guiGraphics, mouseX, mouseY, delta);
     }
 
@@ -106,18 +109,23 @@ public class CustomDeathScreen extends Screen {
     public static class RespawnPointList extends AbstractSelectionList<RespawnPointList.Entry>{
 
         public RespawnPointList(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, height, top, bottom, itemHeight);
-            setRenderBackground(false);
-            setRenderTopAndBottom(false);
+            super(mc, width, bottom - top, top, itemHeight);
             setRenderHeader(false, 0);
         }
+
+        // Replaces setRenderBackground(false) / setRenderTopAndBottom(false) from 1.20
+        @Override
+        protected void renderListBackground(GuiGraphics guiGraphics) {}
+
+        @Override
+        protected void renderListSeparators(GuiGraphics guiGraphics) {}
 
         public void addRespawnPoint(CustomDeathScreen.RespawnUiElement element, Runnable onSelect) {
             this.addEntry(new Entry(element, onSelect));
         }
 
         @Override
-        public void updateNarration(NarrationElementOutput narrationElementOutput) { }
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         public class Entry extends AbstractSelectionList.Entry<Entry> {
             private final CustomDeathScreen.RespawnUiElement element;

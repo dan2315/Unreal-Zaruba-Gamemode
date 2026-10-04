@@ -4,16 +4,15 @@ import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.NetworkPackets.StartHudTimerPacket;
 import com.dod.unrealzaruba.NetworkPackets.StopHudTimerPacket;
 import com.dod.unrealzaruba.UnrealZaruba;
-import net.minecraftforge.server.ServerLifecycleHooks;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class NetworkedTimer implements IGameTimer {
     @Override
     public void startCountDown(long startTime, int durationSeconds) {
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
             UnrealZaruba.LOGGER.warn("SENDING TIMER START PACKET TO " + player.getName());
-            NetworkHandler.CHANNEL.send(
-                    PacketDistributor.PLAYER.with(() -> player), new StartHudTimerPacket(startTime, durationSeconds)
+            PacketDistributor.sendToPlayer(player, new StartHudTimerPacket(startTime, durationSeconds)
             );
         });
     }
@@ -21,8 +20,7 @@ public class NetworkedTimer implements IGameTimer {
     @Override
     public void stop() {
         ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers().forEach(player -> {
-            NetworkHandler.CHANNEL.send(
-                    PacketDistributor.PLAYER.with(() -> player), new StopHudTimerPacket()
+            PacketDistributor.sendToPlayer(player, new StopHudTimerPacket()
             );
         });
     }

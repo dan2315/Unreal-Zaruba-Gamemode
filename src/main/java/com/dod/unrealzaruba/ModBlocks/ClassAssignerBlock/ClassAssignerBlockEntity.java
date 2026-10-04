@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock;
 
+import net.minecraft.core.HolderLookup;
 import com.dod.unrealzaruba.ModBlocks.ModBlocks;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.UnrealZaruba;
@@ -46,8 +47,8 @@ public class ClassAssignerBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         if (classId != null) {
             tag.putString("classId", classId);
         }
@@ -57,8 +58,8 @@ public class ClassAssignerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("classId")) {
             classId = tag.getString("classId");
         }

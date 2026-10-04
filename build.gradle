@@ -1,233 +1,141 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
-    }
-}
-
 plugins {
-    id 'net.minecraftforge.gradle' version '6.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
-    id 'eclipse'
+    id 'java-library'
     id 'idea'
     id 'maven-publish'
-    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
-    id "com.modrinth.minotaur" version "2.4.5" apply false
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-
-    // id "architectury-plugin" version "3.4.146"
-    // id "dev.architectury.loom" version "1.3.355"
+    id 'net.neoforged.moddev' version '2.0.148'
 }
 
-version = '0.2'
-group = 'com.dod.unrealzaruba' 
-archivesBaseName = 'unrealzaruba'
+version = mod_version
+group = mod_group_id
 
+base {
+    archivesName = mod_id
+}
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: 'official', version: '1.20.1'
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
 
     runs {
         client {
-            
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'unrealzaruba'
-
-
-            mods {
-                unrealzaruba {
-                    source sourceSets.main
-                }
-            }
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'unrealzaruba'
-
-            mods {
-                unrealzaruba {
-                    source sourceSets.main
-                }
-            }
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         gameTestServer {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'unrealzaruba'
-
-            mods {
-                unrealzaruba {
-                    source sourceSets.main
-                }
-            }
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', 'unrealzaruba', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
 
-            mods {
-                unrealzaruba {
-                    source sourceSets.main
-                }
-            }
+        configureEach {
+            gameDirectory = project.file(project.findProperty('runDir') ?: 'run')
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
         }
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-mixin {
-    // disableAnnotationProcessorCheck()
-    add sourceSets.main, 'mixins.unrealzaruba.refmap.json'
-    config 'mixins.unrealzaruba.json'
-}
-
-
 repositories {
-    maven {
-        url = 'https://libraries.minecraft.net/'
-    }
-    maven {
-        url = 'https://files.minecraftforge.net/maven/'
-    }
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-    }
-    maven {
-        name = "Curse Maven"
-        url = "https://www.cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-    maven {
-         url = 'https://repo.maven.apache.org/maven2/'
-    }
-    maven {
-        name = "Valkyrien Skies Internal"
-        url = 'https://maven.valkyrienskies.org'
-    }
-    maven {
-        name "realrobotixCreatebigcannons"
-        url "https://maven.realrobotix.me/createbigcannons"
-    }
-    maven { url = 'https://files.minecraftforge.net/maven' }
-
-    maven {
-        url = "https://maven.tterrag.com/"
-        content {
-            includeGroup("com.tterrag.registrate")
-            includeGroup("com.simibubi.create")
-        }
-    }
-
-    maven { // Registrate
-        url "https://maven.tterrag.com/"
-    }
-
-    maven {
-        name "ModMaven"
-        url "https://modmaven.dev"
-    }
     mavenLocal()
-    flatDir{
-        dir 'libs'
+    maven { url = 'https://maven.createmod.net' }            // Create, Ponder, Flywheel
+    maven { url = 'https://maven.ithundxr.dev/snapshots' }   // Registrate
+    maven { url = 'https://maven.blamejared.com' }           // Veil and other transitive deps
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'RyanHCode Maven'
+                url = 'https://maven.ryanhcode.dev/releases'
+            }
+        }
+        filter {
+            includeGroupAndSubgroups 'dev.ryanhcode'
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.0"
+    // Create
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    implementation("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
 
-    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+    // Sable physics (the engine behind Create Aeronautics), replaces Valkyrien Skies
+    implementation("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
+    runtimeOnly("maven.modrinth:create-aeronautics:${create_aeronautics_modrinth_version}")
 
-    implementation ('com.fasterxml.jackson.core:jackson-databind:2.13.3')
-    implementation('org.spongepowered:mixin:0.8.5')
-    implementation("org.joml:joml:1.10.4")
-    implementation("org.joml:joml-primitives:1.10.0")
+    // Xaero's Minimap waypoint integration (optional at runtime)
+    compileOnly("maven.modrinth:xaeros-minimap:${xaero_minimap_modrinth_version}")
 
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    jarJar(group: 'com.tterrag.registrate', name: 'Registrate', version: "[MC1.20-1.3.3, MC1.21)")
-
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-forge:$vs2_version") { transitive = false }
-    implementation fg.deobf("org.valkyrienskies:valkyrienskies-1201-common:$vs2_version") { transitive = false }
-
-    implementation fg.deobf("org.valkyrienskies.core:api:$vs_core_version")
-    implementation fg.deobf("org.valkyrienskies.core:api-game:$vs_core_version")
-    implementation fg.deobf("org.valkyrienskies.core:util:$vs_core_version")
-    implementation fg.deobf("org.valkyrienskies.core:impl:$vs_core_version")
-    implementation fg.deobf("org.valkyrienskies.eureka:eureka-1201-forge:1.5.2-beta.3+6a8f7ebb44")
-
-    implementation fg.deobf("curse.maven:curios-309927:5367944") // That shit is not working, sad face
-
-    // Create and its dependencies
-    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-1.20.1:0.6.11-12")
-
-    // Valkyrien Ship Schematics dependency for 1.20.1
-    // implementation fg.deobf("net.spaceeye:valkyrien-ship-schematics-forge-${minecraft_version}:1.0")
-    compileOnly fg.deobf(files("./libs/VMod-Forge-1.20.1-1.6.0.jar"))
-    compileOnly fg.deobf(files("./Valkyrien-Ship-Schematics/forge/build/libs/valkyrien-ship-schematics-forge-1.20.1-1.0.jar"))
-    compileOnly fg.deobf(files("./libs/Xaeros_Minimap_25.2.10_Forge_1.20.jar"))
-    compileOnly fg.deobf("sosal:advancedcompass.forge.1.20.1:1.2.15")
-
-    // TODO: бляяяя, добавьте Биг Кэнонс 
-    // implementation fg.deobf('curse.maven:timeless-and-classics-zero-1028108:5529108-sources-5529188')
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-371e22a")
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-371e22a")
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-common-1.18.2:0.5.4-nightly-2697705")
-    // implementation fg.deobf("com.rbasamoyai:createbigcannons-forge-1.18.2:0.5.4-nightly-2697705")
 }
 
-// configurations {
-//     embeddedDeps
-// }
-
-// dependencies {
-//     embeddedDeps files(
-//     )
-// }
-
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : "unrealzaruba",
-                "Specification-Vendor"    : "unrealzaruba",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "unrealzaruba",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_credits            : mod_credits,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
     }
 }
 
-
-jar.finalizedBy('reobfJar')
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            from components.java
         }
     }
     repositories {
@@ -235,24 +143,15 @@ publishing {
             url "file://${project.projectDir}/mcmodsrepo"
         }
     }
-    
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }
 
-reobf {
-    jarJar { }
-}
-
-tasks.jarJar.finalizedBy('reobfJarJar')
-
-
-tasks.register('buildClient', Exec) {
-    commandLine 'cmd', '/c', 'buildClient.bat', archivesBaseName + "-" + version + ".jar"
-}
-
-tasks.register('buildServer', Exec) {
-    commandLine 'cmd', '/c', 'buildServer.bat', archivesBaseName + "-" + version + ".jar"
+tasks.named('compileJava', JavaCompile) {
+    options.compilerArgs += ['-Xmaxerrs', '2000']
 }

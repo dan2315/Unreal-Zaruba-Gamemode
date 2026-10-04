@@ -3,15 +3,16 @@ package com.dod.unrealzaruba.Mobs;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class ModMobs {
-    public static final DeferredRegister<EntityType<?>>ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, UnrealZaruba.MOD_ID);
+    public static final DeferredRegister<EntityType<?>>ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, UnrealZaruba.MOD_ID);
 
-    public static final RegistryObject<EntityType<ClickableHumanoidEntity>> CLICKABLE_HUMANOID_ENTITY = ENTITY_TYPES.register("clickable_humanoid_entity",
+    public static final DeferredHolder<EntityType<?>, EntityType<ClickableHumanoidEntity>> CLICKABLE_HUMANOID_ENTITY = ENTITY_TYPES.register("clickable_humanoid_entity",
      () -> EntityType.Builder.of(ClickableHumanoidEntity::new, MobCategory.CREATURE)
     .sized(0.6f, 1.95f)  
     .build("custom_npc"));

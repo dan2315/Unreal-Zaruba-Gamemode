@@ -25,18 +25,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.dod.unrealzaruba.NetworkPackets.UpdateDeathTimerPacket;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectivesData;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectivesHandler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 
 public abstract class BaseGamemode implements IPhaseHolder {
@@ -161,14 +163,14 @@ public abstract class BaseGamemode implements IPhaseHolder {
         return 1;
     }
 
-    public void onServerTick(TickEvent.ServerTickEvent event) {
+    public void onServerTick(ServerTickEvent.Pre event) {
         if (objectivesHandler != null) objectivesHandler.onServerTick();
         if (isConditionalPhase) { // По сути тикают помимо этой фазы ещё ТаймедФазы, но по внутреннему таймеру
             conditionalPhase.OnTick(0);
         }
     }
 
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent.Post event) {
         if (objectivesHandler != null) objectivesHandler.onPlayerTick(event);
     }
 
@@ -229,9 +231,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
         
         int remainingSeconds = RESPAWN_DURATION_SECONDS - (ticks / 20);
         
-        NetworkHandler.CHANNEL.send(
-            PacketDistributor.PLAYER.with(() -> player), 
-            new UpdateDeathTimerPacket(remainingSeconds)
+        PacketDistributor.sendToPlayer(player, new UpdateDeathTimerPacket(remainingSeconds)
         );
     }
 }

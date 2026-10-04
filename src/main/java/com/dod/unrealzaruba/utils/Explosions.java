@@ -42,7 +42,7 @@ public class Explosions {
      * @param strength
      */
     public static void createExplosionNoPlayerDamage(Level world, Entity sourceEntity, BlockPos pos, float strength) {
-        Explosion explosion = new Explosion(world, sourceEntity, null, null, pos.getX(), pos.getY(), pos.getZ(), strength, false, Explosion.BlockInteraction.DESTROY);
+        Explosion explosion = new Explosion(world, sourceEntity, pos.getX(), pos.getY(), pos.getZ(), strength, false, Explosion.BlockInteraction.DESTROY);
         explosion.explode();
 
         AABB explosionArea = new AABB(
@@ -54,7 +54,7 @@ public class Explosions {
 
         for (Entity entity : entitiesInRange) {
             if (!(entity instanceof Player)) {
-                entity.hurt(explosion.getDamageSource(), strength);
+                entity.hurt(world.damageSources().explosion(explosion), strength);
             }
         }
 

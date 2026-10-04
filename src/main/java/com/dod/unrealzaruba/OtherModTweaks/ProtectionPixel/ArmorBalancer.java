@@ -1,7 +1,9 @@
 package com.dod.unrealzaruba.OtherModTweaks.ProtectionPixel;
 
 import com.dod.unrealzaruba.UnrealZaruba;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -9,8 +11,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Equipable;
-import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 import java.util.*;
 
@@ -98,7 +101,7 @@ public class ArmorBalancer {
     public static void onItemAttributeModifier(ItemAttributeModifierEvent event) {
         ItemStack stack = event.getItemStack();
         Item item = stack.getItem();
-        ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         
         if (itemId == null) return;
         String itemKey = itemId.toString();
@@ -115,52 +118,39 @@ public class ArmorBalancer {
                 return;
             }
 
-            if (event.getSlotType() == itemSlot) {
-                replaceAttribute(event, Attributes.ARMOR, stats.armor);
-                replaceAttribute(event, Attributes.ARMOR_TOUGHNESS, stats.toughness);
-                replaceAttribute(event, Attributes.KNOCKBACK_RESISTANCE, stats.knockbackResistance);
-                if (stats.attackDamage > 0) {
-                    replaceAttribute(event, Attributes.ATTACK_DAMAGE, stats.attackDamage);
-                }
-                if (stats.attackSpeed > 0) {
-                    replaceAttribute(event, Attributes.ATTACK_SPEED, stats.attackSpeed);
-                }
-                
-                for (Map.Entry<Attribute, Float> entry : stats.customAttributes.entrySet()) {
-                    replaceAttribute(event, entry.getKey(), entry.getValue());
-                }
+            replaceAttribute(event, itemSlot, Attributes.ARMOR, stats.armor);
+            replaceAttribute(event, itemSlot, Attributes.ARMOR_TOUGHNESS, stats.toughness);
+            replaceAttribute(event, itemSlot, Attributes.KNOCKBACK_RESISTANCE, stats.knockbackResistance);
+            if (stats.attackDamage > 0) {
+                replaceAttribute(event, itemSlot, Attributes.ATTACK_DAMAGE, stats.attackDamage);
+            }
+            if (stats.attackSpeed > 0) {
+                replaceAttribute(event, itemSlot, Attributes.ATTACK_SPEED, stats.attackSpeed);
+            }
+            
+            for (Map.Entry<Holder<Attribute>, Float> entry : stats.customAttributes.entrySet()) {
+                replaceAttribute(event, itemSlot, entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private static void replaceAttribute(ItemAttributeModifierEvent event, Attribute attribute, float value) {
+    private static void replaceAttribute(ItemAttributeModifierEvent event, EquipmentSlot slot, Holder<Attribute> attribute, float value) {
         if (attribute == null) return;
-        
-        List<AttributeModifier> modifiersToRemove = new ArrayList<>();
-        
-        event.getModifiers().forEach((attr, modifier) -> {
-            if (attr == attribute) {
-                modifiersToRemove.add(modifier);
-            }
-        });
-        
-        for (AttributeModifier modifier : modifiersToRemove) {
-            event.removeModifier(attribute, modifier);
-        }
-        
+
+        event.removeAllModifiersFor(attribute);
+
         if (value > 0) {
             event.addModifier(attribute, new AttributeModifier(
-                getConsistentUUID(attribute, event.getSlotType()),
-                attribute.getDescriptionId(),
+                getConsistentId(attribute, slot),
                 value,
-                AttributeModifier.Operation.ADDITION
-            ));
+                AttributeModifier.Operation.ADD_VALUE
+            ), EquipmentSlotGroup.bySlot(slot));
         }
     }
 
-    private static UUID getConsistentUUID(Attribute attribute, EquipmentSlot slot) {
-        String seed = attribute.getDescriptionId() + "_" + slot.getName();
-        return UUID.nameUUIDFromBytes(seed.getBytes());
+    private static ResourceLocation getConsistentId(Holder<Attribute> attribute, EquipmentSlot slot) {
+        String attributeName = attribute.unwrapKey().map(key -> key.location().getPath()).orElse("unknown");
+        return ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "armor_balance/" + slot.getName() + "/" + attributeName);
     }
 
     private static class ArmorStats {
@@ -169,7 +159,7 @@ public class ArmorBalancer {
         float knockbackResistance = 0.0f;
         float attackDamage = 0.0f;
         float attackSpeed = 0.0f;
-        Map<Attribute, Float> customAttributes = new HashMap<>();
+        Map<Holder<Attribute>, Float> customAttributes = new HashMap<>();
         
         ArmorStats setVanillaStats(float armor, float toughness, float knockbackResistance) {
             this.armor = armor;
@@ -184,7 +174,7 @@ public class ArmorBalancer {
             return this;
         }
         
-        ArmorStats setAttribute(Attribute attribute, float value) {
+        ArmorStats setAttribute(Holder<Attribute> attribute, float value) {
             if (attribute != null) {
                 customAttributes.put(attribute, value);
             }

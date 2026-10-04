@@ -26,7 +26,7 @@ public class EnterUnrealZarubaEntityRenderer extends MobRenderer<ClickableHumano
 
     @Override
     public ResourceLocation getTextureLocation(@Nonnull ClickableHumanoidEntity clickableEntity) {
-        return new ResourceLocation("minecraft", "textures/entity/steve.png");
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/steve.png");
     }
 
     @Override

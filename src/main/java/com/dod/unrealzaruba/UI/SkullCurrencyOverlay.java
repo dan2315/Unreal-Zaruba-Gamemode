@@ -5,18 +5,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.gui.Gui;
+import com.dod.unrealzaruba.UI.ZarubaOverlay;
 
-public class SkullCurrencyOverlay implements IGuiOverlay {
+public class SkullCurrencyOverlay implements ZarubaOverlay {
     public boolean is_visible = false;
     public int amount = 0;
 
-    public static IGuiOverlay INSTANCE = new SkullCurrencyOverlay();
+    public static ZarubaOverlay INSTANCE = new SkullCurrencyOverlay();
     public static SkullCurrencyOverlay OVERLAY_INSTANCE = (SkullCurrencyOverlay) INSTANCE;
     // Даня, это надо перех@ячить))
     @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
 
         if (!is_visible) {

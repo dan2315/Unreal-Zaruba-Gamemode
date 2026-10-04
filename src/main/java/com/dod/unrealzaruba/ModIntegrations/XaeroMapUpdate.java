@@ -45,7 +45,7 @@ public class XaeroMapUpdate {
                     capturePointObjective.GetPosition().getZ(),
                     capturePointObjective.GetName(),
                     capturePointObjective.GetName().substring(0, 1).toUpperCase(),
-                    Conversion.IntColorToXaeroColor(capturePointObjective.getOwnerColor()),
+                    IntColorToXaeroColor(capturePointObjective.getOwnerColor()),
                     WaypointPurpose.NORMAL,
                     true
             );
@@ -68,4 +68,30 @@ public class XaeroMapUpdate {
         return null;
     }
 
+
+    private static WaypointColor IntColorToXaeroColor(int color) {
+        WaypointColor closest = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        int r1 = (color >> 16) & 0xFF;
+        int g1 = (color >> 8) & 0xFF;
+        int b1 = color & 0xFF;
+
+        for (WaypointColor wc : WaypointColor.values()) {
+            int hex = wc.getHex();
+            int r2 = (hex >> 16) & 0xFF;
+            int g2 = (hex >> 8) & 0xFF;
+            int b2 = hex & 0xFF;
+
+            double distance = Math.sqrt(Math.pow(r1 - r2, 2) +
+                    Math.pow(g1 - g2, 2) +
+                    Math.pow(b1 - b2, 2));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closest = wc;
+            }
+        }
+
+        return closest;
+    }
 }

@@ -3,13 +3,13 @@ package com.dod.unrealzaruba.NetworkPackets;
 import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class RenderableZonesPacket {
+public class RenderableZonesPacket implements ModPacket {
     int zonesToUpdate;
     List<ColoredSquareZone> squareZones;
 
@@ -40,7 +40,7 @@ public class RenderableZonesPacket {
         return packet;
     }
 
-    public static void handle(RenderableZonesPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(RenderableZonesPacket packet, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() ->
                 packet.squareZones.forEach(zone ->
                         UnrealZaruba.geometryRenderer.UpdateRenderableObject(zone)));

@@ -2,13 +2,13 @@ package com.dod.unrealzaruba.NetworkPackets;
 
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class DeleteRenderableZonesPacket {
+public class DeleteRenderableZonesPacket implements ModPacket {
     List<Integer> ids;
 
     public DeleteRenderableZonesPacket(List<Integer> ids) {
@@ -31,7 +31,7 @@ public class DeleteRenderableZonesPacket {
         return new DeleteRenderableZonesPacket(list);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
+    public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
             for(var id : ids) {
                 UnrealZaruba.geometryRenderer.Remove(id);

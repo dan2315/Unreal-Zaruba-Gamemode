@@ -25,18 +25,17 @@ import com.dod.unrealzaruba.Vehicles.VehicleRegistry;
 
 import com.mojang.logging.LogUtils;
 
-import dlovin.advancedcompass.AdvancedCompass;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
 import com.dod.unrealzaruba.Commands.CommandRegistration;
 import com.dod.unrealzaruba.Gamemodes.GamemodeFactory;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.Gamemodes.GameTimer.NetworkedTimer;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 
 @Mod(UnrealZaruba.MOD_ID)
@@ -50,22 +49,18 @@ public class UnrealZaruba {
     public static WorldManager worldManager;
     public static VehicleManager vehicleManager;
     public static GeometryRenderer geometryRenderer;
-    public static AdvancedCompass advancedCompass;
 
-    public UnrealZaruba() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-        advancedCompass = AdvancedCompass.getInstance();
-
+    public UnrealZaruba(IEventBus modEventBus, ModContainer modContainer) {
         ConfigManager.init();
-        MinecraftForge.EVENT_BUS.register(new NetworkHandler());
         NetworkHandler.init();
+        modEventBus.addListener(NetworkHandler::onRegisterPayloads);
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         CreativeTabs.register(modEventBus);
-        TeamColorArgument.RegisterArgument();
+        TeamColorArgument.RegisterArgument(modEventBus);
         ModSounds.register(modEventBus);
         ModMobs.register(modEventBus);
+        modEventBus.register(AttributesRegistration.class);
         ModMenus.register(modEventBus);
 
 
@@ -81,8 +76,11 @@ public class UnrealZaruba {
         httpClientService = new HttpClientService();
         gameStatisticsService = new GameStatisticsService(httpClientService);
 
-        modEventBus.addListener(ModSetupEvents::onClientSetup);
-        modEventBus.addListener(ModSetupEvents::registerGuiOverlays);
+        if (FMLEnvironment.dist.isClient()) {
+            modEventBus.addListener(ModSetupEvents::onClientSetup);
+            modEventBus.addListener(ModSetupEvents::registerGuiOverlays);
+            modEventBus.addListener(ModSetupEvents::registerMenuScreens);
+        }
 
         VehicleRegistry.init();
         vehicleManager = new VehicleManager();
@@ -91,15 +89,12 @@ public class UnrealZaruba {
         HudObjective.InitializeAllHudObjectiveTypes();
 
         var serverEvents = new ServerEvents(gameStatisticsService, GamemodeManager.instance);
-        MinecraftForge.EVENT_BUS.register(serverEvents);
+        NeoForge.EVENT_BUS.register(serverEvents);
 
         if (FMLEnvironment.dist.isClient()) {
             var clientEvents = new ClientEvents(GamemodeManager.instance);
-            MinecraftForge.EVENT_BUS.register(clientEvents);
+            NeoForge.EVENT_BUS.register(clientEvents);
         }
-
-        MinecraftForge.EVENT_BUS.register(AttributesRegistration.class);
-
         CommandRegistration.init(gameStatisticsService);
     }
 }

@@ -9,9 +9,9 @@ import com.dod.unrealzaruba.TeamLogic.TeamContext;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
-public class SelectRespawnPointPacket {
+public class SelectRespawnPointPacket implements ModPacket {
     
     private final UUID playerID;
     private final byte respawnPointIndex;
@@ -40,7 +40,7 @@ public class SelectRespawnPointPacket {
         return new SelectRespawnPointPacket(playerID, respawnPointIndex);
     }
 
-    public static void handle(SelectRespawnPointPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(SelectRespawnPointPacket packet, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             TeamPlayerContext player = ((TeamPlayerContext)PlayerContext.Get(packet.getPlayerID()));
             if (player == null) return;

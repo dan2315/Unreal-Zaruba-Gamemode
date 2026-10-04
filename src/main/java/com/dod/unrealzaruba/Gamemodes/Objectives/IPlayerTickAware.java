@@ -1,7 +1,8 @@
 package com.dod.unrealzaruba.Gamemodes.Objectives;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
 
 /**
  * Interface for objects that need to receive player tick events.
@@ -13,5 +14,5 @@ public interface IPlayerTickAware {
      * @param event The player tick event
      * @param player The server player
      */
-    void onPlayerTick(TickEvent.PlayerTickEvent event, ServerPlayer player);
+    void onPlayerTick(PlayerTickEvent.Post event, ServerPlayer player);
 } 

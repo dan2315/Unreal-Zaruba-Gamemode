@@ -10,15 +10,14 @@ import java.util.Comparator;
 import com.dod.unrealzaruba.Title.TitleMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 import com.dod.unrealzaruba.UnrealZaruba;
 
 
 public class GamemodeManager {
-    public static final int MINIMUM_PLAYERS_TO_START = 6;
-
     public static GamemodeManager instance;
     private BaseGamemode activeGamemode;
 
@@ -77,7 +76,7 @@ public class GamemodeManager {
             }
         }
 
-        if (allPlayersReady && players.size() > MINIMUM_PLAYERS_TO_START) { // TODO: Make it configurable
+        if (allPlayersReady && players.size() >= ConfigManager.getMainConfig().getMinPlayersToStart()) {
             StartGame();
         }
     }

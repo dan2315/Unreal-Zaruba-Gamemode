@@ -3,9 +3,8 @@ package com.dod.unrealzaruba.Mobs;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class AttributesRegistration {
 
@@ -20,7 +19,7 @@ public class AttributesRegistration {
             .add(Attributes.ARMOR)
             .add(Attributes.ARMOR_TOUGHNESS)
             .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
-            .add(ForgeMod.ENTITY_GRAVITY.get())
+            .add(Attributes.GRAVITY)
             .build());
     }
 }

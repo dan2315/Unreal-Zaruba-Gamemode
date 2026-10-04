@@ -8,9 +8,9 @@ import com.dod.unrealzaruba.CommanderSystem.CommanderSystem;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
-public class VotePlayerPacket {
+public class VotePlayerPacket implements ModPacket {
 
     private final UUID uuid;
 
@@ -31,7 +31,7 @@ public class VotePlayerPacket {
         return new VotePlayerPacket(uuid);
     }
 
-    public static void handle(VotePlayerPacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(VotePlayerPacket msg, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer serverPlayer = ctx.get().getSender();
             if (serverPlayer != null) {

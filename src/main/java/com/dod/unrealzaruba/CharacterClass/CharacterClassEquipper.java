@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.CharacterClass;
+import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.VanillaItems;
 
 import java.util.List;
 
@@ -62,7 +63,9 @@ public class CharacterClassEquipper {
                 player.setItemSlot(slot, item.copy());
             }
             else if (itemType.toString().contains("pumpkin")) {
-                player.setItemSlot(EquipmentSlot.HEAD, item.copy());
+                ItemStack pumpkin = item.copy();
+                VanillaItems.applyBindingCurse(pumpkin, player.registryAccess());
+                player.setItemSlot(EquipmentSlot.HEAD, pumpkin);
                 UnrealZaruba.LOGGER.info("Found pumpkin: {}", itemType.getDescriptionId());
             }
             else if (!player.getInventory().add(item.copy())) {

@@ -4,12 +4,12 @@ import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
 import com.dod.unrealzaruba.UI.Objectives.HudObjectiveUpdate;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-public class ClientboundUpdateObjectivePacket {
+public class ClientboundUpdateObjectivePacket implements ModPacket {
     HudObjectiveUpdate objectiveUpdate;
 
     public ClientboundUpdateObjectivePacket(HudObjectiveUpdate objectiveUpdate) {
@@ -25,7 +25,7 @@ public class ClientboundUpdateObjectivePacket {
         return new ClientboundUpdateObjectivePacket(new HudObjectiveUpdate(buffer.readByte(), buffer.readByte()));
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
+    public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
             ObjectivesOverlay.INSTANCE.UpdateObjectives(List.of(this.objectiveUpdate));
         });

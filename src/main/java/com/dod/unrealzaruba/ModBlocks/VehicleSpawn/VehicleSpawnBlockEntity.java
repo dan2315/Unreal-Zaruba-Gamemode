@@ -1,8 +1,9 @@
 package com.dod.unrealzaruba.ModBlocks.VehicleSpawn;
 
+import net.minecraft.core.HolderLookup;
 import com.dod.unrealzaruba.ModBlocks.ModBlocks;
 import com.dod.unrealzaruba.UnrealZaruba;
-import com.dod.unrealzaruba.VsIntegration.ShipCreator;
+import com.dod.unrealzaruba.SableIntegration.ShipCreator;
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
@@ -64,7 +65,7 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
                                     " for team: " + teamColor + " at " + worldPosition);
             
             if (level instanceof ServerLevel serverLevel) {
-                boolean result = ShipCreator.CreateShipFromTemplate( new ResourceLocation(vehicleType), worldPosition, Direction.NORTH,serverLevel, null); // TODO: Replace North with actual direction
+                boolean result = ShipCreator.CreateShipFromTemplate( ResourceLocation.parse(vehicleType), worldPosition, Direction.NORTH,serverLevel, null); // TODO: Replace North with actual direction
 
                 if (!result) {
                     UnrealZaruba.LOGGER.error("[VehicleSpawnBlockEntity] Failed to spawn vehicle of type: " + vehicleType);
@@ -76,15 +77,15 @@ public class VehicleSpawnBlockEntity extends BlockEntity {
     }
     
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putString("VehicleType", vehicleType);
         tag.putString("TeamColor", teamColor.name());
     }
     
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("VehicleType")) {
             vehicleType = tag.getString("VehicleType");
         }

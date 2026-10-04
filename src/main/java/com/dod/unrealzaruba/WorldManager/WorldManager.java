@@ -2,8 +2,17 @@ package com.dod.unrealzaruba.WorldManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 
 import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.dod.unrealzaruba.UnrealZaruba;
@@ -34,22 +43,22 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.LevelEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import org.apache.commons.lang3.tuple.Pair;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.apigame.VSCore;
-import org.valkyrienskies.core.apigame.world.ServerShipWorldCore;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import com.dod.unrealzaruba.SableIntegration.SableShips;
 
 public class WorldManager {
     public static final ResourceKey<Level> GAME_DIMENSION = ResourceKey
-            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "game_dim"));
+            .create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath("unrealzaruba", "game_dim"));
     public static final ResourceKey<Level> LOBBY_DIMENSION = ResourceKey
-            .create(Registries.DIMENSION, new ResourceLocation("unrealzaruba", "lobby_dim"));
+            .create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath("unrealzaruba", "lobby_dim"));
     
     public static final ResourceKey<DimensionType> DIMENSION_TYPE = ResourceKey
-            .create(Registries.DIMENSION_TYPE, new ResourceLocation("unrealzaruba", "custom_dimension_type"));
+            .create(Registries.DIMENSION_TYPE, ResourceLocation.fromNamespaceAndPath("unrealzaruba", "custom_dimension_type"));
+
+    private static final String TEMPLATE_WORLDS_DIR = "game_worlds";
+    private static final String RUNTIME_WORLDS_DIR = "game_worlds_runtime";
 
     public static ServerLevel gameLevel;
     public static MinecraftServer server;
@@ -70,6 +79,7 @@ public class WorldManager {
     public static void ReloadGameWorld(BaseGamemode gamemode) {
         var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
         deleteGameWorld();
+        prepareRuntimeCopy(gamemodeName);
         prepareWorldStorage(gamemodeName);
         createGameWorld(gamemodeName);
     }
@@ -83,12 +93,75 @@ public class WorldManager {
             UnrealZaruba.LOGGER.info("Deleting game world");
             deleteGameWorld();
 
-            TimerManager.createRealTimeTimer(1000 /*1s*/, () -> {
+            // Copying a map takes a moment, so do it off the server thread
+            CompletableFuture.runAsync(() -> prepareRuntimeCopy(gamemodeName)).whenComplete((ignored, error) -> server.execute(() -> {
+                if (error != null) {
+                    UnrealZaruba.LOGGER.error("Failed to copy map template for {}", gamemodeName, error);
+                    return;
+                }
                 UnrealZaruba.LOGGER.info("Creating game world");
                 prepareWorldStorage(gamemodeName);
                 createGameWorld(gamemodeName);
-            }, null);
+            }));
         }, null);
+    }
+
+    /**
+     * Maps in game_worlds/ are templates. Outside DEV mode the game level runs on a throwaway copy in
+     * game_worlds_runtime/, because Minecraft writes to the loaded world in ways a mixin can't fully block
+     * (entity unloads, shutdown saves, other mods). Whatever gets written then never reaches the template.
+     * DEV mode loads the template directly so map edits are saved.
+     */
+    private static boolean useRuntimeCopy() {
+        return !ConfigManager.isDevMode();
+    }
+
+    private static File worldsRoot() {
+        return new File(useRuntimeCopy() ? RUNTIME_WORLDS_DIR : TEMPLATE_WORLDS_DIR);
+    }
+
+    private static void prepareRuntimeCopy(String gamemodeName) {
+        if (!useRuntimeCopy()) {
+            return;
+        }
+        Path template = Path.of(TEMPLATE_WORLDS_DIR, gamemodeName);
+        Path runtime = Path.of(RUNTIME_WORLDS_DIR, gamemodeName);
+        try {
+            deleteRecursively(runtime);
+            if (!Files.isDirectory(template)) {
+                UnrealZaruba.LOGGER.error("Map template not found: {}, the game world will be empty", template.toAbsolutePath());
+                return;
+            }
+            long start = System.currentTimeMillis();
+            copyRecursively(template, runtime);
+            UnrealZaruba.LOGGER.info("Copied map template {} in {} ms", template, System.currentTimeMillis() - start);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static void copyRecursively(Path source, Path target) throws IOException {
+        try (Stream<Path> paths = Files.walk(source)) {
+            for (Path path : (Iterable<Path>) paths::iterator) {
+                Path destination = target.resolve(source.relativize(path).toString());
+                if (Files.isDirectory(path)) {
+                    Files.createDirectories(destination);
+                } else if (!path.getFileName().toString().equals("session.lock")) {
+                    Files.copy(path, destination, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
+    }
+
+    private static void deleteRecursively(Path path) throws IOException {
+        if (!Files.exists(path)) {
+            return;
+        }
+        try (Stream<Path> paths = Files.walk(path)) {
+            for (Path p : (Iterable<Path>) paths.sorted(Comparator.reverseOrder())::iterator) {
+                Files.delete(p);
+            }
+        }
     }
 
     public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
@@ -97,13 +170,9 @@ public class WorldManager {
     }
 
     private static void prepareWorldStorage(String gamemodeName) {
-        File file = new File("game_worlds");
-        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(worldsRoot().toPath());
         try {
-            if (access != null) {
-                access.close();
-            }
-            // TODO: Manage how and why to use try with resource
+            closeAccess();
             access = levelStorageSource.validateAndCreateAccess(gamemodeName);
         } catch (IOException | ContentValidationException e) {
             throw new RuntimeException(e);
@@ -119,41 +188,59 @@ public class WorldManager {
                 chunkGenerator
         );
 
-        progressListener = new LoggerChunkProgressListener(11);
+        progressListener = LoggerChunkProgressListener.create(11);
         serverLevelData = server.getWorldData().overworldData();
     }
 
     // Better not try
     public static void deleteGameWorld() {
         ((IMinecraftServerExtended) server).deleteLevel(GAME_DIMENSION);
+        ServerLevel oldLevel = gameLevel;
         gameLevel = null;
+
+        if (oldLevel != null) {
+            // Nobody may stay in a level that's being closed
+            for (ServerPlayer player : new ArrayList<>(oldLevel.players())) {
+                teleportPlayerToDimension(player, LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
+            }
+            // Close it like vanilla does on shutdown, so its chunks, threads and file handles are released.
+            // Closing saves its chunks, which only matters in DEV mode; otherwise they land in the throwaway copy.
+            try {
+                NeoForge.EVENT_BUS.post(new LevelEvent.Unload(oldLevel));
+                oldLevel.close();
+            } catch (IOException e) {
+                UnrealZaruba.LOGGER.error("Failed to close the old game level", e);
+            }
+        }
+        closeAccess();
+    }
+
+    private static void closeAccess() {
+        if (access == null) {
+            return;
+        }
+        try {
+            access.close();
+        } catch (IOException e) {
+            UnrealZaruba.LOGGER.error("Failed to close game world storage", e);
+        }
+        access = null;
     }
 
     public static void createGameWorld(String gamemodeName) {
-        File file = new File("game_worlds");
-        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
-        try {
-            if (access != null) {
-                access.close();
-            }
-            // TODO: Manage how and why to use try with resource
-            access = levelStorageSource.validateAndCreateAccess(gamemodeName);
-        } catch (IOException | ContentValidationException e) {
-            throw new RuntimeException(e);
-        }
         gameLevel = new ServerLevel(server, Util.backgroundExecutor(), access, serverLevelData, GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), false, null);
         // boolean shouldSave = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV; Maybe it will be used at some point
         gameLevel.noSave = true;
         ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, gameLevel);
         server.markWorldsDirty();
-        MinecraftForge.EVENT_BUS.post(new LevelEvent.Load(gameLevel));
+        NeoForge.EVENT_BUS.post(new LevelEvent.Load(gameLevel));
     }
 
     public static void clearShipsInDimension(ServerLevel level) {
-        VSCore vsCore = VSGameUtilsKt.getVsCore();
-        ServerShipWorldCore shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
-        List<ServerShip> ships = new ArrayList<>(shipWorld.getAllShips());
-        vsCore.deleteShips(shipWorld, ships);
+        if (level == null) {
+            return;
+        }
+        SableShips.removeAll(level);
     }
 
     public static void TeleportAllPlayersTo(MinecraftServer server, ResourceKey<Level> dimensionKey) {

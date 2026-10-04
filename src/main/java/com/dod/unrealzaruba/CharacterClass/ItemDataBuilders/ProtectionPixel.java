@@ -1,10 +1,13 @@
 package com.dod.unrealzaruba.CharacterClass.ItemDataBuilders;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 public class ProtectionPixel {
 
@@ -17,8 +20,8 @@ public class ProtectionPixel {
 
     public static ItemStack CreatePowerEngineWithWaterTank() {
 
-        ItemStack powerEngine = new ItemStack(ForgeRegistries.ITEMS.getValue(
-            new ResourceLocation("protection_pixel:powerengine")), 1);
+        ItemStack powerEngine = new ItemStack(BuiltInRegistries.ITEM.get(
+            ResourceLocation.parse("protection_pixel:powerengine")), 1);
         
         CompoundTag mainTag = new CompoundTag();
         mainTag.putString("id", "protection_pixel:powerengine");
@@ -59,7 +62,8 @@ public class ProtectionPixel {
         
         mainTag.putDouble("steampower", 8.0d);
         
-        powerEngine.setTag(mainTag);
+        // TODO(1.21): this mod item still uses its pre-1.20.5 NBT layout; check the mod's 1.21 data components
+        powerEngine.set(DataComponents.CUSTOM_DATA, CustomData.of(mainTag));
         return powerEngine;
     }
 }

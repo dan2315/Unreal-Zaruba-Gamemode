@@ -41,8 +41,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,8 +153,8 @@ public class CapturePointsGamemode extends TeamGamemode {
         ArrayList<HudObjective> hudObjectives = new ArrayList<>();
         PrepareObjectiveDataToSendToClient(hudObjectives, zones);
         for(var player : server.getPlayerList().getPlayers()) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new RenderableZonesPacket(zones));
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ClientboundObjectivesPacket(hudObjectives));
+            PacketDistributor.sendToPlayer(player, new RenderableZonesPacket(zones));
+            PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(hudObjectives));
         }
     }
 
@@ -205,8 +205,8 @@ public class CapturePointsGamemode extends TeamGamemode {
         List<ColoredSquareZone> zones = new ArrayList<>();
         ArrayList<HudObjective> hudObjectives = new ArrayList<>();
         PrepareObjectiveDataToSendToClient(hudObjectives, zones);
-        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new RenderableZonesPacket(zones));
-        NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ClientboundObjectivesPacket(hudObjectives));
+        PacketDistributor.sendToPlayer(serverPlayer, new RenderableZonesPacket(zones));
+        PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
 
         if (server == null)
             return;
@@ -265,9 +265,7 @@ public class CapturePointsGamemode extends TeamGamemode {
             if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext tPlayerContext) {
                 tPlayerContext.DeselectRespawnPoint();
             }
-            NetworkHandler.CHANNEL.send(
-                    PacketDistributor.PLAYER.with(() -> player),
-                    new DeleteRenderableZonesPacket(
+            PacketDistributor.sendToPlayer(player, new DeleteRenderableZonesPacket(
                             objectivesHandler.getObjectives().stream()
                                     .filter(obj -> obj instanceof CapturePointObjective)
                                     .map(obj -> ((CapturePointObjective) obj).GetCaptureAreaAABB().hashCode() + ColoredSquareZone.RenderableIDShift)
@@ -283,7 +281,7 @@ public class CapturePointsGamemode extends TeamGamemode {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
         for (ServerPlayer player : players) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(()-> player), new ClientboundRemoveObjectivesPacket());
+            PacketDistributor.sendToPlayer(player, new ClientboundRemoveObjectivesPacket());
             player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();
         }

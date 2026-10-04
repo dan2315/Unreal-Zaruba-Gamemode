@@ -6,7 +6,8 @@ import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 public class CharacterClassData {
     private final String nameId;
@@ -28,7 +29,7 @@ public class CharacterClassData {
     }
 
     public CharacterClassData addKitItem(ResourceLocation item, int count) {
-        kit.add(new ItemStack(ForgeRegistries.ITEMS.getValue(item), count));
+        kit.add(new ItemStack(BuiltInRegistries.ITEM.get(item), count));
         return this;
     }
 

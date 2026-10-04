@@ -25,7 +25,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.core.Direction;
 import net.minecraft.world.MenuProvider;
-import net.minecraftforge.network.NetworkHooks;
 
 public class VehiclePurchaseBlock extends Block implements EntityBlock {
 
@@ -60,15 +59,12 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
             BlockEntityType<T> type) {
-                if (level.isClientSide) {
-                    return createTickerHelper(type, ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get(), 
-                        (world, pos, blockState, be) -> be.clientTick());
-                }
-                else {
-                    return type == ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get() ? 
+        if (level.isClientSide) {
+            return null;
+        }
+        return type == ModBlocks.VEHICLE_PURCHASE_BLOCK_ENTITY.get() ? 
                     (BlockEntityTicker<T>) (world, pos, blockState, be) ->
                     ((VehiclePurchaseBlockEntity) be).serverTick() : null; 
-                }
     }
 
     @SuppressWarnings("unchecked")
@@ -78,11 +74,11 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof VehiclePurchaseBlockEntity) {
-                NetworkHooks.openScreen((ServerPlayer) player, (MenuProvider) blockEntity, pos);
+                player.openMenu((MenuProvider) blockEntity, pos);
             } 
         }
         return InteractionResult.sidedSuccess(level.isClientSide());

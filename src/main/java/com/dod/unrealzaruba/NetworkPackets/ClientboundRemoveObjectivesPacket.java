@@ -4,12 +4,12 @@ import com.dod.unrealzaruba.Gamemodes.List;
 
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class ClientboundRemoveObjectivesPacket {
+public class ClientboundRemoveObjectivesPacket implements ModPacket {
     Integer size; // Можно отправить пустой пакет, что значит - удалить все обжективы из списка
     ArrayList<Byte> runtimeIds;
 
@@ -39,7 +39,7 @@ public class ClientboundRemoveObjectivesPacket {
         return new ClientboundRemoveObjectivesPacket(ids);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
+    public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
             if (size == 0) {
                 ObjectivesOverlay.INSTANCE.Clear();

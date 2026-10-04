@@ -2,11 +2,11 @@ package com.dod.unrealzaruba.NetworkPackets;
 
 import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 import com.dod.unrealzaruba.UI.CustomDeathScreen;
 import net.minecraft.client.Minecraft;
 
-public class UpdateDeathTimerPacket {
+public class UpdateDeathTimerPacket implements ModPacket {
     
     private int remainingTime;
 
@@ -29,7 +29,7 @@ public class UpdateDeathTimerPacket {
     }
 
     // Handle the packet on the client side
-    public static void handle(UpdateDeathTimerPacket packet, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(UpdateDeathTimerPacket packet, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             // Update the client-side death timer UI
             Minecraft minecraft = Minecraft.getInstance();

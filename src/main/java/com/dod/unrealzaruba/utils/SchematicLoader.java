@@ -11,25 +11,34 @@ import net.minecraft.nbt.NbtIo;
 import java.io.InputStream;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.minecraft.world.level.Level;
 import net.minecraft.client.Minecraft;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.FriendlyByteBuf;
 
-import net.spaceeye.valkyrien_ship_schematics.interfaces.IShipSchematic;
-import net.spaceeye.valkyrien_ship_schematics.ShipSchematic;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SchematicLoader {
     private static final Map<ResourceLocation, CompoundTag> SCHEMATIC_CACHE = new HashMap<>();
     private static final Map<ResourceLocation, StructureTemplate> TEMPLATE_CACHE = new HashMap<>();
-    private static final Map<ResourceLocation, IShipSchematic> VSCHEM_CACHE = new HashMap<>();
+    private static final Map<ResourceLocation, StructureTemplate> VEHICLE_CACHE = new HashMap<>();
 
     public static CompoundTag GetSchematicNbt(ResourceLocation location) {
         if (SCHEMATIC_CACHE.containsKey(location)) {
@@ -52,7 +61,11 @@ public class SchematicLoader {
             String path = "data/" + location.getNamespace() + "/" + location.getPath() + ".nbt";
             
             inputStream = SchematicLoader.class.getClassLoader().getResourceAsStream(path);
-    
+            if (inputStream == null) {
+                UnrealZaruba.LOGGER.warn("Schematic not found in mod resources: {}", path);
+                return null;
+            }
+
             byte[] bytes = inputStream.readAllBytes();
             System.out.println("File size: " + bytes.length + " bytes for " + path);
             
@@ -63,7 +76,7 @@ public class SchematicLoader {
             inputStream = new ByteArrayInputStream(bytes);
             
             try {
-                CompoundTag tag = NbtIo.readCompressed(new ByteArrayInputStream(bytes));
+                CompoundTag tag = NbtIo.readCompressed(new ByteArrayInputStream(bytes), NbtAccounter.unlimitedHeap());
                 if (tag == null) {
                     System.out.println("readCompressed returned null for " + path);
                 } else {
@@ -130,75 +143,62 @@ public class SchematicLoader {
     }
 
 
-    // VSCHEM
-    public static IShipSchematic GetVSchem(ResourceLocation location) {
-        UnrealZaruba.LOGGER.info("GetVSchem called for {}", location.toString());
-        if (VSCHEM_CACHE.containsKey(location)) {
-            return VSCHEM_CACHE.get(location);
+    // VEHICLES
+    /**
+     * Loads a vehicle structure template (vanilla structure .nbt, e.g. saved with a structure block).
+     * A file at schematics/vehicles/<name>.nbt in the server directory overrides the copy bundled at
+     * data/unrealzaruba/vehicles/<name>.nbt.
+     */
+    public static StructureTemplate GetVehicleTemplate(ResourceLocation location, ServerLevel level) {
+        if (VEHICLE_CACHE.containsKey(location)) {
+            return VEHICLE_CACHE.get(location);
         }
 
         try {
-            byte[] bytes;
-            String source;
-            
-            java.io.File file = new java.io.File("schematics/vs/" + location.getPath() + ".vschem");
-            UnrealZaruba.LOGGER.info("Trying to find file {}", file);
+            CompoundTag nbt;
+            File file = new File("schematics/vehicles/" + location.getPath() + ".nbt");
             if (file.exists()) {
-                source = "server directory: " + file.getAbsolutePath();
-                try (java.io.FileInputStream fileInputStream = new java.io.FileInputStream(file)) {
-                    bytes = fileInputStream.readAllBytes();
-                }
+                UnrealZaruba.LOGGER.info("Loading vehicle template from {}", file.getAbsolutePath());
+                nbt = NbtIo.readCompressed(file.toPath(), NbtAccounter.unlimitedHeap());
             } else {
-                String resourcePath = "/assets/unrealzaruba/schematics/" + location.getPath();
-                try (InputStream inputStream = SchematicLoader.class.getResourceAsStream(resourcePath)) {
-                    if (inputStream == null) {
-                        throw new IOException("Schematic file not found in both server directory and mod resources: " + location);
-                    }
-                    source = "mod resources: " + resourcePath;
-                    bytes = inputStream.readAllBytes();
-                }
+                nbt = GetSchematicNbt(ResourceLocation.fromNamespaceAndPath(location.getNamespace(), "vehicles/" + location.getPath()));
             }
-            
-            UnrealZaruba.LOGGER.info("Loading schematic from " + source);
-            UnrealZaruba.LOGGER.info("Bytes: " + bytes.length);
-            var buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(bytes));
-
-
-            if (bytes.length > 3 && bytes[3] == 1) {
-                UnrealZaruba.LOGGER.error("Vschem version 1 is not supported");
+            if (nbt == null) {
                 return null;
             }
-            else if (buf.readUtf().equals("vschem")) {
-                try {
-                    String type = buf.readUtf();
-                    UnrealZaruba.LOGGER.info("Type: {}", type);
-                    if (type.equals("VModShipSchematicV1")) {
-                        UnrealZaruba.LOGGER.error("Vschem version 1 is not supported");
-                        return null;
-                    } else {
-                        IShipSchematic instance = ShipSchematic.getSchematicFromBytes(bytes);
-                        UnrealZaruba.LOGGER.info("Result: {}", instance != null);
-                        VSCHEM_CACHE.put(location, instance);
-                        return instance;
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    return ShipSchematic.getSchematicFromBytes(bytes);
-                }
-                catch (Error e) {
-                    e.printStackTrace();
-                    return ShipSchematic.getSchematicFromBytes(bytes);
-                }
-            }
+
+            StructureTemplate template = new StructureTemplate();
+            template.load(level.holderLookup(Registries.BLOCK), nbt);
+            VEHICLE_CACHE.put(location, template);
+            return template;
         } catch (Exception e) {
-            e.printStackTrace();
+            UnrealZaruba.LOGGER.error("Failed to load vehicle template {}", location, e);
             return null;
         }
-        catch (Error e) {
-            e.printStackTrace();
-            return null;
+    }
+
+    /**
+     * World positions of every non-air block the template will place with the given settings and origin.
+     */
+    public static List<BlockPos> GetPlacedBlockPositions(StructureTemplate template, StructurePlaceSettings settings, BlockPos origin, ServerLevel level) {
+        CompoundTag saved = template.save(new CompoundTag());
+        ListTag palette = saved.contains("palette", Tag.TAG_LIST)
+                ? saved.getList("palette", Tag.TAG_COMPOUND)
+                : saved.getList("palettes", Tag.TAG_LIST).getList(0);
+        HolderGetter<Block> blockLookup = level.holderLookup(Registries.BLOCK);
+
+        List<BlockPos> positions = new ArrayList<>();
+        ListTag blocks = saved.getList("blocks", Tag.TAG_COMPOUND);
+        for (int i = 0; i < blocks.size(); i++) {
+            CompoundTag block = blocks.getCompound(i);
+            BlockState state = NbtUtils.readBlockState(blockLookup, palette.getCompound(block.getInt("state")));
+            if (state.isAir()) {
+                continue;
+            }
+            ListTag pos = block.getList("pos", Tag.TAG_INT);
+            BlockPos relative = new BlockPos(pos.getInt(0), pos.getInt(1), pos.getInt(2));
+            positions.add(StructureTemplate.calculateRelativePosition(settings, relative).offset(origin));
         }
-        return null;
+        return positions;
     }
 }

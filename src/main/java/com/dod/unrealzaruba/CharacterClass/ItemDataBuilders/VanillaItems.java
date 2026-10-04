@@ -1,23 +1,22 @@
 package com.dod.unrealzaruba.CharacterClass.ItemDataBuilders;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 public class VanillaItems {
 
+    /**
+     * Enchantments are data-driven since 1.21, so the curse is applied at equip time
+     * via {@link #applyBindingCurse} when registry access is available.
+     */
     public static ItemStack getStickyPumpkin() {
-        ItemStack cursedPumpkin = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("minecraft:carved_pumpkin")));
-        CompoundTag enchTag = new CompoundTag();
-        ListTag enchList = new ListTag();
-        CompoundTag bindingEnch = new CompoundTag();
-        bindingEnch.putString("id", "minecraft:binding_curse");
-        bindingEnch.putInt("lvl", 1);
-        enchList.add(bindingEnch);
-        enchTag.put("Enchantments", enchList);
-        cursedPumpkin.setTag(enchTag);
-        return cursedPumpkin;
+        return new ItemStack(Items.CARVED_PUMPKIN);
+    }
+
+    public static void applyBindingCurse(ItemStack stack, RegistryAccess registryAccess) {
+        stack.enchant(registryAccess.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE), 1);
     }
 }

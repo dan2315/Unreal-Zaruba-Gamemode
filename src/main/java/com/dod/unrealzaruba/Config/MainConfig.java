@@ -11,6 +11,8 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     
     private static final String CONFIG_PATH = "unrealzaruba" + File.separator + "mainConfig.json";
     private static MainConfig instance;
+    // Getters are called every tick, so keep the config in memory instead of re-reading the file
+    private MainConfigData cached;
     
     public enum Mode {
         DEV,    // Mode to change map in many ways
@@ -21,6 +23,7 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
         private boolean isZarubaServer = false;
         private Mode mode = Mode.GAME;
         private BlockPos lobbySpawnPoint = new BlockPos(0, 65, 0);
+        private int minPlayersToStart = 6;
 
         public boolean getIsZarubaServer() {
             return isZarubaServer;
@@ -44,6 +47,14 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
 
         public void setLobbySpawnPoint(BlockPos lobbySpawnPoint) {
             this.lobbySpawnPoint = lobbySpawnPoint;
+        }
+
+        public int getMinPlayersToStart() {
+            return minPlayersToStart;
+        }
+
+        public void setMinPlayersToStart(int minPlayersToStart) {
+            this.minPlayersToStart = minPlayersToStart;
         }
     }
     
@@ -76,6 +87,7 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     public void saveMainConfig(MainConfigData config) {
         try {
             save(config);
+            cached = config;
             UnrealZaruba.LOGGER.info("[UnrealZaruba] Saved main configuration");
         } catch (IOException e) {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] Failed to save main configuration");
@@ -84,12 +96,19 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
     }
     
     public MainConfigData loadMainConfig() {
+        if (cached != null) {
+            return cached;
+        }
         MainConfigData config = load();
         if (config == null) {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] No main configuration found, using defaults");
-            return createDefaultIfNotExist();
+            cached = createDefaultIfNotExist();
+            return cached;
         }
-        return config;
+        cached = config;
+        // Write back so settings added in newer versions show up in the file with their defaults
+        saveMainConfig(config);
+        return cached;
     }
     
     public Mode getMode() {
@@ -109,5 +128,9 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
 
     public BlockPos getLobbySpawnPoint() {
         return loadMainConfig().getLobbySpawnPoint();
+    }
+
+    public int getMinPlayersToStart() {
+        return loadMainConfig().getMinPlayersToStart();
     }
 } 

@@ -2,11 +2,11 @@ package com.dod.unrealzaruba.NetworkPackets;
 
 import com.dod.unrealzaruba.UI.ScoreOverlay;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class ClientboundUpdateTopScorePacket {
+public class ClientboundUpdateTopScorePacket implements ModPacket {
     boolean visible;
     byte id;
     short score;
@@ -36,7 +36,7 @@ public class ClientboundUpdateTopScorePacket {
         return new ClientboundUpdateTopScorePacket(buffer.readByte(), buffer.readShort(), visible);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context) {
+    public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
             if (visible) {
                 ScoreOverlay.INSTANCE.SetScore(id, score);

@@ -12,27 +12,27 @@ import net.minecraft.sounds.SoundEvent;
 public enum TeamAssets {
     RED(
         TeamColor.RED, 
-        new ResourceLocation("unrealzaruba", "red_tent"),
+        ResourceLocation.fromNamespaceAndPath("unrealzaruba", "red_tent"),
         ModSounds.HORN_DIRE.get()
     ),
     BLUE(
         TeamColor.BLUE, 
-        new ResourceLocation("unrealzaruba", "blue_tent"),
+        ResourceLocation.fromNamespaceAndPath("unrealzaruba", "blue_tent"),
         ModSounds.HORN_RADIANT.get()
     ),
     PURPLE(
         TeamColor.PURPLE, 
-        new ResourceLocation("unrealzaruba", "purple_tent"),
+        ResourceLocation.fromNamespaceAndPath("unrealzaruba", "purple_tent"),
         ModSounds.HORN_DIRE.get()
     ),
     YELLOW(
         TeamColor.YELLOW, 
-        new ResourceLocation("unrealzaruba", "yellow_tent"),
+        ResourceLocation.fromNamespaceAndPath("unrealzaruba", "yellow_tent"),
         ModSounds.HORN_RADIANT.get()
     ),
     UNDEFINED(
         TeamColor.UNDEFINED, 
-        new ResourceLocation("unrealzaruba", "tent"),
+        ResourceLocation.fromNamespaceAndPath("unrealzaruba", "tent"),
         ModSounds.SELECT1.get()
     );
 

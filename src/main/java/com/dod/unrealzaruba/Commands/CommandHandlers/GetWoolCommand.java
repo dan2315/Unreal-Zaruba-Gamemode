@@ -1,4 +1,6 @@
 package com.dod.unrealzaruba.Commands.CommandHandlers;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -69,15 +71,9 @@ public class GetWoolCommand implements ICommandHandler {
             String woolName = player.getName().getString() + " " + color.getName();
             ItemStack itemStack = new ItemStack((itemMap.get(color)), 1);
 
-            if (!itemStack.hasTag()) {
-                itemStack.setTag(new CompoundTag());
-            }
-            CompoundTag nbtData = itemStack.getTag();
-            nbtData.putString("Owner", player.getName().getString());
+            CustomData.update(DataComponents.CUSTOM_DATA, itemStack, nbtData -> nbtData.putString("Owner", player.getName().getString()));
 
-            itemStack.setTag(nbtData);
-
-            itemStack.setHoverName(Component.literal(woolName));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(woolName));
             player.getInventory().add(itemStack);
         }
         source.sendSuccess(() -> Component.literal("Given all colored wool to " + player.getName().getString()),

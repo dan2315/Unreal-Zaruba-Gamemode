@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.NetworkPackets.CharacterClasses;
+import com.dod.unrealzaruba.NetworkPackets.ModPacket;
 
 import com.dod.unrealzaruba.ModBlocks.ClassAssignerBlock.ClassAssignerBlockEntity;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassData;
@@ -13,11 +14,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
 import java.util.function.Supplier;
 
-public class AssignClassToPlayerPacket {
+public class AssignClassToPlayerPacket implements ModPacket {
     private final BlockPos blockPos;
 
     public AssignClassToPlayerPacket(BlockPos blockPos) {
@@ -32,8 +33,8 @@ public class AssignClassToPlayerPacket {
         return new AssignClassToPlayerPacket(buffer.readBlockPos());
     }
 
-    public static void handle(AssignClassToPlayerPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
+    public static void handle(AssignClassToPlayerPacket packet, Supplier<PacketContext> contextSupplier) {
+        PacketContext context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {

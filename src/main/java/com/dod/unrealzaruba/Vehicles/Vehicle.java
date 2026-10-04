@@ -6,17 +6,18 @@ import com.dod.unrealzaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.dod.unrealzaruba.SableIntegration.SableShips;
 import com.dod.unrealzaruba.UnrealZaruba;
-import com.dod.unrealzaruba.utils.Conversion;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.spaceeye.valkyrien_ship_schematics.interfaces.v1.IShipSchematicDataV1;
-import org.valkyrienskies.core.api.ships.ServerShip;
 public class Vehicle extends BaseRespawnPoint {
-    private List<ServerShip> ships;
+    private final ServerLevel level;
+    private final List<UUID> subLevelIds;
     private String vehicleType;
     private TeamColor owner;
     private boolean isAlive;
@@ -26,39 +27,32 @@ public class Vehicle extends BaseRespawnPoint {
     HashSet<BlockPos> damagedBlocks = new HashSet<>();
 
 
-    public Vehicle(String vehicleType, TeamColor owner, List<ServerShip> ships, IShipSchematicDataV1 schematicV1, Consumer<Vehicle> initialization) {
+    public Vehicle(String vehicleType, TeamColor owner, ServerLevel level, List<UUID> subLevelIds, int totalBlocks, Consumer<Vehicle> initialization) {
         this.vehicleType = vehicleType;
         this.owner = owner;
         this.isAlive = true;
-        this.ships = ships;
+        this.level = level;
+        this.subLevelIds = subLevelIds;
         this.initialization = initialization;
 
-        int totalBlocks = 0;
-        var blockStatePalette = schematicV1.getBlockPalette();
-        for (var blockData : schematicV1.getBlockData().values()) {
-            UnrealZaruba.LOGGER.warn("Iterating through chunkyBlockData: {}", blockData.toString());
-            for (var chunkData : blockData.getBlocks().entrySet()) {
-                UnrealZaruba.LOGGER.warn("Iterating through presumably chunks, chunk is: {}", chunkData.getKey());
-                totalBlocks += chunkData.getValue().size();
-                for (var blockEntry : chunkData.getValue().entrySet()) {
-
-                    int id = blockEntry.getValue().getPaletteId();
-                    var blockState = blockStatePalette.fromId(id);
-                }
-            }
-        }
-
         hitPoints = totalBlocks;
-        UnrealZaruba.LOGGER.error("Total {} health is: {}", vehicleType, hitPoints);
+        UnrealZaruba.LOGGER.info("Total {} health is: {}", vehicleType, hitPoints);
         currentHP = hitPoints;
     }
 
     public void Initialize() {
-        initialization.accept(this);
+        if (initialization != null) {
+            initialization.accept(this);
+        }
     }
 
-    public List<ServerShip> getShips() {
-        return ships;
+    public ServerLevel getLevel() {
+        return level;
+    }
+
+    /** UUIDs of the Sable sub-levels this vehicle consists of. */
+    public List<UUID> getSubLevelIds() {
+        return subLevelIds;
     }
 
     public boolean isAlive() {
@@ -70,14 +64,8 @@ public class Vehicle extends BaseRespawnPoint {
     }
 
     public boolean blockInsideShip(BlockPos pos) {
-        int chunkX = pos.getX() >> 4;
-        int chunkZ = pos.getZ() >> 4;
-        for (ServerShip ship : ships) {
-            if (ship.getChunkClaim().contains(chunkX, chunkZ)) {
-                return true;
-            }
-        }
-        return false;
+        var subLevel = SableShips.getContaining(level, pos);
+        return subLevel != null && subLevelIds.contains(subLevel.getUniqueId());
     }
 
     public TeamColor getOwner() {
@@ -110,14 +98,18 @@ public class Vehicle extends BaseRespawnPoint {
 
             UnrealZaruba.LOGGER.warn("HP left: {}", (float) currentHP/hitPoints);
             if ((float) currentHP /hitPoints < 0.8f) {
+                // Read the position before the sub-level gets removed
+                var subLevel = SableShips.get(level, subLevelIds.get(0));
                 UnrealZaruba.vehicleManager.removeVehicle(this);
-                Level level = event.getLevel();
-                BlockPos pos = Conversion.Vec3dcToBlockPos(ships.get(0).getTransform().getPositionInWorld());
-                level.explode(
+                if (subLevel == null) {
+                    return;
+                }
+                var position = subLevel.logicalPose().position();
+                event.getLevel().explode(
                         null,                // no entity (can also pass player/entity)
-                        pos.getX() + 0.5,              // center X
-                        pos.getY() + 0.5,              // center Y
-                        pos.getZ() + 0.5,              // center Z
+                        position.x(),                  // center X
+                        position.y(),                  // center Y
+                        position.z(),                  // center Z
                         6.0F,                          // explosion power (TNT is 4.0F)
                         Level.ExplosionInteraction.BLOCK // destroy blocks
                 );

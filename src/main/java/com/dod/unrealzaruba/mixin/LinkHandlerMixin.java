@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.dod.unrealzaruba.utils.Gamerules;
 import com.simibubi.create.content.redstone.link.LinkHandler;
 
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 
 @Mixin(value = LinkHandler.class , remap = false)

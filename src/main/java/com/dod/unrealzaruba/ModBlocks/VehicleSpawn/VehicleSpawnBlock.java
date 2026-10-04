@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.ModBlocks.VehicleSpawn;
 
+import com.mojang.serialization.MapCodec;
 import com.dod.unrealzaruba.utils.ITriggerableBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,10 +18,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class VehicleSpawnBlock extends HorizontalDirectionalBlock implements EntityBlock, ITriggerableBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final MapCodec<VehicleSpawnBlock> CODEC = simpleCodec(properties -> new VehicleSpawnBlock());
     
     public VehicleSpawnBlock() {
         super(Properties.of().mapColor(MapColor.METAL).strength(3.5F));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
     }
 
     @Override

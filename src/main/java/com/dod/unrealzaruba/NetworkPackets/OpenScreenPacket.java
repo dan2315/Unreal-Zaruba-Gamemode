@@ -15,9 +15,9 @@ import com.dod.unrealzaruba.UI.PlayerVoteScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
-public class OpenScreenPacket {
+public class OpenScreenPacket implements ModPacket {
 
     private final Integer screenID;
     private final Map<String, Object> data;
@@ -118,7 +118,7 @@ public class OpenScreenPacket {
         return new OpenScreenPacket(screenID, data);
     }
 
-    public static void handle(OpenScreenPacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(OpenScreenPacket msg, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
             ClientPacketHandler.handleOpenScreenPacket(msg);
         });

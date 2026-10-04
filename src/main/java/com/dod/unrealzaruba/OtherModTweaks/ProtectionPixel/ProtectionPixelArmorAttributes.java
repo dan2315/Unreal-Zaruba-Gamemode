@@ -1,8 +1,10 @@
 package com.dod.unrealzaruba.OtherModTweaks.ProtectionPixel;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,41 +37,41 @@ public class ProtectionPixelArmorAttributes {
     public static final String NEUTRALITY_ID = "protection_pixel:neutrality";
     public static final String DRONE_ID = "protection_pixel:drone";
     
-    private static final Map<String, Attribute> ATTRIBUTE_CACHE = new HashMap<>();
+    private static final Map<String, Holder<Attribute>> ATTRIBUTE_CACHE = new HashMap<>();
     
-    public static Attribute FLOAT_SHIELD_ATTRIBUTE = getOrCreateAttribute(FLOAT_SHIELD_ATTRIBUTE_ID);
-    public static Attribute EFFECT_CLEAR = getOrCreateAttribute(EFFECT_CLEAR_ID);
-    public static Attribute HIGH_SPEED_DAMAGE_INCREASE = getOrCreateAttribute(HIGH_SPEED_DAMAGE_INCREASE_ID);
-    public static Attribute DYNAMIC_ENTITY_PERCEPTION = getOrCreateAttribute(DYNAMIC_ENTITY_PERCEPTION_ID);
-    public static Attribute ARROW_MARKING = getOrCreateAttribute(ARROW_MARKING_ID);
-    public static Attribute BREATH_IN_SWIMMING = getOrCreateAttribute(BREATH_IN_SWIMMING_ID);
-    public static Attribute BURN_REDUCTION = getOrCreateAttribute(BURN_REDUCTION_ID);
-    public static Attribute MAGIC_DAMAGE_REDUCTION = getOrCreateAttribute(MAGIC_DAMAGE_REDUCTION_ID);
-    public static Attribute HEALTH_CONVERSION = getOrCreateAttribute(HEALTH_CONVERSION_ID);
-    public static Attribute WEAK_RADIATION = getOrCreateAttribute(WEAK_RADIATION_ID);
-    public static Attribute ARROW_BARRIER = getOrCreateAttribute(ARROW_BARRIER_ID);
-    public static Attribute PROSTHETIC_ATTACK = getOrCreateAttribute(PROSTHETIC_ATTACK_ID);
-    public static Attribute MAGNETIC_RANGE = getOrCreateAttribute(MAGNETIC_RANGE_ID);
-    public static Attribute MAGNETIC_ATTRACT_TARGET = getOrCreateAttribute(MAGNETIC_ATTRACT_TARGET_ID);
-    public static Attribute PNEUMATIC_PICKAXE = getOrCreateAttribute(PNEUMATIC_PICKAXE_ID);
-    public static Attribute PREVENT_BURIAL = getOrCreateAttribute(PREVENT_BURIAL_ID);
-    public static Attribute HELLFIRE = getOrCreateAttribute(HELLFIRE_ID);
-    public static Attribute ROCKET_ASSIST = getOrCreateAttribute(ROCKET_ASSIST_ID);
-    public static Attribute SHIELD = getOrCreateAttribute(SHIELD_ID);
-    public static Attribute JUMP_BOOST = getOrCreateAttribute(JUMP_BOOST_ID);
-    public static Attribute FALL_DAMAGE_REDUCTION = getOrCreateAttribute(FALL_DAMAGE_REDUCTION_ID);
-    public static Attribute SUSPENSION = getOrCreateAttribute(SUSPENSION_ID);
-    public static Attribute FOG_PERSPECTIVE = getOrCreateAttribute(FOG_PERSPECTIVE_ID);
-    public static Attribute CLEAVE = getOrCreateAttribute(CLEAVE_ID);
-    public static Attribute NEUTRALITY = getOrCreateAttribute(NEUTRALITY_ID);
-    public static Attribute DRONE = getOrCreateAttribute(DRONE_ID);
+    public static Holder<Attribute> FLOAT_SHIELD_ATTRIBUTE = getOrCreateAttribute(FLOAT_SHIELD_ATTRIBUTE_ID);
+    public static Holder<Attribute> EFFECT_CLEAR = getOrCreateAttribute(EFFECT_CLEAR_ID);
+    public static Holder<Attribute> HIGH_SPEED_DAMAGE_INCREASE = getOrCreateAttribute(HIGH_SPEED_DAMAGE_INCREASE_ID);
+    public static Holder<Attribute> DYNAMIC_ENTITY_PERCEPTION = getOrCreateAttribute(DYNAMIC_ENTITY_PERCEPTION_ID);
+    public static Holder<Attribute> ARROW_MARKING = getOrCreateAttribute(ARROW_MARKING_ID);
+    public static Holder<Attribute> BREATH_IN_SWIMMING = getOrCreateAttribute(BREATH_IN_SWIMMING_ID);
+    public static Holder<Attribute> BURN_REDUCTION = getOrCreateAttribute(BURN_REDUCTION_ID);
+    public static Holder<Attribute> MAGIC_DAMAGE_REDUCTION = getOrCreateAttribute(MAGIC_DAMAGE_REDUCTION_ID);
+    public static Holder<Attribute> HEALTH_CONVERSION = getOrCreateAttribute(HEALTH_CONVERSION_ID);
+    public static Holder<Attribute> WEAK_RADIATION = getOrCreateAttribute(WEAK_RADIATION_ID);
+    public static Holder<Attribute> ARROW_BARRIER = getOrCreateAttribute(ARROW_BARRIER_ID);
+    public static Holder<Attribute> PROSTHETIC_ATTACK = getOrCreateAttribute(PROSTHETIC_ATTACK_ID);
+    public static Holder<Attribute> MAGNETIC_RANGE = getOrCreateAttribute(MAGNETIC_RANGE_ID);
+    public static Holder<Attribute> MAGNETIC_ATTRACT_TARGET = getOrCreateAttribute(MAGNETIC_ATTRACT_TARGET_ID);
+    public static Holder<Attribute> PNEUMATIC_PICKAXE = getOrCreateAttribute(PNEUMATIC_PICKAXE_ID);
+    public static Holder<Attribute> PREVENT_BURIAL = getOrCreateAttribute(PREVENT_BURIAL_ID);
+    public static Holder<Attribute> HELLFIRE = getOrCreateAttribute(HELLFIRE_ID);
+    public static Holder<Attribute> ROCKET_ASSIST = getOrCreateAttribute(ROCKET_ASSIST_ID);
+    public static Holder<Attribute> SHIELD = getOrCreateAttribute(SHIELD_ID);
+    public static Holder<Attribute> JUMP_BOOST = getOrCreateAttribute(JUMP_BOOST_ID);
+    public static Holder<Attribute> FALL_DAMAGE_REDUCTION = getOrCreateAttribute(FALL_DAMAGE_REDUCTION_ID);
+    public static Holder<Attribute> SUSPENSION = getOrCreateAttribute(SUSPENSION_ID);
+    public static Holder<Attribute> FOG_PERSPECTIVE = getOrCreateAttribute(FOG_PERSPECTIVE_ID);
+    public static Holder<Attribute> CLEAVE = getOrCreateAttribute(CLEAVE_ID);
+    public static Holder<Attribute> NEUTRALITY = getOrCreateAttribute(NEUTRALITY_ID);
+    public static Holder<Attribute> DRONE = getOrCreateAttribute(DRONE_ID);
 
-    private static Attribute getOrCreateAttribute(String id) {
+    private static Holder<Attribute> getOrCreateAttribute(String id) {
         return ATTRIBUTE_CACHE.computeIfAbsent(id, key -> 
-            ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(key)));
+            BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.parse(key)).orElse(null));
     }
 
-    public static Attribute getAttribute(String id) {
+    public static Holder<Attribute> getAttribute(String id) {
         return getOrCreateAttribute(id);
     }
 }

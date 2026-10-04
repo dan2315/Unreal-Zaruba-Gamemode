@@ -2,55 +2,39 @@ package com.dod.unrealzaruba.ModItems;
 
 import javax.annotation.Nonnull;
 
+import com.dod.unrealzaruba.SableIntegration.SableShips;
 import com.dod.unrealzaruba.UnrealZaruba;
-import org.joml.Vector3dc;
-import org.joml.Vector3i;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.impl.datastructures.DenseBlockPosSet;
-import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
-
-import com.ibm.icu.text.DecimalFormat;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 
+/**
+ * Debug tool: assembles the clicked block and everything connected to it into a Sable sub-level.
+ */
 public class HandAssembler extends Item {
+    private static final int MAX_BLOCKS = 4096;
 
-    public HandAssembler(Properties p_41383_) {
-        super(p_41383_);
+    public HandAssembler(Properties properties) {
+        super(properties);
     }
 
     @Override
     public InteractionResult useOn(@Nonnull UseOnContext useContext) {
-        Level level = useContext.getLevel();
-        if (!(level instanceof ServerLevel))
+        if (!(useContext.getLevel() instanceof ServerLevel level))
             return InteractionResult.FAIL;
         BlockPos blockPos = useContext.getClickedPos();
-        var block = useContext.getLevel().getBlockState(blockPos);
-        
-        DenseBlockPosSet denseBlockPosSet = new DenseBlockPosSet();
-        denseBlockPosSet.add(new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
-        ServerShip createdShip = ShipAssemblyKt.createNewShipWithBlocks(blockPos, denseBlockPosSet,
-                (ServerLevel) useContext.getLevel());
 
-        DecimalFormat df = new DecimalFormat("#");
-        Vector3dc shipPos = createdShip.getTransform().getPositionInShip();
-        UnrealZaruba.LOGGER.warn("Position In Ship X {}", df.format(createdShip.getTransform().getPositionInShip().x()));
-        UnrealZaruba.LOGGER.warn("Position In Ship Y {}", df.format(createdShip.getTransform().getPositionInShip().y()));
-        UnrealZaruba.LOGGER.warn("Position In Ship Z {}", df.format(createdShip.getTransform().getPositionInShip().z()));
-        
-        createdShip.setStatic(true);
-        BlockState blockState = Blocks.STONE.defaultBlockState();
-        level.setBlock(new BlockPos((int)shipPos.x(), level.getMinBuildHeight(), (int)shipPos.z()), blockState, 3);
+        var subLevel = SableShips.assembleConnected(level, blockPos, MAX_BLOCKS);
+        if (subLevel == null) {
+            UnrealZaruba.LOGGER.warn("Hand assembler failed to assemble at {}", blockPos);
+            return InteractionResult.FAIL;
+        }
 
-        //ContraptionManager.loadSchematicToWorld((ServerLevel) level, new BlockPos((int)shipPos.x(), (int)shipPos.y(), (int)shipPos.z()), ContraptionManager.readSchematicFile("schematics\\sample.nbt"));
-
+        var position = subLevel.logicalPose().position();
+        UnrealZaruba.LOGGER.info("Assembled sub-level {} at {}, {}, {}", subLevel.getUniqueId(), position.x(), position.y(), position.z());
         return InteractionResult.SUCCESS;
-    };
+    }
 }

@@ -34,6 +34,6 @@ public class VehicleRegistry {
     }
 
     public static ResourceLocation GetLocation(String vehicleName) {
-        return new ResourceLocation(UnrealZaruba.MOD_ID, vehicleName);
+        return ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, vehicleName);
     }
 }

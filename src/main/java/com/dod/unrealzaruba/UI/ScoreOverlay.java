@@ -1,10 +1,10 @@
 package com.dod.unrealzaruba.UI;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraft.client.gui.Gui;
+import com.dod.unrealzaruba.UI.ZarubaOverlay;
 
-public class ScoreOverlay implements IGuiOverlay {
+public class ScoreOverlay implements ZarubaOverlay {
     public static final ScoreOverlay INSTANCE = new ScoreOverlay();
 
     boolean visible;
@@ -12,7 +12,7 @@ public class ScoreOverlay implements IGuiOverlay {
     short rightScore;
 
     @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!visible) return;
 
         int widthUnit = screenWidth / 10;

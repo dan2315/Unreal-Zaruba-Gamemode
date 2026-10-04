@@ -1,40 +1,22 @@
 package com.dod.unrealzaruba.ModIntegrations;
 
-import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
-import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudObjective;
-import com.dod.unrealzaruba.utils.Conversion;
+import net.neoforged.fml.ModList;
 
 import java.util.List;
 
 public class WaypointManager {
     public static WaypointManager INSTANCE = new WaypointManager();
-    private final HudCaptureCompassUpdate compassUpdate;
+    // Xaero's Minimap is optional; only touch its classes when it is installed.
     private final XaeroMapUpdate xaeroMapUpdate;
 
     public WaypointManager() {
-        compassUpdate = new HudCaptureCompassUpdate();
-        xaeroMapUpdate = new XaeroMapUpdate();
+        xaeroMapUpdate = ModList.get().isLoaded("xaerominimap") ? new XaeroMapUpdate() : null;
     }
 
     public void SetupWaypoints(List<HudObjective> objectives) {
-        xaeroMapUpdate.UpdateOrCreateMinimapWaypoints(objectives);
-        for (var objective : objectives) {
-             if (objective instanceof HudCapturePointObjective hudCapturePointObjective) {
-                 compassUpdate.UpdateOrCreateCompassWaypoints(
-                         hudCapturePointObjective.GetRuntimeId(),
-                         hudCapturePointObjective.GetName(),
-                         Conversion.BlockPosToVec3(hudCapturePointObjective.GetPosition()),
-                         hudCapturePointObjective.getOwnerColor()
-                 );
-             } else if (objective instanceof HudDestroyObjective hudDestroyObjective) {
-                 compassUpdate.UpdateOrCreateCompassWaypoints(
-                         hudDestroyObjective.GetRuntimeId(),
-                         hudDestroyObjective.GetName(),
-                         Conversion.BlockPosToVec3(hudDestroyObjective.GetPosition()),
-                         0x0000FF
-                 );
-             }
+        if (xaeroMapUpdate != null) {
+            xaeroMapUpdate.UpdateOrCreateMinimapWaypoints(objectives);
         }
     }
 }

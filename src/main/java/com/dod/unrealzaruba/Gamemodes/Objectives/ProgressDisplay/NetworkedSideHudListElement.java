@@ -6,7 +6,7 @@ import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.UI.Objectives.HudObjectiveUpdate;
 import com.dod.unrealzaruba.utils.Conversion;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import static com.dod.unrealzaruba.WorldManager.WorldManager.server;
 
@@ -22,8 +22,7 @@ public class NetworkedSideHudListElement implements IProgressDisplay {
     public void updateProgress(float progress) {
         var players = server.getPlayerList().getPlayers();
         for (var player : players) {
-            NetworkHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                    new ClientboundUpdateObjectivePacket(new HudObjectiveUpdate(objective.GetRuntimeId(), Conversion.fromNormalizedFloatToByte(progress))));
+            PacketDistributor.sendToPlayer(player, new ClientboundUpdateObjectivePacket(new HudObjectiveUpdate(objective.GetRuntimeId(), Conversion.fromNormalizedFloatToByte(progress))));
         }
     }
 

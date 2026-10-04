@@ -2,17 +2,25 @@ package com.dod.unrealzaruba.NetworkPackets;
 
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
 import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.SetClassPacket;
@@ -20,130 +28,100 @@ import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerP
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(UnrealZaruba.MOD_ID, "main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals);
 
-    private static int packetId = 0;
+    private enum Direction { TO_CLIENT, TO_SERVER }
 
+    private record Registration<T extends ModPacket>(
+            Direction direction,
+            CustomPacketPayload.Type<T> type,
+            StreamCodec<RegistryFriendlyByteBuf, T> codec,
+            BiConsumer<T, Supplier<PacketContext>> handler) {
+
+        void register(PayloadRegistrar registrar) {
+            if (direction == Direction.TO_CLIENT) {
+                registrar.playToClient(type, codec, (payload, context) -> handler.accept(payload, () -> new PacketContext(context)));
+            } else {
+                registrar.playToServer(type, codec, (payload, context) -> handler.accept(payload, () -> new PacketContext(context)));
+            }
+        }
+    }
+
+    private static final List<Registration<?>> REGISTRATIONS = new ArrayList<>();
+    private static final Map<Class<?>, CustomPacketPayload.Type<?>> TYPES = new HashMap<>();
 
     public static void init() {
-        CHANNEL.registerMessage(packetId++, OpenScreenPacket.class,
-                OpenScreenPacket::encode,
-                OpenScreenPacket::decode,
-                OpenScreenPacket::handle);
+        toClient("open_screen", OpenScreenPacket.class, OpenScreenPacket::encode, OpenScreenPacket::decode, OpenScreenPacket::handle);
+        toServer("vote_player", VotePlayerPacket.class, VotePlayerPacket::encode, VotePlayerPacket::decode, VotePlayerPacket::handle);
+        toClient("update_death_timer", UpdateDeathTimerPacket.class, UpdateDeathTimerPacket::encode, UpdateDeathTimerPacket::decode, UpdateDeathTimerPacket::handle);
+        toServer("select_respawn_point", SelectRespawnPointPacket.class, SelectRespawnPointPacket::encode, SelectRespawnPointPacket::decode, SelectRespawnPointPacket::handle);
+        toServer("purchase_vehicle", PurchaseVehiclePacket.class, PurchaseVehiclePacket::encode, PurchaseVehiclePacket::decode, PurchaseVehiclePacket::handle);
+        toClient("purchase_result", PurchaseResultPacket.class, PurchaseResultPacket::encode, PurchaseResultPacket::decode, PurchaseResultPacket::handle);
+        toServer("set_class", SetClassPacket.class, SetClassPacket::encode, SetClassPacket::decode, SetClassPacket::handle);
+        toServer("assign_class_to_player", AssignClassToPlayerPacket.class, AssignClassToPlayerPacket::encode, AssignClassToPlayerPacket::decode, AssignClassToPlayerPacket::handle);
+        toClient("start_hud_timer", StartHudTimerPacket.class, StartHudTimerPacket::encode, StartHudTimerPacket::decode, StartHudTimerPacket::handle);
+        toClient("stop_hud_timer", StopHudTimerPacket.class, StopHudTimerPacket::encode, StopHudTimerPacket::decode, StopHudTimerPacket::handle);
+        toClient("renderable_zones", RenderableZonesPacket.class, RenderableZonesPacket::encode, RenderableZonesPacket::decode, RenderableZonesPacket::handle);
+        toClient("delete_renderable_zones", DeleteRenderableZonesPacket.class, DeleteRenderableZonesPacket::encode, DeleteRenderableZonesPacket::decode, DeleteRenderableZonesPacket::handle);
+        toClient("objectives", ClientboundObjectivesPacket.class, ClientboundObjectivesPacket::encode, ClientboundObjectivesPacket::decode, ClientboundObjectivesPacket::handle);
+        toClient("update_objective", ClientboundUpdateObjectivePacket.class, ClientboundUpdateObjectivePacket::encode, ClientboundUpdateObjectivePacket::decode, ClientboundUpdateObjectivePacket::handle);
+        toClient("update_objectives", ClientboundUpdateObjectivesPacket.class, ClientboundUpdateObjectivesPacket::encode, ClientboundUpdateObjectivesPacket::decode, ClientboundUpdateObjectivesPacket::handle);
+        toClient("remove_objectives", ClientboundRemoveObjectivesPacket.class, ClientboundRemoveObjectivesPacket::encode, ClientboundRemoveObjectivesPacket::decode, ClientboundRemoveObjectivesPacket::handle);
+        toServer("gamemode_vote", GamemodeVotePacket.class, GamemodeVotePacket::encode, GamemodeVotePacket::decode, GamemodeVotePacket::handle);
+        toClient("update_top_score", ClientboundUpdateTopScorePacket.class, ClientboundUpdateTopScorePacket::encode, ClientboundUpdateTopScorePacket::decode, ClientboundUpdateTopScorePacket::handle);
+    }
 
-        CHANNEL.registerMessage(packetId++, VotePlayerPacket.class,
-                VotePlayerPacket::encode,
-                VotePlayerPacket::decode,
-                VotePlayerPacket::handle);
+    public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
+        for (Registration<?> registration : REGISTRATIONS) {
+            registration.register(registrar);
+        }
+    }
 
-        CHANNEL.registerMessage(packetId++, UpdateDeathTimerPacket.class,
-                UpdateDeathTimerPacket::encode,
-                UpdateDeathTimerPacket::decode,
-                UpdateDeathTimerPacket::handle);
+    @SuppressWarnings("unchecked")
+    static <T extends ModPacket> CustomPacketPayload.Type<T> typeOf(Class<?> packetClass) {
+        CustomPacketPayload.Type<?> type = TYPES.get(packetClass);
+        if (type == null) {
+            throw new IllegalStateException("Packet not registered: " + packetClass.getName());
+        }
+        return (CustomPacketPayload.Type<T>) type;
+    }
 
-        CHANNEL.registerMessage(packetId++, SelectRespawnPointPacket.class,
-                SelectRespawnPointPacket::encode,
-                SelectRespawnPointPacket::decode,
-                SelectRespawnPointPacket::handle);
+    private static <T extends ModPacket> void toClient(String name, Class<T> packetClass, BiConsumer<T, FriendlyByteBuf> encoder,
+                                                       Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<PacketContext>> handler) {
+        add(Direction.TO_CLIENT, name, packetClass, encoder, decoder, handler);
+    }
 
-        CHANNEL.registerMessage(packetId++, PurchaseVehiclePacket.class,
-                PurchaseVehiclePacket::encode,
-                PurchaseVehiclePacket::decode,
-                PurchaseVehiclePacket::handle);
+    private static <T extends ModPacket> void toServer(String name, Class<T> packetClass, BiConsumer<T, FriendlyByteBuf> encoder,
+                                                       Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<PacketContext>> handler) {
+        add(Direction.TO_SERVER, name, packetClass, encoder, decoder, handler);
+    }
 
-        CHANNEL.registerMessage(packetId++, PurchaseResultPacket.class,
-                PurchaseResultPacket::encode,
-                PurchaseResultPacket::decode,
-                PurchaseResultPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, SetClassPacket.class,
-                SetClassPacket::encode,
-                SetClassPacket::decode,
-                SetClassPacket::handle);
-                
-        CHANNEL.registerMessage(packetId++, AssignClassToPlayerPacket.class,
-                AssignClassToPlayerPacket::encode,
-                AssignClassToPlayerPacket::decode,
-                AssignClassToPlayerPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, StartHudTimerPacket.class,
-                StartHudTimerPacket::encode,
-                StartHudTimerPacket::decode,
-                StartHudTimerPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, StopHudTimerPacket.class,
-                StopHudTimerPacket::encode,
-                StopHudTimerPacket::decode,
-                StopHudTimerPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, RenderableZonesPacket.class,
-                RenderableZonesPacket::encode,
-                RenderableZonesPacket::decode,
-                RenderableZonesPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, DeleteRenderableZonesPacket.class,
-                DeleteRenderableZonesPacket::encode,
-                DeleteRenderableZonesPacket::decode,
-                DeleteRenderableZonesPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, ClientboundObjectivesPacket.class,
-                ClientboundObjectivesPacket::encode,
-                ClientboundObjectivesPacket::decode,
-                ClientboundObjectivesPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, ClientboundUpdateObjectivePacket.class,
-                ClientboundUpdateObjectivePacket::encode,
-                ClientboundUpdateObjectivePacket::decode,
-                ClientboundUpdateObjectivePacket::handle);
-
-        CHANNEL.registerMessage(packetId++, ClientboundUpdateObjectivesPacket.class,
-                ClientboundUpdateObjectivesPacket::encode,
-                ClientboundUpdateObjectivesPacket::decode,
-                ClientboundUpdateObjectivesPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, ClientboundRemoveObjectivesPacket.class,
-                ClientboundRemoveObjectivesPacket::encode,
-                ClientboundRemoveObjectivesPacket::decode,
-                ClientboundRemoveObjectivesPacket::handle);
-
-        CHANNEL.registerMessage(packetId++, GamemodeVotePacket.class,
-                GamemodeVotePacket::encode,
-                GamemodeVotePacket::decode,
-                GamemodeVotePacket::handle);
-
-        CHANNEL.registerMessage(packetId++, ClientboundUpdateTopScorePacket.class,
-                ClientboundUpdateTopScorePacket::encode,
-                ClientboundUpdateTopScorePacket::decode,
-                ClientboundUpdateTopScorePacket::handle);
-
+    private static <T extends ModPacket> void add(Direction direction, String name, Class<T> packetClass, BiConsumer<T, FriendlyByteBuf> encoder,
+                                                  Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<PacketContext>> handler) {
+        var type = new CustomPacketPayload.Type<T>(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, name));
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = StreamCodec.of((buf, packet) -> encoder.accept(packet, buf), decoder::apply);
+        TYPES.put(packetClass, type);
+        REGISTRATIONS.add(new Registration<>(direction, type, codec, handler));
     }
 
     public class Screens {
         public static void openDeathScreen(ServerPlayer player, List<IRespawnPoint> respawnPoints) {
-            NetworkHandler.CHANNEL.send(
-                PacketDistributor.PLAYER.with(() -> player),
+            PacketDistributor.sendToPlayer(player,
                 new OpenScreenPacket(OpenScreenPacket.ScreenType.DEATH_SCREEN.id(), new HashMap<>() {{
                     put("respawnPoints", respawnPoints);
                 }})
             );
         }
-        
+
         public static void openClassAssignerScreen(ServerPlayer player, BlockPos blockPos, String currentClassId) {
             boolean isAdmin = player.hasPermissions(2); // Check if player has OP level 2 or higher
-            
+
             Map<String, Object> data = new HashMap<>();
             data.put("blockPos", blockPos);
             data.put("currentClassId", currentClassId);
             data.put("isAdmin", isAdmin);
-            
-            NetworkHandler.CHANNEL.send(
-                PacketDistributor.PLAYER.with(() -> player),
-                new OpenScreenPacket(3, data)
-            );
+
+            PacketDistributor.sendToPlayer(player, new OpenScreenPacket(3, data));
         }
     }
 }

@@ -6,7 +6,7 @@ import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.minecraft.network.chat.Component;
 import com.dod.unrealzaruba.Title.TitleMessage;
 

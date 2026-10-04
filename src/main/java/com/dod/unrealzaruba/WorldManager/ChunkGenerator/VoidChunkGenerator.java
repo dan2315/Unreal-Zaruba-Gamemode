@@ -1,6 +1,6 @@
 package com.dod.unrealzaruba.WorldManager.ChunkGenerator;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 
 public class VoidChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<VoidChunkGenerator> CODEC = RecordCodecBuilder.create(
+    public static final MapCodec<VoidChunkGenerator> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     BiomeSource.CODEC.fieldOf("biome_source").forGetter(generator -> generator.biomeSource)
             ).apply(instance, instance.stable(VoidChunkGenerator::new))
@@ -45,7 +45,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
     public VoidChunkGenerator() {
         super(new BiomeSource() {
             @Override
-            protected Codec<? extends BiomeSource> codec() {
+            protected MapCodec<? extends BiomeSource> codec() {
                 return null;
             }
 
@@ -63,7 +63,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
 
 
     @Override
-    protected Codec<? extends ChunkGenerator> codec() {
+    protected MapCodec<? extends ChunkGenerator> codec() {
         return CODEC;
     }
 
@@ -86,7 +86,7 @@ public class VoidChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, RandomState randomState, 
+    public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, 
                                                        StructureManager structureManager, ChunkAccess chunk) {
         return CompletableFuture.completedFuture(chunk);
     }

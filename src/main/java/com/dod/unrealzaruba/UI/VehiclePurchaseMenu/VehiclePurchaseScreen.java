@@ -1,4 +1,5 @@
 package com.dod.unrealzaruba.UI.VehiclePurchaseMenu;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket;
@@ -22,7 +23,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
 
 public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurchaseMenu> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(UnrealZaruba.MOD_ID, "textures/gui/vehicle_purchase.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "textures/gui/vehicle_purchase.png");
     private static final int DROPDOWN_HEIGHT = 20;
     private static final int DROPDOWN_WIDTH = 120;
     private static final int ERROR_DISPLAY_TICKS = 100;
@@ -82,7 +83,7 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
         deployButton = addRenderableWidget(Button.builder(Component.translatable("button.unrealzaruba.deploy"), button -> {
             if (menu.getSelectedVehicle() != null) {
                 var result = menu.getBlockEntity().getBlockPos();
-                NetworkHandler.CHANNEL.sendToServer(
+                PacketDistributor.sendToServer(
                     new PurchaseVehiclePacket(result, menu.getSelectedVehicle())
                 );
             }
@@ -131,7 +132,6 @@ public class VehiclePurchaseScreen extends AbstractContainerScreen<VehiclePurcha
     
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, delta);
 
         int x = (width - imageWidth) / 2;
