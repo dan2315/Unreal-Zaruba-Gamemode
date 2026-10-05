@@ -103,6 +103,7 @@ public class CapturePointsGamemode extends TeamGamemode {
                 () -> {},
                 this::AfterMapLoaded,
                 new TimePassedCondition(9)
+                    .WaitFor(WorldManager::isGameWorldReady)
                     .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
         ))
         .AddPhase(new ConditionalPhase(

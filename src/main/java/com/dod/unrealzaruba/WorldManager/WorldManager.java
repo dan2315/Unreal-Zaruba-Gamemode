@@ -61,6 +61,8 @@ public class WorldManager {
     private static final String RUNTIME_WORLDS_DIR = "game_worlds_runtime";
 
     public static ServerLevel gameLevel;
+    // Between the start of a map reload and the new level being created; the old level must not count as ready
+    private static volatile boolean reloading;
     public static MinecraftServer server;
     public static LevelStorageSource.LevelStorageAccess access; 
     public static ChunkProgressListener progressListener;
@@ -70,6 +72,11 @@ public class WorldManager {
     public WorldManager(GameStatisticsService leaderboardService, MinecraftServer server) {
         WorldManager.server = server;
         clearShipsInDimension(gameLevel);
+    }
+
+    /** True when the game map for the current match is loaded and nothing is replacing it. */
+    public static boolean isGameWorldReady() {
+        return gameLevel != null && !reloading;
     }
 
     /** Terrain region files of the loaded game map, or null before a map is loaded. */
@@ -90,6 +97,7 @@ public class WorldManager {
     }
 
     public static void ReloadGameWorldDelayed(String gamemodeName) {
+        reloading = true;
         UnrealZaruba.LOGGER.info("Deleting ships in game world");
         clearShipsInDimension(gameLevel);
 
@@ -102,11 +110,14 @@ public class WorldManager {
             CompletableFuture.runAsync(() -> prepareRuntimeCopy(gamemodeName)).whenComplete((ignored, error) -> server.execute(() -> {
                 if (error != null) {
                     UnrealZaruba.LOGGER.error("Failed to copy map template for {}", gamemodeName, error);
-                    return;
                 }
-                UnrealZaruba.LOGGER.info("Creating game world");
-                prepareWorldStorage(gamemodeName);
-                createGameWorld(gamemodeName);
+                try {
+                    UnrealZaruba.LOGGER.info("Creating game world");
+                    prepareWorldStorage(gamemodeName);
+                    createGameWorld(gamemodeName);
+                } finally {
+                    reloading = false;
+                }
             }));
         }, null);
     }
@@ -131,6 +142,7 @@ public class WorldManager {
         }
         Path template = Path.of(TEMPLATE_WORLDS_DIR, gamemodeName);
         Path runtime = Path.of(RUNTIME_WORLDS_DIR, gamemodeName);
+        UnrealZaruba.LOGGER.info("Copying map template {}", gamemodeName);
         try {
             deleteRecursively(runtime);
             if (!Files.isDirectory(template)) {
@@ -200,6 +212,8 @@ public class WorldManager {
     // Better not try
     public static void deleteGameWorld() {
         ((IMinecraftServerExtended) server).deleteLevel(GAME_DIMENSION);
+        // NeoForge ticks levels from a cached array; without this the closed level keeps ticking (Sable crashes on it)
+        server.markWorldsDirty();
         ServerLevel oldLevel = gameLevel;
         gameLevel = null;
 

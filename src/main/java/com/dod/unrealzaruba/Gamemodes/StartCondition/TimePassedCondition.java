@@ -12,6 +12,7 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
     private final int requiredDurationSeconds;
     private final int requiredDurationTicks;
     private Consumer<Integer> onEverySecond;
+    private java.util.function.BooleanSupplier readiness;
     private int sustainedTicks = 0;
 
 
@@ -46,11 +47,11 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
         sustainedTicks++;
         
         if (sustainedTicks % 20 == 0) { // Once per second
-            int remainingSeconds = (requiredDurationTicks - sustainedTicks) / 20;
+            int remainingSeconds = Math.max(0, (requiredDurationTicks - sustainedTicks) / 20);
             if (onEverySecond != null) onEverySecond.accept(remainingSeconds);
         }
         
-        if (sustainedTicks >= requiredDurationTicks) {
+        if (sustainedTicks >= requiredDurationTicks && (readiness == null || readiness.getAsBoolean())) {
             conditionMet = true;
 
             if (onConditionMet != null) {
@@ -62,6 +63,12 @@ public class TimePassedCondition extends Condition implements IDelayedCondition 
     @Override
     public int getSustainedTicks() {
         return sustainedTicks;
+    }
+
+    /** After the time is up, keeps waiting (at 0) until this is true, e.g. until the map has loaded. */
+    public TimePassedCondition WaitFor(java.util.function.BooleanSupplier readiness) {
+        this.readiness = readiness;
+        return this;
     }
 
     public TimePassedCondition OnEverySecond(Consumer<Integer> onEverySecond) {
