@@ -150,16 +150,20 @@ public class CapturePointObjective extends PositionedGameobjective {
         return beingCapturedBy;
     }
 
-    public void SendUpdateHudElement() {
+    public HudCapturePointObjective ToHudObjective() {
         var ownerTeam = (TeamContext) GetOwner();
+        var capturingTeam = (TeamContext) GetBeingCapturedBy();
         int ownerColor = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
-        var beingCapturedBy = (TeamContext) GetBeingCapturedBy();
-        int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
-        var players = UnrealZaruba.server.getPlayerList().getPlayers();
-        for (var player : players) {
-            PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(
-                    List.of(new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor, GetProgress(), GetPosition()))
-            ));
+        int capturedByColor = capturingTeam == null ? 0xDDDDEE : capturingTeam.GetIntColor();
+        return new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor,
+                ownerTeam == null ? null : ownerTeam.Color(), capturingTeam == null ? null : capturingTeam.Color(),
+                GetProgress(), GetPosition());
+    }
+
+    public void SendUpdateHudElement() {
+        var hudObjective = ToHudObjective();
+        for (var player : UnrealZaruba.server.getPlayerList().getPlayers()) {
+            PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(List.of(hudObjective)));
         }
     }
 

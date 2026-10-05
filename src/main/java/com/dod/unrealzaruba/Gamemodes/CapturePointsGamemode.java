@@ -164,17 +164,9 @@ public class CapturePointsGamemode extends TeamGamemode {
             if (objective instanceof CapturePointObjective capturePointObjective) {
                 var ownerTeam = (TeamContext) capturePointObjective.GetOwner();
                 int ownerColor = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
-                var beingCapturedBy = (TeamContext) capturePointObjective.GetBeingCapturedBy();
-                int capturedByColor = beingCapturedBy == null ?  0xDDDDEE : beingCapturedBy.GetIntColor();
                 zones.add(new ColoredSquareZone(capturePointObjective.GetCaptureAreaAABB(), ownerColor));
 
-                hudObjectives.add(new HudCapturePointObjective(
-                        capturePointObjective.GetRuntimeId(),
-                        capturePointObjective.GetName(),
-                        ownerColor,
-                        capturedByColor,
-                        capturePointObjective.GetProgress(),
-                        capturePointObjective.GetPosition()));
+                hudObjectives.add(capturePointObjective.ToHudObjective());
             }
         }
     }

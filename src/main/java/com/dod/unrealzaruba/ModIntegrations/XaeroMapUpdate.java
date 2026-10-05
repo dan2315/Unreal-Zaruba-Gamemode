@@ -3,6 +3,7 @@ package com.dod.unrealzaruba.ModIntegrations;
 import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudObjective;
+import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.utils.Conversion;
 import xaero.common.minimap.waypoints.Waypoint;
 import xaero.hud.minimap.BuiltInHudModules;
@@ -44,7 +45,7 @@ public class XaeroMapUpdate {
                     capturePointObjective.GetPosition().getY(),
                     capturePointObjective.GetPosition().getZ(),
                     capturePointObjective.GetName(),
-                    capturePointObjective.GetName().substring(0, 1).toUpperCase(),
+                    initialsFor(capturePointObjective),
                     IntColorToXaeroColor(capturePointObjective.getOwnerColor()),
                     WaypointPurpose.NORMAL,
                     true
@@ -68,6 +69,12 @@ public class XaeroMapUpdate {
         return null;
     }
 
+
+    // Same letter as the objectives panel, so the minimap pins match the rows
+    private static String initialsFor(HudCapturePointObjective objective) {
+        String letter = ObjectivesOverlay.INSTANCE.letterFor(objective.GetRuntimeId());
+        return letter != null ? letter : objective.GetName().substring(0, 1).toUpperCase();
+    }
 
     private static WaypointColor IntColorToXaeroColor(int color) {
         WaypointColor closest = null;

@@ -1,35 +1,42 @@
 package com.dod.unrealzaruba.UI.Objectives;
 
+import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.NetworkPackets.SerializationUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
+/** Capture point state sent to clients. Drawn by {@link ObjectivesOverlay}. */
 public class HudCapturePointObjective extends HudObjective {
     public static final int TYPE_ID = 1;
 
     private final String name;
-    private final int ownerColor; // as background
-    private final int capturedByColor; // as progress line
+    private final int ownerColor;
+    private final int capturedByColor;
+    /** Null when nobody holds / captures the point. */
+    private final TeamColor owner;
+    private final TeamColor capturedBy;
     private float progress;
     private final BlockPos position;
-
 
     public HudCapturePointObjective(FriendlyByteBuf buffer) {
         this.runtimeId = buffer.readByte();
         this.name = buffer.readUtf();
         this.ownerColor = buffer.readVarInt();
         this.capturedByColor = buffer.readVarInt();
+        this.owner = readTeam(buffer);
+        this.capturedBy = readTeam(buffer);
         this.progress = buffer.readFloat();
         this.position = SerializationUtils.decodeBlockPos(buffer);
     }
 
-    public HudCapturePointObjective(Byte runtimeId, String name, int ownerColor, int capturedByColor, float progress, BlockPos position) {
+    public HudCapturePointObjective(Byte runtimeId, String name, int ownerColor, int capturedByColor,
+                                    TeamColor owner, TeamColor capturedBy, float progress, BlockPos position) {
         this.runtimeId = runtimeId;
         this.name = name;
         this.ownerColor = ownerColor;
         this.capturedByColor = capturedByColor;
+        this.owner = owner;
+        this.capturedBy = capturedBy;
         this.progress = progress;
         this.position = position;
     }
@@ -41,29 +48,19 @@ public class HudCapturePointObjective extends HudObjective {
         buffer.writeUtf(name);
         buffer.writeVarInt(ownerColor);
         buffer.writeVarInt(capturedByColor);
+        writeTeam(buffer, owner);
+        writeTeam(buffer, capturedBy);
         buffer.writeFloat(progress);
         SerializationUtils.encodeBlockPos(buffer, position);
     }
 
-    @Override
-    public void Render(GuiGraphics guiGraphics, int x, int[] yReference) {
-        Minecraft mc = Minecraft.getInstance();
+    private static void writeTeam(FriendlyByteBuf buffer, TeamColor team) {
+        buffer.writeByte(team == null ? -1 : team.ordinal());
+    }
 
-        int y = yReference[0] + 10;     // vertical offset
-
-        guiGraphics.drawString(mc.font, name, x ,y ,0xFFFFFF);
-
-        int barX = x;
-        int barY = y + 12;
-        int barWidth = 100;
-        int barHeight = 8;
-
-        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF000000 | ownerColor);
-
-        int filled = (int) (barWidth * progress);
-        guiGraphics.fill(barX, barY, barX + filled, barY + barHeight, 0xFF000000 | capturedByColor);
-
-        yReference[0] = barY + barHeight + 4;
+    private static TeamColor readTeam(FriendlyByteBuf buffer) {
+        int ordinal = buffer.readByte();
+        return ordinal < 0 || ordinal >= TeamColor.values().length ? null : TeamColor.values()[ordinal];
     }
 
     @Override
@@ -73,6 +70,18 @@ public class HudCapturePointObjective extends HudObjective {
 
     public int getOwnerColor() {
         return ownerColor;
+    }
+
+    public TeamColor getOwner() {
+        return owner;
+    }
+
+    public TeamColor getCapturedBy() {
+        return capturedBy;
+    }
+
+    public float getProgress() {
+        return progress;
     }
 
     public String GetName() {

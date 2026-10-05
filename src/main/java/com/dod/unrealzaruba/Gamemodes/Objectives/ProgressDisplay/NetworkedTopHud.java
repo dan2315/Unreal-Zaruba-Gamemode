@@ -19,7 +19,7 @@ public class NetworkedTopHud implements IProgressDisplay {
     @Override
     public void updateProgress(float progress) {
         for (var player :  server.getPlayerList().getPlayers()) {
-            PacketDistributor.sendToPlayer(player, new ClientboundUpdateTopScorePacket(id, (short) (requiredPoints * progress)));
+            PacketDistributor.sendToPlayer(player, new ClientboundUpdateTopScorePacket(id, (short) (requiredPoints * progress), requiredPoints));
         }
     }
 

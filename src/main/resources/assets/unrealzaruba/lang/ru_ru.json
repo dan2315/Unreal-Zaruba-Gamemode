@@ -34,6 +34,14 @@
     "economy.unrealzaruba.kill_reward": "Убит %s: +%s",
     "economy.unrealzaruba.kill": "Убит %s",
 
+    "hud.unrealzaruba.objectives": "Объективы",
+    "hud.unrealzaruba.capturing": "Захват %s",
+    "hud.unrealzaruba.neutral": "Нейтральна",
+    "hud.unrealzaruba.team.red": "Красные",
+    "hud.unrealzaruba.team.blue": "Синие",
+    "hud.unrealzaruba.team.yellow": "Жёлтые",
+    "hud.unrealzaruba.team.purple": "Фиолетовые",
+
     "buymenu.unrealzaruba.title": "Магазин",
     "buymenu.unrealzaruba.balance": "Баланс",
     "buymenu.unrealzaruba.esc": "Esc, чтобы закрыть",

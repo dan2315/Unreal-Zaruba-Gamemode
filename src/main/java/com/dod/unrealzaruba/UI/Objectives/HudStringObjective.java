@@ -1,8 +1,6 @@
 package com.dod.unrealzaruba.UI.Objectives;
 
 import com.dod.unrealzaruba.UnrealZaruba;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 
 import static com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective.LastRuntimeId;
@@ -29,13 +27,8 @@ public class HudStringObjective extends HudObjective {
         buffer.writeUtf(displayString);
     }
 
-    @Override
-    public void Render(GuiGraphics guiGraphics, int x, int[] yReference) {
-        Minecraft mc = Minecraft.getInstance();
-
-        int y = yReference[0] + 10;     // vertical offset
-
-        guiGraphics.drawString(mc.font, displayString, x, y, 0xFFFFFF);
+    public String getText() {
+        return displayString;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.dod.unrealzaruba.UI.Objectives;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.HashMap;
@@ -13,7 +12,6 @@ public abstract class HudObjective {
         var typeId = buffer.readVarInt();
         return factoryMethodsMap.get(typeId).apply(buffer);
     }
-    public abstract void Render(GuiGraphics guiGraphics, int x, int[] yReference);
     public byte GetRuntimeId() {
         return runtimeId;
     }

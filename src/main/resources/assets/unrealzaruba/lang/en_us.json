@@ -35,6 +35,14 @@
     "economy.unrealzaruba.kill_reward": "Killed %s: +%s",
     "economy.unrealzaruba.kill": "Killed %s",
 
+    "hud.unrealzaruba.objectives": "Objectives",
+    "hud.unrealzaruba.capturing": "Capturing %s",
+    "hud.unrealzaruba.neutral": "Neutral",
+    "hud.unrealzaruba.team.red": "Red",
+    "hud.unrealzaruba.team.blue": "Blue",
+    "hud.unrealzaruba.team.yellow": "Yellow",
+    "hud.unrealzaruba.team.purple": "Purple",
+
     "buymenu.unrealzaruba.title": "Buy menu",
     "buymenu.unrealzaruba.balance": "Balance",
     "buymenu.unrealzaruba.esc": "Esc to close",
