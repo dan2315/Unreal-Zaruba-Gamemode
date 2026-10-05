@@ -44,7 +44,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 
 public abstract class BaseGamemode implements IPhaseHolder {
-    private static final int RESPAWN_DURATION_SECONDS = 10;
+    protected static final int RESPAWN_DURATION_SECONDS = 10;
     protected ObjectivesHandler objectivesHandler;
     protected AbstractGamePhase currentPhase;
     // Smotri, kakuyu huinyu ya pridumal

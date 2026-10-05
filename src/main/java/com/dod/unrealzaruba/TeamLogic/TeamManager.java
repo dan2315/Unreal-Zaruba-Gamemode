@@ -13,6 +13,7 @@ import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsSync;
 import java.util.Comparator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -151,6 +152,7 @@ public class TeamManager implements IResettable {
         }
 
         teams.get(dyeColor).Assign(player);
+        RespawnPointsSync.sendTo(player);
     }
 
     public void ChangeGameModeOfAllParticipants(GameType gameType) {

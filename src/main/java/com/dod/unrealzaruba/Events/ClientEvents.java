@@ -5,6 +5,8 @@ import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.UI.GamemodeSelectionScreen;
 import com.dod.unrealzaruba.UI.MoneyOverlay;
+import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
+import com.dod.unrealzaruba.UI.Respawn.RespawnClientState;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
@@ -33,6 +35,7 @@ public class ClientEvents {
     @SubscribeEvent
     public void OnClientTickPre(ClientTickEvent.Pre event) {
         TimerManager.updateAll();
+        WaypointManager.INSTANCE.tick();
     }
 
     @SubscribeEvent
@@ -52,5 +55,6 @@ public class ClientEvents {
         UnrealZaruba.LOGGER.warn("Clearing objectives overlay");
         ObjectivesOverlay.INSTANCE.Clear();
         MoneyOverlay.INSTANCE.set(false, 0);
+        RespawnClientState.reset();
     }
 }

@@ -199,6 +199,11 @@ public class CapturePointsGamemode extends TeamGamemode {
         PrepareObjectiveDataToSendToClient(hudObjectives, zones);
         PacketDistributor.sendToPlayer(serverPlayer, new RenderableZonesPacket(zones));
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
+        // Scores are only sent when they change, so a player joining during a stalemate needs them now
+        PacketDistributor.sendToPlayer(serverPlayer, new ClientboundUpdateTopScorePacket((byte) 0,
+                (short) (REQUIRED_POINTS_TO_WIN * scorePointsObjectiveRed.GetProgress()), REQUIRED_POINTS_TO_WIN));
+        PacketDistributor.sendToPlayer(serverPlayer, new ClientboundUpdateTopScorePacket((byte) 1,
+                (short) (REQUIRED_POINTS_TO_WIN * scorePointsObjectiveBlue.GetProgress()), REQUIRED_POINTS_TO_WIN));
 
         if (server == null)
             return;

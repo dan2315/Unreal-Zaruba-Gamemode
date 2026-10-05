@@ -3,8 +3,7 @@ package com.dod.unrealzaruba.NetworkPackets;
 import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import com.dod.unrealzaruba.NetworkPackets.PacketContext;
-import com.dod.unrealzaruba.UI.CustomDeathScreen;
-import net.minecraft.client.Minecraft;
+import com.dod.unrealzaruba.UI.Respawn.ClientRespawnHandlers;
 
 public class UpdateDeathTimerPacket implements ModPacket {
     
@@ -31,11 +30,7 @@ public class UpdateDeathTimerPacket implements ModPacket {
     // Handle the packet on the client side
     public static void handle(UpdateDeathTimerPacket packet, Supplier<PacketContext> ctx) {
         ctx.get().enqueueWork(() -> {
-            // Update the client-side death timer UI
-            Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.screen instanceof CustomDeathScreen ) {
-                ((CustomDeathScreen) minecraft.screen).updateRespawnTimer(packet.getRemainingTime());
-            }
+            ClientRespawnHandlers.onTimer(packet.getRemainingTime());
         });
         ctx.get().setPacketHandled(true);
     }

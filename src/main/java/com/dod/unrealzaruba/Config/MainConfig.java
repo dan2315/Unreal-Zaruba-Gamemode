@@ -24,6 +24,7 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
         private Mode mode = Mode.GAME;
         private BlockPos lobbySpawnPoint = new BlockPos(0, 65, 0);
         private int minPlayersToStart = 6;
+        private boolean classEquipmentEnabled = false;
 
         public boolean getIsZarubaServer() {
             return isZarubaServer;
@@ -132,5 +133,9 @@ public class MainConfig extends AbstractConfig<MainConfig.MainConfigData> {
 
     public int getMinPlayersToStart() {
         return loadMainConfig().getMinPlayersToStart();
+    }
+
+    public boolean isClassEquipmentEnabled() {
+        return loadMainConfig().classEquipmentEnabled;
     }
 } 

@@ -4,6 +4,7 @@ import com.dod.unrealzaruba.CharacterClass.ItemDataBuilders.VanillaItems;
 import java.util.List;
 
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
 
@@ -19,6 +20,8 @@ public class CharacterClassEquipper {
 
     public static boolean equipPlayerWithSelectedClass(ServerPlayer player) {
         if (player == null) return false;
+        // Kits are off unless mainConfig.json turns them on: players buy their gear now
+        if (!MainConfig.getInstance().isClassEquipmentEnabled()) return false;
         
         PlayerContext playerContext = PlayerContext.Get(player.getUUID());
         if (!(playerContext instanceof TeamPlayerContext teamPlayerContext)) {

@@ -30,6 +30,8 @@ import com.dod.unrealzaruba.NetworkPackets.Economy.BuyResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundMoneyPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.OpenBuyMenuPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.RequestBuyMenuPacket;
+import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundDeathStatePacket;
+import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundRespawnPointsPacket;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -78,6 +80,8 @@ public class NetworkHandler {
         toClient("open_buy_menu", OpenBuyMenuPacket.class, OpenBuyMenuPacket::encode, OpenBuyMenuPacket::decode, OpenBuyMenuPacket::handle);
         toServer("buy_items", BuyItemsPacket.class, BuyItemsPacket::encode, BuyItemsPacket::decode, BuyItemsPacket::handle);
         toClient("buy_result", BuyResultPacket.class, BuyResultPacket::encode, BuyResultPacket::decode, BuyResultPacket::handle);
+        toClient("respawn_points", ClientboundRespawnPointsPacket.class, ClientboundRespawnPointsPacket::encode, ClientboundRespawnPointsPacket::decode, ClientboundRespawnPointsPacket::handle);
+        toClient("death_state", ClientboundDeathStatePacket.class, ClientboundDeathStatePacket::encode, ClientboundDeathStatePacket::decode, ClientboundDeathStatePacket::handle);
     }
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {

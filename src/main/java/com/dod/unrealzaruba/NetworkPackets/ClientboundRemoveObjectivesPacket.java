@@ -3,6 +3,7 @@ package com.dod.unrealzaruba.NetworkPackets;
 import com.dod.unrealzaruba.Gamemodes.List;
 
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
+import com.dod.unrealzaruba.UI.Respawn.RespawnClientState;
 import net.minecraft.network.FriendlyByteBuf;
 import com.dod.unrealzaruba.NetworkPackets.PacketContext;
 
@@ -43,6 +44,7 @@ public class ClientboundRemoveObjectivesPacket implements ModPacket {
         context.get().enqueueWork(() -> {
             if (size == 0) {
                 ObjectivesOverlay.INSTANCE.Clear();
+                RespawnClientState.reset();
             } else {
                 ObjectivesOverlay.INSTANCE.RemoveById(runtimeIds);
             }

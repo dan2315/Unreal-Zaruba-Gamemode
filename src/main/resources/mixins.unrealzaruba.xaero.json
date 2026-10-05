@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.dod.unrealzaruba.mixin.xaero",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "GuiMapMixin",
+    "WaypointReaderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

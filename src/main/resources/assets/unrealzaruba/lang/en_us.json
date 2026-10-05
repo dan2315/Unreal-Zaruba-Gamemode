@@ -36,6 +36,13 @@
     "economy.unrealzaruba.kill": "Killed %s",
 
     "hud.unrealzaruba.objectives": "Objectives",
+    "hud.unrealzaruba.respawn.in": "Respawn in %s s",
+    "hud.unrealzaruba.respawn.point": "Respawn point: %s",
+    "hud.unrealzaruba.respawn.hint": "Right-click a point on the map to respawn there",
+    "hud.unrealzaruba.respawn.open_map": "Open the map to change it",
+    "hud.unrealzaruba.respawn.choose": "Choose as respawn point",
+    "hud.unrealzaruba.respawn.current": "✔ Current respawn point",
+    "hud.unrealzaruba.respawn.not_available": "Can't respawn here",
     "hud.unrealzaruba.capturing": "Capturing %s",
     "hud.unrealzaruba.neutral": "Neutral",
     "hud.unrealzaruba.team.red": "Red",

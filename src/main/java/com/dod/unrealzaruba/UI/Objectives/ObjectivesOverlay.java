@@ -142,6 +142,10 @@ public class ObjectivesOverlay implements ZarubaOverlay {
         }
     }
 
+    public java.util.Collection<HudObjective> objectives() {
+        return objectivesMap.values();
+    }
+
     /** Letter shown for a capture point (A, B, ...), or null if it isn't one. Matches the minimap waypoints. */
     public String letterFor(byte runtimeId) {
         char letter = 'A';

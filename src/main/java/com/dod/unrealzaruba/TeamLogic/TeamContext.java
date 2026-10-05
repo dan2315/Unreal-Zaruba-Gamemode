@@ -9,6 +9,7 @@ import com.dod.unrealzaruba.Gamemodes.Objectives.ObjectiveOwner;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.BaseRespawnPoint;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.IRespawnPoint;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPoint;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsSync;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import com.dod.unrealzaruba.UnrealZaruba;
@@ -117,6 +118,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
 
     public void AddRespawnPoint(IRespawnPoint respawnPoint) {
         respawnPoints.add(respawnPoint);
+        RespawnPointsSync.sendToTeam(this);
     }
 
     public void RemoveRespawnPointByBlockPos(BlockPos blockPos) {
@@ -137,14 +139,15 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
         RemoveRespawnPoint(point.get());
     }
 
-    private void RemoveRespawnPoint(IRespawnPoint point) {
+    public void RemoveRespawnPoint(IRespawnPoint point) {
         UnrealZaruba.LOGGER.info("Respawn point removed");
         for (var uuid : members) {
-            if (PlayerContext.Get(uuid) instanceof TeamPlayerContext tPlayer) {
+            if (PlayerContext.Get(uuid) instanceof TeamPlayerContext tPlayer && tPlayer.RespawnPoint() == point) {
                 tPlayer.DeselectRespawnPoint();
             }
         }
         respawnPoints.remove(point);
+        RespawnPointsSync.sendToTeam(this);
     }
 
     public void setCommander(MinecraftServer server, Player player) {

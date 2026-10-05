@@ -3,6 +3,10 @@ package com.dod.unrealzaruba.Gamemodes;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
+import com.dod.unrealzaruba.utils.NBT;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsSync;
+import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundDeathStatePacket;
+import net.neoforged.neoforge.network.PacketDistributor;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import com.dod.unrealzaruba.TeamLogic.TeamManager;
@@ -53,15 +57,18 @@ public class TeamGamemode extends BaseGamemode {
         } else {
             TeamManager.teleportToSpawnByPriority(player);
         }
+        PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(false, 0));
     }
     
     @Override
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
         super.HandleDeath(player, event);
         if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext teamPlayerContext) {
-            if (teamPlayerContext.Team() == null) return;
-            var respawnPoints = teamPlayerContext.Team().RespawnPoints();
-            NetworkHandler.Screens.openDeathScreen(player, respawnPoints);
+            // Deaths before the battle are cancelled in BaseGamemode and don't count
+            if (teamPlayerContext.Team() == null || NBT.readEntityTag(player, "isPlayerDead") != 1) return;
+            // The client opens the map to pick a respawn point
+            RespawnPointsSync.sendTo(player);
+            PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS));
         }
     }
 

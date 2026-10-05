@@ -59,10 +59,7 @@ public class CustomDeathScreen extends Screen {
     }
 
     private void sendSelectRespawnPoint(byte respawnPointId) {
-        var player = Minecraft.getInstance().player;
-        if (player == null)
-            UnrealZaruba.LOGGER.warn("[WARN] Local player is not found");
-        PacketDistributor.sendToServer(new SelectRespawnPointPacket(player.getUUID(), respawnPointId));
+        PacketDistributor.sendToServer(new SelectRespawnPointPacket(respawnPointId));
     }
 
     @Override

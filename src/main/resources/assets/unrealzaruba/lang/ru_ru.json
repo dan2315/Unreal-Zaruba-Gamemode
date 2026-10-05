@@ -35,6 +35,13 @@
     "economy.unrealzaruba.kill": "Убит %s",
 
     "hud.unrealzaruba.objectives": "Объективы",
+    "hud.unrealzaruba.respawn.in": "Возрождение через %s с",
+    "hud.unrealzaruba.respawn.point": "Точка возрождения: %s",
+    "hud.unrealzaruba.respawn.hint": "ПКМ по точке на карте — возродиться там",
+    "hud.unrealzaruba.respawn.open_map": "Откройте карту, чтобы сменить точку",
+    "hud.unrealzaruba.respawn.choose": "Выбрать точкой возрождения",
+    "hud.unrealzaruba.respawn.current": "✔ Текущая точка возрождения",
+    "hud.unrealzaruba.respawn.not_available": "Здесь нельзя возродиться",
     "hud.unrealzaruba.capturing": "Захват %s",
     "hud.unrealzaruba.neutral": "Нейтральна",
     "hud.unrealzaruba.team.red": "Красные",

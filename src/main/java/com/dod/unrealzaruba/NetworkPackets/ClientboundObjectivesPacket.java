@@ -1,6 +1,5 @@
 package com.dod.unrealzaruba.NetworkPackets;
 
-import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
 import com.dod.unrealzaruba.UI.Objectives.HudObjective;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
@@ -38,10 +37,8 @@ public class ClientboundObjectivesPacket implements ModPacket {
 
     public void handle(Supplier<PacketContext> context) {
         context.get().enqueueWork(() -> {
+            // Xaero waypoints follow the overlay on their own, see XaeroWaypoints
             ObjectivesOverlay.INSTANCE.SetObjectives(objectives);
-            TimerManager.createRealTimeTimer(2000, () -> {
-                WaypointManager.INSTANCE.SetupWaypoints(objectives);
-            });
         });
         context.get().setPacketHandled(true);
     }

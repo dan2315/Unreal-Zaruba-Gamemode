@@ -105,6 +105,9 @@ dependencies {
 
     // Xaero's Minimap waypoint integration (optional at runtime)
     compileOnly("maven.modrinth:xaeros-minimap:${xaero_minimap_modrinth_version}")
+    compileOnly("maven.modrinth:xaeros-world-map:${xaero_worldmap_modrinth_version}")
+    // XaeroLib ships inside the world map jar (jar-in-jar), so it isn't on Modrinth's maven
+    compileOnly(files("libs/xaerolib-neoforge-1.21.1-1.7.3.jar"))
 
 }
 

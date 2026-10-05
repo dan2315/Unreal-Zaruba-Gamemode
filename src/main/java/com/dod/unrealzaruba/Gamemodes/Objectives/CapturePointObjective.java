@@ -5,6 +5,8 @@ import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.Gamemodes.Objectives.ProgressDisplay.NetworkedSideHudListElement;
 import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
+import com.dod.unrealzaruba.Gamemodes.RespawnPoints.CapturePointRespawnPoint;
+import net.minecraft.core.BlockPos;
 import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.NetworkPackets.RenderableZonesPacket;
@@ -25,12 +27,15 @@ import java.util.*;
 
 public class CapturePointObjective extends PositionedGameobjective {
     private BlockVolume captureArea;
+    // Where the owners respawn (feet position). Null: on the floor at the center of the capture area
+    private BlockPos respawnPosition;
 
     private transient AABB captureAreaAABB;
     private transient CaptureStatus captureStatus = CaptureStatus.None;
     private transient ObjectiveOwner beingCapturedBy;
     private transient ObjectiveOwner owner;
     private transient int updateCounter;
+    private transient CapturePointRespawnPoint respawnPoint;
 
     public CapturePointObjective(String name, BlockVolume volume) {
         super(name, "capturepoint", volume.GetCenter());
@@ -45,10 +50,35 @@ public class CapturePointObjective extends PositionedGameobjective {
         captureAreaAABB = new AABB(Vec3.atLowerCornerOf(captureArea.getMinPos()), Vec3.atLowerCornerOf(captureArea.getMaxPos()));
         setProgressDisplay(new NetworkedSideHudListElement(this));
         TeamManager teamManager = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode()).GetTeamManager();
+        respawnPoint = new CapturePointRespawnPoint(this);
         if (Objects.equals(name, "Вертолётная площадка")) {
             owner = teamManager.Get(TeamColor.RED);
         } else if (Objects.equals(name, "Склад боеприпасов")) {
             owner = teamManager.Get(TeamColor.BLUE);
+        }
+        MoveRespawnPoint(null, owner);
+    }
+
+    public BlockPos GetRespawnPosition() {
+        return respawnPosition;
+    }
+
+    public BlockVolume GetCaptureArea() {
+        return captureArea;
+    }
+
+    public CapturePointRespawnPoint GetRespawnPoint() {
+        return respawnPoint;
+    }
+
+    // The owning team can respawn here
+    private void MoveRespawnPoint(ObjectiveOwner from, ObjectiveOwner to) {
+        if (respawnPoint == null || from == to) return;
+        if (from instanceof TeamContext oldTeam) {
+            oldTeam.RemoveRespawnPoint(respawnPoint);
+        }
+        if (to instanceof TeamContext newTeam) {
+            newTeam.AddRespawnPoint(respawnPoint);
         }
     }
 
@@ -133,6 +163,7 @@ public class CapturePointObjective extends PositionedGameobjective {
     }
 
     private void Capture() {
+        MoveRespawnPoint(owner, beingCapturedBy);
         owner = beingCapturedBy;
         var ownerTeam = (TeamContext) this.GetOwner();
         int color = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
