@@ -30,6 +30,11 @@ import com.dod.unrealzaruba.NetworkPackets.Economy.BuyResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundMoneyPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.OpenBuyMenuPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.RequestBuyMenuPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackDataPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackOfferPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.RequestMapPackPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackUploadRequestPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.UploadMapPackPacket;
 import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundDeathStatePacket;
 import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundRespawnPointsPacket;
 
@@ -82,6 +87,11 @@ public class NetworkHandler {
         toClient("buy_result", BuyResultPacket.class, BuyResultPacket::encode, BuyResultPacket::decode, BuyResultPacket::handle);
         toClient("respawn_points", ClientboundRespawnPointsPacket.class, ClientboundRespawnPointsPacket::encode, ClientboundRespawnPointsPacket::decode, ClientboundRespawnPointsPacket::handle);
         toClient("death_state", ClientboundDeathStatePacket.class, ClientboundDeathStatePacket::encode, ClientboundDeathStatePacket::decode, ClientboundDeathStatePacket::handle);
+        toClient("map_pack_offer", ClientboundMapPackOfferPacket.class, ClientboundMapPackOfferPacket::encode, ClientboundMapPackOfferPacket::decode, ClientboundMapPackOfferPacket::handle);
+        toClient("map_pack_data", ClientboundMapPackDataPacket.class, ClientboundMapPackDataPacket::encode, ClientboundMapPackDataPacket::decode, ClientboundMapPackDataPacket::handle);
+        toServer("request_map_pack", RequestMapPackPacket.class, RequestMapPackPacket::encode, RequestMapPackPacket::decode, RequestMapPackPacket::handle);
+        toClient("map_pack_upload_request", ClientboundMapPackUploadRequestPacket.class, ClientboundMapPackUploadRequestPacket::encode, ClientboundMapPackUploadRequestPacket::decode, ClientboundMapPackUploadRequestPacket::handle);
+        toServer("upload_map_pack", UploadMapPackPacket.class, UploadMapPackPacket::encode, UploadMapPackPacket::decode, UploadMapPackPacket::handle);
     }
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {

@@ -38,7 +38,7 @@ import xaero.hud.minimap.world.MinimapWorld;
  * Xaero session or the player deleting one. All of ours are temporary, so Xaero never saves them.
  */
 public class XaeroWaypoints {
-    private static final ResourceKey<Level> GAME_DIMENSION =
+    static final ResourceKey<Level> GAME_DIMENSION =
             ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "game_dim"));
     private static final String SELECTED_PREFIX = "► ";
 

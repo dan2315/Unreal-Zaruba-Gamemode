@@ -72,6 +72,11 @@ public class WorldManager {
         clearShipsInDimension(gameLevel);
     }
 
+    /** Terrain region files of the loaded game map, or null before a map is loaded. */
+    public static java.nio.file.Path gameRegionFolder() {
+        return access == null ? null : access.getDimensionPath(GAME_DIMENSION).resolve("region");
+    }
+
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
         return Pair.of(GAME_DIMENSION, LOBBY_DIMENSION);
     }

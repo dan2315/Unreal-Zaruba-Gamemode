@@ -2,6 +2,10 @@ package com.dod.unrealzaruba.ModIntegrations.Xaero;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsView;
 import com.dod.unrealzaruba.UI.HudStyle;
@@ -19,6 +23,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import xaero.map.MapProcessor;
 import xaero.map.WorldMapSession;
 import xaero.map.gui.GuiMap;
 import xaero.map.gui.IRightClickableElement;
@@ -33,6 +38,7 @@ import xaero.map.mods.gui.Waypoint;
  */
 public class XaeroWorldMap {
     private static final int PANEL_WIDTH = 220;
+    private static final String PACK_MARKER = ".unrealzaruba-pack";
 
     private final XaeroWaypoints waypoints;
     private boolean openedForRespawn;
@@ -67,6 +73,51 @@ public class XaeroWorldMap {
             mc.setScreen(null);
         }
         openedForRespawn = false;
+    }
+
+    /** Xaero's folder with the game dimension's map for this server and multiworld, or null if not known yet. */
+    public Path gameDimensionFolder() {
+        WorldMapSession session = WorldMapSession.getCurrentSession();
+        MapProcessor processor = session == null ? null : session.getMapProcessor();
+        if (processor == null) return null;
+        String worldId = processor.getCurrentWorldId();
+        String mwId = processor.getCurrentMWId();
+        if (worldId == null || mwId == null) return null;
+        String dimName = processor.getDimensionName(XaeroWaypoints.GAME_DIMENSION);
+        return processor.getMapSaveLoad().getMWSubFolder(worldId, dimName, mwId);
+    }
+
+    /**
+     * Puts a map pack's region files into Xaero's folder for the game dimension (same server, same multiworld as the
+     * current one), replacing regions left there by other maps. Returns false if Xaero isn't ready yet.
+     */
+    public boolean installMapPack(Path source, List<String> fileNames, String hash) {
+        try {
+            Path target = gameDimensionFolder();
+            if (target == null) return false;
+
+            Path marker = target.resolve(PACK_MARKER);
+            if (Files.exists(marker) && hash.equals(Files.readString(marker, StandardCharsets.UTF_8).trim())) {
+                return true;
+            }
+            Files.createDirectories(target);
+            try (var existing = Files.list(target)) {
+                for (Path file : existing.filter(path -> path.getFileName().toString().endsWith(".zip")).toList()) {
+                    if (!fileNames.contains(file.getFileName().toString())) {
+                        Files.delete(file); // terrain of another map in the same dimension
+                    }
+                }
+            }
+            for (String name : fileNames) {
+                Files.copy(source.resolve(name), target.resolve(name), StandardCopyOption.REPLACE_EXISTING);
+            }
+            Files.writeString(marker, hash, StandardCharsets.UTF_8);
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] Installed world map pack {} into {}", hash, target);
+            return true;
+        } catch (Throwable e) {
+            UnrealZaruba.LOGGER.warn("[UnrealZaruba] Could not install world map pack", e);
+            return false;
+        }
     }
 
     public void refresh() {

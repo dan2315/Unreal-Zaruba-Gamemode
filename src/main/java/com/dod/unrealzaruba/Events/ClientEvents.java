@@ -6,6 +6,7 @@ import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.UI.GamemodeSelectionScreen;
 import com.dod.unrealzaruba.UI.MoneyOverlay;
 import com.dod.unrealzaruba.ModIntegrations.WaypointManager;
+import com.dod.unrealzaruba.ModIntegrations.Xaero.MapPackClient;
 import com.dod.unrealzaruba.UI.Respawn.RespawnClientState;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UnrealZaruba;
@@ -36,6 +37,7 @@ public class ClientEvents {
     public void OnClientTickPre(ClientTickEvent.Pre event) {
         TimerManager.updateAll();
         WaypointManager.INSTANCE.tick();
+        MapPackClient.tick();
     }
 
     @SubscribeEvent
@@ -56,5 +58,6 @@ public class ClientEvents {
         ObjectivesOverlay.INSTANCE.Clear();
         MoneyOverlay.INSTANCE.set(false, 0);
         RespawnClientState.reset();
+        MapPackClient.reset();
     }
 }

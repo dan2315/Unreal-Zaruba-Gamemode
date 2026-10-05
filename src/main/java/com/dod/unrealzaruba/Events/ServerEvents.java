@@ -8,6 +8,8 @@ import com.dod.unrealzaruba.Services.GameStatisticsService;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
+import com.dod.unrealzaruba.WorldManager.MapPacks;
+import com.dod.unrealzaruba.WorldManager.MapScan;
 import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Economy.Wallets;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsSync;
@@ -57,6 +59,8 @@ public class ServerEvents {
             return;
 
         TimerManager.updateAll();
+        MapPacks.tick(server);
+        MapScan.tick(server);
         if (!isDevMode) {
             gamemodeManager.Tick();
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
@@ -100,6 +104,7 @@ public class ServerEvents {
             activeGamemode.HandleConnectedPlayer(event.getEntity());
             Wallets.sync(player);
             RespawnPointsSync.sendTo(player);
+            MapPacks.offer(player);
         }
         else {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());

@@ -19,6 +19,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.unrealzaruba.Economy.EconomyData;
 import com.dod.unrealzaruba.Economy.Wallets;
+import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.dod.unrealzaruba.Economy.Money;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
@@ -62,6 +63,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
         new EconomyData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
         Wallets.reset(server);
+        MapPacks.select(server, this.getClass().getSimpleName());
         WorldManager.ReloadGameWorldDelayed(this);
     }
 

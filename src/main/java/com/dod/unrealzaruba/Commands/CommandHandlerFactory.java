@@ -28,6 +28,7 @@ public class CommandHandlerFactory {
         handlers.add(new OpenGamemodeMapCommand());
         handlers.add(new ForceStartGameCommand());
         handlers.add(new MoneyCommand());
+        handlers.add(new MapScanCommand());
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());
