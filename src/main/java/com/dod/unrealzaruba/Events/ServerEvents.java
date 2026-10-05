@@ -9,6 +9,7 @@ import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.Economy.Wallets;
 
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -96,6 +97,7 @@ public class ServerEvents {
         var activeGamemode = gamemodeManager.GetActiveGamemode();
         if (activeGamemode != null) {
             activeGamemode.HandleConnectedPlayer(event.getEntity());
+            Wallets.sync(player);
         }
         else {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());

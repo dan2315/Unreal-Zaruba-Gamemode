@@ -12,9 +12,15 @@ public class KeyBindings {
             InputConstants.KEY_G,
             CATEGORY
     );
+    public static final KeyMapping OPEN_BUY_MENU = new KeyMapping(
+            "key.unrealzaruba.open_buy_menu",
+            InputConstants.KEY_B,
+            CATEGORY
+    );
 
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         event.register(OPEN_GAMEMODE_MENU);
+        event.register(OPEN_BUY_MENU);
     }
 }

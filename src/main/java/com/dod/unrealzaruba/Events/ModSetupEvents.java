@@ -3,6 +3,7 @@ package com.dod.unrealzaruba.Events;
 import com.dod.unrealzaruba.Renderers.GeometryRenderer;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UI.ScoreOverlay;
+import com.dod.unrealzaruba.UI.MoneyOverlay;
 import com.dod.unrealzaruba.UnrealZaruba;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -23,6 +24,7 @@ public class ModSetupEvents {
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "gametimer"), TimerOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "objectives"), ObjectivesOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "score"), ScoreOverlay.INSTANCE);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "money"), MoneyOverlay.INSTANCE);
     }
 
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {

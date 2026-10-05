@@ -23,8 +23,6 @@ public class ModItems {
             () -> new HandTent(new Item.Properties().rarity(Rarity.EPIC)));
     public static final DeferredHolder<Item, Item> HAND_ASSEMBLER = ModItems.ITEMS.register("hand_assembler",
             () -> new HandAssembler(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SKULL = ModItems.ITEMS.register("skull",
-            () -> new Item(new Item.Properties()));
     public static final DeferredHolder<Item, Item> RED_BLOCK_ITEM = ModItems.ITEMS.register("red_block",
             () -> new BlockItem(ModBlocks.RED_BLOCK.get(), new Item.Properties()));
     public static final DeferredHolder<Item, Item> BLUE_BLOCK_ITEM = ModItems.ITEMS.register("blue_block",

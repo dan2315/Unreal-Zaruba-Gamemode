@@ -1,6 +1,9 @@
 package com.dod.unrealzaruba.ModBlocks.VehiclePurchase;
 
 import net.minecraft.core.HolderLookup;
+import com.dod.unrealzaruba.Economy.EconomyConfig;
+import com.dod.unrealzaruba.Economy.EconomyData;
+import com.dod.unrealzaruba.Economy.Wallets;
 import com.dod.unrealzaruba.ModBlocks.ModBlocks;
 import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.Vehicles.VehicleData;
@@ -100,7 +103,8 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
     @Override
     @Nullable
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new VehiclePurchaseMenu(containerId, inventory, this, ContainerLevelAccess.create(level, worldPosition));
+        return new VehiclePurchaseMenu(containerId, inventory, this, ContainerLevelAccess.create(level, worldPosition),
+                VehiclePurchaseMenu.offersFor(EconomyData.current()));
     }
 
     public Tuple<Boolean, String> purchaseVehicle(ServerPlayer player) {
@@ -114,14 +118,17 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         if (vehicleData == null) {
             return new Tuple<>(false, "Invalid vehicle selected");
         }
-    
 
-        if (!vehicleData.hasRequiredItems(player.getInventory())) {
-            player.sendSystemMessage(Component.translatable("container.vehicle_purchase.missing_items"));
-            return new Tuple<>(false, "Missing items");
+        EconomyConfig economy = EconomyData.current();
+        if (!economy.vehicles.contains(vehicleData.getId())) {
+            return new Tuple<>(false, "Not sold on this map");
         }
-        UnrealZaruba.LOGGER.info("[UnrealZaruba] Consuming items");
-    
+        int price = economy.vehiclePrice(vehicleData.getId());
+        if (Wallets.get(player) < price) {
+            player.sendSystemMessage(Component.translatable("container.vehicle_purchase.no_money"));
+            return new Tuple<>(false, "Not enough money");
+        }
+
         if (cooldownTicks > 0) {
             player.sendSystemMessage(Component.translatable("container.vehicle_purchase.cooldown")
                     .append(" (" + (cooldownTicks / 20) + " seconds)"));
@@ -135,8 +142,8 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
             boolean success = ShipCreator.CreateShipFromTemplate(vehicleData.getSchematicLocation(), targetPos, facing, serverLevel, player);
             if (success) {
                 cooldownTicks = 600;
-                
-                vehicleData.consumeRequiredItems(player.getInventory());
+
+                Wallets.trySpend(player, price);
                 return new Tuple<>(true, "Vehicle deployed successfully");
             } else {
                 return new Tuple<>(false, "Error: Failed to deploy vehicle");

@@ -25,6 +25,11 @@ import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseVehiclePacket
 import com.dod.unrealzaruba.NetworkPackets.VehiclePurchase.PurchaseResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.SetClassPacket;
 import com.dod.unrealzaruba.NetworkPackets.CharacterClasses.AssignClassToPlayerPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.BuyItemsPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.BuyResultPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundMoneyPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.OpenBuyMenuPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.RequestBuyMenuPacket;
 
 public class NetworkHandler {
     public static final String PROTOCOL_VERSION = "1";
@@ -68,6 +73,11 @@ public class NetworkHandler {
         toClient("remove_objectives", ClientboundRemoveObjectivesPacket.class, ClientboundRemoveObjectivesPacket::encode, ClientboundRemoveObjectivesPacket::decode, ClientboundRemoveObjectivesPacket::handle);
         toServer("gamemode_vote", GamemodeVotePacket.class, GamemodeVotePacket::encode, GamemodeVotePacket::decode, GamemodeVotePacket::handle);
         toClient("update_top_score", ClientboundUpdateTopScorePacket.class, ClientboundUpdateTopScorePacket::encode, ClientboundUpdateTopScorePacket::decode, ClientboundUpdateTopScorePacket::handle);
+        toClient("money", ClientboundMoneyPacket.class, ClientboundMoneyPacket::encode, ClientboundMoneyPacket::decode, ClientboundMoneyPacket::handle);
+        toServer("request_buy_menu", RequestBuyMenuPacket.class, RequestBuyMenuPacket::encode, RequestBuyMenuPacket::decode, RequestBuyMenuPacket::handle);
+        toClient("open_buy_menu", OpenBuyMenuPacket.class, OpenBuyMenuPacket::encode, OpenBuyMenuPacket::decode, OpenBuyMenuPacket::handle);
+        toServer("buy_items", BuyItemsPacket.class, BuyItemsPacket::encode, BuyItemsPacket::decode, BuyItemsPacket::handle);
+        toClient("buy_result", BuyResultPacket.class, BuyResultPacket::encode, BuyResultPacket::decode, BuyResultPacket::handle);
     }
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {

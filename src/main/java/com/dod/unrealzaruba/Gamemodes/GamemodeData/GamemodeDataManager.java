@@ -26,6 +26,7 @@ public class GamemodeDataManager {
     private static final Map<Class<? extends BaseGamemode>, Map<Class<? extends GamemodeData<?>>, GamemodeData<?>>> dataRegistry = new HashMap<>();
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObjective.class, new ObjectiveFactory())
+            .disableHtmlEscaping()
             .setPrettyPrinting()
             .create();
     

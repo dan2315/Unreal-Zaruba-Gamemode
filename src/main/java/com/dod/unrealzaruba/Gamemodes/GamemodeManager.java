@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.Comparator;
 
+import com.dod.unrealzaruba.Economy.Wallets;
 import com.dod.unrealzaruba.Title.TitleMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -120,6 +121,7 @@ public class GamemodeManager {
 
     public void CleanupCurrentGamemode() {
         activeGamemode = null;
+        Wallets.clear(ServerLifecycleHooks.getCurrentServer());
         StartVoting();
     }
 }

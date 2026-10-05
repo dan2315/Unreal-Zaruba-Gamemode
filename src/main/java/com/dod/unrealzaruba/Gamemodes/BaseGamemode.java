@@ -17,13 +17,15 @@ import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
-import com.dod.unrealzaruba.ModItems.ModItems;
+import com.dod.unrealzaruba.Economy.EconomyData;
+import com.dod.unrealzaruba.Economy.Wallets;
+import com.dod.unrealzaruba.Economy.Money;
+import com.dod.unrealzaruba.Player.PlayerContext;
+import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -57,7 +59,9 @@ public abstract class BaseGamemode implements IPhaseHolder {
         new TeamData(this.getClass());
         new VehicleSpawnData(this.getClass());
         new BarrierVolumesData(this.getClass());
+        new EconomyData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
+        Wallets.reset(server);
         WorldManager.ReloadGameWorldDelayed(this);
     }
 
@@ -178,8 +182,6 @@ public abstract class BaseGamemode implements IPhaseHolder {
         player.setGameMode(GameType.SURVIVAL);
         player.setInvulnerable(false);
         CharacterClassEquipper.equipPlayerWithSelectedClass(player);
-        int skulls = NBT.readEntityTag(player, "skulls");
-        player.getInventory().add(new ItemStack(ModItems.SKULL.get(), skulls));
         NBT.addEntityTag(player, "isPlayerDead", 0);
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
@@ -197,16 +199,19 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
         player.setHealth(20);
         player.getFoodData().setFoodLevel(20);
-        NBT.addEntityTag(player, "skulls", player.getInventory().countItem(ModItems.SKULL.get()));
         player.setInvulnerable(true);
         player.getInventory().clearContent();
         event.setCanceled(true);
 
         var killingEntity = event.getSource().getEntity();
         if (killingEntity instanceof ServerPlayer killer) {
-            Inventory killerInventory = killer.getInventory();
-            killerInventory.add(new ItemStack(ModItems.SKULL.get()));
-            killer.displayClientMessage(Component.literal("You have killed " + player.getDisplayName().getString() + ", got 1 SKULL"), true);
+            int reward = isEnemy(killer, player) ? EconomyData.current().killReward : 0;
+            if (reward > 0) {
+                Wallets.add(killer, reward);
+                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill_reward", player.getDisplayName(), Money.format(reward)), true);
+            } else {
+                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill", player.getDisplayName()), true);
+            }
             player.displayClientMessage(Component.literal("You have been killed by " + killer.getDisplayName().getString()), true);
         }
 
@@ -216,6 +221,18 @@ public abstract class BaseGamemode implements IPhaseHolder {
         startRespawnTimer(player);
     }
     
+    // No money for suicides and team kills
+    private static boolean isEnemy(ServerPlayer killer, ServerPlayer victim) {
+        if (killer == victim) return false;
+        PlayerContext killerContext = PlayerContext.Get(killer.getUUID());
+        PlayerContext victimContext = PlayerContext.Get(victim.getUUID());
+        if (killerContext instanceof TeamPlayerContext killerTeam && victimContext instanceof TeamPlayerContext victimTeam
+                && killerTeam.Team() != null) {
+            return killerTeam.Team() != victimTeam.Team();
+        }
+        return true;
+    }
+
     private void startRespawnTimer(ServerPlayer player) {
         TimerManager.createRealTimeTimer(
             RESPAWN_DURATION_SECONDS * 1000, 

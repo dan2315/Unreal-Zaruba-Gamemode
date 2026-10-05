@@ -27,6 +27,7 @@ public class CommandHandlerFactory {
         handlers.add(new VoteForGamemodeCommand());
         handlers.add(new OpenGamemodeMapCommand());
         handlers.add(new ForceStartGameCommand());
+        handlers.add(new MoneyCommand());
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());

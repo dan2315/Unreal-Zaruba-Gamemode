@@ -1,5 +1,7 @@
 package com.dod.unrealzaruba.ModBlocks.VehiclePurchase;
 
+import com.dod.unrealzaruba.Economy.EconomyData;
+import com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
 import javax.annotation.Nullable;
 
 import com.dod.unrealzaruba.ModBlocks.ModBlocks;
@@ -78,7 +80,7 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof VehiclePurchaseBlockEntity) {
-                player.openMenu((MenuProvider) blockEntity, pos);
+                player.openMenu((MenuProvider) blockEntity, buf -> VehiclePurchaseMenu.writeExtraData(buf, pos, VehiclePurchaseMenu.offersFor(EconomyData.current())));
             } 
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
