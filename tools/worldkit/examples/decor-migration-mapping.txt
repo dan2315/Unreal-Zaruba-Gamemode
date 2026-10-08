@@ -1,0 +1,91 @@
+# design_decor castle bricks -> Create cut bricks of the same stone
+design_decor:dripstone_castel_bricks -> create:cut_dripstone_bricks
+design_decor:dripstone_castel_brick_stairs -> create:cut_dripstone_brick_stairs
+design_decor:dripstone_castel_brick_slab -> create:cut_dripstone_brick_slab
+design_decor:dripstone_castel_brick_wall -> create:cut_dripstone_brick_wall
+design_decor:granite_castel_bricks -> create:cut_granite_bricks
+design_decor:granite_castel_brick_stairs -> create:cut_granite_brick_stairs
+design_decor:granite_castel_brick_slab -> create:cut_granite_brick_slab
+design_decor:granite_castel_brick_wall -> create:cut_granite_brick_wall
+design_decor:scoria_castel_bricks -> create:cut_scoria_bricks
+design_decor:scoria_castel_brick_stairs -> create:cut_scoria_brick_stairs
+design_decor:scoria_castel_brick_slab -> create:cut_scoria_brick_slab
+design_decor:scoria_castel_brick_wall -> create:cut_scoria_brick_wall
+design_decor:scorchia_castel_bricks -> create:cut_scorchia_bricks
+design_decor:scorchia_castel_brick_stairs -> create:cut_scorchia_brick_stairs
+design_decor:scorchia_castel_brick_slab -> create:cut_scorchia_brick_slab
+design_decor:scorchia_castel_brick_wall -> create:cut_scorchia_brick_wall
+design_decor:deepslate_castel_bricks -> create:cut_deepslate_bricks
+design_decor:deepslate_castel_brick_stairs -> create:cut_deepslate_brick_stairs
+design_decor:deepslate_castel_brick_slab -> create:cut_deepslate_brick_slab
+design_decor:deepslate_castel_brick_wall -> create:cut_deepslate_brick_wall
+design_decor:andesite_castel_bricks -> create:cut_andesite_bricks
+design_decor:andesite_castel_brick_stairs -> create:cut_andesite_brick_stairs
+design_decor:andesite_castel_brick_slab -> create:cut_andesite_brick_slab
+design_decor:andesite_castel_brick_wall -> create:cut_andesite_brick_wall
+design_decor:tuff_castel_bricks -> create:cut_tuff_bricks
+design_decor:tuff_castel_brick_stairs -> create:cut_tuff_brick_stairs
+design_decor:tuff_castel_brick_slab -> create:cut_tuff_brick_slab
+design_decor:tuff_castel_brick_wall -> create:cut_tuff_brick_wall
+design_decor:ochrum_castel_bricks -> create:cut_ochrum_bricks
+design_decor:ochrum_castel_brick_stairs -> create:cut_ochrum_brick_stairs
+design_decor:ochrum_castel_brick_slab -> create:cut_ochrum_brick_slab
+design_decor:ochrum_castel_brick_wall -> create:cut_ochrum_brick_wall
+design_decor:dripstone_castel_tiles -> create:polished_cut_dripstone
+design_decor:ochrum_castel_tile_stairs -> create:polished_cut_ochrum_stairs
+design_decor:vertical_tinted_framed_glass -> create:vertical_framed_glass
+design_decor:tinted_framed_glass -> create:framed_glass
+# same blocks in Design n' Decor 2.x
+design_decor:green_container -> dndecor:green_container
+design_decor:red_container -> dndecor:red_container
+design_decor:blue_container -> dndecor:blue_container
+design_decor:industrial_plating_block -> dndecor:industrial_plating_block
+design_decor:diagonal_girder -> dndecor:diagonal_girder
+design_decor:iron_catwalk -> dndecor:iron_catwalk set layer=1 drop turned_on
+design_decor:deepslate_millstone -> dndecor:deepslate_millstone
+design_decor:brass_lamp -> dndecor:brass_lamp set lit=true drop facing
+design_decor:zinc_lamp -> dndecor:zinc_lamp set lit=true drop facing
+design_decor:brass_light -> dndecor:brass_lamp set lit=true
+design_decor:copper_light -> dndecor:copper_lamp set lit=true
+design_decor:andesite_floodlight -> dndecor:andesite_frontlight drop turned_on,wrenched
+design_decor:industrial_iron_floor -> dndecor:industrial_floor
+design_decor:industrial_gear -> dndecor:industrial_cogwheel
+design_decor:white_metal_sheet -> dndecor:white_sheet_metal set axis=y
+design_decor:white_metal_sheet_slab -> minecraft:smooth_quartz_slab
+# boilers: facing -> axis
+design_decor:andesite_boiler -> dndecor:andesite_boiler axisFromFacing set size=normal
+design_decor:andesite_boiler_large -> dndecor:andesite_boiler axisFromFacing set size=large drop extension
+design_decor:andesite_boiler_structure -> dndecor:boiler_structure set size=normal drop facing
+design_decor:industrial_iron_boiler -> dndecor:industrial_boiler axisFromFacing set size=normal
+design_decor:industrial_iron_boiler_large -> dndecor:industrial_boiler axisFromFacing set size=large drop extension
+design_decor:industrial_iron_boiler_structure -> dndecor:boiler_structure set size=normal drop facing
+design_decor:cast_iron_boiler -> dndecor:iron_boiler axisFromFacing set size=normal
+# gas tanks: no equivalent, small upright boilers
+design_decor:gas_tank -> dndecor:industrial_boiler set axis=y,size=small
+design_decor:copper_gas_tank -> dndecor:copper_boiler set axis=y,size=small
+# signs: no equivalent
+design_decor:american_sign -> minecraft:air
+design_decor:arrow_down_sign -> minecraft:air
+design_decor:creeper_sign -> minecraft:air
+design_decor:stop_sign -> minecraft:air
+design_decor:tap_sign -> minecraft:air
+design_decor:warning_sign -> minecraft:air
+design_decor:magnet_sign -> minecraft:air
+design_decor:capitalism_block -> minecraft:air
+# createdeco ids that no longer exist
+createdeco:cast_iron_ladder -> createdeco:industrial_iron_ladder
+createdeco:cast_iron_trapdoor -> createdeco:industrial_iron_trapdoor
+createdeco:locked_cast_iron_door -> createdeco:locked_industrial_iron_door
+createdeco:copper_trapdoor -> minecraft:copper_trapdoor
+createdeco:iron_sheet_slab_vert -> createdeco:iron_sheet_metal set axis=y drop facing,type,waterlogged
+createdeco:netherite_sheet_metal -> dndecor:netherite_sheet_metal set axis=y
+createdeco:netherite_support -> createdeco:industrial_iron_support
+createdeco:red_netherite_lamp -> createdeco:red_iron_lamp
+# block entities
+be design_decor:green_container -> dndecor:dyed_container
+be design_decor:red_container -> dndecor:dyed_container
+be design_decor:blue_container -> dndecor:dyed_container
+be design_decor:gas_tank -> REMOVE
+be design_decor:deepslate_millstone -> REMOVE
+be design_decor:simple_kinetic -> REMOVE
+be design_decor:simple_kinetic_2 -> REMOVE
