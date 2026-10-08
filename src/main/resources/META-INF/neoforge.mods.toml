@@ -65,3 +65,17 @@ config="mixins.${mod_id}.xaero.json"
     versionRange="*"
     ordering="AFTER"
     side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="ufessential"
+    type="required"
+    versionRange="[0.2.0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="create_aeronautics_toolgun"
+    type="required"
+    versionRange="[0.3.6,)"
+    ordering="AFTER"
+    side="BOTH"

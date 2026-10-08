@@ -98,6 +98,36 @@ final class DefaultBuyMenu {
         return tab;
     }
 
+    /** Supply crate contents: mostly ammo and healing, sometimes a good gun or an optic. */
+    static List<EconomyConfig.Loot> supplyLoot() {
+        List<EconomyConfig.Loot> loot = new java.util.ArrayList<>();
+        loot.add(loot(ammo("762x39", 60, 0).item, 60, 10));
+        loot.add(loot(ammo("556x45", 60, 0).item, 60, 10));
+        loot.add(loot(ammo("9mm", 90, 0).item, 90, 10));
+        loot.add(loot(ammo("12g", 24, 0).item, 24, 6));
+        loot.add(loot(ammo("308", 40, 0).item, 40, 5));
+        loot.add(loot("minecraft:golden_apple", 2, 8));
+        loot.add(loot("minecraft:cooked_beef", 8, 8));
+        loot.add(loot(attachment("scope_acog_ta31", 0).item, 1, 4));
+        loot.add(loot(attachment("muzzle_silencer_phantom_s1", 0).item, 1, 4));
+        loot.add(loot(attachment("extended_mag_2", 0).item, 1, 4));
+        loot.add(loot(gun("ak47", "AUTO", "", 30, 0).item, 1, 3));
+        loot.add(loot(gun("m4a1", "AUTO", "", 30, 0).item, 1, 3));
+        loot.add(loot(gun("hk_mp5a5", "AUTO", "", 30, 0).item, 1, 3));
+        loot.add(loot(gun("m870", "SEMI", "", 5, 0).item, 1, 3));
+        loot.add(loot(gun("ai_awp", "SEMI", "", 5, 0).item, 1, 1));
+        loot.add(loot(gun("m249", "AUTO", "", 75, 0).item, 1, 1));
+        return loot;
+    }
+
+    private static EconomyConfig.Loot loot(String item, int count, int weight) {
+        EconomyConfig.Loot entry = new EconomyConfig.Loot();
+        entry.item = item;
+        entry.count = count;
+        entry.weight = weight;
+        return entry;
+    }
+
     private static Category armorSet(String name, String helmet, String note) {
         Category set = category(name, null,
                 armorPiece("buymenu.unrealzaruba.slot.head", helmet + "_helmet", helmet + "as_helmet", 300),

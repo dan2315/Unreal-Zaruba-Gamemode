@@ -45,6 +45,8 @@ import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 import java.util.ArrayList;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
+    // Everyone is brought here when the map has loaded, before teams go to their spawns
+    private static final BlockPos ARRIVAL_POINT = new BlockPos(177, 75, -216);
     public static final String GAMEMODE_NAME = "destroyobjectives";
     private static final int STRATEGY_TIME_DURATION_MS = 30 * 1000; // 30 seconds
     private static final int GAME_DURATION_S = 40 * 60; // 10 minutes
@@ -90,9 +92,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 PhaseId.MAP_INITIALIZATION,
                 () -> {},
                 this::AfterMapLoaded,
-                new TimePassedCondition(9)
+                new TimePassedCondition(MIN_MAP_LOADING_SECONDS)
                     .WaitFor(WorldManager::isGameWorldReady)
-                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
+                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server,
+                            Component.literal("Загрузка карты: " + Math.round(WorldManager.preloadProgress() * 100) + "%")))
         ))
         .AddPhase(new ConditionalPhase(
                 PhaseId.PREPARATION,
@@ -124,13 +127,20 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         ProceedToPhaseForced(PhaseId.MAP_INITIALIZATION);
     }
 
+    @Override
+    public java.util.Collection<BlockPos> GetPreloadPositions() {
+        var positions = new java.util.ArrayList<>(super.GetPreloadPositions());
+        positions.add(ARRIVAL_POINT);
+        return positions;
+    }
+
     private void AfterMapLoaded() {
         LateInitialize();
         objectivesHandler.OnObjectivesCompleted(() -> {
             UnrealZaruba.LOGGER.warn("ALL OBJECTIVES COMPLETED");
             CompleteGame(server, TeamColor.RED);
         });
-        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
+        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
     }
 
     private void SendObjectivesDataToClients() {

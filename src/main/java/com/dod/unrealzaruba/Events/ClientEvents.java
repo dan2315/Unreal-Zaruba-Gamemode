@@ -10,8 +10,10 @@ import com.dod.unrealzaruba.ModIntegrations.Xaero.MapPackClient;
 import com.dod.unrealzaruba.UI.Respawn.RespawnClientState;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UnrealZaruba;
+import com.dod.unrealzaruba.Schematics.SchematicsBrowserScreen;
 import com.dod.unrealzaruba.utils.Timers.TimerManager;
 import com.dod.unrealzaruba.NetworkPackets.Economy.RequestBuyMenuPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.RequestTeamStoragePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
@@ -49,6 +51,14 @@ public class ClientEvents {
             if (Minecraft.getInstance().getConnection() != null) {
                 PacketDistributor.sendToServer(new RequestBuyMenuPacket());
             }
+        }
+        while (KeyBindings.OPEN_TEAM_STORAGE.consumeClick()) {
+            if (Minecraft.getInstance().getConnection() != null) {
+                PacketDistributor.sendToServer(new RequestTeamStoragePacket());
+            }
+        }
+        while (KeyBindings.OPEN_SCHEMATICS.consumeClick()) {
+            Minecraft.getInstance().setScreen(new SchematicsBrowserScreen());
         }
     }
 

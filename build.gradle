@@ -109,6 +109,12 @@ dependencies {
     // XaeroLib ships inside the world map jar (jar-in-jar), so it isn't on Modrinth's maven
     compileOnly(files("libs/xaerolib-neoforge-1.21.1-1.7.3.jar"))
 
+    // Unreal Frontiers Essential: backend HTTP client (UFHttpClient) for the schematics browser. Client-only.
+    compileOnly(files("libs/ufessential-0.2.0-neoforge-1.21.1.jar"))
+
+    // Create Aeronautics: Toolgun. Its .excraft blueprints are the schematics players share and spawn as vehicles.
+    compileOnly(files("libs/create_aeronautics_toolgun-0.3.6.jar"))
+
 }
 
 tasks.withType(ProcessResources).configureEach {

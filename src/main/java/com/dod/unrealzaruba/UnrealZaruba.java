@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba;
 
+import com.dod.unrealzaruba.Camera.ClientCamera;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColorArgument;
 import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 import com.dod.unrealzaruba.Events.ClientEvents;
@@ -94,6 +95,7 @@ public class UnrealZaruba {
         if (FMLEnvironment.dist.isClient()) {
             var clientEvents = new ClientEvents(GamemodeManager.instance);
             NeoForge.EVENT_BUS.register(clientEvents);
+            NeoForge.EVENT_BUS.register(ClientCamera.class);
         }
         CommandRegistration.init(gameStatisticsService);
     }

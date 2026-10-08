@@ -30,6 +30,13 @@ import com.dod.unrealzaruba.NetworkPackets.Economy.BuyResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundMoneyPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.OpenBuyMenuPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.RequestBuyMenuPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.RequestTeamStoragePacket;
+import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundOpenSchematicSpawnerPacket;
+import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundSchematicSpawnResultPacket;
+import com.dod.unrealzaruba.NetworkPackets.Schematics.SpawnSchematicPiecePacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyDropPacket;
+import com.dod.unrealzaruba.NetworkPackets.Camera.CameraShotResultPacket;
+import com.dod.unrealzaruba.NetworkPackets.Camera.ClientboundCameraShotPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackDataPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackOfferPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.RequestMapPackPacket;
@@ -82,9 +89,14 @@ public class NetworkHandler {
         toClient("update_top_score", ClientboundUpdateTopScorePacket.class, ClientboundUpdateTopScorePacket::encode, ClientboundUpdateTopScorePacket::decode, ClientboundUpdateTopScorePacket::handle);
         toClient("money", ClientboundMoneyPacket.class, ClientboundMoneyPacket::encode, ClientboundMoneyPacket::decode, ClientboundMoneyPacket::handle);
         toServer("request_buy_menu", RequestBuyMenuPacket.class, RequestBuyMenuPacket::encode, RequestBuyMenuPacket::decode, RequestBuyMenuPacket::handle);
+        toServer("request_team_storage", RequestTeamStoragePacket.class, RequestTeamStoragePacket::encode, RequestTeamStoragePacket::decode, RequestTeamStoragePacket::handle);
+        toClient("open_schematic_spawner", ClientboundOpenSchematicSpawnerPacket.class, ClientboundOpenSchematicSpawnerPacket::encode, ClientboundOpenSchematicSpawnerPacket::decode, ClientboundOpenSchematicSpawnerPacket::handle);
+        toServer("spawn_schematic_piece", SpawnSchematicPiecePacket.class, SpawnSchematicPiecePacket::encode, SpawnSchematicPiecePacket::decode, SpawnSchematicPiecePacket::handle);
+        toClient("schematic_spawn_result", ClientboundSchematicSpawnResultPacket.class, ClientboundSchematicSpawnResultPacket::encode, ClientboundSchematicSpawnResultPacket::decode, ClientboundSchematicSpawnResultPacket::handle);
         toClient("open_buy_menu", OpenBuyMenuPacket.class, OpenBuyMenuPacket::encode, OpenBuyMenuPacket::decode, OpenBuyMenuPacket::handle);
         toServer("buy_items", BuyItemsPacket.class, BuyItemsPacket::encode, BuyItemsPacket::decode, BuyItemsPacket::handle);
         toClient("buy_result", BuyResultPacket.class, BuyResultPacket::encode, BuyResultPacket::decode, BuyResultPacket::handle);
+        toClient("supply_drop", ClientboundSupplyDropPacket.class, ClientboundSupplyDropPacket::encode, ClientboundSupplyDropPacket::decode, ClientboundSupplyDropPacket::handle);
         toClient("respawn_points", ClientboundRespawnPointsPacket.class, ClientboundRespawnPointsPacket::encode, ClientboundRespawnPointsPacket::decode, ClientboundRespawnPointsPacket::handle);
         toClient("death_state", ClientboundDeathStatePacket.class, ClientboundDeathStatePacket::encode, ClientboundDeathStatePacket::decode, ClientboundDeathStatePacket::handle);
         toClient("map_pack_offer", ClientboundMapPackOfferPacket.class, ClientboundMapPackOfferPacket::encode, ClientboundMapPackOfferPacket::decode, ClientboundMapPackOfferPacket::handle);
@@ -92,6 +104,8 @@ public class NetworkHandler {
         toServer("request_map_pack", RequestMapPackPacket.class, RequestMapPackPacket::encode, RequestMapPackPacket::decode, RequestMapPackPacket::handle);
         toClient("map_pack_upload_request", ClientboundMapPackUploadRequestPacket.class, ClientboundMapPackUploadRequestPacket::encode, ClientboundMapPackUploadRequestPacket::decode, ClientboundMapPackUploadRequestPacket::handle);
         toServer("upload_map_pack", UploadMapPackPacket.class, UploadMapPackPacket::encode, UploadMapPackPacket::decode, UploadMapPackPacket::handle);
+        toClient("camera_shot", ClientboundCameraShotPacket.class, ClientboundCameraShotPacket::encode, ClientboundCameraShotPacket::decode, ClientboundCameraShotPacket::handle);
+        toServer("camera_shot_result", CameraShotResultPacket.class, CameraShotResultPacket::encode, CameraShotResultPacket::decode, CameraShotResultPacket::handle);
     }
 
     public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {

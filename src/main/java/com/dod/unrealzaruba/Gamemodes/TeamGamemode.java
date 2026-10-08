@@ -26,6 +26,9 @@ public class TeamGamemode extends BaseGamemode {
     protected TeamManager TeamManager;
     public HashMap<TeamColor, StartGameText> startGameTexts = new HashMap<>();
     
+    // Shortest map loading phase: clients use it to install the map's pre-rendered world map in the lobby
+    protected static final int MIN_MAP_LOADING_SECONDS = 3;
+
     public TeamManager GetTeamManager() { return TeamManager; }
     public void SetTeamManager(TeamManager teamManager) { TeamManager = teamManager; }
     
@@ -70,6 +73,15 @@ public class TeamGamemode extends BaseGamemode {
             RespawnPointsSync.sendTo(player);
             PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS));
         }
+    }
+
+    @Override
+    public java.util.Collection<net.minecraft.core.BlockPos> GetPreloadPositions() {
+        java.util.List<net.minecraft.core.BlockPos> positions = new java.util.ArrayList<>();
+        if (TeamManager != null) {
+            TeamManager.GetTeams().values().forEach(team -> positions.add(team.MainSpawn()));
+        }
+        return positions;
     }
 
     @Override

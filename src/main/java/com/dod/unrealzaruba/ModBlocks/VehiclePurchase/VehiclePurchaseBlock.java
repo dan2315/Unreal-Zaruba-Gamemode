@@ -1,7 +1,6 @@
 package com.dod.unrealzaruba.ModBlocks.VehiclePurchase;
 
-import com.dod.unrealzaruba.Economy.EconomyData;
-import com.dod.unrealzaruba.UI.VehiclePurchaseMenu.VehiclePurchaseMenu;
+import com.dod.unrealzaruba.Vehicles.SchematicSpawner;
 import javax.annotation.Nullable;
 
 import com.dod.unrealzaruba.ModBlocks.ModBlocks;
@@ -26,7 +25,6 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.core.Direction;
-import net.minecraft.world.MenuProvider;
 
 public class VehiclePurchaseBlock extends Block implements EntityBlock {
 
@@ -79,9 +77,10 @@ public class VehiclePurchaseBlock extends Block implements EntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof VehiclePurchaseBlockEntity) {
-                player.openMenu((MenuProvider) blockEntity, buf -> VehiclePurchaseMenu.writeExtraData(buf, pos, VehiclePurchaseMenu.offersFor(EconomyData.current())));
-            } 
+            // Opens the schematics browser with a Spawn button; the fixed vehicle list (VehiclePurchaseMenu) is no longer offered here
+            if (blockEntity instanceof VehiclePurchaseBlockEntity purchaseBlock && player instanceof ServerPlayer serverPlayer) {
+                SchematicSpawner.open(serverPlayer, purchaseBlock);
+            }
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }

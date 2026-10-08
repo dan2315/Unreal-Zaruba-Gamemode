@@ -7,6 +7,7 @@ public final class RespawnClientState {
     private static RespawnPointsView view = RespawnPointsView.EMPTY;
     private static boolean dead;
     private static int secondsLeft;
+    private static net.minecraft.core.BlockPos supplyDrop;
 
     private RespawnClientState() {}
 
@@ -45,7 +46,17 @@ public final class RespawnClientState {
         return entry.name();
     }
 
+    /** The unopened supply crate, shown on the map, or null. */
+    public static net.minecraft.core.BlockPos supplyDrop() {
+        return supplyDrop;
+    }
+
+    public static void setSupplyDrop(net.minecraft.core.BlockPos pos) {
+        supplyDrop = pos;
+    }
+
     public static void reset() {
+        supplyDrop = null;
         view = RespawnPointsView.EMPTY;
         dead = false;
         secondsLeft = 0;

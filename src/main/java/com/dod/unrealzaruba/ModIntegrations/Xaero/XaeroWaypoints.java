@@ -148,6 +148,13 @@ public class XaeroWaypoints {
             }
         }
 
+        net.minecraft.core.BlockPos drop = RespawnClientState.supplyDrop();
+        if (drop != null) {
+            wanted.add(new Wanted("supply_drop", drop,
+                    net.minecraft.network.chat.Component.translatable("supplydrop.unrealzaruba.waypoint").getString(),
+                    "$", WaypointColor.YELLOW, null));
+        }
+
         for (RespawnPointsView.Entry entry : view.points()) {
             if (entry.kind() == RespawnPointsView.Kind.CAPTURE_POINT) continue; // shown on the objective's waypoint
             boolean selected = effective != null && entry.id() == effective;

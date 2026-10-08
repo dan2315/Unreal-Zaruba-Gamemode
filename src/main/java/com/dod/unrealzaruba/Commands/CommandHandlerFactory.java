@@ -29,6 +29,8 @@ public class CommandHandlerFactory {
         handlers.add(new ForceStartGameCommand());
         handlers.add(new MoneyCommand());
         handlers.add(new MapScanCommand());
+        handlers.add(new CameraCommand());
+        handlers.add(new SupplyDropCommand());
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());

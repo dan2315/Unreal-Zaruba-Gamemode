@@ -38,10 +38,10 @@ public class GamemodeDataManager {
 
     public static <D> D getHandler(Class<? extends BaseGamemode> gamemodeClass, Class<D> dataClass) {
         Map<Class<? extends GamemodeData<?>>, GamemodeData<?>> gamemodeMap = dataRegistry.get(gamemodeClass);
-        UnrealZaruba.LOGGER.info("[GamemodeDataManager] Getting handler for " + gamemodeClass.getSimpleName() + " and " + dataClass.getSimpleName());
+        UnrealZaruba.LOGGER.debug("[GamemodeDataManager] Getting handler for " + gamemodeClass.getSimpleName() + " and " + dataClass.getSimpleName());
         if (gamemodeMap != null) {
             GamemodeData<?> dataHandler = gamemodeMap.get(dataClass);
-            UnrealZaruba.LOGGER.info("[GamemodeDataManager] Data: " + dataHandler);
+            UnrealZaruba.LOGGER.debug("[GamemodeDataManager] Data: " + dataHandler);
             if (dataHandler != null) {
                 return (D) dataHandler;
             }

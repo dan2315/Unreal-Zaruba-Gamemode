@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.Events;
 
+import com.dod.unrealzaruba.Camera.CameraShots;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.OtherModTweaks.ProtectionPixel.ArmorBalancer;
 import com.dod.unrealzaruba.Player.PlayerContext;
@@ -12,6 +13,11 @@ import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.dod.unrealzaruba.WorldManager.MapScan;
 import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Economy.Wallets;
+import com.dod.unrealzaruba.Economy.SideIncome;
+import com.dod.unrealzaruba.Economy.SupplyDrops;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsSync;
 
 import net.minecraft.world.level.GameType;
@@ -63,6 +69,7 @@ public class ServerEvents {
         MapScan.tick(server);
         if (!isDevMode) {
             gamemodeManager.Tick();
+            SideIncome.tick(server);
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }
     }
@@ -93,6 +100,10 @@ public class ServerEvents {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         ServerPlayer player = (ServerPlayer) event.getEntity();
         PlayerContext playerContext = TeamPlayerContext.Instantiate(player.getUUID(), player.gameMode.getGameModeForPlayer());
+        if (CameraShots.isCamera(player)) {
+            player.setGameMode(GameType.SPECTATOR);
+            return;
+        }
         if (!server.isDedicatedServer())
             return;
         if (isDevMode)
@@ -105,10 +116,18 @@ public class ServerEvents {
             Wallets.sync(player);
             RespawnPointsSync.sendTo(player);
             MapPacks.offer(player);
+            SupplyDrops.syncTo(player);
         }
         else {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
             player.setGameMode(GameType.ADVENTURE);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            com.dod.unrealzaruba.Vehicles.SchematicSpawner.forget(player);
         }
     }
 
@@ -151,6 +170,21 @@ public class ServerEvents {
     @SubscribeEvent
     public void onItemAttributeModifier(ItemAttributeModifierEvent event) {
         ArmorBalancer.onItemAttributeModifier(event);
+    }
+
+    @SubscribeEvent
+    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        SupplyDrops.onRightClickBlock(event);
+    }
+
+    @SubscribeEvent
+    public void onBlockBreak(BlockEvent.BreakEvent event) {
+        SupplyDrops.onBreak(event);
+    }
+
+    @SubscribeEvent
+    public void onExplosion(ExplosionEvent.Detonate event) {
+        SupplyDrops.onExplosion(event);
     }
 
     @SubscribeEvent

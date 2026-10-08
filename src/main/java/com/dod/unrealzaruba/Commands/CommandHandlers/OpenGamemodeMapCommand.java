@@ -13,6 +13,7 @@ public class OpenGamemodeMapCommand implements ICommandHandler {
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("openmap")
+                .requires(source -> source.hasPermission(3))
                 .then(Commands.argument("gamemode", StringArgumentType.word())
                         .suggests(GAMEMODE_SUGGESTIONS).executes(context -> {
                             var gamemodeName = StringArgumentType.getString(context, "gamemode");

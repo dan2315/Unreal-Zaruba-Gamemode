@@ -11,10 +11,7 @@ import com.dod.unrealzaruba.NetworkPackets.Economy.OpenBuyMenuPacket;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import com.dod.unrealzaruba.UnrealZaruba;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -96,6 +93,9 @@ public final class BuyMenuService {
         if (player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR || player.isDeadOrDying()) {
             return Component.translatable("buymenu.unrealzaruba.error.dead");
         }
+        if (EconomyData.current().buyOnlyInRespawnZones && !TeamZones.isInOwnZone(player)) {
+            return Component.translatable("buymenu.unrealzaruba.error.not_in_zone");
+        }
         return null;
     }
 
@@ -116,16 +116,7 @@ public final class BuyMenuService {
         if (item.teamItems != null && context instanceof TeamPlayerContext teamContext && teamContext.Team() != null) {
             spec = item.teamItems.getOrDefault(teamContext.Team().Color().name(), spec);
         }
-        if (spec == null || spec.isBlank()) {
-            return ItemStack.EMPTY;
-        }
-        try {
-            ItemParser.ItemResult result = new ItemParser(player.server.registryAccess()).parse(new StringReader(spec));
-            return new ItemStack(result.item(), Math.max(1, item.count), result.components());
-        } catch (CommandSyntaxException e) {
-            UnrealZaruba.LOGGER.warn("[UnrealZaruba] Bad buy menu item '{}': {}", spec, e.getMessage());
-            return ItemStack.EMPTY;
-        }
+        return ItemSpecs.parse(player.server.registryAccess(), spec, item.count);
     }
 
     /** Armor goes straight into an empty armor slot, everything else into the inventory (or at the feet if full). */

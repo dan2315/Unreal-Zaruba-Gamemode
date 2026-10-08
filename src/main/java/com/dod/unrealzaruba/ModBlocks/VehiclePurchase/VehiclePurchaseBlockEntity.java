@@ -153,6 +153,14 @@ public class VehiclePurchaseBlockEntity extends BlockEntity implements MenuProvi
         }
     }
 
+    public int getCooldownTicks() {
+        return cooldownTicks;
+    }
+
+    public void startCooldown(int ticks) {
+        cooldownTicks = ticks;
+    }
+
     public void serverTick() {
         if (cooldownTicks > 0) {
             cooldownTicks--;

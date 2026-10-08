@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -29,6 +31,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.LoggerChunkProgressListener;
 import net.minecraft.world.level.Level;
@@ -63,6 +67,14 @@ public class WorldManager {
     public static ServerLevel gameLevel;
     // Between the start of a map reload and the new level being created; the old level must not count as ready
     private static volatile boolean reloading;
+    private static int reloadGeneration;
+    private static final long SHIP_REMOVAL_DELAY_MS = 250;
+    // Chunks around spawns and objectives, loaded before players are let in. Tickets expire on their own once
+    // players are there to keep the chunks loaded
+    private static final TicketType<ChunkPos> PRELOAD_TICKET =
+            TicketType.create("unrealzaruba_preload", Comparator.comparingLong(ChunkPos::toLong), 20 * 60);
+    private static final int PRELOAD_RADIUS = 3;
+    private static volatile List<ChunkPos> preloadChunks = List.of();
     public static MinecraftServer server;
     public static LevelStorageSource.LevelStorageAccess access; 
     public static ChunkProgressListener progressListener;
@@ -74,9 +86,9 @@ public class WorldManager {
         clearShipsInDimension(gameLevel);
     }
 
-    /** True when the game map for the current match is loaded and nothing is replacing it. */
+    /** True when the game map for the current match is loaded, with the chunks players arrive in. */
     public static boolean isGameWorldReady() {
-        return gameLevel != null && !reloading;
+        return gameLevel != null && !reloading && preloadProgress() >= 1;
     }
 
     /** Terrain region files of the loaded game map, or null before a map is loaded. */
@@ -97,17 +109,31 @@ public class WorldManager {
     }
 
     public static void ReloadGameWorldDelayed(String gamemodeName) {
+        ReloadGameWorldDelayed(gamemodeName, List::of);
+    }
+
+    /**
+     * Replaces the game map: removes ships, closes the old level, copies the template (off the server thread),
+     * creates the new level and loads the chunks around {@code preloadPositions}. {@link #isGameWorldReady()} turns
+     * true once all of that is done, so the match can bring players in right away instead of after a fixed delay.
+     */
+    public static void ReloadGameWorldDelayed(String gamemodeName, Supplier<Collection<BlockPos>> preloadPositions) {
+        int generation = ++reloadGeneration;
         reloading = true;
+        preloadChunks = List.of();
+        long start = System.currentTimeMillis();
         UnrealZaruba.LOGGER.info("Deleting ships in game world");
         clearShipsInDimension(gameLevel);
 
-        // Idunno why, but it works
-        TimerManager.createRealTimeTimer(7500 /*7.5s*/, () -> {
+        // Sable finishes removing sub-levels on the level's next tick; close the level only after that
+        TimerManager.createRealTimeTimer(SHIP_REMOVAL_DELAY_MS, () -> {
+            if (generation != reloadGeneration) return; // a newer reload took over
             UnrealZaruba.LOGGER.info("Deleting game world");
             deleteGameWorld();
 
             // Copying a map takes a moment, so do it off the server thread
             CompletableFuture.runAsync(() -> prepareRuntimeCopy(gamemodeName)).whenComplete((ignored, error) -> server.execute(() -> {
+                if (generation != reloadGeneration) return;
                 if (error != null) {
                     UnrealZaruba.LOGGER.error("Failed to copy map template for {}", gamemodeName, error);
                 }
@@ -115,11 +141,43 @@ public class WorldManager {
                     UnrealZaruba.LOGGER.info("Creating game world");
                     prepareWorldStorage(gamemodeName);
                     createGameWorld(gamemodeName);
+                    startPreload(preloadPositions.get());
+                    UnrealZaruba.LOGGER.info("Game world for {} created in {} ms, loading {} chunks",
+                            gamemodeName, System.currentTimeMillis() - start, preloadChunks.size());
                 } finally {
                     reloading = false;
                 }
             }));
         }, null);
+    }
+
+    /** Asks the level to load the chunks around these positions. They count as loaded once they're full chunks. */
+    private static void startPreload(Collection<BlockPos> positions) {
+        if (gameLevel == null || positions == null) return;
+        List<ChunkPos> chunks = new ArrayList<>();
+        for (BlockPos pos : positions) {
+            if (pos == null) continue;
+            ChunkPos center = new ChunkPos(pos);
+            gameLevel.getChunkSource().addRegionTicket(PRELOAD_TICKET, center, PRELOAD_RADIUS, center);
+            for (int dx = -PRELOAD_RADIUS + 1; dx < PRELOAD_RADIUS; dx++) {
+                for (int dz = -PRELOAD_RADIUS + 1; dz < PRELOAD_RADIUS; dz++) {
+                    chunks.add(new ChunkPos(center.x + dx, center.z + dz));
+                }
+            }
+        }
+        preloadChunks = chunks;
+    }
+
+    /** How much of the preloaded area is loaded, 0..1 (1 when there's nothing to load). */
+    public static float preloadProgress() {
+        if (gameLevel == null || reloading) return 0;
+        List<ChunkPos> chunks = preloadChunks;
+        if (chunks.isEmpty()) return 1;
+        int loaded = 0;
+        for (ChunkPos chunk : chunks) {
+            if (gameLevel.getChunkSource().hasChunk(chunk.x, chunk.z)) loaded++;
+        }
+        return (float) loaded / chunks.size();
     }
 
     /**
@@ -183,7 +241,7 @@ public class WorldManager {
 
     public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
         var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
-        ReloadGameWorldDelayed(gamemodeName);
+        ReloadGameWorldDelayed(gamemodeName, gamemode::GetPreloadPositions);
     }
 
     private static void prepareWorldStorage(String gamemodeName) {
@@ -248,15 +306,17 @@ public class WorldManager {
 
     public static void createGameWorld(String gamemodeName) {
         gameLevel = new ServerLevel(server, Util.backgroundExecutor(), access, serverLevelData, GAME_DIMENSION, levelStem, progressListener,false, server.getWorldData().worldGenOptions().seed(), List.of(), false, null);
-        // boolean shouldSave = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV; Maybe it will be used at some point
-        gameLevel.noSave = true;
+        // Matches run on a throwaway copy and never save. In DEV the level is the template, so edits are saved by
+        // autosave and /save-all like any world
+        gameLevel.noSave = !ConfigManager.isDevMode();
         ((IMinecraftServerExtended) server).addLevel(GAME_DIMENSION, gameLevel);
         server.markWorldsDirty();
         NeoForge.EVENT_BUS.post(new LevelEvent.Load(gameLevel));
     }
 
     public static void clearShipsInDimension(ServerLevel level) {
-        if (level == null) {
+        // In DEV the game level is the template itself: its ships are part of the map being edited
+        if (level == null || ConfigManager.isDevMode()) {
             return;
         }
         SableShips.removeAll(level);

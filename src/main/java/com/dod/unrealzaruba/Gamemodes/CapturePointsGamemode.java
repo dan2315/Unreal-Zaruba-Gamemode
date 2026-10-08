@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class CapturePointsGamemode extends TeamGamemode {
+    // Everyone is brought here when the map has loaded, before teams go to their spawns
+    private static final BlockPos ARRIVAL_POINT = new BlockPos(177, 75, -216);
     public static final String GAMEMODE_NAME = "capturepoints";
     private static final short REQUIRED_POINTS_TO_WIN = 200;
     private final ScorePointsObjective scorePointsObjectiveRed;
@@ -102,9 +104,10 @@ public class CapturePointsGamemode extends TeamGamemode {
                 PhaseId.MAP_INITIALIZATION,
                 () -> {},
                 this::AfterMapLoaded,
-                new TimePassedCondition(9)
+                new TimePassedCondition(MIN_MAP_LOADING_SECONDS)
                     .WaitFor(WorldManager::isGameWorldReady)
-                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Загрузка карты: " + integer)))
+                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server,
+                            Component.literal("Загрузка карты: " + Math.round(WorldManager.preloadProgress() * 100) + "%")))
         ))
         .AddPhase(new ConditionalPhase(
                 PhaseId.PREPARATION,
@@ -131,6 +134,22 @@ public class CapturePointsGamemode extends TeamGamemode {
         ProceedToPhaseForced(PhaseId.MAP_INITIALIZATION);
     }
 
+    @Override
+    public Integer GetTeamScore(TeamColor team) {
+        return switch (team) {
+            case RED -> Math.round(REQUIRED_POINTS_TO_WIN * scorePointsObjectiveRed.GetProgress());
+            case BLUE -> Math.round(REQUIRED_POINTS_TO_WIN * scorePointsObjectiveBlue.GetProgress());
+            default -> null;
+        };
+    }
+
+    @Override
+    public java.util.Collection<BlockPos> GetPreloadPositions() {
+        var positions = new java.util.ArrayList<>(super.GetPreloadPositions());
+        positions.add(ARRIVAL_POINT);
+        return positions;
+    }
+
     private void AfterMapLoaded() {
         LateInitialize();
 
@@ -148,7 +167,7 @@ public class CapturePointsGamemode extends TeamGamemode {
             });
         }
 
-        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, new BlockPos(177, 75, -216));
+        WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
 
         List<ColoredSquareZone> zones = new ArrayList<>();
         ArrayList<HudObjective> hudObjectives = new ArrayList<>();

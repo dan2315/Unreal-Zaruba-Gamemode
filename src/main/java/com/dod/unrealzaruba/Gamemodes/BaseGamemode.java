@@ -19,6 +19,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.unrealzaruba.Economy.EconomyData;
 import com.dod.unrealzaruba.Economy.Wallets;
+import com.dod.unrealzaruba.Economy.SideIncome;
+import com.dod.unrealzaruba.Economy.TeamStorage;
 import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.dod.unrealzaruba.Economy.Money;
 import com.dod.unrealzaruba.Player.PlayerContext;
@@ -63,6 +65,8 @@ public abstract class BaseGamemode implements IPhaseHolder {
         new EconomyData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
         Wallets.reset(server);
+        SideIncome.reset();
+        TeamStorage.reset();
         MapPacks.select(server, this.getClass().getSimpleName());
         WorldManager.ReloadGameWorldDelayed(this);
     }
@@ -70,6 +74,22 @@ public abstract class BaseGamemode implements IPhaseHolder {
     public void LateInitialize() {
         new ObjectivesData(this.getClass());
         objectivesHandler = new ObjectivesHandler();
+    }
+
+    /** Whether the fighting part of the match is running (side income only pays then). */
+    public boolean IsBattleActive() {
+        PhaseId phase = GetCurrentPhaseId();
+        return phase == PhaseId.BATTLE || phase == PhaseId.GAME;
+    }
+
+    /** A team's score for catch-up income, or null if this gamemode has no comparable score. */
+    public Integer GetTeamScore(com.dod.unrealzaruba.Commands.Arguments.TeamColor team) {
+        return null;
+    }
+
+    /** Where players will be when the match starts; the map loader loads the chunks around these first. */
+    public java.util.Collection<net.minecraft.core.BlockPos> GetPreloadPositions() {
+        return List.of();
     }
 
     public AbstractGamePhase GetCurrentPhase() {
@@ -216,6 +236,8 @@ public abstract class BaseGamemode implements IPhaseHolder {
             }
             player.displayClientMessage(Component.literal("You have been killed by " + killer.getDisplayName().getString()), true);
         }
+        ServerPlayer enemyKiller = killingEntity instanceof ServerPlayer killer && isEnemy(killer, player) ? killer : null;
+        SideIncome.onDeath(player, enemyKiller, server);
 
         NBT.addEntityTag(player, "isPlayerDead", 1);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);

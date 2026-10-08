@@ -17,10 +17,22 @@ public class KeyBindings {
             InputConstants.KEY_B,
             CATEGORY
     );
+    public static final KeyMapping OPEN_TEAM_STORAGE = new KeyMapping(
+            "key.unrealzaruba.open_team_storage",
+            InputConstants.KEY_H,
+            CATEGORY
+    );
+    public static final KeyMapping OPEN_SCHEMATICS = new KeyMapping(
+            "key.unrealzaruba.open_schematics",
+            InputConstants.KEY_K,
+            CATEGORY
+    );
 
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         event.register(OPEN_GAMEMODE_MENU);
         event.register(OPEN_BUY_MENU);
+        event.register(OPEN_TEAM_STORAGE);
+        event.register(OPEN_SCHEMATICS);
     }
 }
