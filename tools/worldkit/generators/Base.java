@@ -2,21 +2,22 @@ import java.util.*;
 
 /**
  * Prints the commands that build a respawn base for a capture point, for the match dimension.
- *   compound: java Base.java compound <cx> <groundY> <cz> <R> <padLen> <tents yes|no>
- *   outpost:  java Base.java outpost  <cx> <groundY> <cz> <padLen>
+ *   compound: java -cp <worldkit classes> Base compound <cx> <groundY> <cz> <R> <padLen> <tents yes|no>
+ *   outpost:  java -cp <worldkit classes> Base outpost  <cx> <groundY> <cz> <padLen>     > base.build
  * groundY is the top ground block (the floor is laid at that y; players stand at groundY+1). The vehicle spawner
  * sits in the east gate facing west, so vehicles appear east of the base on the pad.
  */
 public class Base {
     static int CX, G, CZ;
-    static final List<String> out = new ArrayList<>();
+    static Canvas C;
 
     public static void main(String[] a) {
         String kind = a[0];
         CX = Integer.parseInt(a[1]); G = Integer.parseInt(a[2]); CZ = Integer.parseInt(a[3]);
+        C = new Canvas(CX, CZ);
         if (kind.equals("compound")) compound(Integer.parseInt(a[4]), Integer.parseInt(a[5]), a[6].equals("yes"));
         else outpost(Integer.parseInt(a[4]));
-        out.forEach(c -> System.out.println("execute in unrealzaruba:game_dim run " + c));
+        C.print(a);
     }
 
     // ================= walled compound =================
@@ -24,15 +25,12 @@ public class Base {
     static void compound(int R, int padLen, boolean tents) {
         int F = G + 1;
         int p0 = R + 2, p1 = R + 1 + padLen;
-        out.add("forceload add " + (CX - R - 30) + " " + (CZ - R - 6) + " " + (CX + p1 + 6) + " " + (CZ + R + 6));
 
         // ---- clear trees and plants, fill holes, level ----
         int m = R + 4;
-        fill(-m, F, -m, m, F + 12, m, "air");
-        fill(-m, F + 13, -m, m, F + 28, m, "air");
-        fill(R + 1, F, -R - 2, p1 + 3, F + 20, R + 2, "air");
-        fillReplace(-R - 1, G - 4, -R - 1, p1 + 1, G - 1, R + 1, "dirt", "air");
-        fillReplace(-R - 1, G - 4, -R - 1, p1 + 1, G - 1, R + 1, "dirt", "water");
+        C.clear(-m, F, -m, m, F + 28, m, "trees over the compound");
+        C.clear(R + 1, F, -R - 2, p1 + 3, F + 20, R + 2, "trees over the vehicle pad");
+        fill(-R - 1, G - 4, -R - 1, p1 + 1, G - 1, R + 1, "dirt");          // holes and water under the floor
         fill(-R - 1, G - 1, -R - 1, R + 1, G - 1, R + 1, "stone");
 
         // ---- foundation and plaza ----
@@ -140,8 +138,7 @@ public class Base {
 
     static void outpost(int padLen) {
         int F = G + 1;
-        out.add("forceload add " + (CX - 10) + " " + (CZ - 10) + " " + (CX + 10 + padLen) + " " + (CZ + 10));
-        fill(-6, F, -6, 6, F + 6, 6, "air");
+        C.clear(-6, F, -6, 6, F + 6, 6, "anything standing on the plaza");
         // plaza: dark ring, light field, cross, lodestone
         fill(-6, G, -6, 6, G, 6, "polished_blackstone_bricks");
         fill(-5, G, -5, 5, G, 5, "polished_andesite");
@@ -235,21 +232,13 @@ public class Base {
         set(x1 - 1, f, z1 - 1, "barrel[facing=up]");
     }
 
+    // draws into the additive canvas; layer G is the floor and may replace natural ground
     static void fill(int x0, int y0, int z0, int x1, int y1, int z1, String block) {
-        out.add("fill " + (CX + x0) + " " + y0 + " " + (CZ + z0) + " " + (CX + x1) + " " + y1 + " " + (CZ + z1) + " " + id(block));
-    }
-
-    static void fillReplace(int x0, int y0, int z0, int x1, int y1, int z1, String block, String replace) {
-        out.add("fill " + (CX + x0) + " " + y0 + " " + (CZ + z0) + " " + (CX + x1) + " " + y1 + " " + (CZ + z1) + " " + id(block) + " replace " + id(replace));
+        if (y0 == G && y1 == G) C.ground(x0, y0, z0, x1, y1, z1, block);
+        else C.fill(x0, y0, z0, x1, y1, z1, block);
     }
 
     static void set(int x, int y, int z, String block) {
-        out.add("setblock " + (CX + x) + " " + y + " " + (CZ + z) + " " + id(block));
-    }
-
-    static String id(String block) {
-        int end = block.length();
-        for (char c : new char[] {'[', '{'}) if (block.indexOf(c) >= 0) end = Math.min(end, block.indexOf(c));
-        return block.substring(0, end).contains(":") ? block : "minecraft:" + block;
+        fill(x, y, z, x, y, z, block);
     }
 }

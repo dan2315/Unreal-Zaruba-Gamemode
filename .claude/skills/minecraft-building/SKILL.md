@@ -8,6 +8,9 @@ description: Build, edit, analyze or repair the Zaruba game maps (capture points
 You can read every block from the region files and place blocks over RCON. To see the result, use the screenshot
 camera (below); without it, compensate with numbers (summaries, probes) and ask the user for screenshots.
 
+**Read [builds.md](builds.md) first**: what has been built where (respawn bases A–E, the pumping station and its
+deck), with generator arguments, layouts and known issues. Add every new build or change to it.
+
 ## Screenshot camera
 
 A second client, `ClaudeCam` (Prism instance `X:\Games\mc_modpacks\Instances\ZarubaCamera`), runs in the background
@@ -23,6 +26,11 @@ rcon.sh "camera status"                                          # repeat until 
 Then Read `X:\Games\mc_modpacks\Instances\ZarubaCamera\minecraft\screenshots\claude\<name>.png`. Yaw: 0 = south (+z),
 90 = west, 180 = north, -90 = east. Take an overview from ~20 blocks up at 45° plus ground-level shots from each
 approach. Coordinates are game_dim's; the command always shoots in the game map.
+
+- Put the camera in open air: inside a building or tank the shot is just a dark wall (happened with a camera inside a
+  storage tank). `look` from outside the build, 10-30 blocks away; ground-level shots 1-2 blocks above the floor.
+- A server restart disconnects ClaudeCam: ask the user to reconnect it before taking shots.
+- Wait for `camera status` to say `saved` (usually 3-8 s), then Read the PNG. 2560x1411 when the window is maximised.
 
 ## The setup
 
@@ -49,7 +57,12 @@ approach. Coordinates are game_dim's; the command always shoots in the game map.
 4. **Ask before restarting** if anyone is online (`rcon.sh list`). Restarts kick players. Tell the user what moves them.
 5. **Backups:** the user keeps their own. Don't make extra copies unless the operation is destructive and offline;
    then one copy of just the files you rewrite.
-6. **Check block ids exist** before building: vanilla ids are 1.21 names (`short_grass`, not `grass`), mod ids from
+6. **Build additively.** Generators draw into `generators/Canvas` and never replace what's already in the world:
+   blocks go only into air, water and replaceable plants; floors (`ground()`, and layer G in the generators) may also
+   replace natural ground. Removing anything (trees, an opening in an existing wall) is a `C.clear(...)` that only runs
+   with `/buildkit apply <name> clear`; use it only when the user agrees to those listed clears. Never write
+   `fill ... air` by hand into a generator.
+7. **Check block ids exist** before building: vanilla ids are 1.21 names (`short_grass`, not `grass`), mod ids from
    the jars (see "known ids" below). An unknown id fails the whole command.
 
 ## Tools (tools/worldkit, Java 21)
@@ -58,8 +71,9 @@ Compile once per session into the scratchpad:
 
 ```bash
 GS=$(find /x/Projects/UnrealFrontiers/zaruba-server/data/libraries -name "gson-2*.jar" | head -1)
-javac -d "$SCRATCH/wk" -cp "$GS" /x/Projects/Unreal-Zaruba-Gamemode/tools/worldkit/*.java
-java -cp "$SCRATCH/wk" <Tool> ...      # StateProps needs ";$GS" on the classpath too
+W=/x/Projects/Unreal-Zaruba-Gamemode/tools/worldkit
+javac -d "$SCRATCH/wk" -cp "$GS" $W/*.java $W/generators/*.java
+java -cp "$SCRATCH/wk" <Tool> ...      # StateProps needs ";$(cygpath -m $GS)" on the classpath too
 ```
 
 All read region files offline and print summaries. Region dir = `.../game_dim/region`.
@@ -79,22 +93,63 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `Transplant <src.mca> <dst.mca> cx0 cz0 cx1 cz1` | Copy a chunk rectangle between region files (offline). Undo, or moving a build into a template |
 | `Restore <backup region> x0 y0 z0 x1 y1 z1` | Commands that rebuild a box from a backup (live undo while the map is open) |
 | `Migrate <rules> <region dir> <out dir>` | Rename blocks / block entity ids / copycat materials in region files (offline). Rule file syntax in its header; example in `examples/decor-migration-mapping.txt`. Add the line `copycatfix` to convert old `create:copycat` entities on Copycats+ blocks |
-| `generators/Base.java` | Respawn base: `compound <cx> <groundY> <cz> <R> <padLen> <tents yes/no>` or `outpost <cx> <groundY> <cz> <padLen>` |
-| `generators/Complex.java` | The lakeside pumping station (capture point). Template for capture-point complexes |
+| `generators/Canvas.java` | Additive canvas the generators draw into (see rule 6). Writes a build file; lists its clears on stderr |
+| `Skipped <cmds_lf.txt> <out.txt>` | Only for the `--commands` fallback: what an RCON-command build couldn't place |
+| `Base compound <cx> <groundY> <cz> <R> <padLen> <tents yes/no>` / `Base outpost <cx> <groundY> <cz> <padLen>` | Respawn base generator |
+| `Complex <cx> <groundY> <cz>` | The lakeside pumping station (capture point). Template for capture-point complexes |
+| `PumpDeck <cx> <groundY> <cz>` | Catwalk second floor of the pumping station (after Complex) |
+| `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)
 into a `known.txt` of `ns:path`; check ids with `grep -qxF`.
 
-## Running many commands
+## Applying a build (BuildKit, DEV mode, map open)
 
-Generators print one `execute in unrealzaruba:game_dim run ...` command per line. Run them inside the container in one go:
+Generators print a build file (`clear|place|ground x0 y0 z0 x1 y1 z1 reason|block`, absolute coordinates). The mod's
+`/buildkit` command (op 3, DEV mode, applies to the open game map) places it in one tick, additively, with undo:
+
+```bash
+java -cp "$SCRATCH/wk" PumpDeck -150 32 10 > pumpdeck.build      # stderr: the clears it contains
+cp pumpdeck.build /x/Projects/UnrealFrontiers/zaruba-server/data/unrealzaruba/builds/
+rcon.sh "buildkit check pumpdeck"          # dry run: would place / already there / skipped, what's in the way
+rcon.sh "buildkit apply pumpdeck"          # place; "apply pumpdeck clear" also runs the clears (ask first)
+rcon.sh "buildkit undo pumpdeck"           # put back exactly what the last apply changed (journal in builds/undo/)
+```
+
+- Reports with every skipped position and the block in the way: `data/unrealzaruba/builds/reports/<name>.txt`.
+- "already there" = same block with the properties the file names (re-applying a build is a no-op).
+- Undo journals stack: each `undo` reverts the latest not-yet-undone apply of that name (the journal is then renamed
+  `.undone`). After an undo, `check` should report the whole build as placeable again; that's the proof it's gone.
+- Block entities with NBT (`oak_sign[...]{...}`) work; replaced containers are emptied first (no item drops).
+- Tested 2026-10-08: 9,339 blocks applied in ~0.5 s, undone exactly (lake water back). `save-all flush` afterwards.
+- `skipped` isn't always a problem: a deck re-check skips the rack girders that pass through it, by design. Read the
+  report's "in the way" list before deciding.
+- Files copied from Windows into `data/unrealzaruba/builds/` may need `docker exec zaruba sh -c 'chown -R 1000:1000
+  /data/unrealzaruba/builds'` so the mod can write `undo/` and `reports/`.
+- New mod code needs the jar swapped with the server **stopped** (overwriting a jar under a running JVM can crash it):
+  `save-all flush`, `docker compose stop`, copy, `docker compose start`, wait for "Done (", `/openmap capturepoints`.
+  Ask first if anyone is online.
+
+## Organic shapes
+
+For non-boxy builds (statues, rocks, terrain features) see `generators/Dragon.java`: sweep spheres along Catmull-Rom
+splines (`spline` + `tube`, radius per control point), rasterise thin surfaces as dense barycentric samples of
+triangles (`membrane`), classify voxels by priority (eye > claw > spike > body > bone > membrane > base) and only then
+pick materials, with a hash noise for speckled mixes and a "belly" flag for the underside. Keep it in one generator
+run so one `undo` removes all of it.
+
+## Fallback: RCON commands
+
+With `--commands` (and `--clear` to include the clears) generators print `execute in unrealzaruba:game_dim run ...`
+fill commands instead. Use only if the mod's BuildKit is unavailable. Run them inside the container in one go:
 
 ```bash
 tr -d '\r' < cmds.txt > cmds_lf.txt                      # Windows line endings break every command
 docker cp cmds_lf.txt zaruba:/tmp/run.txt
 docker cp tools/worldkit/runcmds.sh zaruba:/tmp/runcmds.sh
 docker exec zaruba sh -c 'sh /tmp/runcmds.sh' > out.txt  # sh -c: Git Bash rewrites bare /tmp paths
-grep -viE "\|(Successfully filled|Changed the block|Marked|Unmarked)" out.txt   # what didn't apply
+grep -viE "\|(Successfully filled|No blocks were filled|Changed the block|Marked|Unmarked)" out.txt   # errors
+java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive build couldn't place
 ```
 
 `out.txt` lines are `<n>|<reply>`; map `n` back to the command to see what failed.
@@ -114,16 +169,20 @@ grep -viE "\|(Successfully filled|Changed the block|Marked|Unmarked)" out.txt   
 3. **Match the style.** Run `Built` over a building the user likes (e.g. the RED base around -938 449) and use its
    top blocks as the palette. Capture points map palette: cut granite / cut dripstone bricks, bricks, polished
    andesite, smooth stone, stone bricks, dndecor containers, create metal girders, andesite bars, grey glass panes.
-4. **Write a generator** (copy `Base.java` / `Complex.java`): relative coordinates around a centre, ground y as a
-   parameter, `site()` that clears trees (air above floor), fills holes (`fill ... dirt replace air|water`) and lays the
-   floor; then features. Keep gameplay structures mirrored between the two team directions.
-5. **Check ids** in the generated file against `known.txt`, then run (above).
-6. **Verify**: `save-all flush`, then `Probe` key spots (respawn block + 2 air above, spawner present) and a `Surface`
-   top-down of the whole build.
+4. **Write a generator** (copy `Base.java` / `Complex.java`, draw into a `Canvas`): relative coordinates around a
+   centre, ground y as a parameter, `site()` that fills holes under the floor and lays the floor at G, trees only as a
+   `C.clear`; then features. Openings in your own walls: draw "air" over them (erases from the canvas, safe). Keep
+   gameplay structures mirrored between the two team directions.
+5. **Check ids** in the generated file against `known.txt`, read the clears it lists on stderr, `buildkit check`, then
+   `buildkit apply`. If trees or old builds block important parts (the report lists them), tell the user what and
+   where, and ask before `apply <name> clear` or before moving the build. Wrong result: `buildkit undo`, fix, re-apply.
+6. **Verify**: camera shots (overview + each approach), then `save-all flush`; `Probe` key spots (respawn block + 2 air
+   above, spawner present) if needed.
 7. **Wire up config**: `respawnPosition` (feet position) on the capture point; new capture points need
    `captureArea {minPos, maxPos, center}`, `position`, `name`, `type: "capturepoint"`, `progress`, `isCompleted`.
    Edit `objectives.json` textually (keep formatting), validate with PowerShell `ConvertFrom-Json`.
-8. **Report** what was built where, what was kept/cleared, then ask for screenshots of specific spots
+8. **Record it in builds.md**: location, generator and arguments, layout, gameplay intent, config wiring, leftovers.
+9. **Report** what was built where, what was kept/cleared, then ask for screenshots of specific spots
    (give tp commands: `execute in unrealzaruba:game_dim run tp <player> x y z`). Remind: `/mapscan` refreshes the
    pre-rendered Xaero map; GAME mode to play.
 
@@ -150,3 +209,9 @@ grep -viE "\|(Successfully filled|Changed the block|Marked|Unmarked)" out.txt   
 - `/openmap` needs op level 3; the game level exists only after it (or a match) loads the map.
 - Players standing on a build you clear will fall: teleport them aside first.
 - Use the scratchpad for generated command files; keep reusable code in `tools/worldkit`.
+- `java Gen.java` (single-file mode) can't see `Canvas`: compile generators together with javac (see Tools).
+- In Git Bash, a Java classpath with `;` needs Windows paths (`cygpath -m`); `/x/...` entries are silently ignored.
+- No Python on this machine; multi-line edits from the shell: perl (watch out, `//` in a replacement ends `s///`).
+- createdeco catwalk stairs face their low end (opposite of vanilla stairs); catwalk floors sit at the top of their
+  block (catwalk at y = stand at y+1); railings are separate blocks above the catwalk with per-side booleans.
+- The capture points lake: surface y 28, bottom about y -31 (60 blocks deep), roughly x -404..-212, z -100..160.

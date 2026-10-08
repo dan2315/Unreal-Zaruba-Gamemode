@@ -3,16 +3,16 @@ import java.util.*;
 /**
  * Lakeside pumping station, a capture point. Coordinates are relative to the yard centre (the capture area);
  * x grows east (away from the lake), z south. Symmetric north/south so neither team's approach is favoured.
- * Usage: java Complex.java <cx> <groundY> <cz>
+ * Usage: java -cp <worldkit classes> Complex <cx> <groundY> <cz> > pump.build   (or --commands [--clear] for RCON fill commands)
  */
 public class Complex {
     static int CX, G, CZ, F;
-    static final List<String> out = new ArrayList<>();
+    static Canvas C;
 
     public static void main(String[] a) {
         CX = Integer.parseInt(a[0]); G = Integer.parseInt(a[1]); CZ = Integer.parseInt(a[2]);
         F = G + 1;
-        out.add("forceload add " + (CX - 66) + " " + (CZ - 34) + " " + (CX + 30) + " " + (CZ + 34));
+        C = new Canvas(CX, CZ);
 
         site();
         yard();
@@ -27,14 +27,13 @@ public class Complex {
         controlBuilding();
         lamps();
 
-        out.add("forceload remove " + (CX - 66) + " " + (CZ - 34) + " " + (CX + 30) + " " + (CZ + 34));
-        out.forEach(c -> System.out.println("execute in unrealzaruba:game_dim run " + c));
+        C.print(a);
     }
 
     // ---------------- ground ----------------
     static void site() {
-        bigFill(-56, F, -30, 28, F + 30, 30, "air");                          // trees and plants
-        fillReplace(-40, G - 4, -28, 26, G - 1, 28, "dirt", "air");
+        C.clear(-56, F, -30, 28, F + 30, 30, "trees over the site");
+        fill(-40, G - 4, -28, 26, G - 1, 28, "dirt");                         // holes under the floor
         fill(-40, G, -28, 26, G, 28, "coarse_dirt");
         // gravel roads: N/S paths, east approaches, link to the pier
         fill(-2, G, -28, 2, G, 28, "gravel");
@@ -211,7 +210,7 @@ public class Complex {
         }
     }
 
-    // ---------------- helpers ----------------
+    // ---------------- helpers: draw into the additive canvas; layer G is the floor and may replace natural ground ----------------
     static void hollow(int x0, int y0, int z0, int x1, int y1, int z1, String block) {
         fill(x0, y0, z0, x1, y1, z0, block);
         fill(x0, y0, z1, x1, y1, z1, block);
@@ -219,27 +218,12 @@ public class Complex {
         fill(x1, y0, z0, x1, y1, z1, block);
     }
 
-    static void bigFill(int x0, int y0, int z0, int x1, int y1, int z1, String block) {
-        int area = (x1 - x0 + 1) * (z1 - z0 + 1);
-        int layers = Math.max(1, 32768 / area);
-        for (int y = y0; y <= y1; y += layers) fill(x0, y, z0, x1, Math.min(y1, y + layers - 1), z1, block);
-    }
-
     static void fill(int x0, int y0, int z0, int x1, int y1, int z1, String block) {
-        out.add("fill " + (CX + x0) + " " + y0 + " " + (CZ + z0) + " " + (CX + x1) + " " + y1 + " " + (CZ + z1) + " " + id(block));
-    }
-
-    static void fillReplace(int x0, int y0, int z0, int x1, int y1, int z1, String block, String replace) {
-        out.add("fill " + (CX + x0) + " " + y0 + " " + (CZ + z0) + " " + (CX + x1) + " " + y1 + " " + (CZ + z1) + " " + id(block) + " replace " + id(replace));
+        if (y0 == G && y1 == G) C.ground(x0, y0, z0, x1, y1, z1, block);
+        else C.fill(x0, y0, z0, x1, y1, z1, block);
     }
 
     static void set(int x, int y, int z, String block) {
-        out.add("setblock " + (CX + x) + " " + y + " " + (CZ + z) + " " + id(block));
-    }
-
-    static String id(String block) {
-        int end = block.length();
-        for (char c : new char[] {'[', '{'}) if (block.indexOf(c) >= 0) end = Math.min(end, block.indexOf(c));
-        return block.substring(0, end).contains(":") ? block : "minecraft:" + block;
+        fill(x, y, z, x, y, z, block);
     }
 }
