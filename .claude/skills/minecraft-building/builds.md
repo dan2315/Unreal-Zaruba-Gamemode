@@ -92,7 +92,34 @@ Second floor (`PumpDeck`, 2026-10-08, built with the old commands; the generator
 Camera viewpoints that show it well: overview `camera look -185 58 -25 -150 34 10`, deck from the north-west
 `camera look -175 52 -25 -150 37 10`, roof stair `camera look -160 40 4 -165 39 10`.
 
-Known leftovers: cut tree trunks and dirt mounds south-west of the site around -175 -10 (from the site clearing).
+Ground (2026-10-08, `Reground <region> -190 -18 -124 38 32 coarse_dirt`, applied as BuildKit build `pumpground`):
+the coarse dirt site floor (2,314 cells) was re-covered to match the natural surface around it: gravel beach on the
+lake side, grass / moss / lime terracotta / green concrete powder patches with grass, ferns and tulips inland. Roads,
+yard, tank and building floors were left as they were. `/buildkit undo pumpground` would bring the coarse dirt back.
+
+Trail from 0,0 (2026-10-10, `Pathway <region> 8 -7 0 -35 -3 -65 -6 -95 -1 -115 2 -126 2`, BuildKit
+build `pathway`, 985 swaps): a dirt trail in the style of the existing north-south trail at x ~ -7 by
+0,0, branching off it and running west ~120 blocks (south of the wheat plots at -62..-58 z 2..8, through the wood
+around x -110..-96) to the station's north-east approach road at x -124, z 0..3. About 16 wide, dense clumped middle,
+soft edges. No stumps: the user found the generated stump line ugly (2026-10-10), don't add `--stumps` again.
+A first, sparser version (half width 7, per-cell speckle, no stumps) was undone: it looked like a thin dotted line.
+
+Known leftovers: the site clearing cut the trees standing on the edges of its box (x -206..-122, z -20..40, y 33+):
+canopies sliced flat on the side facing the site, mostly along the north (z -21), south (z 41) and east (x -121)
+edges. Not fixed yet; options: trim them into whole smaller trees, or remove those trees.
+
+### Vehicle road from base B (2026-10-10)
+
+`Pathway <region> 9 -412 450 -412 425 -409 395 -398 365 -380 340 -358 322 -335 313 -315 311 --density=0.75
+--clear-trees`, BuildKit build `vehicleroad`, applied with `apply vehicleroad clear` (user asked to remove trees in
+the way). ~18 wide dirt road in the style of the east-west road at z ~305..317 (coarse dirt / podzol / rooted dirt,
+moss): from the middle of base B's vehicle pad north edge (-412 452) north, curving right (east) into that road around
+x -335..-315. Six whole trees in the corridor were removed (634 wood, ~1,960 of their own leaves; root wood on the
+ground layer covered with moss); trees beside the road kept their full crowns. `/buildkit undo vehicleroad` restores
+trees and ground. Then `LevelMounds <region> 32 9 <same waypoints>` (build `levelmounds`, applied with clear): the six
+small raised mounds (cobblestone/granite/wheat bumps, 1-3 high, ~7x8) touching the road were levelled whole to the
+ground layer (254 columns), road texture inside the corridor, grass outside. Mounds beside the road are untouched.
+Undo order if ever needed: `undo levelmounds`, then `undo vehicleroad`.
 
 ### Removed: ender dragon test statue (2026-10-08)
 

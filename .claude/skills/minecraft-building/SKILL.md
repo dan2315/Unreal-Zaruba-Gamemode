@@ -13,8 +13,10 @@ deck), with generator arguments, layouts and known issues. Add every new build o
 
 ## Screenshot camera
 
-A second client, `ClaudeCam` (Prism instance `X:\Games\mc_modpacks\Instances\ZarubaCamera`), runs in the background
-as a spectator. DEV mode only, map open (`/openmap`). Check it's online with `rcon.sh list`; if it isn't, ask the user to
+A second client, `ClaudeCam`, runs in the background as a spectator. The user starts it from the UF launcher ("Unreal
+Zaruba" pack, signed in as ClaudeCam); the launcher passes the login in `UF_ACCESS_TOKEN`. The old Prism instance
+`X:\Games\mc_modpacks\Instances\ZarubaCamera` no longer authenticates. Any client logged in as ClaudeCam with the Zaruba
+mod works: the camera tag is in ClaudeCam's player data on the server. DEV mode only, map open (`/openmap`). Check it's online with `rcon.sh list`; if it isn't, ask the user to
 launch it.
 
 ```bash
@@ -23,7 +25,8 @@ rcon.sh "camera shot -150 45 10 0 90 pump_top 70"                # xyz yaw pitch
 rcon.sh "camera status"                                          # repeat until "<name>: saved ..." (usually 2-10 s)
 ```
 
-Then Read `X:\Games\mc_modpacks\Instances\ZarubaCamera\minecraft\screenshots\claude\<name>.png`. Yaw: 0 = south (+z),
+Then Read the PNG at the path `camera status` prints (UF launcher client:
+`%LOCALAPPDATA%\UnrealFrontiers.Local\Instances\Unreal Zaruba\screenshots\claude\<name>.png`). Yaw: 0 = south (+z),
 90 = west, 180 = north, -90 = east. Take an overview from ~20 blocks up at 45° plus ground-level shots from each
 approach. Coordinates are game_dim's; the command always shoots in the game map.
 
@@ -98,6 +101,10 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `Base compound <cx> <groundY> <cz> <R> <padLen> <tents yes/no>` / `Base outpost <cx> <groundY> <cz> <padLen>` | Respawn base generator |
 | `Complex <cx> <groundY> <cz>` | The lakeside pumping station (capture point). Template for capture-point complexes |
 | `PumpDeck <cx> <groundY> <cz>` | Catwalk second floor of the pumping station (after Complex) |
+| `Reground <region> x0 z0 x1 z1 <groundY> <block>` | Re-covers an artificial floor (e.g. coarse dirt under a site) with the natural surface pattern learned from a 24-block band around it, plants included. Only cells whose top block is `<block>` change. Read the region after `save-all flush` |
+| `Pathway <region> <halfWidth> x z x z ... [--stumps=1|-1]` | Natural dirt trail (coarse dirt / podzol / rooted dirt in 2-block clumps, ~68% dense middle, soft edges, painted grass near the middle turned to moss/grass) along a spline through waypoints, in the style of the trail at 0,0; optional oak log stumps along one edge. Uses swaps; runs under tree canopies, skips farmland, roads and builds. Half width 8 matches the 0,0 trail |
+| `LevelMounds <region> <groundY> <halfWidth> x z ...` | Levels whole raised mounds (rock/wheat bumps) that touch a road corridor, same waypoints as Pathway; road texture inside, grass outside. Clears: apply with `clear` |
+| `Pathway ... --density=0.75 --clear-trees` | Vehicle road variant: denser, and removes whole trees whose wood within 8 of the ground stands in the corridor (+1 clearance), with their own leaves; neighbours keep full crowns. Apply with `clear` |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)
@@ -116,6 +123,10 @@ rcon.sh "buildkit apply pumpdeck"          # place; "apply pumpdeck clear" also 
 rcon.sh "buildkit undo pumpdeck"           # put back exactly what the last apply changed (journal in builds/undo/)
 ```
 
+- Fourth op, `swap x0 y0 z0 x1 y1 z1 <from> <block>` (Canvas `swap()`): replaces only where the world has exactly
+  `<from>`. For surface edits on blocks the ground rule doesn't allow (this map paints its grass with
+  `lime_terracotta` and `green_concrete_powder`): the generator reads the region, writes what it saw as `<from>`, and
+  anything changed since is skipped. Read the region after `save-all flush`.
 - Reports with every skipped position and the block in the way: `data/unrealzaruba/builds/reports/<name>.txt`.
 - "already there" = same block with the properties the file names (re-applying a build is a no-op).
 - Undo journals stack: each `undo` reverts the latest not-yet-undone apply of that name (the journal is then renamed

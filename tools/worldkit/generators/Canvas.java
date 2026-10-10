@@ -17,7 +17,7 @@ public class Canvas {
             "#minecraft:dirt", "#minecraft:sand", "minecraft:gravel"};
     static final String[] ATTACHED = {"ladder", "lantern", "torch", "sign", "banner", "button", "lever", "lightning_rod", "valve_handle"};
 
-    record Cell(String block, String[] filter) {}
+    record Cell(String block, String[] filter, String from) {}
     record Clear(int x0, int y0, int z0, int x1, int y1, int z1, String reason) {}
 
     final int cx, cz;
@@ -42,6 +42,11 @@ public class Canvas {
         draw(x0, y0, z0, x1, y1, z1, block, GROUND);
     }
 
+    /** Replace exactly the block "from" (read from the region files) at one spot; anything else there is left. */
+    public void swap(int x, int y, int z, String from, String block) {
+        cells.put(key(x, y, z), new Cell(id(block), PLACE, id(from)));
+    }
+
     public void clear(int x0, int y0, int z0, int x1, int y1, int z1, String reason) {
         clears.add(new Clear(Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1), reason));
     }
@@ -52,7 +57,7 @@ public class Canvas {
             for (int y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
                 for (int z = Math.min(z0, z1); z <= Math.max(z0, z1); z++) {
                     if (full.equals("minecraft:air")) cells.remove(key(x, y, z));
-                    else cells.put(key(x, y, z), new Cell(full, filter));
+                    else cells.put(key(x, y, z), new Cell(full, filter, null));
                 }
     }
 
@@ -115,7 +120,8 @@ public class Canvas {
                 }
                 for (int x = x0; x <= x1; x++) for (int z = z0; z <= z1; z++) done.add(key(x, y, z));
                 String area = (cx + x0) + " " + y + " " + (cz + z0) + " " + (cx + x1) + " " + y + " " + (cz + z1);
-                if (!commands) out.add((cell.filter == GROUND ? "ground " : "place ") + area + " " + cell.block);
+                if (cell.from != null) out.add(commands ? "fill " + area + " " + cell.block + " replace " + cell.from : "swap " + area + " " + cell.from + " " + cell.block);
+                else if (!commands) out.add((cell.filter == GROUND ? "ground " : "place ") + area + " " + cell.block);
                 else for (String f : cell.filter) out.add("fill " + area + " " + cell.block + " replace " + f);
             }
         }
@@ -124,7 +130,7 @@ public class Canvas {
     boolean same(int x, int y, int z, Cell cell, Set<Long> done) {
         long k = key(x, y, z);
         Cell other = cells.get(k);
-        return other != null && !done.contains(k) && other.block.equals(cell.block) && other.filter == cell.filter;
+        return other != null && !done.contains(k) && other.block.equals(cell.block) && other.filter == cell.filter && Objects.equals(other.from, cell.from);
     }
 
     int[] bounds() {
