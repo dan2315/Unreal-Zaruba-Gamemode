@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
  *   clear  x0 y0 z0 x1 y1 z1 reason...   empty the box (only when applied with clears)
  *   place  x0 y0 z0 x1 y1 z1 block       put the block where the world has air, water or replaceable plants
  *   ground x0 y0 z0 x1 y1 z1 block       same, and it may replace natural ground (dirt, grass block, sand, gravel)
+ *   swap   x0 y0 z0 x1 y1 z1 from block  replace only where the world has exactly the block "from" (the generator read
+ *                                        it from the region files; anything else, e.g. a later change, is skipped)
  * </pre>
  * Placement is additive: anything else already there stays, and is listed in the report. Every change is journaled
  * (previous state and block entity) so undo puts back exactly what was there.
@@ -80,11 +82,16 @@ public final class BuildKit {
             if (line.isEmpty() || line.startsWith("#")) {
                 continue;
             }
-            String[] parts = line.split(" ", 8);
-            if (parts.length < 8) {
-                throw new IOException("line " + (n + 1) + ": expected '<op> x0 y0 z0 x1 y1 z1 <block|reason>'");
+            String op = line.substring(0, Math.max(0, line.indexOf(' ')));
+            String[] parts = line.split(" ", op.equals("swap") ? 9 : 8);
+            if (parts.length < (op.equals("swap") ? 9 : 8)) {
+                throw new IOException("line " + (n + 1) + ": expected '<op> x0 y0 z0 x1 y1 z1 [from] <block|reason>'");
             }
-            String op = parts[0];
+            String from = null;
+            if (op.equals("swap")) {
+                from = parts[7].contains(":") ? parts[7] : "minecraft:" + parts[7];
+                parts[7] = parts[8];
+            }
             int x0 = Integer.parseInt(parts[1]), y0 = Integer.parseInt(parts[2]), z0 = Integer.parseInt(parts[3]);
             int x1 = Integer.parseInt(parts[4]), y1 = Integer.parseInt(parts[5]), z1 = Integer.parseInt(parts[6]);
             total += (Math.abs(x1 - x0) + 1) * (Math.abs(y1 - y0) + 1) * (Math.abs(z1 - z0) + 1);
@@ -115,7 +122,7 @@ public final class BuildKit {
             }
 
             boolean ground = op.equals("ground");
-            if (!ground && !op.equals("place")) {
+            if (!ground && !op.equals("place") && from == null) {
                 throw new IOException("line " + (n + 1) + ": unknown op " + op);
             }
             BlockStateParser.BlockResult block = parsed.get(parts[7]);
@@ -130,9 +137,9 @@ public final class BuildKit {
                     already++;
                     continue;
                 }
-                if (!canReplace(current, ground)) {
+                String id = current.getBlock().builtInRegistryHolder().key().location().toString();
+                if (from != null ? !id.equals(from) : !canReplace(current, ground)) {
                     skipped++;
-                    String id = current.getBlock().builtInRegistryHolder().key().location().toString();
                     blockers.merge(id, 1, Integer::sum);
                     skippedLines.add(pos.getX() + " " + pos.getY() + " " + pos.getZ() + "  " + id + "  (wanted " + parts[7] + ")");
                     continue;
