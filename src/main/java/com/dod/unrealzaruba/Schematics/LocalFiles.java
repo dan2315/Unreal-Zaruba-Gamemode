@@ -103,7 +103,8 @@ public final class LocalFiles {
         if (data.length < 2 || (data[0] & 0xFF) != 0x1F || (data[1] & 0xFF) != 0x8B) {
             return SchematicInfo.error("schematics.unrealzaruba.error.not_gzip");
         }
-        Blueprints.Info info = Blueprints.read(path.getFileName().toString(), data, null);
+        // Blueprints with runtime contraptions need a level to read their blocks; null only works for the simple ones
+        Blueprints.Info info = Blueprints.read(path.getFileName().toString(), data, Minecraft.getInstance().level);
         if (info == null) {
             return SchematicInfo.error("schematics.unrealzaruba.error.not_structure");
         }
