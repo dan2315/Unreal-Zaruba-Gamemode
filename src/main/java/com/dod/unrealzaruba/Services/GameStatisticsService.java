@@ -34,7 +34,7 @@ public class GameStatisticsService {
                 UnrealZaruba.LOGGER.warn("JSON to send:" + jsonInputString);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(HttpClientService.BASEURL + "/leaderboard/update"))
+                .uri(new URI(HttpClientService.baseUrl() + "/leaderboard/update"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonInputString, StandardCharsets.UTF_8))
                 .build();
