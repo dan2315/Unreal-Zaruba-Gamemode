@@ -40,7 +40,7 @@ public final class SchematicsApi {
     public record Upload(String filename, String contentType, byte[] data) {}
 
     public enum Sort {
-        NEWEST("newest"), RATING("rating"), BATTLES("battles");
+        NEWEST("newest"), RATING("rating"), BATTLES("battles"), PRICE("price");
 
         public final String param;
 
@@ -72,6 +72,11 @@ public final class SchematicsApi {
 
     public static CompletableFuture<Result<SchematicDto>> get(long id) {
         return json(UFHttpClient.get("/schematics/" + id), SchematicDto.class);
+    }
+
+    /** Price breakdown; fetched only when a schematic is opened. */
+    public static CompletableFuture<Result<SchematicPriceDto>> price(long id) {
+        return json(UFHttpClient.get("/schematics/" + id + "/price"), SchematicPriceDto.class);
     }
 
     public static CompletableFuture<Result<SchematicDto>> upload(String name, String description, boolean isPublic,

@@ -51,6 +51,11 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
     private SchematicDto selected;
     /** Full version of the selected schematic (images, my rating), once loaded. */
     private SchematicDto detail;
+    /** Price breakdown of the selected schematic, fetched when it is opened. */
+    private SchematicPriceDto breakdown;
+    private long breakdownId = -1;
+    private String breakdownError;
+    private boolean showBreakdown;
     private int gallery;
     private long confirmDelete = -1;
     private boolean busy;
@@ -119,8 +124,24 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             detail = null;
             gallery = 0;
             confirmDelete = -1;
+            showBreakdown = false;
+            breakdown = null;
+            breakdownError = null;
+            breakdownId = -1;
         }
         loadDetail(schematic.id);
+        loadBreakdown(schematic);
+    }
+
+    private void loadBreakdown(SchematicDto schematic) {
+        if (schematic.price == null || breakdown != null && breakdownId == schematic.id) return;
+        long id = schematic.id;
+        breakdownId = id;
+        SchematicsApi.then(SchematicsApi.price(id), result -> {
+            if (selected == null || selected.id != id) return;
+            breakdown = result.value();
+            breakdownError = result.error();
+        });
     }
 
     private void loadDetail(long id) {
@@ -168,11 +189,16 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             selected = null;
             detail = null;
             selectAfterLoad = saved.id;
-            showStatus(Component.translatable("schematics.unrealzaruba.uploaded", saved.name), false);
+            showStatus(saved.price != null
+                    ? Component.translatable("schematics.unrealzaruba.uploaded_priced", saved.name, Money.format(saved.price))
+                    : Component.translatable("schematics.unrealzaruba.uploaded", saved.name), false);
         } else {
             showStatus(Component.translatable("schematics.unrealzaruba.saved"), false);
             if (selected != null && selected.id == saved.id) {
                 detail = null;
+                breakdown = null; // the file may have been replaced
+                breakdownError = null;
+                breakdownId = -1;
             }
         }
         reload();
@@ -435,6 +461,10 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             image(g, SchematicImages.remote(s.previewUrl), cx + 1, cy + 1, cardWidth - 2, imageHeight - 1,
                     s.previewUrl == null ? tr("schematics.unrealzaruba.no_preview") : null);
             g.renderOutline(cx, cy, cardWidth, cardHeight, on ? ACCENT : hover ? MUTED : BORDER);
+            String price = priceText(s);
+            int pw = (int) (font.width(price) * 0.75f) + 6;
+            g.fill(cx + cardWidth - 1 - pw, cy + imageHeight - 11, cx + cardWidth - 1, cy + imageHeight - 1, 0xCC0B0E12);
+            small(g, price, cx + cardWidth - 1 - pw + 3, cy + imageHeight - 9, s.price != null ? ACCENT : MUTED);
 
             int ty = cy + imageHeight + 4;
             g.drawString(font, trim(s.name, cardWidth - 10), cx + 5, ty, TEXT, false);
@@ -499,9 +529,11 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         int bottom = height - 8;
         int buttonsTop = bottom - 18 - (own ? 21 : 0) - (spawner != null ? 21 : 0);
         int ratingTop = buttonsTop - (canRate ? 26 : 0);
-        int statsTop = ratingTop - 4 * 9 - 6;
+        int statsTop = ratingTop - 5 * 9 - 6;
 
-        if (s.description != null && !s.description.isBlank()) {
+        if (showBreakdown && s.price != null) {
+            renderBreakdown(g, left, right, y, statsTop - 4);
+        } else if (s.description != null && !s.description.isBlank()) {
             List<FormattedCharSequence> lines = font.split(Component.literal(s.description), w);
             int maxLines = Math.max(0, (statsTop - 4 - y) / 10);
             for (int i = 0; i < Math.min(lines.size(), maxLines); i++) {
@@ -513,6 +545,12 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
 
         // stats
         int sy = statsTop;
+        String priceLabel = tr("schematics.unrealzaruba.stat.price") + (s.price == null ? "" : showBreakdown ? " [-]" : " [+]");
+        stat(g, left, right, sy, priceLabel, priceText(s), s.price != null ? ACCENT : MUTED);
+        if (s.price != null) {
+            hits.add(new Hit(left, sy - 1, right, sy + 9, () -> showBreakdown = !showBreakdown));
+        }
+        sy += 9;
         stat(g, left, right, sy, tr("schematics.unrealzaruba.stat.rating"), s.rating != null
                 ? String.format(Locale.ROOT, "%.2f / 10  (%d)", s.rating, s.ratingsCount) : tr("schematics.unrealzaruba.no_rating"));
         stat(g, left, right, sy + 9, tr("schematics.unrealzaruba.stat.battles"), String.valueOf(s.battlesCount));
@@ -566,8 +604,69 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
     }
 
     private void stat(GuiGraphics g, int left, int right, int y, String label, String value) {
+        stat(g, left, right, y, label, value, TEXT);
+    }
+
+    private void stat(GuiGraphics g, int left, int right, int y, String label, String value, int valueColor) {
         small(g, upper(label), left, y, MUTED);
-        small(g, value, right - (int) (font.width(value) * 0.75f), y, TEXT);
+        small(g, value, right - (int) (font.width(value) * 0.75f), y, valueColor);
+    }
+
+    /** Sums per kind, the costliest lines and a note about unpriced things, as many rows as fit between top and bottom. */
+    private void renderBreakdown(GuiGraphics g, int left, int right, int top, int bottom) {
+        int rows = Math.max(0, (bottom - top) / 9);
+        if (breakdown == null) {
+            if (rows > 0) small(g, breakdownError != null ? breakdownError : tr("schematics.unrealzaruba.loading"), left, top,
+                    breakdownError != null ? ERROR : MUTED);
+            return;
+        }
+        SchematicPriceDto b = breakdown;
+        int y = top;
+        int used = 0;
+        String[][] sums = {
+                {"schematics.unrealzaruba.price.blocks", Money.format(b.blocks)},
+                {"schematics.unrealzaruba.price.items", Money.format(b.items)},
+                {"schematics.unrealzaruba.price.fluids", Money.format(b.fluids)}};
+        for (String[] sum : sums) {
+            if (used++ >= rows) return;
+            stat(g, left, right, y, tr(sum[0]), sum[1]);
+            y += 9;
+        }
+        int reserve = b.unpriced.isEmpty() ? 0 : 1;
+        int lineRows = Math.max(0, rows - used - reserve - 1);
+        if (lineRows > 0 && !b.lines.isEmpty()) {
+            g.fill(left, y + 1, right, y + 2, BORDER);
+            y += 4;
+            lineRows = Math.max(0, lineRows - 1);
+        }
+        int maxName = (right - left) * 62 / 100;
+        for (int i = 0; i < Math.min(lineRows, b.lines.size()); i++) {
+            SchematicPriceDto.Line line = b.lines.get(i);
+            String amount = "fluid".equals(line.kind) ? bucketsText(line.count) : line.count + "x";
+            String name = trim(amount + " " + shortId(line.id), (int) (maxName / 0.75f));
+            small(g, name, left, y, 0xFFC3CAD2);
+            String subtotal = Money.format(line.subtotal);
+            small(g, subtotal, right - (int) (font.width(subtotal) * 0.75f), y, TEXT);
+            y += 9;
+        }
+        if (reserve == 1 && y + 9 <= bottom + 1) {
+            small(g, trim(tr("schematics.unrealzaruba.price.unpriced", b.unpriced.size()), (int) ((right - left) / 0.75f)), left, bottom - 9, ERROR);
+        }
+    }
+
+    private static String priceText(SchematicDto s) {
+        return s.price != null ? Money.format(s.price) : "—";
+    }
+
+    private static String shortId(String id) {
+        int colon = id.indexOf(':');
+        return colon >= 0 && id.startsWith("minecraft:") ? id.substring(colon + 1) : id;
+    }
+
+    /** Fluid stacks come in millibuckets; shown as buckets. */
+    private static String bucketsText(long millibuckets) {
+        double buckets = millibuckets / 1000.0;
+        return (buckets == Math.rint(buckets) ? String.format(Locale.ROOT, "%.0f", buckets) : String.format(Locale.ROOT, "%.2f", buckets)) + " B";
     }
 
     private static String ratingText(SchematicDto s) {

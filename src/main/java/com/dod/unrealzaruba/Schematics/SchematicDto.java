@@ -20,6 +20,8 @@ public class SchematicDto {
     public String sha256;
     public String createdAt;
     public String updatedAt;
+    /** Price in game dollars, computed by the backend; null when the file could not be read as a structure. */
+    public Double price;
     /** Cover image path relative to the backend, or null. */
     public String previewUrl;
     /** Only in GET /schematics/{id} and POST /schematics responses. */
