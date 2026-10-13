@@ -46,6 +46,8 @@ public final class SupplyDrops {
 
     public static void reset() {
         removeCrate();
+        SupplyParadrop.clear();
+        SupplyCases.reset();
         nextDropTick = -1;
         lastLocationIndex = -1;
     }
@@ -104,11 +106,16 @@ public final class SupplyDrops {
     }
 
     private static List<ItemStack> rollLoot(MinecraftServer server, EconomyConfig.SupplyDrops config) {
+        return rollLoot(server, config.loot, config.lootRolls);
+    }
+
+    /** {@code rolls} weighted picks from {@code loot}; entries that don't parse are skipped. */
+    static List<ItemStack> rollLoot(MinecraftServer server, List<EconomyConfig.Loot> table, int rolls) {
         List<ItemStack> stacks = new ArrayList<>();
-        List<EconomyConfig.Loot> loot = config.loot == null ? List.of() : config.loot;
+        List<EconomyConfig.Loot> loot = table == null ? List.of() : table;
         int totalWeight = loot.stream().mapToInt(entry -> Math.max(0, entry.weight)).sum();
         if (totalWeight <= 0) return stacks;
-        for (int roll = 0; roll < config.lootRolls; roll++) {
+        for (int roll = 0; roll < rolls; roll++) {
             int pick = RANDOM.nextInt(totalWeight);
             for (EconomyConfig.Loot entry : loot) {
                 pick -= Math.max(0, entry.weight);

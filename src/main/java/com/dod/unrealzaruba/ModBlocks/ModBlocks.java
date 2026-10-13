@@ -53,6 +53,8 @@ public class ModBlocks {
             () -> new ClassAssignerBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD)));
     public static final DeferredHolder<Block, Block> VEHICLE_SPAWN_BLOCK = ModBlocks.BLOCKS.register("vehicle_spawn_block",
             () -> new VehicleSpawnBlock());
+    public static final DeferredHolder<Block, Block> PARACHUTE_PACK_BLOCK = ModBlocks.BLOCKS.register("parachute_pack",
+            () -> new com.dod.unrealzaruba.ModBlocks.Parachute.ParachutePackBlock());
 
 
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES 
@@ -66,6 +68,10 @@ public class ModBlocks {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VehicleSpawnBlockEntity>> VEHICLE_SPAWN_BLOCK_ENTITY = BLOCK_ENTITIES.register("vehicle_spawn_block_entity",
             () -> BlockEntityType.Builder.of(VehicleSpawnBlockEntity::new, ModBlocks.VEHICLE_SPAWN_BLOCK.get()).build(null));
+
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.dod.unrealzaruba.ModBlocks.Parachute.ParachutePackBlockEntity>> PARACHUTE_PACK_BLOCK_ENTITY = BLOCK_ENTITIES.register("parachute_pack_block_entity",
+            () -> BlockEntityType.Builder.of(com.dod.unrealzaruba.ModBlocks.Parachute.ParachutePackBlockEntity::new, ModBlocks.PARACHUTE_PACK_BLOCK.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {

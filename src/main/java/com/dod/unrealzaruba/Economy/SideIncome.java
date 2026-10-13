@@ -34,7 +34,10 @@ public final class SideIncome {
 
     public static void tick(MinecraftServer server) {
         BaseGamemode gamemode = GamemodeManager.instance.GetActiveGamemode();
-        if (!(gamemode instanceof TeamGamemode teamGamemode) || !gamemode.IsBattleActive()) return;
+        if (!(gamemode instanceof TeamGamemode teamGamemode) || !gamemode.IsBattleActive()) {
+            SupplyCases.idle();
+            return;
+        }
         EconomyConfig config = EconomyData.current();
         battleTicks++;
 
@@ -43,6 +46,7 @@ public final class SideIncome {
             payIncome(server, teamGamemode, income);
         }
         SupplyDrops.tick(server, config.supplyDrops, battleTicks);
+        SupplyCases.tick(server, config.supplyDrops, battleTicks);
     }
 
     private static void payIncome(MinecraftServer server, TeamGamemode gamemode, EconomyConfig.PassiveIncome income) {

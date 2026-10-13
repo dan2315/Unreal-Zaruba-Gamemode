@@ -44,6 +44,9 @@ public class CreativeTabs {
             event.accept(ModItems.TENT_MAIN_BLOCK_RED_ITEM.get());
             event.accept(ModItems.VEHICLE_PURCHASE_BLOCK_ITEM.get());
             event.accept(ModItems.CLASS_ASSIGNER_BLOCK_ITEM.get());
+            event.accept(ModItems.PARACHUTE_PACK_ITEM.get());
+            event.accept(ModItems.SUPPLY_CASE.get());
+            event.accept(ModItems.CONTRAPTION_SCANNER.get());
         }
     }
 }

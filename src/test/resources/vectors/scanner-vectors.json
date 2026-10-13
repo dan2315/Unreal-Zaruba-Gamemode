@@ -1,0 +1,147 @@
+[
+  {
+    "name": "item_stacks_in_a_chest_lowercase_count",
+    "description": "Stacks are found by id + count anywhere below the block entity tag; the tag's own id (the block entity type) is not an item; equal ids add up",
+    "nbt": {
+      "id": "minecraft:chest", "x": 0, "y": 64, "z": 0,
+      "Items": [
+        { "Slot": 0, "id": "minecraft:diamond", "count": 5 },
+        { "Slot": 1, "id": "minecraft:diamond", "count": 2 },
+        { "Slot": 2, "id": "minecraft:gold_ingot", "count": 1 }
+      ]
+    },
+    "expect": { "items": { "minecraft:diamond": 7, "minecraft:gold_ingot": 1 }, "fluids": {} }
+  },
+  {
+    "name": "item_stacks_with_the_old_capital_count",
+    "description": "Before 1.20.5 the count is called Count (a byte)",
+    "nbt": { "id": "minecraft:chest", "Items": [ { "Slot": 0, "id": "minecraft:gold_ingot", "Count": 3 } ] },
+    "expect": { "items": { "minecraft:gold_ingot": 3 }, "fluids": {} }
+  },
+  {
+    "name": "lowercase_count_is_read_before_capital_count",
+    "description": "If a stack has both, count wins",
+    "nbt": { "Items": [ { "id": "m:both", "count": 4, "Count": 9 } ] },
+    "expect": { "items": { "m:both": 4 }, "fluids": {} }
+  },
+  {
+    "name": "shulker_box_components_multiply_the_inner_stacks",
+    "description": "Stacks inside a stack are multiplied by the size of the stack that holds them (2 shulker boxes with 10 iron = 20 iron); the box itself counts too; components are searched",
+    "nbt": {
+      "id": "minecraft:chest",
+      "Items": [
+        {
+          "Slot": 0, "id": "minecraft:shulker_box", "count": 2,
+          "components": { "minecraft:container": [ { "slot": 0, "item": { "id": "minecraft:iron_ingot", "count": 10 } } ] }
+        }
+      ]
+    },
+    "expect": { "items": { "minecraft:shulker_box": 2, "minecraft:iron_ingot": 20 }, "fluids": {} }
+  },
+  {
+    "name": "old_tag_nesting_is_searched",
+    "description": "Before 1.20.5 the inner stacks live under tag",
+    "nbt": {
+      "Items": [
+        { "id": "minecraft:shulker_box", "Count": 1, "tag": { "BlockEntityTag": { "Items": [ { "id": "minecraft:coal", "Count": 64 } ] } } }
+      ]
+    },
+    "expect": { "items": { "minecraft:shulker_box": 1, "minecraft:coal": 64 }, "fluids": {} }
+  },
+  {
+    "name": "bundle_inside_bundle_multiplies_twice",
+    "description": "3 bundles each holding 2 bundles each holding 5 apples: bundle 3 + 6, apples 5 * 2 * 3",
+    "nbt": {
+      "Items": [
+        {
+          "id": "minecraft:bundle", "count": 3,
+          "components": {
+            "minecraft:bundle_contents": [
+              {
+                "id": "minecraft:bundle", "count": 2,
+                "components": { "minecraft:bundle_contents": [ { "id": "minecraft:apple", "count": 5 } ] }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "expect": { "items": { "minecraft:bundle": 9, "minecraft:apple": 30 }, "fluids": {} }
+  },
+  {
+    "name": "the_block_entity_type_id_alone_is_nothing",
+    "description": "id without a count is not a stack",
+    "nbt": { "id": "minecraft:chest", "x": 0, "y": 0, "z": 0, "Items": [] },
+    "expect": { "items": {}, "fluids": {} }
+  },
+  {
+    "name": "fluids_in_every_known_spelling",
+    "description": "id / FluidName / fluid / Fluid with amount / Amount (millibuckets); the id keys are tried in that order",
+    "nbt": {
+      "id": "create:fluid_tank",
+      "Tanks": [
+        { "id": "m:a", "amount": 500 },
+        { "FluidName": "create:honey", "Amount": 2000 },
+        { "fluid": "m:b", "amount": 100 },
+        { "Fluid": "m:c", "Amount": 250 },
+        { "id": "m:a", "Amount": 500 }
+      ]
+    },
+    "expect": { "items": {}, "fluids": { "m:a": 1000, "create:honey": 2000, "m:b": 100, "m:c": 250 } }
+  },
+  {
+    "name": "empty_fluid_is_ignored",
+    "description": "minecraft:empty is not a fluid",
+    "nbt": { "Tank": { "id": "minecraft:empty", "amount": 1000 } },
+    "expect": { "items": {}, "fluids": {} }
+  },
+  {
+    "name": "an_id_without_a_namespace_is_ignored",
+    "description": "A resource id is 3-128 characters with a colon",
+    "nbt": { "Items": [ { "id": "stone", "count": 5 }, { "id": "a:", "count": 5 } ], "Tank": { "FluidName": "water", "Amount": 1000 } },
+    "expect": { "items": {}, "fluids": {} }
+  },
+  {
+    "name": "a_stack_with_an_amount_is_an_item_not_a_fluid",
+    "description": "The item check comes first",
+    "nbt": { "Items": [ { "id": "m:bucketlike", "count": 2, "amount": 1000 } ] },
+    "expect": { "items": { "m:bucketlike": 2 }, "fluids": {} }
+  },
+  {
+    "name": "fractional_numbers_are_not_counts",
+    "description": "Only integer tags (byte, short, int, long) count; a double amount or count is skipped",
+    "nbt": { "Tank": { "id": "m:f", "amount": 1.5 }, "Items": [ { "id": "m:g", "count": 2.5 } ] },
+    "expect": { "items": {}, "fluids": {} }
+  },
+  {
+    "name": "zero_and_negative_counts_add_nothing",
+    "description": "Counts are clamped to 0..2^50 and nothing is listed for 0",
+    "nbt": { "Items": [ { "id": "m:zero", "count": 0 }, { "id": "m:neg", "count": -5 } ] },
+    "expect": { "items": {}, "fluids": {} }
+  },
+  {
+    "name": "huge_counts_are_clamped_to_2_pow_50",
+    "description": "CountCap = 1125899906842624",
+    "nbt": { "Items": [ { "id": "m:huge", "count": 9223372036854775807 } ], "Tank": { "id": "m:sea", "amount": 9223372036854775807 } },
+    "expect": { "items": { "m:huge": 1125899906842624 }, "fluids": { "m:sea": 1125899906842624 } }
+  },
+  {
+    "name": "sums_are_capped_too",
+    "description": "Adding up never goes over the cap",
+    "nbt": { "Items": [ { "id": "m:x", "count": 1125899906842624 }, { "id": "m:x", "count": 1125899906842624 }, { "id": "m:x", "count": 5 } ] },
+    "expect": { "items": { "m:x": 1125899906842624 }, "fluids": {} }
+  },
+  {
+    "name": "nested_multiplication_is_capped",
+    "description": "A multiplier that would overflow stays at the cap",
+    "nbt": {
+      "Items": [
+        {
+          "id": "m:box", "count": 1125899906842624,
+          "components": { "c": [ { "id": "m:inner", "count": 1125899906842624 } ] }
+        }
+      ]
+    },
+    "expect": { "items": { "m:box": 1125899906842624, "m:inner": 1125899906842624 }, "fluids": {} }
+  }
+]

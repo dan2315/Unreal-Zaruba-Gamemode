@@ -1,0 +1,4420 @@
+[
+  {
+    "name": "lookup_exact_then_mod_then_wildcard_then_unpriced",
+    "description": "Exact id wins over mod:*, mod:* over *, and an item with no item entry is unpriced even though a block entry exists",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "minecraft:stone",
+        "price": 2,
+        "forbidden": false
+      },
+      {
+        "kind": "block",
+        "id": "create:*",
+        "price": 3,
+        "forbidden": false
+      },
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      },
+      {
+        "kind": "block",
+        "id": "minecraft:diamond",
+        "price": 100,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "minecraft:stone": 10,
+        "create:shaft": 5,
+        "other:thing": 4
+      },
+      "items": {
+        "minecraft:diamond": 3
+      },
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 39,
+      "blocks": 39,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "minecraft:stone",
+          "count": 10,
+          "unitPrice": 2,
+          "subtotal": 20
+        },
+        {
+          "kind": "block",
+          "id": "create:shaft",
+          "count": 5,
+          "unitPrice": 3,
+          "subtotal": 15
+        },
+        {
+          "kind": "block",
+          "id": "other:thing",
+          "count": 4,
+          "unitPrice": 1,
+          "subtotal": 4
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "item",
+          "id": "minecraft:diamond",
+          "count": 3
+        }
+      ],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "kinds_are_separate",
+    "description": "A block price does not price the item with the same id and the other way round",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:x",
+        "price": 5,
+        "forbidden": false
+      },
+      {
+        "kind": "item",
+        "id": "m:y",
+        "price": 7,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:x": 2,
+        "m:y": 1
+      },
+      "items": {
+        "m:x": 4,
+        "m:y": 2
+      },
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 24,
+      "blocks": 10,
+      "items": 14,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "item",
+          "id": "m:y",
+          "count": 2,
+          "unitPrice": 7,
+          "subtotal": 14
+        },
+        {
+          "kind": "block",
+          "id": "m:x",
+          "count": 2,
+          "unitPrice": 5,
+          "subtotal": 10
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "item",
+          "id": "m:x",
+          "count": 4
+        },
+        {
+          "kind": "block",
+          "id": "m:y",
+          "count": 1
+        }
+      ],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "fluid_per_bucket_and_rounding",
+    "description": "Fluid amounts are millibuckets and the price is per bucket; 333 mB at 0.5 is 0.1665, rounded to cents away from zero",
+    "catalog": [
+      {
+        "kind": "fluid",
+        "id": "minecraft:water",
+        "price": 0.5,
+        "forbidden": false
+      },
+      {
+        "kind": "fluid",
+        "id": "create:honey",
+        "price": 12,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {},
+      "items": {},
+      "fluids": {
+        "minecraft:water": 333,
+        "create:honey": 2500
+      },
+      "size": null
+    },
+    "expect": {
+      "total": 30.17,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 30.17,
+      "lines": [
+        {
+          "kind": "fluid",
+          "id": "create:honey",
+          "count": 2500,
+          "unitPrice": 12,
+          "subtotal": 30.00
+        },
+        {
+          "kind": "fluid",
+          "id": "minecraft:water",
+          "count": 333,
+          "unitPrice": 0.5,
+          "subtotal": 0.17
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "rounding_away_from_zero",
+    "description": "Midpoints round up: 0.005 is 0.01 and 0.125 is 0.13",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:a",
+        "price": 0.005,
+        "forbidden": false
+      },
+      {
+        "kind": "item",
+        "id": "m:b",
+        "price": 0.125,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {
+        "m:b": 1
+      },
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0.13,
+      "blocks": 0.01,
+      "items": 0.13,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "item",
+          "id": "m:b",
+          "count": 1,
+          "unitPrice": 0.125,
+          "subtotal": 0.13
+        },
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 0.005,
+          "subtotal": 0.01
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "totals_use_unrounded_subtotals",
+    "description": "Each line shows its rounded subtotal, the total is the unrounded sum rounded once",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:a",
+        "price": 0.004,
+        "forbidden": false
+      },
+      {
+        "kind": "block",
+        "id": "m:b",
+        "price": 0.004,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1,
+        "m:b": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0.01,
+      "blocks": 0.01,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 0.004,
+          "subtotal": 0.00
+        },
+        {
+          "kind": "block",
+          "id": "m:b",
+          "count": 1,
+          "unitPrice": 0.004,
+          "subtotal": 0.00
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "four_decimal_prices",
+    "description": "Prices keep four decimals",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:a",
+        "price": 0.0001,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 12345
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 1.23,
+      "blocks": 1.23,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 12345,
+          "unitPrice": 0.0001,
+          "subtotal": 1.23
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "lines_are_ordered_by_subtotal_then_kind_then_id",
+    "description": "Ties on subtotal are broken by kind, then by id (ordinal)",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      },
+      {
+        "kind": "item",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:b": 2,
+        "m:a": 2,
+        "m:c": 3
+      },
+      "items": {
+        "m:a": 2
+      },
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 9,
+      "blocks": 7,
+      "items": 2,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:c",
+          "count": 3,
+          "unitPrice": 1,
+          "subtotal": 3
+        },
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 2,
+          "unitPrice": 1,
+          "subtotal": 2
+        },
+        {
+          "kind": "block",
+          "id": "m:b",
+          "count": 2,
+          "unitPrice": 1,
+          "subtotal": 2
+        },
+        {
+          "kind": "item",
+          "id": "m:a",
+          "count": 2,
+          "unitPrice": 1,
+          "subtotal": 2
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "empty_composition",
+    "description": "Nothing in it, nothing to pay",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {},
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "total_is_capped",
+    "description": "Subtotals and the total never exceed 1e15",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1000000000,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1000000000000000,
+        "m:b": 1000000000000000
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 1000000000000000,
+      "blocks": 1000000000000000,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1000000000000000,
+          "unitPrice": 1000000000,
+          "subtotal": 1000000000000000
+        },
+        {
+          "kind": "block",
+          "id": "m:b",
+          "count": 1000000000000000,
+          "unitPrice": 1000000000,
+          "subtotal": 1000000000000000
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "lines_are_cut_at_200",
+    "description": "At most 200 lines, the most expensive first, linesTruncated says so; unpriced is cut at 200 too",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:b000": 1,
+        "m:b001": 2,
+        "m:b002": 3,
+        "m:b003": 4,
+        "m:b004": 5,
+        "m:b005": 6,
+        "m:b006": 7,
+        "m:b007": 8,
+        "m:b008": 9,
+        "m:b009": 10,
+        "m:b010": 11,
+        "m:b011": 12,
+        "m:b012": 13,
+        "m:b013": 14,
+        "m:b014": 15,
+        "m:b015": 16,
+        "m:b016": 17,
+        "m:b017": 18,
+        "m:b018": 19,
+        "m:b019": 20,
+        "m:b020": 21,
+        "m:b021": 22,
+        "m:b022": 23,
+        "m:b023": 24,
+        "m:b024": 25,
+        "m:b025": 26,
+        "m:b026": 27,
+        "m:b027": 28,
+        "m:b028": 29,
+        "m:b029": 30,
+        "m:b030": 31,
+        "m:b031": 32,
+        "m:b032": 33,
+        "m:b033": 34,
+        "m:b034": 35,
+        "m:b035": 36,
+        "m:b036": 37,
+        "m:b037": 38,
+        "m:b038": 39,
+        "m:b039": 40,
+        "m:b040": 41,
+        "m:b041": 42,
+        "m:b042": 43,
+        "m:b043": 44,
+        "m:b044": 45,
+        "m:b045": 46,
+        "m:b046": 47,
+        "m:b047": 48,
+        "m:b048": 49,
+        "m:b049": 50,
+        "m:b050": 51,
+        "m:b051": 52,
+        "m:b052": 53,
+        "m:b053": 54,
+        "m:b054": 55,
+        "m:b055": 56,
+        "m:b056": 57,
+        "m:b057": 58,
+        "m:b058": 59,
+        "m:b059": 60,
+        "m:b060": 61,
+        "m:b061": 62,
+        "m:b062": 63,
+        "m:b063": 64,
+        "m:b064": 65,
+        "m:b065": 66,
+        "m:b066": 67,
+        "m:b067": 68,
+        "m:b068": 69,
+        "m:b069": 70,
+        "m:b070": 71,
+        "m:b071": 72,
+        "m:b072": 73,
+        "m:b073": 74,
+        "m:b074": 75,
+        "m:b075": 76,
+        "m:b076": 77,
+        "m:b077": 78,
+        "m:b078": 79,
+        "m:b079": 80,
+        "m:b080": 81,
+        "m:b081": 82,
+        "m:b082": 83,
+        "m:b083": 84,
+        "m:b084": 85,
+        "m:b085": 86,
+        "m:b086": 87,
+        "m:b087": 88,
+        "m:b088": 89,
+        "m:b089": 90,
+        "m:b090": 91,
+        "m:b091": 92,
+        "m:b092": 93,
+        "m:b093": 94,
+        "m:b094": 95,
+        "m:b095": 96,
+        "m:b096": 97,
+        "m:b097": 98,
+        "m:b098": 99,
+        "m:b099": 100,
+        "m:b100": 101,
+        "m:b101": 102,
+        "m:b102": 103,
+        "m:b103": 104,
+        "m:b104": 105,
+        "m:b105": 106,
+        "m:b106": 107,
+        "m:b107": 108,
+        "m:b108": 109,
+        "m:b109": 110,
+        "m:b110": 111,
+        "m:b111": 112,
+        "m:b112": 113,
+        "m:b113": 114,
+        "m:b114": 115,
+        "m:b115": 116,
+        "m:b116": 117,
+        "m:b117": 118,
+        "m:b118": 119,
+        "m:b119": 120,
+        "m:b120": 121,
+        "m:b121": 122,
+        "m:b122": 123,
+        "m:b123": 124,
+        "m:b124": 125,
+        "m:b125": 126,
+        "m:b126": 127,
+        "m:b127": 128,
+        "m:b128": 129,
+        "m:b129": 130,
+        "m:b130": 131,
+        "m:b131": 132,
+        "m:b132": 133,
+        "m:b133": 134,
+        "m:b134": 135,
+        "m:b135": 136,
+        "m:b136": 137,
+        "m:b137": 138,
+        "m:b138": 139,
+        "m:b139": 140,
+        "m:b140": 141,
+        "m:b141": 142,
+        "m:b142": 143,
+        "m:b143": 144,
+        "m:b144": 145,
+        "m:b145": 146,
+        "m:b146": 147,
+        "m:b147": 148,
+        "m:b148": 149,
+        "m:b149": 150,
+        "m:b150": 151,
+        "m:b151": 152,
+        "m:b152": 153,
+        "m:b153": 154,
+        "m:b154": 155,
+        "m:b155": 156,
+        "m:b156": 157,
+        "m:b157": 158,
+        "m:b158": 159,
+        "m:b159": 160,
+        "m:b160": 161,
+        "m:b161": 162,
+        "m:b162": 163,
+        "m:b163": 164,
+        "m:b164": 165,
+        "m:b165": 166,
+        "m:b166": 167,
+        "m:b167": 168,
+        "m:b168": 169,
+        "m:b169": 170,
+        "m:b170": 171,
+        "m:b171": 172,
+        "m:b172": 173,
+        "m:b173": 174,
+        "m:b174": 175,
+        "m:b175": 176,
+        "m:b176": 177,
+        "m:b177": 178,
+        "m:b178": 179,
+        "m:b179": 180,
+        "m:b180": 181,
+        "m:b181": 182,
+        "m:b182": 183,
+        "m:b183": 184,
+        "m:b184": 185,
+        "m:b185": 186,
+        "m:b186": 187,
+        "m:b187": 188,
+        "m:b188": 189,
+        "m:b189": 190,
+        "m:b190": 191,
+        "m:b191": 192,
+        "m:b192": 193,
+        "m:b193": 194,
+        "m:b194": 195,
+        "m:b195": 196,
+        "m:b196": 197,
+        "m:b197": 198,
+        "m:b198": 199,
+        "m:b199": 200,
+        "m:b200": 201,
+        "m:b201": 202,
+        "m:b202": 203,
+        "m:b203": 204,
+        "m:b204": 205,
+        "m:b205": 206,
+        "m:b206": 207,
+        "m:b207": 208,
+        "m:b208": 209,
+        "m:b209": 210,
+        "m:b210": 211,
+        "m:b211": 212,
+        "m:b212": 213,
+        "m:b213": 214,
+        "m:b214": 215,
+        "m:b215": 216,
+        "m:b216": 217,
+        "m:b217": 218,
+        "m:b218": 219,
+        "m:b219": 220,
+        "m:b220": 221,
+        "m:b221": 222,
+        "m:b222": 223,
+        "m:b223": 224,
+        "m:b224": 225,
+        "m:b225": 226,
+        "m:b226": 227,
+        "m:b227": 228,
+        "m:b228": 229,
+        "m:b229": 230,
+        "m:b230": 231,
+        "m:b231": 232,
+        "m:b232": 233,
+        "m:b233": 234,
+        "m:b234": 235,
+        "m:b235": 236,
+        "m:b236": 237,
+        "m:b237": 238,
+        "m:b238": 239,
+        "m:b239": 240,
+        "m:b240": 241,
+        "m:b241": 242,
+        "m:b242": 243,
+        "m:b243": 244,
+        "m:b244": 245,
+        "m:b245": 246,
+        "m:b246": 247,
+        "m:b247": 248,
+        "m:b248": 249,
+        "m:b249": 250
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 31375,
+      "blocks": 31375,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:b249",
+          "count": 250,
+          "unitPrice": 1,
+          "subtotal": 250
+        },
+        {
+          "kind": "block",
+          "id": "m:b248",
+          "count": 249,
+          "unitPrice": 1,
+          "subtotal": 249
+        },
+        {
+          "kind": "block",
+          "id": "m:b247",
+          "count": 248,
+          "unitPrice": 1,
+          "subtotal": 248
+        },
+        {
+          "kind": "block",
+          "id": "m:b246",
+          "count": 247,
+          "unitPrice": 1,
+          "subtotal": 247
+        },
+        {
+          "kind": "block",
+          "id": "m:b245",
+          "count": 246,
+          "unitPrice": 1,
+          "subtotal": 246
+        },
+        {
+          "kind": "block",
+          "id": "m:b244",
+          "count": 245,
+          "unitPrice": 1,
+          "subtotal": 245
+        },
+        {
+          "kind": "block",
+          "id": "m:b243",
+          "count": 244,
+          "unitPrice": 1,
+          "subtotal": 244
+        },
+        {
+          "kind": "block",
+          "id": "m:b242",
+          "count": 243,
+          "unitPrice": 1,
+          "subtotal": 243
+        },
+        {
+          "kind": "block",
+          "id": "m:b241",
+          "count": 242,
+          "unitPrice": 1,
+          "subtotal": 242
+        },
+        {
+          "kind": "block",
+          "id": "m:b240",
+          "count": 241,
+          "unitPrice": 1,
+          "subtotal": 241
+        },
+        {
+          "kind": "block",
+          "id": "m:b239",
+          "count": 240,
+          "unitPrice": 1,
+          "subtotal": 240
+        },
+        {
+          "kind": "block",
+          "id": "m:b238",
+          "count": 239,
+          "unitPrice": 1,
+          "subtotal": 239
+        },
+        {
+          "kind": "block",
+          "id": "m:b237",
+          "count": 238,
+          "unitPrice": 1,
+          "subtotal": 238
+        },
+        {
+          "kind": "block",
+          "id": "m:b236",
+          "count": 237,
+          "unitPrice": 1,
+          "subtotal": 237
+        },
+        {
+          "kind": "block",
+          "id": "m:b235",
+          "count": 236,
+          "unitPrice": 1,
+          "subtotal": 236
+        },
+        {
+          "kind": "block",
+          "id": "m:b234",
+          "count": 235,
+          "unitPrice": 1,
+          "subtotal": 235
+        },
+        {
+          "kind": "block",
+          "id": "m:b233",
+          "count": 234,
+          "unitPrice": 1,
+          "subtotal": 234
+        },
+        {
+          "kind": "block",
+          "id": "m:b232",
+          "count": 233,
+          "unitPrice": 1,
+          "subtotal": 233
+        },
+        {
+          "kind": "block",
+          "id": "m:b231",
+          "count": 232,
+          "unitPrice": 1,
+          "subtotal": 232
+        },
+        {
+          "kind": "block",
+          "id": "m:b230",
+          "count": 231,
+          "unitPrice": 1,
+          "subtotal": 231
+        },
+        {
+          "kind": "block",
+          "id": "m:b229",
+          "count": 230,
+          "unitPrice": 1,
+          "subtotal": 230
+        },
+        {
+          "kind": "block",
+          "id": "m:b228",
+          "count": 229,
+          "unitPrice": 1,
+          "subtotal": 229
+        },
+        {
+          "kind": "block",
+          "id": "m:b227",
+          "count": 228,
+          "unitPrice": 1,
+          "subtotal": 228
+        },
+        {
+          "kind": "block",
+          "id": "m:b226",
+          "count": 227,
+          "unitPrice": 1,
+          "subtotal": 227
+        },
+        {
+          "kind": "block",
+          "id": "m:b225",
+          "count": 226,
+          "unitPrice": 1,
+          "subtotal": 226
+        },
+        {
+          "kind": "block",
+          "id": "m:b224",
+          "count": 225,
+          "unitPrice": 1,
+          "subtotal": 225
+        },
+        {
+          "kind": "block",
+          "id": "m:b223",
+          "count": 224,
+          "unitPrice": 1,
+          "subtotal": 224
+        },
+        {
+          "kind": "block",
+          "id": "m:b222",
+          "count": 223,
+          "unitPrice": 1,
+          "subtotal": 223
+        },
+        {
+          "kind": "block",
+          "id": "m:b221",
+          "count": 222,
+          "unitPrice": 1,
+          "subtotal": 222
+        },
+        {
+          "kind": "block",
+          "id": "m:b220",
+          "count": 221,
+          "unitPrice": 1,
+          "subtotal": 221
+        },
+        {
+          "kind": "block",
+          "id": "m:b219",
+          "count": 220,
+          "unitPrice": 1,
+          "subtotal": 220
+        },
+        {
+          "kind": "block",
+          "id": "m:b218",
+          "count": 219,
+          "unitPrice": 1,
+          "subtotal": 219
+        },
+        {
+          "kind": "block",
+          "id": "m:b217",
+          "count": 218,
+          "unitPrice": 1,
+          "subtotal": 218
+        },
+        {
+          "kind": "block",
+          "id": "m:b216",
+          "count": 217,
+          "unitPrice": 1,
+          "subtotal": 217
+        },
+        {
+          "kind": "block",
+          "id": "m:b215",
+          "count": 216,
+          "unitPrice": 1,
+          "subtotal": 216
+        },
+        {
+          "kind": "block",
+          "id": "m:b214",
+          "count": 215,
+          "unitPrice": 1,
+          "subtotal": 215
+        },
+        {
+          "kind": "block",
+          "id": "m:b213",
+          "count": 214,
+          "unitPrice": 1,
+          "subtotal": 214
+        },
+        {
+          "kind": "block",
+          "id": "m:b212",
+          "count": 213,
+          "unitPrice": 1,
+          "subtotal": 213
+        },
+        {
+          "kind": "block",
+          "id": "m:b211",
+          "count": 212,
+          "unitPrice": 1,
+          "subtotal": 212
+        },
+        {
+          "kind": "block",
+          "id": "m:b210",
+          "count": 211,
+          "unitPrice": 1,
+          "subtotal": 211
+        },
+        {
+          "kind": "block",
+          "id": "m:b209",
+          "count": 210,
+          "unitPrice": 1,
+          "subtotal": 210
+        },
+        {
+          "kind": "block",
+          "id": "m:b208",
+          "count": 209,
+          "unitPrice": 1,
+          "subtotal": 209
+        },
+        {
+          "kind": "block",
+          "id": "m:b207",
+          "count": 208,
+          "unitPrice": 1,
+          "subtotal": 208
+        },
+        {
+          "kind": "block",
+          "id": "m:b206",
+          "count": 207,
+          "unitPrice": 1,
+          "subtotal": 207
+        },
+        {
+          "kind": "block",
+          "id": "m:b205",
+          "count": 206,
+          "unitPrice": 1,
+          "subtotal": 206
+        },
+        {
+          "kind": "block",
+          "id": "m:b204",
+          "count": 205,
+          "unitPrice": 1,
+          "subtotal": 205
+        },
+        {
+          "kind": "block",
+          "id": "m:b203",
+          "count": 204,
+          "unitPrice": 1,
+          "subtotal": 204
+        },
+        {
+          "kind": "block",
+          "id": "m:b202",
+          "count": 203,
+          "unitPrice": 1,
+          "subtotal": 203
+        },
+        {
+          "kind": "block",
+          "id": "m:b201",
+          "count": 202,
+          "unitPrice": 1,
+          "subtotal": 202
+        },
+        {
+          "kind": "block",
+          "id": "m:b200",
+          "count": 201,
+          "unitPrice": 1,
+          "subtotal": 201
+        },
+        {
+          "kind": "block",
+          "id": "m:b199",
+          "count": 200,
+          "unitPrice": 1,
+          "subtotal": 200
+        },
+        {
+          "kind": "block",
+          "id": "m:b198",
+          "count": 199,
+          "unitPrice": 1,
+          "subtotal": 199
+        },
+        {
+          "kind": "block",
+          "id": "m:b197",
+          "count": 198,
+          "unitPrice": 1,
+          "subtotal": 198
+        },
+        {
+          "kind": "block",
+          "id": "m:b196",
+          "count": 197,
+          "unitPrice": 1,
+          "subtotal": 197
+        },
+        {
+          "kind": "block",
+          "id": "m:b195",
+          "count": 196,
+          "unitPrice": 1,
+          "subtotal": 196
+        },
+        {
+          "kind": "block",
+          "id": "m:b194",
+          "count": 195,
+          "unitPrice": 1,
+          "subtotal": 195
+        },
+        {
+          "kind": "block",
+          "id": "m:b193",
+          "count": 194,
+          "unitPrice": 1,
+          "subtotal": 194
+        },
+        {
+          "kind": "block",
+          "id": "m:b192",
+          "count": 193,
+          "unitPrice": 1,
+          "subtotal": 193
+        },
+        {
+          "kind": "block",
+          "id": "m:b191",
+          "count": 192,
+          "unitPrice": 1,
+          "subtotal": 192
+        },
+        {
+          "kind": "block",
+          "id": "m:b190",
+          "count": 191,
+          "unitPrice": 1,
+          "subtotal": 191
+        },
+        {
+          "kind": "block",
+          "id": "m:b189",
+          "count": 190,
+          "unitPrice": 1,
+          "subtotal": 190
+        },
+        {
+          "kind": "block",
+          "id": "m:b188",
+          "count": 189,
+          "unitPrice": 1,
+          "subtotal": 189
+        },
+        {
+          "kind": "block",
+          "id": "m:b187",
+          "count": 188,
+          "unitPrice": 1,
+          "subtotal": 188
+        },
+        {
+          "kind": "block",
+          "id": "m:b186",
+          "count": 187,
+          "unitPrice": 1,
+          "subtotal": 187
+        },
+        {
+          "kind": "block",
+          "id": "m:b185",
+          "count": 186,
+          "unitPrice": 1,
+          "subtotal": 186
+        },
+        {
+          "kind": "block",
+          "id": "m:b184",
+          "count": 185,
+          "unitPrice": 1,
+          "subtotal": 185
+        },
+        {
+          "kind": "block",
+          "id": "m:b183",
+          "count": 184,
+          "unitPrice": 1,
+          "subtotal": 184
+        },
+        {
+          "kind": "block",
+          "id": "m:b182",
+          "count": 183,
+          "unitPrice": 1,
+          "subtotal": 183
+        },
+        {
+          "kind": "block",
+          "id": "m:b181",
+          "count": 182,
+          "unitPrice": 1,
+          "subtotal": 182
+        },
+        {
+          "kind": "block",
+          "id": "m:b180",
+          "count": 181,
+          "unitPrice": 1,
+          "subtotal": 181
+        },
+        {
+          "kind": "block",
+          "id": "m:b179",
+          "count": 180,
+          "unitPrice": 1,
+          "subtotal": 180
+        },
+        {
+          "kind": "block",
+          "id": "m:b178",
+          "count": 179,
+          "unitPrice": 1,
+          "subtotal": 179
+        },
+        {
+          "kind": "block",
+          "id": "m:b177",
+          "count": 178,
+          "unitPrice": 1,
+          "subtotal": 178
+        },
+        {
+          "kind": "block",
+          "id": "m:b176",
+          "count": 177,
+          "unitPrice": 1,
+          "subtotal": 177
+        },
+        {
+          "kind": "block",
+          "id": "m:b175",
+          "count": 176,
+          "unitPrice": 1,
+          "subtotal": 176
+        },
+        {
+          "kind": "block",
+          "id": "m:b174",
+          "count": 175,
+          "unitPrice": 1,
+          "subtotal": 175
+        },
+        {
+          "kind": "block",
+          "id": "m:b173",
+          "count": 174,
+          "unitPrice": 1,
+          "subtotal": 174
+        },
+        {
+          "kind": "block",
+          "id": "m:b172",
+          "count": 173,
+          "unitPrice": 1,
+          "subtotal": 173
+        },
+        {
+          "kind": "block",
+          "id": "m:b171",
+          "count": 172,
+          "unitPrice": 1,
+          "subtotal": 172
+        },
+        {
+          "kind": "block",
+          "id": "m:b170",
+          "count": 171,
+          "unitPrice": 1,
+          "subtotal": 171
+        },
+        {
+          "kind": "block",
+          "id": "m:b169",
+          "count": 170,
+          "unitPrice": 1,
+          "subtotal": 170
+        },
+        {
+          "kind": "block",
+          "id": "m:b168",
+          "count": 169,
+          "unitPrice": 1,
+          "subtotal": 169
+        },
+        {
+          "kind": "block",
+          "id": "m:b167",
+          "count": 168,
+          "unitPrice": 1,
+          "subtotal": 168
+        },
+        {
+          "kind": "block",
+          "id": "m:b166",
+          "count": 167,
+          "unitPrice": 1,
+          "subtotal": 167
+        },
+        {
+          "kind": "block",
+          "id": "m:b165",
+          "count": 166,
+          "unitPrice": 1,
+          "subtotal": 166
+        },
+        {
+          "kind": "block",
+          "id": "m:b164",
+          "count": 165,
+          "unitPrice": 1,
+          "subtotal": 165
+        },
+        {
+          "kind": "block",
+          "id": "m:b163",
+          "count": 164,
+          "unitPrice": 1,
+          "subtotal": 164
+        },
+        {
+          "kind": "block",
+          "id": "m:b162",
+          "count": 163,
+          "unitPrice": 1,
+          "subtotal": 163
+        },
+        {
+          "kind": "block",
+          "id": "m:b161",
+          "count": 162,
+          "unitPrice": 1,
+          "subtotal": 162
+        },
+        {
+          "kind": "block",
+          "id": "m:b160",
+          "count": 161,
+          "unitPrice": 1,
+          "subtotal": 161
+        },
+        {
+          "kind": "block",
+          "id": "m:b159",
+          "count": 160,
+          "unitPrice": 1,
+          "subtotal": 160
+        },
+        {
+          "kind": "block",
+          "id": "m:b158",
+          "count": 159,
+          "unitPrice": 1,
+          "subtotal": 159
+        },
+        {
+          "kind": "block",
+          "id": "m:b157",
+          "count": 158,
+          "unitPrice": 1,
+          "subtotal": 158
+        },
+        {
+          "kind": "block",
+          "id": "m:b156",
+          "count": 157,
+          "unitPrice": 1,
+          "subtotal": 157
+        },
+        {
+          "kind": "block",
+          "id": "m:b155",
+          "count": 156,
+          "unitPrice": 1,
+          "subtotal": 156
+        },
+        {
+          "kind": "block",
+          "id": "m:b154",
+          "count": 155,
+          "unitPrice": 1,
+          "subtotal": 155
+        },
+        {
+          "kind": "block",
+          "id": "m:b153",
+          "count": 154,
+          "unitPrice": 1,
+          "subtotal": 154
+        },
+        {
+          "kind": "block",
+          "id": "m:b152",
+          "count": 153,
+          "unitPrice": 1,
+          "subtotal": 153
+        },
+        {
+          "kind": "block",
+          "id": "m:b151",
+          "count": 152,
+          "unitPrice": 1,
+          "subtotal": 152
+        },
+        {
+          "kind": "block",
+          "id": "m:b150",
+          "count": 151,
+          "unitPrice": 1,
+          "subtotal": 151
+        },
+        {
+          "kind": "block",
+          "id": "m:b149",
+          "count": 150,
+          "unitPrice": 1,
+          "subtotal": 150
+        },
+        {
+          "kind": "block",
+          "id": "m:b148",
+          "count": 149,
+          "unitPrice": 1,
+          "subtotal": 149
+        },
+        {
+          "kind": "block",
+          "id": "m:b147",
+          "count": 148,
+          "unitPrice": 1,
+          "subtotal": 148
+        },
+        {
+          "kind": "block",
+          "id": "m:b146",
+          "count": 147,
+          "unitPrice": 1,
+          "subtotal": 147
+        },
+        {
+          "kind": "block",
+          "id": "m:b145",
+          "count": 146,
+          "unitPrice": 1,
+          "subtotal": 146
+        },
+        {
+          "kind": "block",
+          "id": "m:b144",
+          "count": 145,
+          "unitPrice": 1,
+          "subtotal": 145
+        },
+        {
+          "kind": "block",
+          "id": "m:b143",
+          "count": 144,
+          "unitPrice": 1,
+          "subtotal": 144
+        },
+        {
+          "kind": "block",
+          "id": "m:b142",
+          "count": 143,
+          "unitPrice": 1,
+          "subtotal": 143
+        },
+        {
+          "kind": "block",
+          "id": "m:b141",
+          "count": 142,
+          "unitPrice": 1,
+          "subtotal": 142
+        },
+        {
+          "kind": "block",
+          "id": "m:b140",
+          "count": 141,
+          "unitPrice": 1,
+          "subtotal": 141
+        },
+        {
+          "kind": "block",
+          "id": "m:b139",
+          "count": 140,
+          "unitPrice": 1,
+          "subtotal": 140
+        },
+        {
+          "kind": "block",
+          "id": "m:b138",
+          "count": 139,
+          "unitPrice": 1,
+          "subtotal": 139
+        },
+        {
+          "kind": "block",
+          "id": "m:b137",
+          "count": 138,
+          "unitPrice": 1,
+          "subtotal": 138
+        },
+        {
+          "kind": "block",
+          "id": "m:b136",
+          "count": 137,
+          "unitPrice": 1,
+          "subtotal": 137
+        },
+        {
+          "kind": "block",
+          "id": "m:b135",
+          "count": 136,
+          "unitPrice": 1,
+          "subtotal": 136
+        },
+        {
+          "kind": "block",
+          "id": "m:b134",
+          "count": 135,
+          "unitPrice": 1,
+          "subtotal": 135
+        },
+        {
+          "kind": "block",
+          "id": "m:b133",
+          "count": 134,
+          "unitPrice": 1,
+          "subtotal": 134
+        },
+        {
+          "kind": "block",
+          "id": "m:b132",
+          "count": 133,
+          "unitPrice": 1,
+          "subtotal": 133
+        },
+        {
+          "kind": "block",
+          "id": "m:b131",
+          "count": 132,
+          "unitPrice": 1,
+          "subtotal": 132
+        },
+        {
+          "kind": "block",
+          "id": "m:b130",
+          "count": 131,
+          "unitPrice": 1,
+          "subtotal": 131
+        },
+        {
+          "kind": "block",
+          "id": "m:b129",
+          "count": 130,
+          "unitPrice": 1,
+          "subtotal": 130
+        },
+        {
+          "kind": "block",
+          "id": "m:b128",
+          "count": 129,
+          "unitPrice": 1,
+          "subtotal": 129
+        },
+        {
+          "kind": "block",
+          "id": "m:b127",
+          "count": 128,
+          "unitPrice": 1,
+          "subtotal": 128
+        },
+        {
+          "kind": "block",
+          "id": "m:b126",
+          "count": 127,
+          "unitPrice": 1,
+          "subtotal": 127
+        },
+        {
+          "kind": "block",
+          "id": "m:b125",
+          "count": 126,
+          "unitPrice": 1,
+          "subtotal": 126
+        },
+        {
+          "kind": "block",
+          "id": "m:b124",
+          "count": 125,
+          "unitPrice": 1,
+          "subtotal": 125
+        },
+        {
+          "kind": "block",
+          "id": "m:b123",
+          "count": 124,
+          "unitPrice": 1,
+          "subtotal": 124
+        },
+        {
+          "kind": "block",
+          "id": "m:b122",
+          "count": 123,
+          "unitPrice": 1,
+          "subtotal": 123
+        },
+        {
+          "kind": "block",
+          "id": "m:b121",
+          "count": 122,
+          "unitPrice": 1,
+          "subtotal": 122
+        },
+        {
+          "kind": "block",
+          "id": "m:b120",
+          "count": 121,
+          "unitPrice": 1,
+          "subtotal": 121
+        },
+        {
+          "kind": "block",
+          "id": "m:b119",
+          "count": 120,
+          "unitPrice": 1,
+          "subtotal": 120
+        },
+        {
+          "kind": "block",
+          "id": "m:b118",
+          "count": 119,
+          "unitPrice": 1,
+          "subtotal": 119
+        },
+        {
+          "kind": "block",
+          "id": "m:b117",
+          "count": 118,
+          "unitPrice": 1,
+          "subtotal": 118
+        },
+        {
+          "kind": "block",
+          "id": "m:b116",
+          "count": 117,
+          "unitPrice": 1,
+          "subtotal": 117
+        },
+        {
+          "kind": "block",
+          "id": "m:b115",
+          "count": 116,
+          "unitPrice": 1,
+          "subtotal": 116
+        },
+        {
+          "kind": "block",
+          "id": "m:b114",
+          "count": 115,
+          "unitPrice": 1,
+          "subtotal": 115
+        },
+        {
+          "kind": "block",
+          "id": "m:b113",
+          "count": 114,
+          "unitPrice": 1,
+          "subtotal": 114
+        },
+        {
+          "kind": "block",
+          "id": "m:b112",
+          "count": 113,
+          "unitPrice": 1,
+          "subtotal": 113
+        },
+        {
+          "kind": "block",
+          "id": "m:b111",
+          "count": 112,
+          "unitPrice": 1,
+          "subtotal": 112
+        },
+        {
+          "kind": "block",
+          "id": "m:b110",
+          "count": 111,
+          "unitPrice": 1,
+          "subtotal": 111
+        },
+        {
+          "kind": "block",
+          "id": "m:b109",
+          "count": 110,
+          "unitPrice": 1,
+          "subtotal": 110
+        },
+        {
+          "kind": "block",
+          "id": "m:b108",
+          "count": 109,
+          "unitPrice": 1,
+          "subtotal": 109
+        },
+        {
+          "kind": "block",
+          "id": "m:b107",
+          "count": 108,
+          "unitPrice": 1,
+          "subtotal": 108
+        },
+        {
+          "kind": "block",
+          "id": "m:b106",
+          "count": 107,
+          "unitPrice": 1,
+          "subtotal": 107
+        },
+        {
+          "kind": "block",
+          "id": "m:b105",
+          "count": 106,
+          "unitPrice": 1,
+          "subtotal": 106
+        },
+        {
+          "kind": "block",
+          "id": "m:b104",
+          "count": 105,
+          "unitPrice": 1,
+          "subtotal": 105
+        },
+        {
+          "kind": "block",
+          "id": "m:b103",
+          "count": 104,
+          "unitPrice": 1,
+          "subtotal": 104
+        },
+        {
+          "kind": "block",
+          "id": "m:b102",
+          "count": 103,
+          "unitPrice": 1,
+          "subtotal": 103
+        },
+        {
+          "kind": "block",
+          "id": "m:b101",
+          "count": 102,
+          "unitPrice": 1,
+          "subtotal": 102
+        },
+        {
+          "kind": "block",
+          "id": "m:b100",
+          "count": 101,
+          "unitPrice": 1,
+          "subtotal": 101
+        },
+        {
+          "kind": "block",
+          "id": "m:b099",
+          "count": 100,
+          "unitPrice": 1,
+          "subtotal": 100
+        },
+        {
+          "kind": "block",
+          "id": "m:b098",
+          "count": 99,
+          "unitPrice": 1,
+          "subtotal": 99
+        },
+        {
+          "kind": "block",
+          "id": "m:b097",
+          "count": 98,
+          "unitPrice": 1,
+          "subtotal": 98
+        },
+        {
+          "kind": "block",
+          "id": "m:b096",
+          "count": 97,
+          "unitPrice": 1,
+          "subtotal": 97
+        },
+        {
+          "kind": "block",
+          "id": "m:b095",
+          "count": 96,
+          "unitPrice": 1,
+          "subtotal": 96
+        },
+        {
+          "kind": "block",
+          "id": "m:b094",
+          "count": 95,
+          "unitPrice": 1,
+          "subtotal": 95
+        },
+        {
+          "kind": "block",
+          "id": "m:b093",
+          "count": 94,
+          "unitPrice": 1,
+          "subtotal": 94
+        },
+        {
+          "kind": "block",
+          "id": "m:b092",
+          "count": 93,
+          "unitPrice": 1,
+          "subtotal": 93
+        },
+        {
+          "kind": "block",
+          "id": "m:b091",
+          "count": 92,
+          "unitPrice": 1,
+          "subtotal": 92
+        },
+        {
+          "kind": "block",
+          "id": "m:b090",
+          "count": 91,
+          "unitPrice": 1,
+          "subtotal": 91
+        },
+        {
+          "kind": "block",
+          "id": "m:b089",
+          "count": 90,
+          "unitPrice": 1,
+          "subtotal": 90
+        },
+        {
+          "kind": "block",
+          "id": "m:b088",
+          "count": 89,
+          "unitPrice": 1,
+          "subtotal": 89
+        },
+        {
+          "kind": "block",
+          "id": "m:b087",
+          "count": 88,
+          "unitPrice": 1,
+          "subtotal": 88
+        },
+        {
+          "kind": "block",
+          "id": "m:b086",
+          "count": 87,
+          "unitPrice": 1,
+          "subtotal": 87
+        },
+        {
+          "kind": "block",
+          "id": "m:b085",
+          "count": 86,
+          "unitPrice": 1,
+          "subtotal": 86
+        },
+        {
+          "kind": "block",
+          "id": "m:b084",
+          "count": 85,
+          "unitPrice": 1,
+          "subtotal": 85
+        },
+        {
+          "kind": "block",
+          "id": "m:b083",
+          "count": 84,
+          "unitPrice": 1,
+          "subtotal": 84
+        },
+        {
+          "kind": "block",
+          "id": "m:b082",
+          "count": 83,
+          "unitPrice": 1,
+          "subtotal": 83
+        },
+        {
+          "kind": "block",
+          "id": "m:b081",
+          "count": 82,
+          "unitPrice": 1,
+          "subtotal": 82
+        },
+        {
+          "kind": "block",
+          "id": "m:b080",
+          "count": 81,
+          "unitPrice": 1,
+          "subtotal": 81
+        },
+        {
+          "kind": "block",
+          "id": "m:b079",
+          "count": 80,
+          "unitPrice": 1,
+          "subtotal": 80
+        },
+        {
+          "kind": "block",
+          "id": "m:b078",
+          "count": 79,
+          "unitPrice": 1,
+          "subtotal": 79
+        },
+        {
+          "kind": "block",
+          "id": "m:b077",
+          "count": 78,
+          "unitPrice": 1,
+          "subtotal": 78
+        },
+        {
+          "kind": "block",
+          "id": "m:b076",
+          "count": 77,
+          "unitPrice": 1,
+          "subtotal": 77
+        },
+        {
+          "kind": "block",
+          "id": "m:b075",
+          "count": 76,
+          "unitPrice": 1,
+          "subtotal": 76
+        },
+        {
+          "kind": "block",
+          "id": "m:b074",
+          "count": 75,
+          "unitPrice": 1,
+          "subtotal": 75
+        },
+        {
+          "kind": "block",
+          "id": "m:b073",
+          "count": 74,
+          "unitPrice": 1,
+          "subtotal": 74
+        },
+        {
+          "kind": "block",
+          "id": "m:b072",
+          "count": 73,
+          "unitPrice": 1,
+          "subtotal": 73
+        },
+        {
+          "kind": "block",
+          "id": "m:b071",
+          "count": 72,
+          "unitPrice": 1,
+          "subtotal": 72
+        },
+        {
+          "kind": "block",
+          "id": "m:b070",
+          "count": 71,
+          "unitPrice": 1,
+          "subtotal": 71
+        },
+        {
+          "kind": "block",
+          "id": "m:b069",
+          "count": 70,
+          "unitPrice": 1,
+          "subtotal": 70
+        },
+        {
+          "kind": "block",
+          "id": "m:b068",
+          "count": 69,
+          "unitPrice": 1,
+          "subtotal": 69
+        },
+        {
+          "kind": "block",
+          "id": "m:b067",
+          "count": 68,
+          "unitPrice": 1,
+          "subtotal": 68
+        },
+        {
+          "kind": "block",
+          "id": "m:b066",
+          "count": 67,
+          "unitPrice": 1,
+          "subtotal": 67
+        },
+        {
+          "kind": "block",
+          "id": "m:b065",
+          "count": 66,
+          "unitPrice": 1,
+          "subtotal": 66
+        },
+        {
+          "kind": "block",
+          "id": "m:b064",
+          "count": 65,
+          "unitPrice": 1,
+          "subtotal": 65
+        },
+        {
+          "kind": "block",
+          "id": "m:b063",
+          "count": 64,
+          "unitPrice": 1,
+          "subtotal": 64
+        },
+        {
+          "kind": "block",
+          "id": "m:b062",
+          "count": 63,
+          "unitPrice": 1,
+          "subtotal": 63
+        },
+        {
+          "kind": "block",
+          "id": "m:b061",
+          "count": 62,
+          "unitPrice": 1,
+          "subtotal": 62
+        },
+        {
+          "kind": "block",
+          "id": "m:b060",
+          "count": 61,
+          "unitPrice": 1,
+          "subtotal": 61
+        },
+        {
+          "kind": "block",
+          "id": "m:b059",
+          "count": 60,
+          "unitPrice": 1,
+          "subtotal": 60
+        },
+        {
+          "kind": "block",
+          "id": "m:b058",
+          "count": 59,
+          "unitPrice": 1,
+          "subtotal": 59
+        },
+        {
+          "kind": "block",
+          "id": "m:b057",
+          "count": 58,
+          "unitPrice": 1,
+          "subtotal": 58
+        },
+        {
+          "kind": "block",
+          "id": "m:b056",
+          "count": 57,
+          "unitPrice": 1,
+          "subtotal": 57
+        },
+        {
+          "kind": "block",
+          "id": "m:b055",
+          "count": 56,
+          "unitPrice": 1,
+          "subtotal": 56
+        },
+        {
+          "kind": "block",
+          "id": "m:b054",
+          "count": 55,
+          "unitPrice": 1,
+          "subtotal": 55
+        },
+        {
+          "kind": "block",
+          "id": "m:b053",
+          "count": 54,
+          "unitPrice": 1,
+          "subtotal": 54
+        },
+        {
+          "kind": "block",
+          "id": "m:b052",
+          "count": 53,
+          "unitPrice": 1,
+          "subtotal": 53
+        },
+        {
+          "kind": "block",
+          "id": "m:b051",
+          "count": 52,
+          "unitPrice": 1,
+          "subtotal": 52
+        },
+        {
+          "kind": "block",
+          "id": "m:b050",
+          "count": 51,
+          "unitPrice": 1,
+          "subtotal": 51
+        }
+      ],
+      "linesTruncated": true,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "unpriced_is_cut_at_200_biggest_counts_first",
+    "description": "What no entry matches is listed with the biggest counts first, at most 200",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:other",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "u:b000": 1000,
+        "u:b001": 999,
+        "u:b002": 998,
+        "u:b003": 997,
+        "u:b004": 996,
+        "u:b005": 995,
+        "u:b006": 994,
+        "u:b007": 993,
+        "u:b008": 992,
+        "u:b009": 991,
+        "u:b010": 990,
+        "u:b011": 989,
+        "u:b012": 988,
+        "u:b013": 987,
+        "u:b014": 986,
+        "u:b015": 985,
+        "u:b016": 984,
+        "u:b017": 983,
+        "u:b018": 982,
+        "u:b019": 981,
+        "u:b020": 980,
+        "u:b021": 979,
+        "u:b022": 978,
+        "u:b023": 977,
+        "u:b024": 976,
+        "u:b025": 975,
+        "u:b026": 974,
+        "u:b027": 973,
+        "u:b028": 972,
+        "u:b029": 971,
+        "u:b030": 970,
+        "u:b031": 969,
+        "u:b032": 968,
+        "u:b033": 967,
+        "u:b034": 966,
+        "u:b035": 965,
+        "u:b036": 964,
+        "u:b037": 963,
+        "u:b038": 962,
+        "u:b039": 961,
+        "u:b040": 960,
+        "u:b041": 959,
+        "u:b042": 958,
+        "u:b043": 957,
+        "u:b044": 956,
+        "u:b045": 955,
+        "u:b046": 954,
+        "u:b047": 953,
+        "u:b048": 952,
+        "u:b049": 951,
+        "u:b050": 950,
+        "u:b051": 949,
+        "u:b052": 948,
+        "u:b053": 947,
+        "u:b054": 946,
+        "u:b055": 945,
+        "u:b056": 944,
+        "u:b057": 943,
+        "u:b058": 942,
+        "u:b059": 941,
+        "u:b060": 940,
+        "u:b061": 939,
+        "u:b062": 938,
+        "u:b063": 937,
+        "u:b064": 936,
+        "u:b065": 935,
+        "u:b066": 934,
+        "u:b067": 933,
+        "u:b068": 932,
+        "u:b069": 931,
+        "u:b070": 930,
+        "u:b071": 929,
+        "u:b072": 928,
+        "u:b073": 927,
+        "u:b074": 926,
+        "u:b075": 925,
+        "u:b076": 924,
+        "u:b077": 923,
+        "u:b078": 922,
+        "u:b079": 921,
+        "u:b080": 920,
+        "u:b081": 919,
+        "u:b082": 918,
+        "u:b083": 917,
+        "u:b084": 916,
+        "u:b085": 915,
+        "u:b086": 914,
+        "u:b087": 913,
+        "u:b088": 912,
+        "u:b089": 911,
+        "u:b090": 910,
+        "u:b091": 909,
+        "u:b092": 908,
+        "u:b093": 907,
+        "u:b094": 906,
+        "u:b095": 905,
+        "u:b096": 904,
+        "u:b097": 903,
+        "u:b098": 902,
+        "u:b099": 901,
+        "u:b100": 900,
+        "u:b101": 899,
+        "u:b102": 898,
+        "u:b103": 897,
+        "u:b104": 896,
+        "u:b105": 895,
+        "u:b106": 894,
+        "u:b107": 893,
+        "u:b108": 892,
+        "u:b109": 891,
+        "u:b110": 890,
+        "u:b111": 889,
+        "u:b112": 888,
+        "u:b113": 887,
+        "u:b114": 886,
+        "u:b115": 885,
+        "u:b116": 884,
+        "u:b117": 883,
+        "u:b118": 882,
+        "u:b119": 881,
+        "u:b120": 880,
+        "u:b121": 879,
+        "u:b122": 878,
+        "u:b123": 877,
+        "u:b124": 876,
+        "u:b125": 875,
+        "u:b126": 874,
+        "u:b127": 873,
+        "u:b128": 872,
+        "u:b129": 871,
+        "u:b130": 870,
+        "u:b131": 869,
+        "u:b132": 868,
+        "u:b133": 867,
+        "u:b134": 866,
+        "u:b135": 865,
+        "u:b136": 864,
+        "u:b137": 863,
+        "u:b138": 862,
+        "u:b139": 861,
+        "u:b140": 860,
+        "u:b141": 859,
+        "u:b142": 858,
+        "u:b143": 857,
+        "u:b144": 856,
+        "u:b145": 855,
+        "u:b146": 854,
+        "u:b147": 853,
+        "u:b148": 852,
+        "u:b149": 851,
+        "u:b150": 850,
+        "u:b151": 849,
+        "u:b152": 848,
+        "u:b153": 847,
+        "u:b154": 846,
+        "u:b155": 845,
+        "u:b156": 844,
+        "u:b157": 843,
+        "u:b158": 842,
+        "u:b159": 841,
+        "u:b160": 840,
+        "u:b161": 839,
+        "u:b162": 838,
+        "u:b163": 837,
+        "u:b164": 836,
+        "u:b165": 835,
+        "u:b166": 834,
+        "u:b167": 833,
+        "u:b168": 832,
+        "u:b169": 831,
+        "u:b170": 830,
+        "u:b171": 829,
+        "u:b172": 828,
+        "u:b173": 827,
+        "u:b174": 826,
+        "u:b175": 825,
+        "u:b176": 824,
+        "u:b177": 823,
+        "u:b178": 822,
+        "u:b179": 821,
+        "u:b180": 820,
+        "u:b181": 819,
+        "u:b182": 818,
+        "u:b183": 817,
+        "u:b184": 816,
+        "u:b185": 815,
+        "u:b186": 814,
+        "u:b187": 813,
+        "u:b188": 812,
+        "u:b189": 811,
+        "u:b190": 810,
+        "u:b191": 809,
+        "u:b192": 808,
+        "u:b193": 807,
+        "u:b194": 806,
+        "u:b195": 805,
+        "u:b196": 804,
+        "u:b197": 803,
+        "u:b198": 802,
+        "u:b199": 801,
+        "u:b200": 800,
+        "u:b201": 799,
+        "u:b202": 798,
+        "u:b203": 797,
+        "u:b204": 796
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "block",
+          "id": "u:b000",
+          "count": 1000
+        },
+        {
+          "kind": "block",
+          "id": "u:b001",
+          "count": 999
+        },
+        {
+          "kind": "block",
+          "id": "u:b002",
+          "count": 998
+        },
+        {
+          "kind": "block",
+          "id": "u:b003",
+          "count": 997
+        },
+        {
+          "kind": "block",
+          "id": "u:b004",
+          "count": 996
+        },
+        {
+          "kind": "block",
+          "id": "u:b005",
+          "count": 995
+        },
+        {
+          "kind": "block",
+          "id": "u:b006",
+          "count": 994
+        },
+        {
+          "kind": "block",
+          "id": "u:b007",
+          "count": 993
+        },
+        {
+          "kind": "block",
+          "id": "u:b008",
+          "count": 992
+        },
+        {
+          "kind": "block",
+          "id": "u:b009",
+          "count": 991
+        },
+        {
+          "kind": "block",
+          "id": "u:b010",
+          "count": 990
+        },
+        {
+          "kind": "block",
+          "id": "u:b011",
+          "count": 989
+        },
+        {
+          "kind": "block",
+          "id": "u:b012",
+          "count": 988
+        },
+        {
+          "kind": "block",
+          "id": "u:b013",
+          "count": 987
+        },
+        {
+          "kind": "block",
+          "id": "u:b014",
+          "count": 986
+        },
+        {
+          "kind": "block",
+          "id": "u:b015",
+          "count": 985
+        },
+        {
+          "kind": "block",
+          "id": "u:b016",
+          "count": 984
+        },
+        {
+          "kind": "block",
+          "id": "u:b017",
+          "count": 983
+        },
+        {
+          "kind": "block",
+          "id": "u:b018",
+          "count": 982
+        },
+        {
+          "kind": "block",
+          "id": "u:b019",
+          "count": 981
+        },
+        {
+          "kind": "block",
+          "id": "u:b020",
+          "count": 980
+        },
+        {
+          "kind": "block",
+          "id": "u:b021",
+          "count": 979
+        },
+        {
+          "kind": "block",
+          "id": "u:b022",
+          "count": 978
+        },
+        {
+          "kind": "block",
+          "id": "u:b023",
+          "count": 977
+        },
+        {
+          "kind": "block",
+          "id": "u:b024",
+          "count": 976
+        },
+        {
+          "kind": "block",
+          "id": "u:b025",
+          "count": 975
+        },
+        {
+          "kind": "block",
+          "id": "u:b026",
+          "count": 974
+        },
+        {
+          "kind": "block",
+          "id": "u:b027",
+          "count": 973
+        },
+        {
+          "kind": "block",
+          "id": "u:b028",
+          "count": 972
+        },
+        {
+          "kind": "block",
+          "id": "u:b029",
+          "count": 971
+        },
+        {
+          "kind": "block",
+          "id": "u:b030",
+          "count": 970
+        },
+        {
+          "kind": "block",
+          "id": "u:b031",
+          "count": 969
+        },
+        {
+          "kind": "block",
+          "id": "u:b032",
+          "count": 968
+        },
+        {
+          "kind": "block",
+          "id": "u:b033",
+          "count": 967
+        },
+        {
+          "kind": "block",
+          "id": "u:b034",
+          "count": 966
+        },
+        {
+          "kind": "block",
+          "id": "u:b035",
+          "count": 965
+        },
+        {
+          "kind": "block",
+          "id": "u:b036",
+          "count": 964
+        },
+        {
+          "kind": "block",
+          "id": "u:b037",
+          "count": 963
+        },
+        {
+          "kind": "block",
+          "id": "u:b038",
+          "count": 962
+        },
+        {
+          "kind": "block",
+          "id": "u:b039",
+          "count": 961
+        },
+        {
+          "kind": "block",
+          "id": "u:b040",
+          "count": 960
+        },
+        {
+          "kind": "block",
+          "id": "u:b041",
+          "count": 959
+        },
+        {
+          "kind": "block",
+          "id": "u:b042",
+          "count": 958
+        },
+        {
+          "kind": "block",
+          "id": "u:b043",
+          "count": 957
+        },
+        {
+          "kind": "block",
+          "id": "u:b044",
+          "count": 956
+        },
+        {
+          "kind": "block",
+          "id": "u:b045",
+          "count": 955
+        },
+        {
+          "kind": "block",
+          "id": "u:b046",
+          "count": 954
+        },
+        {
+          "kind": "block",
+          "id": "u:b047",
+          "count": 953
+        },
+        {
+          "kind": "block",
+          "id": "u:b048",
+          "count": 952
+        },
+        {
+          "kind": "block",
+          "id": "u:b049",
+          "count": 951
+        },
+        {
+          "kind": "block",
+          "id": "u:b050",
+          "count": 950
+        },
+        {
+          "kind": "block",
+          "id": "u:b051",
+          "count": 949
+        },
+        {
+          "kind": "block",
+          "id": "u:b052",
+          "count": 948
+        },
+        {
+          "kind": "block",
+          "id": "u:b053",
+          "count": 947
+        },
+        {
+          "kind": "block",
+          "id": "u:b054",
+          "count": 946
+        },
+        {
+          "kind": "block",
+          "id": "u:b055",
+          "count": 945
+        },
+        {
+          "kind": "block",
+          "id": "u:b056",
+          "count": 944
+        },
+        {
+          "kind": "block",
+          "id": "u:b057",
+          "count": 943
+        },
+        {
+          "kind": "block",
+          "id": "u:b058",
+          "count": 942
+        },
+        {
+          "kind": "block",
+          "id": "u:b059",
+          "count": 941
+        },
+        {
+          "kind": "block",
+          "id": "u:b060",
+          "count": 940
+        },
+        {
+          "kind": "block",
+          "id": "u:b061",
+          "count": 939
+        },
+        {
+          "kind": "block",
+          "id": "u:b062",
+          "count": 938
+        },
+        {
+          "kind": "block",
+          "id": "u:b063",
+          "count": 937
+        },
+        {
+          "kind": "block",
+          "id": "u:b064",
+          "count": 936
+        },
+        {
+          "kind": "block",
+          "id": "u:b065",
+          "count": 935
+        },
+        {
+          "kind": "block",
+          "id": "u:b066",
+          "count": 934
+        },
+        {
+          "kind": "block",
+          "id": "u:b067",
+          "count": 933
+        },
+        {
+          "kind": "block",
+          "id": "u:b068",
+          "count": 932
+        },
+        {
+          "kind": "block",
+          "id": "u:b069",
+          "count": 931
+        },
+        {
+          "kind": "block",
+          "id": "u:b070",
+          "count": 930
+        },
+        {
+          "kind": "block",
+          "id": "u:b071",
+          "count": 929
+        },
+        {
+          "kind": "block",
+          "id": "u:b072",
+          "count": 928
+        },
+        {
+          "kind": "block",
+          "id": "u:b073",
+          "count": 927
+        },
+        {
+          "kind": "block",
+          "id": "u:b074",
+          "count": 926
+        },
+        {
+          "kind": "block",
+          "id": "u:b075",
+          "count": 925
+        },
+        {
+          "kind": "block",
+          "id": "u:b076",
+          "count": 924
+        },
+        {
+          "kind": "block",
+          "id": "u:b077",
+          "count": 923
+        },
+        {
+          "kind": "block",
+          "id": "u:b078",
+          "count": 922
+        },
+        {
+          "kind": "block",
+          "id": "u:b079",
+          "count": 921
+        },
+        {
+          "kind": "block",
+          "id": "u:b080",
+          "count": 920
+        },
+        {
+          "kind": "block",
+          "id": "u:b081",
+          "count": 919
+        },
+        {
+          "kind": "block",
+          "id": "u:b082",
+          "count": 918
+        },
+        {
+          "kind": "block",
+          "id": "u:b083",
+          "count": 917
+        },
+        {
+          "kind": "block",
+          "id": "u:b084",
+          "count": 916
+        },
+        {
+          "kind": "block",
+          "id": "u:b085",
+          "count": 915
+        },
+        {
+          "kind": "block",
+          "id": "u:b086",
+          "count": 914
+        },
+        {
+          "kind": "block",
+          "id": "u:b087",
+          "count": 913
+        },
+        {
+          "kind": "block",
+          "id": "u:b088",
+          "count": 912
+        },
+        {
+          "kind": "block",
+          "id": "u:b089",
+          "count": 911
+        },
+        {
+          "kind": "block",
+          "id": "u:b090",
+          "count": 910
+        },
+        {
+          "kind": "block",
+          "id": "u:b091",
+          "count": 909
+        },
+        {
+          "kind": "block",
+          "id": "u:b092",
+          "count": 908
+        },
+        {
+          "kind": "block",
+          "id": "u:b093",
+          "count": 907
+        },
+        {
+          "kind": "block",
+          "id": "u:b094",
+          "count": 906
+        },
+        {
+          "kind": "block",
+          "id": "u:b095",
+          "count": 905
+        },
+        {
+          "kind": "block",
+          "id": "u:b096",
+          "count": 904
+        },
+        {
+          "kind": "block",
+          "id": "u:b097",
+          "count": 903
+        },
+        {
+          "kind": "block",
+          "id": "u:b098",
+          "count": 902
+        },
+        {
+          "kind": "block",
+          "id": "u:b099",
+          "count": 901
+        },
+        {
+          "kind": "block",
+          "id": "u:b100",
+          "count": 900
+        },
+        {
+          "kind": "block",
+          "id": "u:b101",
+          "count": 899
+        },
+        {
+          "kind": "block",
+          "id": "u:b102",
+          "count": 898
+        },
+        {
+          "kind": "block",
+          "id": "u:b103",
+          "count": 897
+        },
+        {
+          "kind": "block",
+          "id": "u:b104",
+          "count": 896
+        },
+        {
+          "kind": "block",
+          "id": "u:b105",
+          "count": 895
+        },
+        {
+          "kind": "block",
+          "id": "u:b106",
+          "count": 894
+        },
+        {
+          "kind": "block",
+          "id": "u:b107",
+          "count": 893
+        },
+        {
+          "kind": "block",
+          "id": "u:b108",
+          "count": 892
+        },
+        {
+          "kind": "block",
+          "id": "u:b109",
+          "count": 891
+        },
+        {
+          "kind": "block",
+          "id": "u:b110",
+          "count": 890
+        },
+        {
+          "kind": "block",
+          "id": "u:b111",
+          "count": 889
+        },
+        {
+          "kind": "block",
+          "id": "u:b112",
+          "count": 888
+        },
+        {
+          "kind": "block",
+          "id": "u:b113",
+          "count": 887
+        },
+        {
+          "kind": "block",
+          "id": "u:b114",
+          "count": 886
+        },
+        {
+          "kind": "block",
+          "id": "u:b115",
+          "count": 885
+        },
+        {
+          "kind": "block",
+          "id": "u:b116",
+          "count": 884
+        },
+        {
+          "kind": "block",
+          "id": "u:b117",
+          "count": 883
+        },
+        {
+          "kind": "block",
+          "id": "u:b118",
+          "count": 882
+        },
+        {
+          "kind": "block",
+          "id": "u:b119",
+          "count": 881
+        },
+        {
+          "kind": "block",
+          "id": "u:b120",
+          "count": 880
+        },
+        {
+          "kind": "block",
+          "id": "u:b121",
+          "count": 879
+        },
+        {
+          "kind": "block",
+          "id": "u:b122",
+          "count": 878
+        },
+        {
+          "kind": "block",
+          "id": "u:b123",
+          "count": 877
+        },
+        {
+          "kind": "block",
+          "id": "u:b124",
+          "count": 876
+        },
+        {
+          "kind": "block",
+          "id": "u:b125",
+          "count": 875
+        },
+        {
+          "kind": "block",
+          "id": "u:b126",
+          "count": 874
+        },
+        {
+          "kind": "block",
+          "id": "u:b127",
+          "count": 873
+        },
+        {
+          "kind": "block",
+          "id": "u:b128",
+          "count": 872
+        },
+        {
+          "kind": "block",
+          "id": "u:b129",
+          "count": 871
+        },
+        {
+          "kind": "block",
+          "id": "u:b130",
+          "count": 870
+        },
+        {
+          "kind": "block",
+          "id": "u:b131",
+          "count": 869
+        },
+        {
+          "kind": "block",
+          "id": "u:b132",
+          "count": 868
+        },
+        {
+          "kind": "block",
+          "id": "u:b133",
+          "count": 867
+        },
+        {
+          "kind": "block",
+          "id": "u:b134",
+          "count": 866
+        },
+        {
+          "kind": "block",
+          "id": "u:b135",
+          "count": 865
+        },
+        {
+          "kind": "block",
+          "id": "u:b136",
+          "count": 864
+        },
+        {
+          "kind": "block",
+          "id": "u:b137",
+          "count": 863
+        },
+        {
+          "kind": "block",
+          "id": "u:b138",
+          "count": 862
+        },
+        {
+          "kind": "block",
+          "id": "u:b139",
+          "count": 861
+        },
+        {
+          "kind": "block",
+          "id": "u:b140",
+          "count": 860
+        },
+        {
+          "kind": "block",
+          "id": "u:b141",
+          "count": 859
+        },
+        {
+          "kind": "block",
+          "id": "u:b142",
+          "count": 858
+        },
+        {
+          "kind": "block",
+          "id": "u:b143",
+          "count": 857
+        },
+        {
+          "kind": "block",
+          "id": "u:b144",
+          "count": 856
+        },
+        {
+          "kind": "block",
+          "id": "u:b145",
+          "count": 855
+        },
+        {
+          "kind": "block",
+          "id": "u:b146",
+          "count": 854
+        },
+        {
+          "kind": "block",
+          "id": "u:b147",
+          "count": 853
+        },
+        {
+          "kind": "block",
+          "id": "u:b148",
+          "count": 852
+        },
+        {
+          "kind": "block",
+          "id": "u:b149",
+          "count": 851
+        },
+        {
+          "kind": "block",
+          "id": "u:b150",
+          "count": 850
+        },
+        {
+          "kind": "block",
+          "id": "u:b151",
+          "count": 849
+        },
+        {
+          "kind": "block",
+          "id": "u:b152",
+          "count": 848
+        },
+        {
+          "kind": "block",
+          "id": "u:b153",
+          "count": 847
+        },
+        {
+          "kind": "block",
+          "id": "u:b154",
+          "count": 846
+        },
+        {
+          "kind": "block",
+          "id": "u:b155",
+          "count": 845
+        },
+        {
+          "kind": "block",
+          "id": "u:b156",
+          "count": 844
+        },
+        {
+          "kind": "block",
+          "id": "u:b157",
+          "count": 843
+        },
+        {
+          "kind": "block",
+          "id": "u:b158",
+          "count": 842
+        },
+        {
+          "kind": "block",
+          "id": "u:b159",
+          "count": 841
+        },
+        {
+          "kind": "block",
+          "id": "u:b160",
+          "count": 840
+        },
+        {
+          "kind": "block",
+          "id": "u:b161",
+          "count": 839
+        },
+        {
+          "kind": "block",
+          "id": "u:b162",
+          "count": 838
+        },
+        {
+          "kind": "block",
+          "id": "u:b163",
+          "count": 837
+        },
+        {
+          "kind": "block",
+          "id": "u:b164",
+          "count": 836
+        },
+        {
+          "kind": "block",
+          "id": "u:b165",
+          "count": 835
+        },
+        {
+          "kind": "block",
+          "id": "u:b166",
+          "count": 834
+        },
+        {
+          "kind": "block",
+          "id": "u:b167",
+          "count": 833
+        },
+        {
+          "kind": "block",
+          "id": "u:b168",
+          "count": 832
+        },
+        {
+          "kind": "block",
+          "id": "u:b169",
+          "count": 831
+        },
+        {
+          "kind": "block",
+          "id": "u:b170",
+          "count": 830
+        },
+        {
+          "kind": "block",
+          "id": "u:b171",
+          "count": 829
+        },
+        {
+          "kind": "block",
+          "id": "u:b172",
+          "count": 828
+        },
+        {
+          "kind": "block",
+          "id": "u:b173",
+          "count": 827
+        },
+        {
+          "kind": "block",
+          "id": "u:b174",
+          "count": 826
+        },
+        {
+          "kind": "block",
+          "id": "u:b175",
+          "count": 825
+        },
+        {
+          "kind": "block",
+          "id": "u:b176",
+          "count": 824
+        },
+        {
+          "kind": "block",
+          "id": "u:b177",
+          "count": 823
+        },
+        {
+          "kind": "block",
+          "id": "u:b178",
+          "count": 822
+        },
+        {
+          "kind": "block",
+          "id": "u:b179",
+          "count": 821
+        },
+        {
+          "kind": "block",
+          "id": "u:b180",
+          "count": 820
+        },
+        {
+          "kind": "block",
+          "id": "u:b181",
+          "count": 819
+        },
+        {
+          "kind": "block",
+          "id": "u:b182",
+          "count": 818
+        },
+        {
+          "kind": "block",
+          "id": "u:b183",
+          "count": 817
+        },
+        {
+          "kind": "block",
+          "id": "u:b184",
+          "count": 816
+        },
+        {
+          "kind": "block",
+          "id": "u:b185",
+          "count": 815
+        },
+        {
+          "kind": "block",
+          "id": "u:b186",
+          "count": 814
+        },
+        {
+          "kind": "block",
+          "id": "u:b187",
+          "count": 813
+        },
+        {
+          "kind": "block",
+          "id": "u:b188",
+          "count": 812
+        },
+        {
+          "kind": "block",
+          "id": "u:b189",
+          "count": 811
+        },
+        {
+          "kind": "block",
+          "id": "u:b190",
+          "count": 810
+        },
+        {
+          "kind": "block",
+          "id": "u:b191",
+          "count": 809
+        },
+        {
+          "kind": "block",
+          "id": "u:b192",
+          "count": 808
+        },
+        {
+          "kind": "block",
+          "id": "u:b193",
+          "count": 807
+        },
+        {
+          "kind": "block",
+          "id": "u:b194",
+          "count": 806
+        },
+        {
+          "kind": "block",
+          "id": "u:b195",
+          "count": 805
+        },
+        {
+          "kind": "block",
+          "id": "u:b196",
+          "count": 804
+        },
+        {
+          "kind": "block",
+          "id": "u:b197",
+          "count": 803
+        },
+        {
+          "kind": "block",
+          "id": "u:b198",
+          "count": 802
+        },
+        {
+          "kind": "block",
+          "id": "u:b199",
+          "count": 801
+        }
+      ],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "forbidden_entries_cost_nothing_but_are_lines",
+    "description": "A forbidden entry is stored at price 0 and prices its blocks at 0",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:tnt",
+        "price": 0,
+        "forbidden": true
+      },
+      {
+        "kind": "block",
+        "id": "m:ok",
+        "price": 2,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:tnt": 3,
+        "m:ok": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 2,
+      "blocks": 2,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:ok",
+          "count": 1,
+          "unitPrice": 2,
+          "subtotal": 2
+        },
+        {
+          "kind": "block",
+          "id": "m:tnt",
+          "count": 3,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "В схематике есть запрещённые блоки: m:tnt"
+      ],
+      "forbiddenBlocks": [
+        "m:tnt"
+      ],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "forbidden_exact_exception_inside_forbidden_mod",
+    "description": "An exact entry that is not forbidden overrides a forbidden mod:*",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "evil:*",
+        "price": 0,
+        "forbidden": true
+      },
+      {
+        "kind": "block",
+        "id": "evil:harmless",
+        "price": 4,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "evil:bomb": 1,
+        "evil:harmless": 2,
+        "minecraft:stone": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 8,
+      "blocks": 8,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "evil:harmless",
+          "count": 2,
+          "unitPrice": 4,
+          "subtotal": 8
+        },
+        {
+          "kind": "block",
+          "id": "evil:bomb",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "block",
+          "id": "minecraft:stone",
+          "count": 1
+        }
+      ],
+      "problems": [
+        "В схематике есть запрещённые блоки: evil:bomb"
+      ],
+      "forbiddenBlocks": [
+        "evil:bomb"
+      ],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "forbidden_wildcard_for_a_kind",
+    "description": "A forbidden * covers every id of its kind only",
+    "catalog": [
+      {
+        "kind": "item",
+        "id": "*",
+        "price": 0,
+        "forbidden": true
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {
+        "m:a": 1,
+        "m:b": 2
+      },
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "item",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "item",
+          "id": "m:b",
+          "count": 2,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1
+        }
+      ],
+      "problems": [
+        "В схематике есть запрещённые предметы (например, в сундуках): m:a, m:b"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [
+        "m:a",
+        "m:b"
+      ],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "forbidden_items_and_fluids",
+    "description": "Items (say, in a chest) and fluids (in a tank) are forbidden like blocks",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:b",
+        "price": 1,
+        "forbidden": false
+      },
+      {
+        "kind": "item",
+        "id": "m:bomb",
+        "price": 0,
+        "forbidden": true
+      },
+      {
+        "kind": "fluid",
+        "id": "m:acid",
+        "price": 0,
+        "forbidden": true
+      },
+      {
+        "kind": "fluid",
+        "id": "m:water",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:b": 1
+      },
+      "items": {
+        "m:bomb": 3,
+        "m:gem": 1
+      },
+      "fluids": {
+        "m:acid": 1000,
+        "m:water": 1000
+      },
+      "size": null
+    },
+    "expect": {
+      "total": 2.00,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 1.00,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:b",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        },
+        {
+          "kind": "fluid",
+          "id": "m:water",
+          "count": 1000,
+          "unitPrice": 1,
+          "subtotal": 1.00
+        },
+        {
+          "kind": "fluid",
+          "id": "m:acid",
+          "count": 1000,
+          "unitPrice": 0,
+          "subtotal": 0.00
+        },
+        {
+          "kind": "item",
+          "id": "m:bomb",
+          "count": 3,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "item",
+          "id": "m:gem",
+          "count": 1
+        }
+      ],
+      "problems": [
+        "В схематике есть запрещённые предметы (например, в сундуках): m:bomb",
+        "В схематике есть запрещённые жидкости: m:acid"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [
+        "m:bomb"
+      ],
+      "forbiddenFluids": [
+        "m:acid"
+      ]
+    }
+  },
+  {
+    "name": "more_than_ten_forbidden_blocks",
+    "description": "Ten ids are listed, the rest is counted: \"и ещё N\"",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 0,
+        "forbidden": true
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:b00": 1,
+        "m:b01": 1,
+        "m:b02": 1,
+        "m:b03": 1,
+        "m:b04": 1,
+        "m:b05": 1,
+        "m:b06": 1,
+        "m:b07": 1,
+        "m:b08": 1,
+        "m:b09": 1,
+        "m:b10": 1,
+        "m:b11": 1,
+        "m:b12": 1,
+        "m:b13": 1,
+        "m:b14": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        1,
+        1,
+        1
+      ]
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:b00",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b01",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b02",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b03",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b04",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b05",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b06",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b07",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b08",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b09",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b10",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b11",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b12",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b13",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        },
+        {
+          "kind": "block",
+          "id": "m:b14",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "В схематике есть запрещённые блоки: m:b00, m:b01, m:b02, m:b03, m:b04, m:b05, m:b06, m:b07, m:b08, m:b09 и ещё 5"
+      ],
+      "forbiddenBlocks": [
+        "m:b00",
+        "m:b01",
+        "m:b02",
+        "m:b03",
+        "m:b04",
+        "m:b05",
+        "m:b06",
+        "m:b07",
+        "m:b08",
+        "m:b09"
+      ],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_exactly_the_limit",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        30,
+        30,
+        30
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_30x10x25_fits_30x30x30",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        30,
+        10,
+        25
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_one_side_too_long",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        31,
+        1,
+        1
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "Схематик слишком большой: 31x1x1 блоков, максимум 30x30x30"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_y_too_long",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        1,
+        31,
+        1
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "Схематик слишком большой: 1x31x1 блоков, максимум 30x30x30"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_compares_largest_to_largest",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      40,
+      20,
+      10
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        10,
+        40,
+        20
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_largest_over_largest",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      40,
+      20,
+      10
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        10,
+        41,
+        20
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "Схематик слишком большой: 10x41x20 блоков, максимум 40x20x10"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_second_largest_over",
+    "description": "Size check: sides sorted descending and compared pairwise",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "*",
+        "price": 1,
+        "forbidden": false
+      }
+    ],
+    "maxSize": [
+      40,
+      20,
+      10
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        25,
+        25,
+        25
+      ]
+    },
+    "expect": {
+      "total": 1,
+      "blocks": 1,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1,
+          "unitPrice": 1,
+          "subtotal": 1
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "Схематик слишком большой: 25x25x25 блоков, максимум 40x20x10"
+      ],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "no_size_means_no_size_check",
+    "description": "A schematic whose size is unknown is not refused for it",
+    "catalog": [],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:a": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": null
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [],
+      "linesTruncated": false,
+      "unpriced": [
+        {
+          "kind": "block",
+          "id": "m:a",
+          "count": 1
+        }
+      ],
+      "problems": [],
+      "forbiddenBlocks": [],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  },
+  {
+    "name": "size_and_forbidden_together",
+    "description": "Both problems are listed, size first",
+    "catalog": [
+      {
+        "kind": "block",
+        "id": "m:tnt",
+        "price": 0,
+        "forbidden": true
+      }
+    ],
+    "maxSize": [
+      30,
+      30,
+      30
+    ],
+    "composition": {
+      "blocks": {
+        "m:tnt": 1
+      },
+      "items": {},
+      "fluids": {},
+      "size": [
+        31,
+        1,
+        1
+      ]
+    },
+    "expect": {
+      "total": 0,
+      "blocks": 0,
+      "items": 0,
+      "fluids": 0,
+      "lines": [
+        {
+          "kind": "block",
+          "id": "m:tnt",
+          "count": 1,
+          "unitPrice": 0,
+          "subtotal": 0
+        }
+      ],
+      "linesTruncated": false,
+      "unpriced": [],
+      "problems": [
+        "Схематик слишком большой: 31x1x1 блоков, максимум 30x30x30",
+        "В схематике есть запрещённые блоки: m:tnt"
+      ],
+      "forbiddenBlocks": [
+        "m:tnt"
+      ],
+      "forbiddenItems": [],
+      "forbiddenFluids": []
+    }
+  }
+]

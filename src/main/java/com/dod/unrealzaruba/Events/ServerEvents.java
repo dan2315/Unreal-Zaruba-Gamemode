@@ -15,6 +15,7 @@ import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.Economy.Wallets;
 import com.dod.unrealzaruba.Economy.SideIncome;
 import com.dod.unrealzaruba.Economy.SupplyDrops;
+import com.dod.unrealzaruba.Economy.SupplyCases;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
@@ -117,6 +118,7 @@ public class ServerEvents {
             RespawnPointsSync.sendTo(player);
             MapPacks.offer(player);
             SupplyDrops.syncTo(player);
+            SupplyCases.syncTo(player);
         }
         else {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());

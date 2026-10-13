@@ -3,6 +3,7 @@ package com.dod.unrealzaruba.Commands.CommandHandlers;
 import com.dod.unrealzaruba.Economy.EconomyConfig;
 import com.dod.unrealzaruba.Economy.EconomyData;
 import com.dod.unrealzaruba.Economy.SupplyDrops;
+import com.dod.unrealzaruba.Economy.SupplyParadrop;
 import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
@@ -29,7 +30,11 @@ public class SupplyDropCommand implements ICommandHandler {
                 .then(Commands.literal("addspot").executes(SupplyDropCommand::addSpot))
                 .then(Commands.literal("removespot").executes(SupplyDropCommand::removeSpot))
                 .then(Commands.literal("list").executes(SupplyDropCommand::list))
-                .then(Commands.literal("now").executes(SupplyDropCommand::now)));
+                .then(Commands.literal("now").executes(SupplyDropCommand::now))
+                .then(Commands.literal("paradrop")
+                        .executes(context -> paradrop(context, null))
+                        .then(Commands.argument("ground", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
+                                .executes(context -> paradrop(context, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getBlockPos(context, "ground"))))));
     }
 
     private static int addSpot(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -80,6 +85,30 @@ public class SupplyDropCommand implements ICommandHandler {
             context.getSource().sendFailure(Component.literal("No game map loaded or no supply drop spots"));
             return 0;
         }
+        return 1;
+    }
+
+    /** Test drop: a parachuting container cube above a random spot, or above the player when the map has no spots. */
+    private static int paradrop(CommandContext<CommandSourceStack> context, BlockPos given) {
+        EconomyConfig.SupplyDrops config = EconomyData.current().supplyDrops;
+        BlockPos target;
+        if (given != null) {
+            target = given;
+        } else if (config.locations != null && !config.locations.isEmpty()) {
+            target = config.locations.get(new java.util.Random().nextInt(config.locations.size()));
+        } else {
+            ServerPlayer player = context.getSource().getPlayer();
+            if (player == null) {
+                context.getSource().sendFailure(Component.literal("The map has no supply spots: give the ground position, /supplydrop paradrop <x y z>"));
+                return 0;
+            }
+            target = player.blockPosition();
+        }
+        if (!SupplyParadrop.spawn(context.getSource().getServer(), config, target)) {
+            context.getSource().sendFailure(Component.literal("No game map loaded, or the sky above the spot is not free"));
+            return 0;
+        }
+        context.getSource().sendSuccess(() -> Component.literal("Parachute drop started above " + target.toShortString()), true);
         return 1;
     }
 

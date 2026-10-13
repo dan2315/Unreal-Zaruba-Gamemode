@@ -1,0 +1,32 @@
+{
+  "credit": "Placeholder parachute canopy: a stepped dome of red and ivory panels. Drawn scaled up by ParachutePackRenderer, origin at the middle of the rim.",
+  "textures": {
+    "canopy": "unrealzaruba:block/parachute_canopy",
+    "gold": "unrealzaruba:block/supply_case_gold",
+    "particle": "unrealzaruba:block/parachute_canopy"
+  },
+  "elements": [
+    { "name": "layer 0", "from": [-14, 0, -14], "to": [30, 2, 30],
+      "faces": { "up": {"uv": [0,0,16,16], "texture": "#canopy"}, "down": {"uv": [0,0,16,16], "texture": "#canopy"},
+                 "north": {"uv": [0,0,16,2], "texture": "#canopy"}, "south": {"uv": [0,0,16,2], "texture": "#canopy"},
+                 "east": {"uv": [0,0,16,2], "texture": "#canopy"}, "west": {"uv": [0,0,16,2], "texture": "#canopy"} } },
+    { "name": "layer 1", "from": [-12, 2, -12], "to": [28, 4, 28],
+      "faces": { "up": {"uv": [0,0,16,16], "texture": "#canopy"},
+                 "north": {"uv": [0,0,16,2], "texture": "#canopy"}, "south": {"uv": [0,0,16,2], "texture": "#canopy"},
+                 "east": {"uv": [0,0,16,2], "texture": "#canopy"}, "west": {"uv": [0,0,16,2], "texture": "#canopy"} } },
+    { "name": "layer 2", "from": [-9, 4, -9], "to": [25, 6, 25],
+      "faces": { "up": {"uv": [0,0,16,16], "texture": "#canopy"},
+                 "north": {"uv": [0,0,16,2], "texture": "#canopy"}, "south": {"uv": [0,0,16,2], "texture": "#canopy"},
+                 "east": {"uv": [0,0,16,2], "texture": "#canopy"}, "west": {"uv": [0,0,16,2], "texture": "#canopy"} } },
+    { "name": "layer 3", "from": [-5, 6, -5], "to": [21, 8, 21],
+      "faces": { "up": {"uv": [0,0,16,16], "texture": "#canopy"},
+                 "north": {"uv": [0,0,16,2], "texture": "#canopy"}, "south": {"uv": [0,0,16,2], "texture": "#canopy"},
+                 "east": {"uv": [0,0,16,2], "texture": "#canopy"}, "west": {"uv": [0,0,16,2], "texture": "#canopy"} } },
+    { "name": "layer 4", "from": [-1, 8, -1], "to": [17, 10, 17],
+      "faces": { "up": {"uv": [0,0,16,16], "texture": "#canopy"},
+                 "north": {"uv": [0,0,16,2], "texture": "#canopy"}, "south": {"uv": [0,0,16,2], "texture": "#canopy"},
+                 "east": {"uv": [0,0,16,2], "texture": "#canopy"}, "west": {"uv": [0,0,16,2], "texture": "#canopy"} } },
+    { "name": "button", "from": [3.5, 10, 3.5], "to": [12.5, 11.5, 12.5],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } }
+  ]
+}

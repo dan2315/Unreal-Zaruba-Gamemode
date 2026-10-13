@@ -46,6 +46,17 @@ public class ModItems {
     public static final DeferredHolder<Item, Item> VEHICLE_SPAWN_BLOCK_ITEM = ModItems.ITEMS.register("vehicle_spawn_block",
             () -> new BlockItem(ModBlocks.VEHICLE_SPAWN_BLOCK.get(), new Item.Properties()));
 
+    public static final DeferredHolder<Item, Item> PARACHUTE_PACK_ITEM = ModItems.ITEMS.register("parachute_pack",
+            () -> new BlockItem(ModBlocks.PARACHUTE_PACK_BLOCK.get(), new Item.Properties()));
+
+    /** The case from a supply drop: carried to the base to cash in. */
+    public static final DeferredHolder<Item, Item> SUPPLY_CASE = ModItems.ITEMS.register("supply_case",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+
+    /** Shows the size, price and publishing problems of a Sable contraption. */
+    public static final DeferredHolder<Item, Item> CONTRAPTION_SCANNER = ModItems.ITEMS.register("contraption_scanner",
+            () -> new ContraptionScannerItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus) {
         ModItems.ITEMS.register(eventBus);
     }

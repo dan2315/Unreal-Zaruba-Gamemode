@@ -115,6 +115,19 @@ dependencies {
     // Create Aeronautics: Toolgun. Its .excraft blueprints are the schematics players share and spawn as vehicles.
     compileOnly(files("libs/create_aeronautics_toolgun-0.3.6.jar"))
 
+    // Golden vectors shared with the backend (src/test/resources/vectors) keep the pricing rules in sync
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("com.google.code.gson:gson:2.10.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+// The pricing tests only need plain Minecraft classes (NBT), not a running game: reuse the main classpath
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+
+tasks.named("test") {
+    useJUnitPlatform()
 }
 
 tasks.withType(ProcessResources).configureEach {

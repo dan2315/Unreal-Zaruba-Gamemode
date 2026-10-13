@@ -1,0 +1,30 @@
+{
+  "parent": "minecraft:block/block",
+  "credit": "Placeholder parachute pack: a canvas pack with crossed straps and four rings for the lines",
+  "textures": {
+    "pack": "unrealzaruba:block/parachute_pack",
+    "strap": "unrealzaruba:block/parachute_strap",
+    "gold": "unrealzaruba:block/supply_case_gold",
+    "particle": "unrealzaruba:block/parachute_pack"
+  },
+  "elements": [
+    { "name": "body", "from": [4, 0, 4], "to": [12, 3.2, 12],
+      "faces": { "up": {"texture": "#pack"}, "down": {"texture": "#pack"}, "north": {"texture": "#pack"}, "south": {"texture": "#pack"}, "east": {"texture": "#pack"}, "west": {"texture": "#pack"} } },
+    { "name": "flap", "from": [4.4, 3.2, 4.4], "to": [11.6, 4, 11.6],
+      "faces": { "up": {"texture": "#pack"}, "north": {"texture": "#pack"}, "south": {"texture": "#pack"}, "east": {"texture": "#pack"}, "west": {"texture": "#pack"} } },
+    { "name": "strap x", "from": [7.2, 0, 3.8], "to": [8.8, 4.1, 12.2],
+      "faces": { "up": {"texture": "#strap"}, "down": {"texture": "#strap"}, "north": {"texture": "#strap"}, "south": {"texture": "#strap"} } },
+    { "name": "strap z", "from": [3.8, 0, 7.2], "to": [12.2, 4.1, 8.8],
+      "faces": { "up": {"texture": "#strap"}, "down": {"texture": "#strap"}, "east": {"texture": "#strap"}, "west": {"texture": "#strap"} } },
+    { "name": "buckle", "from": [7.4, 3.9, 7.4], "to": [8.6, 4.4, 8.6],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } },
+    { "name": "ring nw", "from": [4, 3.8, 4], "to": [5, 4.6, 5],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } },
+    { "name": "ring ne", "from": [11, 3.8, 4], "to": [12, 4.6, 5],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } },
+    { "name": "ring sw", "from": [4, 3.8, 11], "to": [5, 4.6, 12],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } },
+    { "name": "ring se", "from": [11, 3.8, 11], "to": [12, 4.6, 12],
+      "faces": { "up": {"texture": "#gold"}, "north": {"texture": "#gold"}, "south": {"texture": "#gold"}, "east": {"texture": "#gold"}, "west": {"texture": "#gold"} } }
+  ]
+}

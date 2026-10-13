@@ -27,6 +27,7 @@ public class ModSetupEvents {
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "score"), ScoreOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "money"), MoneyOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "respawn"), RespawnOverlay.INSTANCE);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "contraption_report"), com.dod.unrealzaruba.UI.ContraptionReportOverlay.INSTANCE);
     }
 
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {

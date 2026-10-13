@@ -82,6 +82,33 @@ public class EconomyConfig {
         /** Where the crate goes (the crate block itself). Add spots with /supplydrop addspot. */
         public List<net.minecraft.core.BlockPos> locations = new ArrayList<>();
         public List<Loot> loot = DefaultBuyMenu.supplyLoot();
+        /** The parachuting container cube (/supplydrop paradrop). */
+        public Paradrop paradrop = new Paradrop();
+    }
+
+    /**
+     * A small wooden stand (3x3 floor and roof, four posts, a barrel in the middle) with a parachute pack on its roof,
+     * assembled into a physics body above the drop spot. The barrel holds the supply case plus random extra loot.
+     */
+    public static class Paradrop {
+        /** How far above the spot the drop starts, capped by the build height. */
+        public int dropHeight = 80;
+        /** Speed (blocks per second) the parachute settles the fall at. */
+        public double terminalSpeed = 6.0;
+        /** The stand's blocks (block ids); a missing or unknown id falls back to the default shown. */
+        public String floorBlock = "minecraft:spruce_planks";
+        public String roofBlock = "minecraft:spruce_planks";
+        public String postBlock = "minecraft:spruce_fence";
+        public String barrelBlock = "minecraft:barrel";
+        /** The item players carry to their base to cash in; put in the middle slot of the barrel. Empty for none. */
+        public String cashItem = "unrealzaruba:supply_case";
+        /** Paid to every online member of the team that hands a case in at its base, per case. */
+        public int caseTeamReward = 600;
+        /** Extra for the player who carried it, per case. */
+        public int caseCarrierBonus = 300;
+        /** Extra random loot added to the barrel: lootRolls weighted picks from loot. */
+        public int lootRolls = 3;
+        public List<Loot> loot = DefaultBuyMenu.supplyLoot();
     }
 
     public static class Loot {

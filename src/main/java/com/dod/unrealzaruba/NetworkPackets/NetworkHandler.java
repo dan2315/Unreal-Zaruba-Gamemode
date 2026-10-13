@@ -35,6 +35,8 @@ import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundOpenSchematicSp
 import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundSchematicSpawnResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Schematics.SpawnSchematicPiecePacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyDropPacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyCasePacket;
+import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundContraptionReportPacket;
 import com.dod.unrealzaruba.NetworkPackets.Camera.CameraShotResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Camera.ClientboundCameraShotPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackDataPacket;
@@ -97,6 +99,8 @@ public class NetworkHandler {
         toServer("buy_items", BuyItemsPacket.class, BuyItemsPacket::encode, BuyItemsPacket::decode, BuyItemsPacket::handle);
         toClient("buy_result", BuyResultPacket.class, BuyResultPacket::encode, BuyResultPacket::decode, BuyResultPacket::handle);
         toClient("supply_drop", ClientboundSupplyDropPacket.class, ClientboundSupplyDropPacket::encode, ClientboundSupplyDropPacket::decode, ClientboundSupplyDropPacket::handle);
+        toClient("supply_case", ClientboundSupplyCasePacket.class, ClientboundSupplyCasePacket::encode, ClientboundSupplyCasePacket::decode, ClientboundSupplyCasePacket::handle);
+        toClient("contraption_report", ClientboundContraptionReportPacket.class, ClientboundContraptionReportPacket::encode, ClientboundContraptionReportPacket::decode, ClientboundContraptionReportPacket::handle);
         toClient("respawn_points", ClientboundRespawnPointsPacket.class, ClientboundRespawnPointsPacket::encode, ClientboundRespawnPointsPacket::decode, ClientboundRespawnPointsPacket::handle);
         toClient("death_state", ClientboundDeathStatePacket.class, ClientboundDeathStatePacket::encode, ClientboundDeathStatePacket::decode, ClientboundDeathStatePacket::handle);
         toClient("map_pack_offer", ClientboundMapPackOfferPacket.class, ClientboundMapPackOfferPacket::encode, ClientboundMapPackOfferPacket::decode, ClientboundMapPackOfferPacket::handle);
