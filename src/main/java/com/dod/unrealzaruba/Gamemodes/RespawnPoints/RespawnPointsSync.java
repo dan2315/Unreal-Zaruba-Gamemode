@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
+import com.dod.unrealzaruba.Gamemodes.TeamGamemode;
 import com.dod.unrealzaruba.ModBlocks.Tent.Tent;
 import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundRespawnPointsPacket;
 import com.dod.unrealzaruba.Player.PlayerContext;
@@ -55,7 +57,21 @@ public final class RespawnPointsSync {
                 : points.stream().min(Comparator.comparingInt(IRespawnPoint::getPriority)).orElse(null);
         return new RespawnPointsView(entries,
                 selected == null ? null : selected.getRuntimeId(),
-                effective == null ? null : effective.getRuntimeId());
+                effective == null ? null : effective.getRuntimeId(),
+                enemyBases(context.Team()));
+    }
+
+    /** The main bases of the other teams: where the enemy starts is public knowledge, their tents and vehicles are not. */
+    private static List<RespawnPointsView.EnemyBase> enemyBases(TeamContext own) {
+        List<RespawnPointsView.EnemyBase> bases = new ArrayList<>();
+        if (GamemodeManager.instance != null && GamemodeManager.instance.GetActiveGamemode() instanceof TeamGamemode gamemode
+                && gamemode.GetTeamManager() != null) {
+            for (TeamContext team : gamemode.GetTeamManager().GetTeams().values()) {
+                if (team == own || team.RespawnPoints().isEmpty()) continue;
+                bases.add(new RespawnPointsView.EnemyBase(team.Color(), team.MainSpawn()));
+            }
+        }
+        return bases;
     }
 
     private static RespawnPointsView.Kind kindOf(IRespawnPoint point) {

@@ -41,6 +41,7 @@ public class XaeroWaypoints {
     static final ResourceKey<Level> GAME_DIMENSION =
             ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "game_dim"));
     private static final String SELECTED_PREFIX = "► ";
+    private static final String RESPAWN_SUFFIX = "-Resp";
 
     private record Wanted(String key, BlockPos pos, String name, String initials, WaypointColor color, Byte respawnId) {
         String signature() {
@@ -130,18 +131,12 @@ public class XaeroWaypoints {
         Byte effective = view.effectiveId();
         List<Wanted> wanted = new ArrayList<>();
 
+        // The objectives themselves, in the colour of whoever holds them
         for (HudObjective objective : ObjectivesOverlay.INSTANCE.objectives()) {
             if (objective instanceof HudCapturePointObjective point) {
-                RespawnPointsView.Entry respawn = view.points().stream()
-                        .filter(entry -> entry.objectiveId() != null && entry.objectiveId() == point.GetRuntimeId())
-                        .findFirst().orElse(null);
-                boolean selected = respawn != null && effective != null && respawn.id() == effective;
                 String letter = ObjectivesOverlay.INSTANCE.letterFor(point.GetRuntimeId());
-                wanted.add(new Wanted("objective:" + point.GetRuntimeId(), point.GetPosition(),
-                        (selected ? SELECTED_PREFIX : "") + point.GetName(),
-                        letter != null ? letter : initial(point.GetName()),
-                        selected ? WaypointColor.GOLD : teamColor(point.getOwner()),
-                        respawn == null ? null : respawn.id()));
+                wanted.add(new Wanted("objective:" + point.GetRuntimeId(), point.GetPosition(), point.GetName(),
+                        letter != null ? letter : initial(point.GetName()), teamColor(point.getOwner()), null));
             } else if (objective instanceof HudDestroyObjective target) {
                 wanted.add(new Wanted("objective:" + target.GetRuntimeId(), target.GetPosition(), target.GetName(),
                         initial(target.GetName()), WaypointColor.BLUE, null));
@@ -155,12 +150,21 @@ public class XaeroWaypoints {
                     "$", WaypointColor.YELLOW, null));
         }
 
+        // Every respawn point of the team, including the ones at capture points, as "<name>-Resp"; the chosen one is marked
         for (RespawnPointsView.Entry entry : view.points()) {
-            if (entry.kind() == RespawnPointsView.Kind.CAPTURE_POINT) continue; // shown on the objective's waypoint
             boolean selected = effective != null && entry.id() == effective;
             wanted.add(new Wanted("respawn:" + entry.id(), entry.position().above(),
-                    (selected ? SELECTED_PREFIX : "") + entry.name(), kindInitial(entry.kind()),
+                    (selected ? SELECTED_PREFIX : "") + entry.name() + RESPAWN_SUFFIX, kindInitial(entry.kind()),
                     selected ? WaypointColor.GOLD : WaypointColor.GREEN, entry.id()));
+        }
+
+        // The enemy main bases
+        int index = 0;
+        for (RespawnPointsView.EnemyBase base : view.enemyBases()) {
+            wanted.add(new Wanted("enemy_base:" + index++, base.position().above(),
+                    net.minecraft.network.chat.Component.translatable("waypoint.unrealzaruba.enemy_base",
+                            base.team().getDisplayName()).getString(),
+                    "E", teamColor(base.team()), null));
         }
         return wanted;
     }

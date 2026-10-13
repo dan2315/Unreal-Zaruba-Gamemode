@@ -1,6 +1,7 @@
 package com.dod.unrealzaruba.Schematics;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.system.MemoryUtil;
 
 /**
  * Textures for schematic previews (downloaded from the backend) and screenshot thumbnails (read from disk), loaded
@@ -71,7 +73,7 @@ public final class SchematicImages {
                 .whenComplete((image, error) -> Minecraft.getInstance().execute(() -> {
                     if (error != null || image == null) {
                         created.failed = true;
-                        if (error != null) UnrealZaruba.LOGGER.debug("Schematic image {} failed: {}", key, error.toString());
+                        if (error != null) UnrealZaruba.LOGGER.warn("Schematic image {} failed: {}", key, error.toString());
                         return;
                     }
                     if (CACHE.get(key) != created) { // evicted while loading
@@ -88,15 +90,29 @@ public final class SchematicImages {
     // PNG directly; anything else ImageIO reads (older JPEG previews) through a PNG conversion
     private static NativeImage decode(byte[] data) {
         try {
-            return NativeImage.read(data);
+            return read(data);
         } catch (IOException | RuntimeException e) {
             byte[] png = LocalFiles.toPng(data);
             if (png == null) return null;
             try {
-                return NativeImage.read(png);
+                return read(png);
             } catch (IOException ex) {
                 return null;
             }
+        }
+    }
+
+    /**
+     * NativeImage.read(byte[]) copies the bytes onto the small LWJGL thread stack (64 KB), which a preview screenshot of
+     * a few hundred KB overflows (OutOfMemoryError, and the card stays empty). A malloc'ed buffer has no such limit.
+     */
+    private static NativeImage read(byte[] data) throws IOException {
+        ByteBuffer buffer = MemoryUtil.memAlloc(data.length);
+        try {
+            buffer.put(data).flip();
+            return NativeImage.read(buffer);
+        } finally {
+            MemoryUtil.memFree(buffer);
         }
     }
 
