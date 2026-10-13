@@ -64,6 +64,11 @@ public class WorldManager {
     private static final String TEMPLATE_WORLDS_DIR = "game_worlds";
     private static final String RUNTIME_WORLDS_DIR = "game_worlds_runtime";
 
+    // The map template being copied for a match, and the template the game level currently runs on (a folder name in
+    // game_worlds, i.e. the gamemode key). Read by the world commit command from other threads
+    private static volatile String copyingKey;
+    private static volatile String currentMapKey;
+
     public static ServerLevel gameLevel;
     // Between the start of a map reload and the new level being created; the old level must not count as ready
     private static volatile boolean reloading;
@@ -94,6 +99,16 @@ public class WorldManager {
     /** Terrain region files of the loaded game map, or null before a map is loaded. */
     public static java.nio.file.Path gameRegionFolder() {
         return access == null ? null : access.getDimensionPath(GAME_DIMENSION).resolve("region");
+    }
+
+    /** True while the template of this map is being copied for a match; the template must not be read or replaced then. */
+    public static boolean isCopyingTemplate(String key) {
+        return key != null && key.equals(copyingKey);
+    }
+
+    /** The map the game level is running on (its template folder name), or null before a map is loaded. */
+    public static String currentMapKey() {
+        return currentMapKey;
     }
 
     public static Pair<ResourceKey<Level>, ResourceKey<Level>> getDimensions() {
@@ -201,6 +216,7 @@ public class WorldManager {
         Path template = Path.of(TEMPLATE_WORLDS_DIR, gamemodeName);
         Path runtime = Path.of(RUNTIME_WORLDS_DIR, gamemodeName);
         UnrealZaruba.LOGGER.info("Copying map template {}", gamemodeName);
+        copyingKey = gamemodeName;
         try {
             deleteRecursively(runtime);
             if (!Files.isDirectory(template)) {
@@ -212,6 +228,8 @@ public class WorldManager {
             UnrealZaruba.LOGGER.info("Copied map template {} in {} ms", template, System.currentTimeMillis() - start);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } finally {
+            copyingKey = null;
         }
     }
 
@@ -245,6 +263,7 @@ public class WorldManager {
     }
 
     private static void prepareWorldStorage(String gamemodeName) {
+        currentMapKey = gamemodeName;
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(worldsRoot().toPath());
         try {
             closeAccess();
@@ -255,7 +274,11 @@ public class WorldManager {
 
         Registry<FlatLevelGeneratorPreset> presetRegistry = server.registryAccess().registryOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET);
         FlatLevelGeneratorPreset voidPreset = presetRegistry.get(FlatLevelGeneratorPresets.THE_VOID);
-        FlatLevelGeneratorSettings voidSettings = voidPreset.settings();
+        // A fresh copy for every level: adjustGenerationSettings() nulls the non-solid entries of the settings layer list
+        // (the void is all air), so a second level on the same preset object crashed when it first generated a chunk
+        FlatLevelGeneratorSettings presetSettings = voidPreset.settings();
+        FlatLevelGeneratorSettings voidSettings = presetSettings.withBiomeAndLayers(
+                presetSettings.getLayersInfo(), presetSettings.structureOverrides(), presetSettings.getBiome());
         ChunkGenerator chunkGenerator = new FlatLevelSource(voidSettings);
 
         levelStem = new LevelStem(
