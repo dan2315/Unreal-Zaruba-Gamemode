@@ -2,7 +2,6 @@ package com.dod.unrealzaruba.Commands.CommandHandlers;
 
 import com.dod.unrealzaruba.Economy.EconomyConfig;
 import com.dod.unrealzaruba.Economy.EconomyData;
-import com.dod.unrealzaruba.Economy.SupplyDrops;
 import com.dod.unrealzaruba.Economy.SupplyParadrop;
 import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
@@ -12,94 +11,52 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 
 /**
- * /supplydrop addspot | removespot | list | now. Spots are saved in the current map's economy.json; the crate is
- * placed where the player stands.
+ * /supplydrop now [ground x y z] | area pos1 | pos2 | floor | show | auto on | off. Supply drops come down by parachute
+ * during the battle at a random spot of the area; {@code now} sends one right away. The settings are saved in the
+ * current map's economy.json.
  */
 public class SupplyDropCommand implements ICommandHandler {
-    private static final int REMOVE_RANGE = 5;
+    private static final RandomSource RANDOM = RandomSource.create();
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("supplydrop")
                 .requires(cs -> cs.hasPermission(2))
-                .then(Commands.literal("addspot").executes(SupplyDropCommand::addSpot))
-                .then(Commands.literal("removespot").executes(SupplyDropCommand::removeSpot))
-                .then(Commands.literal("list").executes(SupplyDropCommand::list))
-                .then(Commands.literal("now").executes(SupplyDropCommand::now))
-                .then(Commands.literal("paradrop")
-                        .executes(context -> paradrop(context, null))
-                        .then(Commands.argument("ground", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
-                                .executes(context -> paradrop(context, net.minecraft.commands.arguments.coordinates.BlockPosArgument.getBlockPos(context, "ground"))))));
+                .then(Commands.literal("now")
+                        .executes(context -> now(context, null))
+                        .then(Commands.argument("ground", BlockPosArgument.blockPos())
+                                .executes(context -> now(context, BlockPosArgument.getBlockPos(context, "ground")))))
+                // Where automatic drops may land: stand in a corner of the area and run pos1, then in the opposite
+                // corner for pos2, then stand on the ground and run floor
+                .then(Commands.literal("area")
+                        .then(Commands.literal("pos1").executes(context -> setCorner(context, 1)))
+                        .then(Commands.literal("pos2").executes(context -> setCorner(context, 2)))
+                        .then(Commands.literal("floor").executes(SupplyDropCommand::setFloor))
+                        .then(Commands.literal("show").executes(SupplyDropCommand::showArea)))
+                .then(Commands.literal("auto")
+                        .then(Commands.literal("on").executes(context -> setAuto(context, true)))
+                        .then(Commands.literal("off").executes(context -> setAuto(context, false)))));
     }
 
-    private static int addSpot(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        EconomyData data = data(context);
-        if (data == null) return 0;
-        BlockPos pos = player.blockPosition();
-        data.getData().supplyDrops.locations.add(pos);
-        data.saveData();
-        context.getSource().sendSuccess(() -> Component.literal("Added supply drop spot " + pos.toShortString()
-                + " (" + data.getData().supplyDrops.locations.size() + " spots)"), true);
-        return 1;
-    }
-
-    private static int removeSpot(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        EconomyData data = data(context);
-        if (data == null) return 0;
-        var locations = data.getData().supplyDrops.locations;
-        BlockPos here = player.blockPosition();
-        BlockPos nearest = locations.stream()
-                .filter(pos -> pos.distSqr(here) <= REMOVE_RANGE * REMOVE_RANGE)
-                .min((a, b) -> Double.compare(a.distSqr(here), b.distSqr(here)))
-                .orElse(null);
-        if (nearest == null) {
-            context.getSource().sendFailure(Component.literal("No supply drop spot within " + REMOVE_RANGE + " blocks"));
-            return 0;
-        }
-        locations.remove(nearest);
-        data.saveData();
-        context.getSource().sendSuccess(() -> Component.literal("Removed supply drop spot " + nearest.toShortString()), true);
-        return 1;
-    }
-
-    private static int list(CommandContext<CommandSourceStack> context) {
-        EconomyData data = data(context);
-        if (data == null) return 0;
-        var locations = data.getData().supplyDrops.locations;
-        StringBuilder text = new StringBuilder("Supply drop spots (" + locations.size() + "):");
-        locations.forEach(pos -> text.append("\n  ").append(pos.toShortString()));
-        context.getSource().sendSuccess(() -> Component.literal(text.toString()), false);
-        return locations.size();
-    }
-
-    private static int now(CommandContext<CommandSourceStack> context) {
-        EconomyConfig.SupplyDrops config = EconomyData.current().supplyDrops;
-        if (!SupplyDrops.spawn(context.getSource().getServer(), config)) {
-            context.getSource().sendFailure(Component.literal("No game map loaded or no supply drop spots"));
-            return 0;
-        }
-        return 1;
-    }
-
-    /** Test drop: a parachuting container cube above a random spot, or above the player when the map has no spots. */
-    private static int paradrop(CommandContext<CommandSourceStack> context, BlockPos given) {
+    /** Sends a drop now: at the given ground position, else a random spot of the area, else above the player. */
+    private static int now(CommandContext<CommandSourceStack> context, BlockPos given) {
         EconomyConfig.SupplyDrops config = EconomyData.current().supplyDrops;
         BlockPos target;
         if (given != null) {
             target = given;
-        } else if (config.locations != null && !config.locations.isEmpty()) {
-            target = config.locations.get(new java.util.Random().nextInt(config.locations.size()));
+        } else if (config.paradrop.area.isValid()) {
+            target = config.paradrop.area.randomSpot(RANDOM);
         } else {
             ServerPlayer player = context.getSource().getPlayer();
             if (player == null) {
-                context.getSource().sendFailure(Component.literal("The map has no supply spots: give the ground position, /supplydrop paradrop <x y z>"));
+                context.getSource().sendFailure(Component.literal("The drop area is not set (/supplydrop area pos1, pos2, floor): give the ground position, /supplydrop now <x y z>"));
                 return 0;
             }
             target = player.blockPosition();
@@ -108,8 +65,65 @@ public class SupplyDropCommand implements ICommandHandler {
             context.getSource().sendFailure(Component.literal("No game map loaded, or the sky above the spot is not free"));
             return 0;
         }
-        context.getSource().sendSuccess(() -> Component.literal("Parachute drop started above " + target.toShortString()), true);
+        context.getSource().sendSuccess(() -> Component.literal("Supply drop sent to " + target.getX() + ", " + target.getZ()), true);
         return 1;
+    }
+
+    private static int setCorner(CommandContext<CommandSourceStack> context, int corner) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        EconomyData data = data(context);
+        if (data == null) return 0;
+        EconomyConfig.Area area = data.getData().supplyDrops.paradrop.area;
+        BlockPos pos = player.blockPosition();
+        if (corner == 1) {
+            area.x1 = pos.getX();
+            area.z1 = pos.getZ();
+        } else {
+            area.x2 = pos.getX();
+            area.z2 = pos.getZ();
+        }
+        data.saveData();
+        context.getSource().sendSuccess(() -> Component.literal("Supply drop area corner " + corner + " set to x=" + pos.getX() + " z=" + pos.getZ()
+                + (area.isValid() ? ". " + describe(area) : ". Set the other corner too.")), true);
+        return 1;
+    }
+
+    /** The block you stand on is the floor: drops start high above it and settle on whatever ground is below. */
+    private static int setFloor(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        EconomyData data = data(context);
+        if (data == null) return 0;
+        EconomyConfig.Area area = data.getData().supplyDrops.paradrop.area;
+        area.floorY = player.blockPosition().getY() - 1;
+        data.saveData();
+        context.getSource().sendSuccess(() -> Component.literal("Supply drop floor y set to " + area.floorY), true);
+        return 1;
+    }
+
+    private static int showArea(CommandContext<CommandSourceStack> context) {
+        EconomyData data = data(context);
+        if (data == null) return 0;
+        EconomyConfig.Paradrop paradrop = data.getData().supplyDrops.paradrop;
+        context.getSource().sendSuccess(() -> Component.literal("Automatic supply drops are " + (paradrop.auto ? "ON" : "OFF")
+                + ": first after " + paradrop.firstDropSeconds + " s, then every " + paradrop.intervalSeconds + " s, at most "
+                + paradrop.maxActive + " at once. " + (paradrop.area.isValid() ? describe(paradrop.area) : "The area is not set (use /supplydrop area pos1 and pos2).")), false);
+        return 1;
+    }
+
+    private static int setAuto(CommandContext<CommandSourceStack> context, boolean on) {
+        EconomyData data = data(context);
+        if (data == null) return 0;
+        EconomyConfig.Paradrop paradrop = data.getData().supplyDrops.paradrop;
+        paradrop.auto = on;
+        data.saveData();
+        context.getSource().sendSuccess(() -> Component.literal("Automatic supply drops " + (on ? "ON" : "OFF")
+                + (on && !paradrop.area.isValid() ? ", but the area is not set yet" : "")), true);
+        return 1;
+    }
+
+    private static String describe(EconomyConfig.Area area) {
+        return "Area x " + Math.min(area.x1, area.x2) + ".." + Math.max(area.x1, area.x2) + ", z " + Math.min(area.z1, area.z2) + ".."
+                + Math.max(area.z1, area.z2) + ", floor y " + area.floorY;
     }
 
     private static EconomyData data(CommandContext<CommandSourceStack> context) {

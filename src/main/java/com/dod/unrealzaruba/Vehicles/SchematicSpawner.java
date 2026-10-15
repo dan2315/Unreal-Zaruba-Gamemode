@@ -14,6 +14,9 @@ import com.dod.unrealzaruba.ModBlocks.VehiclePurchase.VehiclePurchaseBlockEntity
 import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundOpenSchematicSpawnerPacket;
 import com.dod.unrealzaruba.NetworkPackets.Schematics.ClientboundSchematicSpawnResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Schematics.SpawnSchematicPiecePacket;
+import com.dod.unrealzaruba.Pricing.BlueprintScanner;
+import com.dod.unrealzaruba.Pricing.Pricer;
+import com.dod.unrealzaruba.Pricing.RulesService;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,6 +48,7 @@ public final class SchematicSpawner {
             player.displayClientMessage(Component.translatable("schematics.unrealzaruba.spawn.disabled"), true);
             return;
         }
+        RulesService.get(); // warms up the price list, so the first spawn does not have to wait for it
         PacketDistributor.sendToPlayer(player, new ClientboundOpenSchematicSpawnerPacket(block.getBlockPos(),
                 economy.defaultVehiclePrice, (block.getCooldownTicks() + 19) / 20));
     }
@@ -93,14 +97,27 @@ public final class SchematicSpawner {
             fail(player, Component.translatable("schematics.unrealzaruba.spawn.cooldown", (block.getCooldownTicks() + 19) / 20));
             return;
         }
-        int price = economy.defaultVehiclePrice;
-        if (Wallets.get(player) < price) {
-            fail(player, Component.translatable("schematics.unrealzaruba.spawn.no_money", Money.format(price)));
-            return;
-        }
         Blueprints.Info info = Blueprints.read(name, data, level);
         if (info == null) {
             fail(player, Component.translatable("schematics.unrealzaruba.error.not_structure"));
+            return;
+        }
+        // The price is what the blueprint is worth by the backend price list, worked out from the file itself (the same
+        // reading the backend does, so it is the number shown in the browser), not a flat fee
+        RulesService.Rules rules = RulesService.get();
+        if (rules == null) {
+            fail(player, Component.translatable("schematics.unrealzaruba.spawn.no_rules"));
+            return;
+        }
+        int price;
+        try {
+            price = Money.charge(Pricer.price(BlueprintScanner.scan(data), rules.catalog()).total());
+        } catch (IOException e) {
+            fail(player, Component.translatable("schematics.unrealzaruba.error.not_structure"));
+            return;
+        }
+        if (Wallets.get(player) < price) {
+            fail(player, Component.translatable("schematics.unrealzaruba.spawn.no_money", Money.format(price)));
             return;
         }
         if (info.blocks() > limits.maxBlocks || info.maxSide() > limits.maxSize) {

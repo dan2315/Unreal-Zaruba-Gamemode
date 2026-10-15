@@ -16,6 +16,7 @@ import com.dod.unrealzaruba.utils.Timers.TimerManager;
 
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -41,11 +42,19 @@ public final class SupplyParadrop {
     /** Lets the placed blocks settle (and the barrel's block entity exist) before they are assembled. */
     private static final int ASSEMBLE_DELAY_TICKS = 4;
     private static final int CEILING_MARGIN = 8;
+    /** Wait this long (10 s) before trying again when a drop could not start or too many are around. */
+    private static final int RETRY_TICKS = 200;
+    private static final net.minecraft.util.RandomSource RANDOM = net.minecraft.util.RandomSource.create();
 
-    private static final List<UUID> ACTIVE = new ArrayList<>();
-    /** Chunks kept loaded around the drops: a body in an unloaded chunk is stored away and stops falling. */
-    private static final List<net.minecraft.world.level.ChunkPos> FORCED = new ArrayList<>();
+    /** A drop that is on its way or lying around: its body, where it was aimed, and the chunks it keeps loaded. */
+    private record Drop(UUID id, BlockPos target, List<ChunkPos> chunks) {}
+
+    private static final List<Drop> ACTIVE = new ArrayList<>();
+    /** Chunks kept loaded around the drops (with how many drops need each): a body in an unloaded chunk is stored away and stops falling. */
+    private static final Map<ChunkPos, Integer> FORCED = new java.util.HashMap<>();
     private static final int FORCE_RADIUS = 2;
+    /** Battle tick of the next automatic drop; negative until the battle starts. */
+    private static int nextAutoTick = -1;
 
     private SupplyParadrop() {}
 
@@ -96,8 +105,8 @@ public final class SupplyParadrop {
         }
 
         List<BlockPos> blocks = new ArrayList<>(parts.keySet());
-        forceChunks(level, target);
-        later(ASSEMBLE_DELAY_TICKS, () -> assemble(level, blocks, target));
+        List<ChunkPos> chunks = forceChunks(level, target);
+        later(ASSEMBLE_DELAY_TICKS, () -> assemble(level, blocks, target, chunks, settings.lifetimeSeconds));
         return true;
     }
 
@@ -119,16 +128,20 @@ public final class SupplyParadrop {
                 cash.isEmpty() ? "" : "the supply case and ", Math.min(loot.size(), free.size()));
     }
 
-    private static void assemble(ServerLevel level, List<BlockPos> blocks, BlockPos target) {
+    private static void assemble(ServerLevel level, List<BlockPos> blocks, BlockPos target, List<ChunkPos> chunks, int lifetimeSeconds) {
         if (level != WorldManager.gameLevel) return; // the map was reloaded meanwhile
         ServerSubLevel subLevel = SableShips.assemble(level, blocks);
         if (subLevel == null) {
             UnrealZaruba.LOGGER.error("[SupplyParadrop] Could not assemble the drop above {}", target);
             for (BlockPos pos : blocks) level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            releaseChunks(level, chunks);
             return;
         }
         subLevel.setName("supply_drop");
-        ACTIVE.add(subLevel.getUniqueId());
+        UUID id = subLevel.getUniqueId();
+        ACTIVE.add(new Drop(id, target, chunks));
+        if (lifetimeSeconds > 0) later(lifetimeSeconds * 20, () -> removeDrop(id));
+        SupplyDrops.refreshWaypoint(level.getServer());
         UnrealZaruba.LOGGER.info("[SupplyParadrop] Drop {} assembled above {}: {} blocks, mass {}", subLevel.getUniqueId(), target,
                 blocks.size(), subLevel.getMassTracker().getMass());
         trace(level, subLevel.getUniqueId(), 0);
@@ -163,23 +176,69 @@ public final class SupplyParadrop {
     public static void clear() {
         ServerLevel level = WorldManager.gameLevel;
         if (level != null) {
-            for (UUID id : ACTIVE) SableShips.remove(level, id);
-            for (net.minecraft.world.level.ChunkPos chunk : FORCED) level.setChunkForced(chunk.x, chunk.z, false);
+            for (Drop drop : ACTIVE) SableShips.remove(level, drop.id());
+            for (ChunkPos chunk : FORCED.keySet()) level.setChunkForced(chunk.x, chunk.z, false);
         }
         ACTIVE.clear();
         FORCED.clear();
+        nextAutoTick = -1;
     }
 
-    private static void forceChunks(ServerLevel level, BlockPos target) {
-        net.minecraft.world.level.ChunkPos center = new net.minecraft.world.level.ChunkPos(target);
+    /** A drop that has been lying around long enough goes away. */
+    private static void removeDrop(UUID id) {
+        ServerLevel level = WorldManager.gameLevel;
+        Drop drop = ACTIVE.stream().filter(d -> d.id().equals(id)).findFirst().orElse(null);
+        if (drop == null || level == null) return;
+        ACTIVE.remove(drop);
+        SableShips.remove(level, id);
+        releaseChunks(level, drop.chunks());
+        SupplyDrops.refreshWaypoint(level.getServer());
+    }
+
+    public static int activeCount() {
+        return ACTIVE.size();
+    }
+
+    /** Where the newest drop was aimed, for the map waypoint; null when none is around. */
+    public static BlockPos waypoint() {
+        return ACTIVE.isEmpty() ? null : ACTIVE.get(ACTIVE.size() - 1).target();
+    }
+
+    /**
+     * Automatic drops during the battle: after firstDropSeconds and then every intervalSeconds one lands at a random spot
+     * inside the configured area, as long as fewer than maxActive are around. Called every tick of the battle.
+     */
+    static void tickAuto(MinecraftServer server, EconomyConfig.SupplyDrops config, int battleTicks) {
+        EconomyConfig.Paradrop settings = config.paradrop;
+        if (!settings.area.isValid()) return;
+        if (nextAutoTick < 0) nextAutoTick = Math.max(0, settings.firstDropSeconds) * 20;
+        if (battleTicks < nextAutoTick) return;
+        if (ACTIVE.size() >= Math.max(1, settings.maxActive)) {
+            nextAutoTick = battleTicks + RETRY_TICKS;
+            return;
+        }
+        BlockPos target = settings.area.randomSpot(RANDOM);
+        boolean started = spawn(server, config, target);
+        nextAutoTick = battleTicks + (started ? Math.max(10, settings.intervalSeconds) * 20 : RETRY_TICKS);
+    }
+
+    private static List<ChunkPos> forceChunks(ServerLevel level, BlockPos target) {
+        ChunkPos center = new ChunkPos(target);
+        List<ChunkPos> chunks = new ArrayList<>();
         for (int dx = -FORCE_RADIUS; dx <= FORCE_RADIUS; dx++) {
             for (int dz = -FORCE_RADIUS; dz <= FORCE_RADIUS; dz++) {
-                net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(center.x + dx, center.z + dz);
-                if (!FORCED.contains(chunk)) {
-                    level.setChunkForced(chunk.x, chunk.z, true);
-                    FORCED.add(chunk);
-                }
+                ChunkPos chunk = new ChunkPos(center.x + dx, center.z + dz);
+                if (FORCED.merge(chunk, 1, Integer::sum) == 1) level.setChunkForced(chunk.x, chunk.z, true);
+                chunks.add(chunk);
             }
+        }
+        return chunks;
+    }
+
+    private static void releaseChunks(ServerLevel level, List<ChunkPos> chunks) {
+        for (ChunkPos chunk : chunks) {
+            Integer left = FORCED.computeIfPresent(chunk, (key, count) -> count > 1 ? count - 1 : null);
+            if (left == null) level.setChunkForced(chunk.x, chunk.z, false);
         }
     }
 

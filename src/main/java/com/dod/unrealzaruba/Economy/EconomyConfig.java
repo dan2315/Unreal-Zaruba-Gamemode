@@ -67,22 +67,9 @@ public class EconomyConfig {
         public int maxAmount = 1500;
     }
 
-    /** Crates dropped at one of {@code locations} during the battle. Opening one pays everyone on the opener's team. */
+    /** Supply drops: parachuting stands with a barrel of loot and a supply case. See {@link Paradrop}. */
     public static class SupplyDrops {
         public boolean enabled = true;
-        public int firstDropSeconds = 120;
-        public int intervalSeconds = 240;
-        /** How long a player must stay next to the crate to open it. */
-        public int openSeconds = 6;
-        /** Removed if still there after this long. */
-        public int lifetimeSeconds = 180;
-        public int teamReward = 250;
-        /** Loot rolls per crate, each picking an entry from loot by weight. */
-        public int lootRolls = 4;
-        /** Where the crate goes (the crate block itself). Add spots with /supplydrop addspot. */
-        public List<net.minecraft.core.BlockPos> locations = new ArrayList<>();
-        public List<Loot> loot = DefaultBuyMenu.supplyLoot();
-        /** The parachuting container cube (/supplydrop paradrop). */
         public Paradrop paradrop = new Paradrop();
     }
 
@@ -100,6 +87,17 @@ public class EconomyConfig {
         public String roofBlock = "minecraft:spruce_planks";
         public String postBlock = "minecraft:spruce_fence";
         public String barrelBlock = "minecraft:barrel";
+        /**
+         * Automatic drops: during the battle, after firstDropSeconds and then every intervalSeconds, one parachutes in at a
+         * random spot of the area below (instead of the old crates at the map spots), while fewer than maxActive are around.
+         * Each drop is removed lifetimeSeconds after it was dropped, opened or not.
+         */
+        public boolean auto = false;
+        public int firstDropSeconds = 120;
+        public int intervalSeconds = 240;
+        public int lifetimeSeconds = 900;
+        public int maxActive = 3;
+        public Area area = new Area();
         /** The item players carry to their base to cash in; put in the middle slot of the barrel. Empty for none. */
         public String cashItem = "unrealzaruba:supply_case";
         /** Paid to every online member of the team that hands a case in at its base, per case. */
@@ -109,6 +107,29 @@ public class EconomyConfig {
         /** Extra random loot added to the barrel: lootRolls weighted picks from loot. */
         public int lootRolls = 3;
         public List<Loot> loot = DefaultBuyMenu.supplyLoot();
+    }
+
+    /**
+     * Where automatic drops may land: a rectangle seen from above, given by two opposite corners (x1, z1) and (x2, z2) in
+     * either order, and the y of the ground there (the drop starts dropHeight above it). Set it with /supplydrop area.
+     */
+    public static class Area {
+        public int x1;
+        public int z1;
+        public int x2;
+        public int z2;
+        public int floorY = 64;
+
+        /** An area with no width or no depth is "not set". */
+        public boolean isValid() {
+            return x1 != x2 && z1 != z2;
+        }
+
+        public net.minecraft.core.BlockPos randomSpot(net.minecraft.util.RandomSource random) {
+            int minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+            int minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
+            return new net.minecraft.core.BlockPos(minX + random.nextInt(maxX - minX + 1), floorY, minZ + random.nextInt(maxZ - minZ + 1));
+        }
     }
 
     public static class Loot {

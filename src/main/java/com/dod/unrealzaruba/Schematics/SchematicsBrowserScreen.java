@@ -527,7 +527,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         boolean own = isMine(s);
         boolean canRate = SchematicsApi.isLoggedIn() && !own;
         int bottom = height - 8;
-        int buttonsTop = bottom - 18 - (own ? 21 : 0) - (spawner != null ? 21 : 0);
+        int buttonsTop = bottom - 18 - (own ? 21 : 0);
         int ratingTop = buttonsTop - (canRate ? 26 : 0);
         int statsTop = ratingTop - 5 * 9 - 6;
 
@@ -584,14 +584,15 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         // buttons
         int actionY = buttonsTop;
         if (spawner != null) {
+            // At a vehicle spawner the one thing to do is spawn; downloading is for the browser opened with the key
             String label = busy ? tr("schematics.unrealzaruba.working")
                     : cooldownTicks > 0 ? tr("schematics.unrealzaruba.spawn.wait", (cooldownTicks + 19) / 20)
-                    : tr("schematics.unrealzaruba.spawn", Money.format(spawner.price()));
+                    : tr("schematics.unrealzaruba.spawn", s.price != null ? Money.format(Money.charge(s.price)) : "?");
             button(g, left, actionY, w, 18, label, Style.PRIMARY, !busy && cooldownTicks == 0, () -> spawn(s));
-            actionY += 21;
+        } else {
+            button(g, left, actionY, w, 18, tr(busy ? "schematics.unrealzaruba.working" : "schematics.unrealzaruba.download"),
+                    Style.PRIMARY, !busy, () -> download(s));
         }
-        button(g, left, actionY, w, 18, tr(busy && spawner == null ? "schematics.unrealzaruba.working" : "schematics.unrealzaruba.download"),
-                spawner != null ? Style.NORMAL : Style.PRIMARY, !busy, () -> download(s));
         if (own) {
             int half = (w - 4) / 2;
             int by2 = actionY + 21;

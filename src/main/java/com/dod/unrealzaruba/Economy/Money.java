@@ -10,6 +10,17 @@ public final class Money {
         return "$" + String.format("%,d", amount);
     }
 
+    /** What a backend price costs in whole dollars: rounded up, never negative or beyond an int. */
+    public static int charge(java.math.BigDecimal price) {
+        java.math.BigDecimal whole = price.setScale(0, java.math.RoundingMode.CEILING);
+        if (whole.signum() < 0) return 0;
+        return whole.compareTo(java.math.BigDecimal.valueOf(Integer.MAX_VALUE)) > 0 ? Integer.MAX_VALUE : whole.intValue();
+    }
+
+    public static int charge(double price) {
+        return charge(java.math.BigDecimal.valueOf(price));
+    }
+
     /** Backend prices can be fractional: whole numbers without decimals, otherwise one or two decimals. */
     public static String format(double amount) {
         if (amount == Math.rint(amount)) return "$" + String.format(Locale.ROOT, "%,.0f", amount);

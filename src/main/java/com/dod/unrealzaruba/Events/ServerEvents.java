@@ -175,21 +175,6 @@ public class ServerEvents {
     }
 
     @SubscribeEvent
-    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        SupplyDrops.onRightClickBlock(event);
-    }
-
-    @SubscribeEvent
-    public void onBlockBreak(BlockEvent.BreakEvent event) {
-        SupplyDrops.onBreak(event);
-    }
-
-    @SubscribeEvent
-    public void onExplosion(ExplosionEvent.Detonate event) {
-        SupplyDrops.onExplosion(event);
-    }
-
-    @SubscribeEvent
     public void onBlockStateChanged(BlockStateChangedEvent event) {
         vehicleManager.OnBlockStateChanged(event);
     }
