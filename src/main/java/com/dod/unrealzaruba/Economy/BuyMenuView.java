@@ -24,9 +24,11 @@ public record BuyMenuView(List<Tab> tabs) {
 
     public record Category(String name, String hint, String note, Map<String, Integer> stats, List<Entry> entries) {}
 
-    /** {@code stack} is empty when the config's item string didn't resolve; such entries can't be bought. */
+    /** {@code index} is the entry's place in the server config (purchases use it), {@code compatible} is false for
+     *  attachments and ammo that fit none of the guns the buyer carries. {@code stack} is empty when the config's item string didn't resolve; such entries can't be bought. */
     public record Entry(String name, String note, String slot, int price, ItemStack stack,
-                        Map<String, Integer> stats, Map<String, String> info) {
+                        Map<String, Integer> stats, Map<String, String> info,
+                        int index, boolean compatible) {
         public boolean available() {
             return !stack.isEmpty();
         }
@@ -52,6 +54,8 @@ public record BuyMenuView(List<Tab> tabs) {
                         ItemStack.OPTIONAL_STREAM_CODEC.encode(registryBuf, entry.stack);
                         b4.writeMap(entry.stats, FriendlyByteBuf::writeUtf, FriendlyByteBuf::writeVarInt);
                         b4.writeMap(entry.info, FriendlyByteBuf::writeUtf, (b5, value) -> b5.writeUtf(value));
+                        b4.writeVarInt(entry.index);
+                        b4.writeBoolean(entry.compatible);
                     });
                 });
             });
@@ -65,7 +69,8 @@ public record BuyMenuView(List<Tab> tabs) {
                         b2.readList(b3 -> new Category(b3.readUtf(), b3.readUtf(), b3.readUtf(), readStats(b3),
                                 b3.readList(b4 -> new Entry(b4.readUtf(), b4.readUtf(), b4.readUtf(), b4.readVarInt(),
                                         ItemStack.OPTIONAL_STREAM_CODEC.decode(registryBuf), readStats(b4),
-                                        b4.readMap(LinkedHashMap::new, FriendlyByteBuf::readUtf, FriendlyByteBuf::readUtf)))))))));
+                                        b4.readMap(LinkedHashMap::new, FriendlyByteBuf::readUtf, FriendlyByteBuf::readUtf),
+                                        b4.readVarInt(), b4.readBoolean()))))))));
         return new BuyMenuView(tabs);
     }
 
@@ -74,7 +79,8 @@ public record BuyMenuView(List<Tab> tabs) {
     }
 
     /** Builds the view for one player's team. Missing config fields become empty strings and maps. */
-    public static BuyMenuView of(EconomyConfig config, java.util.function.Function<EconomyConfig.Item, ItemStack> resolver) {
+    public static BuyMenuView of(EconomyConfig config, java.util.function.Function<EconomyConfig.Item, ItemStack> resolver,
+                                 java.util.function.Predicate<ItemStack> fits) {
         List<Tab> tabs = new ArrayList<>();
         for (EconomyConfig.Tab tab : list(config.buyMenu)) {
             List<Group> groups = new ArrayList<>();
@@ -82,9 +88,15 @@ public record BuyMenuView(List<Tab> tabs) {
                 List<Category> categories = new ArrayList<>();
                 for (EconomyConfig.Category category : list(group.categories)) {
                     List<Entry> entries = new ArrayList<>();
+                    int index = 0;
                     for (EconomyConfig.Item item : list(category.items)) {
+                        ItemStack stack = resolver.apply(item);
                         entries.add(new Entry(str(item.name), str(item.note), str(item.slot), item.price,
-                                resolver.apply(item), map(item.stats), map(item.info)));
+                                stack, map(item.stats), map(item.info), index++, stack.isEmpty() || fits.test(stack)));
+                    }
+                    // What does not fit the buyer's guns goes last (stable, so the config's order holds inside each part)
+                    if (!EconomyConfig.Layout.SETS.equals(tab.layout)) {
+                        entries.sort(java.util.Comparator.comparing(entry -> !entry.compatible()));
                     }
                     categories.add(new Category(str(category.name), str(category.hint), str(category.note),
                             map(category.stats), entries));

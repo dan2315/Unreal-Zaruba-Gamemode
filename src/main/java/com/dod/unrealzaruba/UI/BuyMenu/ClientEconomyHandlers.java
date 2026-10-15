@@ -18,6 +18,10 @@ public final class ClientEconomyHandlers {
     }
 
     public static void openBuyMenu(BuyMenuView view) {
+        if (Minecraft.getInstance().screen instanceof BuyMenuScreen open) {
+            open.replaceView(view);
+            return;
+        }
         Minecraft.getInstance().setScreen(new BuyMenuScreen(view));
     }
 

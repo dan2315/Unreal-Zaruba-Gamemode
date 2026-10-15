@@ -66,7 +66,7 @@ public class BuyMenuScreen extends Screen {
     /** A set on a "sets" tab: categories of all its groups, flattened. */
     private record SetRef(int group, int category, BuyMenuView.Category data) {}
 
-    private final BuyMenuView view;
+    private BuyMenuView view;
     private final List<Hit> hits = new ArrayList<>();
 
     private int tab;
@@ -89,6 +89,19 @@ public class BuyMenuScreen extends Screen {
         super(Component.translatable("buymenu.unrealzaruba.title"));
         this.view = view;
         selectTab(0);
+    }
+
+    /** A fresh menu after a purchase: keeps the open tab and the picked entry (the order can change). */
+    public void replaceView(BuyMenuView fresh) {
+        BuyMenuView.Entry picked = currentEntry();
+        int pickedIndex = picked != null ? picked.index() : -1;
+        this.view = fresh;
+        BuyMenuView.Category cat = currentCategory();
+        if (cat != null && !currentTab().isSets()) {
+            for (int i = 0; i < cat.entries().size(); i++) {
+                if (cat.entries().get(i).index() == pickedIndex) { entry = i; break; }
+            }
+        }
     }
 
     // ---------- state ----------
@@ -340,7 +353,10 @@ public class BuyMenuScreen extends Screen {
 
             String price = Money.format(e.price());
             g.drawString(font, price, cx + cardWidth - 5 - font.width(price), cy + 34, ACCENT, false);
-            g.drawString(font, trim(entryName(e), cardWidth - 14 - font.width(price)), cx + 5, cy + 34, e.available() ? TEXT : MUTED, false);
+            g.drawString(font, trim(entryName(e), cardWidth - 14 - font.width(price)), cx + 5, cy + 34, e.available() && e.compatible() ? TEXT : MUTED, false);
+            if (!e.compatible()) {
+                g.fill(cx + 1, cy + 1, cx + cardWidth - 1, cy + CARD_HEIGHT - 1, 0x99101418); // greyed out
+            }
             drawSmall(g, trim(text(e.note()), (int) ((cardWidth - 10) / 0.75f)), cx + 5, cy + 46, MUTED);
 
             boolean visible = mouseY >= top && mouseY < height - 8;
@@ -388,13 +404,17 @@ public class BuyMenuScreen extends Screen {
             y += 11;
         }
 
+        if (!e.compatible()) {
+            g.drawString(font, trim(tr("buymenu.unrealzaruba.incompatible"), right - left), left, y + 2, ERROR, false);
+        }
+
         int total = e.price();
         boolean canBuy = e.available() && total <= balance();
         String label = !e.available() ? tr("buymenu.unrealzaruba.unavailable")
                 : total > balance() ? tr("buymenu.unrealzaruba.no_funds")
                 : tr("buymenu.unrealzaruba.buy", Money.format(total));
         renderBuyFooter(g, left, right, tr("buymenu.unrealzaruba.price"), total, label, canBuy,
-                () -> buy(group, category, List.of(entry)));
+                () -> buy(group, category, List.of(e.index())));
     }
 
     // ---------- sets tab ----------

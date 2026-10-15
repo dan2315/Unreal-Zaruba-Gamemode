@@ -112,6 +112,9 @@ dependencies {
     // Unreal Frontiers Essential: backend HTTP client (UFHttpClient) for the schematics browser. Client-only.
     compileOnly(files("libs/ufessential-0.2.1-neoforge-1.21.1.jar"))
 
+    // TACZ: which attachments and ammo fit a gun (IGun.allowAttachment, IAmmo.isAmmoOfGun) for the buy menu
+    compileOnly(files("libs/tacz-neoforge-1.21.1-1.1.8-hotfix-r7.jar"))
+
     // Create Aeronautics: Toolgun. Its .excraft blueprints are the schematics players share and spawn as vehicles.
     compileOnly(files("libs/create_aeronautics_toolgun-0.3.6.jar"))
 

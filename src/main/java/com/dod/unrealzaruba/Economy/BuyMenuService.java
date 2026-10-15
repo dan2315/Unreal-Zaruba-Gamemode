@@ -32,8 +32,15 @@ public final class BuyMenuService {
             player.displayClientMessage(reason, true);
             return;
         }
-        PacketDistributor.sendToPlayer(player, new OpenBuyMenuPacket(BuyMenuView.of(EconomyData.current(), item -> resolve(player, item))));
+        sendView(player);
         Wallets.sync(player);
+    }
+
+    /** The menu as this player sees it: items for their team, fit marks for the guns they carry now. */
+    private static void sendView(ServerPlayer player) {
+        java.util.function.Predicate<ItemStack> fits = TaczCompat.fitsGunsOf(player);
+        PacketDistributor.sendToPlayer(player, new OpenBuyMenuPacket(
+                BuyMenuView.of(EconomyData.current(), item -> resolve(player, item), fits)));
     }
 
     /** {@code items}: entry indices in the category. A grid tab buys one entry, a sets tab any of the set's pieces. */
@@ -79,6 +86,7 @@ public final class BuyMenuService {
         }
         stacks.forEach(stack -> give(player, stack));
         reply(player, true, Component.translatable("buymenu.unrealzaruba.bought", Money.format(total)));
+        sendView(player); // a new gun changes what fits
     }
 
     /** Null when the player may buy right now. */

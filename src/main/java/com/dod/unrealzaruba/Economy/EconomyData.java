@@ -19,6 +19,9 @@ public class EconomyData extends AbstractGamemodeData<EconomyConfig> {
     @Override
     public EconomyConfig loadData() {
         EconomyConfig config = super.loadData();
+        if (config.buyMenu == null || config.buyMenu.isEmpty()) {
+            config.buyMenu = EconomyConfig.createDefault().buyMenu; // a file with no menu gets the stock one
+        }
         saveData();
         return config;
     }
