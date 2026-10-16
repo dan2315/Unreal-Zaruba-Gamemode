@@ -1,5 +1,7 @@
 package com.dod.unrealzaruba.UI;
 
+import com.dod.unrealzaruba.UI.Compass.CompassOverlay;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
@@ -24,7 +26,11 @@ public class ScoreOverlay implements ZarubaOverlay {
         int scoreHeight = Math.round(font.lineHeight * SCORE_SCALE) - 1;
         int height = scoreHeight + 8;
         int x = (screenWidth - WIDTH) / 2;
+        // The compass strip lives at the very top; drop the score panel below it when visible.
         int y = HudStyle.MARGIN;
+        if (CompassOverlay.shouldRender(Minecraft.getInstance())) {
+            y = CompassOverlay.topOffset();
+        }
         HudStyle.panel(guiGraphics, x, y, WIDTH, height);
 
         int scoreBox = HudStyle.width(font, "000", SCORE_SCALE);

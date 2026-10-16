@@ -1,6 +1,7 @@
 package com.dod.unrealzaruba.Events;
 
 import com.dod.unrealzaruba.Renderers.GeometryRenderer;
+import com.dod.unrealzaruba.UI.Compass.CompassOverlay;
 import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UI.ScoreOverlay;
 import com.dod.unrealzaruba.UI.MoneyOverlay;
@@ -28,6 +29,7 @@ public class ModSetupEvents {
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "money"), MoneyOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "respawn"), RespawnOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "contraption_report"), com.dod.unrealzaruba.UI.ContraptionReportOverlay.INSTANCE);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "compass"), CompassOverlay.INSTANCE);
     }
 
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {

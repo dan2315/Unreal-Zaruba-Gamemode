@@ -33,6 +33,7 @@ public class CommandHandlerFactory {
         handlers.add(new BuildKitCommand());
         handlers.add(new UfWorldCommand());
         handlers.add(new SupplyDropCommand());
+        handlers.add(new CompassDebugCommand()); // /compass debug toggle for the compass strip
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());
