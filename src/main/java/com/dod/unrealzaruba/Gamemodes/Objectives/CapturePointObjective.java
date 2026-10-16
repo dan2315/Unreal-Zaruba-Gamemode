@@ -29,6 +29,10 @@ public class CapturePointObjective extends PositionedGameobjective {
     private BlockVolume captureArea;
     // Where the owners respawn (feet position). Null: on the floor at the center of the capture area
     private BlockPos respawnPosition;
+    // A point that is only a respawn: capturing it moves the team's respawn forward and advances no objective
+    private boolean respawnOnly;
+    // Team (RED, BLUE, ...) that holds the point when the match starts; respawn-only points default to BLUE
+    private String initialOwner;
 
     private transient AABB captureAreaAABB;
     private transient CaptureStatus captureStatus = CaptureStatus.None;
@@ -44,6 +48,21 @@ public class CapturePointObjective extends PositionedGameobjective {
         setProgressDisplay(new NetworkedSideHudListElement(this));
     }
 
+    public CapturePointObjective(String name, BlockVolume volume, boolean respawnOnly) {
+        this(name, volume);
+        this.respawnOnly = respawnOnly;
+        this.initialOwner = respawnOnly ? TeamColor.BLUE.name() : null;
+    }
+
+    public boolean IsRespawnOnly() {
+        return respawnOnly;
+    }
+
+    @Override
+    public boolean CountsForVictory() {
+        return !respawnOnly;
+    }
+
     @Override
     public void InitializeAfterSerialization() {
         super.InitializeAfterSerialization();
@@ -55,8 +74,19 @@ public class CapturePointObjective extends PositionedGameobjective {
             owner = teamManager.Get(TeamColor.RED);
         } else if (Objects.equals(name, "Склад боеприпасов")) {
             owner = teamManager.Get(TeamColor.BLUE);
+        } else if (respawnOnly || initialOwner != null) {
+            owner = initialOwnerTeam(teamManager);
         }
         MoveRespawnPoint(null, owner);
+    }
+
+    private TeamContext initialOwnerTeam(TeamManager teamManager) {
+        try {
+            return teamManager.Get(initialOwner != null ? TeamColor.valueOf(initialOwner) : TeamColor.BLUE);
+        } catch (IllegalArgumentException e) {
+            UnrealZaruba.LOGGER.warn("[CapturePointObjective] {} has an unknown initial owner '{}'", name, initialOwner);
+            return null;
+        }
     }
 
     public BlockPos GetRespawnPosition() {
@@ -188,7 +218,7 @@ public class CapturePointObjective extends PositionedGameobjective {
         int capturedByColor = capturingTeam == null ? 0xDDDDEE : capturingTeam.GetIntColor();
         return new HudCapturePointObjective(GetRuntimeId(), GetName(), ownerColor, capturedByColor,
                 ownerTeam == null ? null : ownerTeam.Color(), capturingTeam == null ? null : capturingTeam.Color(),
-                GetProgress(), GetPosition());
+                GetProgress(), GetPosition(), respawnOnly);
     }
 
     public void SendUpdateHudElement() {

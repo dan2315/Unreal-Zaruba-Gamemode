@@ -70,7 +70,7 @@ public class ObjectivesOverlay implements ZarubaOverlay {
         char letter = 'A';
         for (HudObjective objective : rows) {
             if (objective instanceof HudCapturePointObjective point) {
-                renderCapturePoint(g, font, point, letter++, left, right, cy);
+                renderCapturePoint(g, font, point, point.isRespawnOnly() ? '⌂' : letter++, left, right, cy);
             } else if (objective instanceof HudDestroyObjective target) {
                 renderDestroyTarget(g, font, target, left, right, cy);
             }
@@ -150,7 +150,7 @@ public class ObjectivesOverlay implements ZarubaOverlay {
     public String letterFor(byte runtimeId) {
         char letter = 'A';
         for (HudObjective objective : objectivesMap.values()) {
-            if (objective instanceof HudCapturePointObjective) {
+            if (objective instanceof HudCapturePointObjective point && !point.isRespawnOnly()) {
                 if (objective.GetRuntimeId() == runtimeId) return String.valueOf(letter);
                 letter++;
             }

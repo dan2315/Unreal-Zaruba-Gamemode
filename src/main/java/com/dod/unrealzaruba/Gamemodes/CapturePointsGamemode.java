@@ -246,7 +246,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
-        TeamManager.teleportToSpawnByPriority(serverPlayer);
+        TeamManager.teleportToChosenOrPriority(serverPlayer);
         serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 
@@ -327,6 +327,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     public void StartTeamSelection() {
         server.getPlayerList().getPlayers().forEach(player -> {
             player.setGameMode(GameType.ADVENTURE);
+            player.sendSystemMessage(Component.translatable("hud.unrealzaruba.respawn.pick_before_start"));
         });
     }
 
@@ -341,7 +342,7 @@ public class CapturePointsGamemode extends TeamGamemode {
                 }
             }
 
-            TeamManager.teleportToSpawnByPriority(player);
+            TeamManager.teleportToChosenOrPriority(player);
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         objectivesHandler.addRecipients(TeamManager.GetTeams());

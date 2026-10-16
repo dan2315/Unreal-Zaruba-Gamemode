@@ -135,6 +135,11 @@ public abstract class GameObjective {
         }
     }
 
+    /** False for objectives that only support the match (respawn points), so they don't hold up or end it. */
+    public boolean CountsForVictory() {
+        return true;
+    }
+
     public Byte GetRuntimeId() {
         return runtimeId;
     }

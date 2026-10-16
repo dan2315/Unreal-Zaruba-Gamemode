@@ -2,6 +2,7 @@ package com.dod.unrealzaruba.Gamemodes;
 
 import com.dod.unrealzaruba.Gamemodes.Barriers.BarrierVolumesData;
 import com.dod.unrealzaruba.Gamemodes.GamePhases.ConditionalPhase;
+import com.dod.unrealzaruba.Gamemodes.Objectives.CapturePointObjective;
 import com.dod.unrealzaruba.Gamemodes.Objectives.DestroyObjective;
 import com.dod.unrealzaruba.Gamemodes.Objectives.GameObjective;
 import com.dod.unrealzaruba.Gamemodes.StartCondition.CombinedOrCondition;
@@ -10,6 +11,9 @@ import com.dod.unrealzaruba.Gamemodes.StartCondition.TimePassedCondition;
 import com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper;
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.NetworkPackets.ClientboundObjectivesPacket;
+import com.dod.unrealzaruba.NetworkPackets.DeleteRenderableZonesPacket;
+import com.dod.unrealzaruba.NetworkPackets.RenderableZonesPacket;
+import com.dod.unrealzaruba.Renderers.ColoredSquareZone;
 import com.dod.unrealzaruba.NetworkPackets.ClientboundRemoveObjectivesPacket;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.Player.PlayerContext;
@@ -43,6 +47,7 @@ import com.dod.unrealzaruba.Config.MainConfig;
 import com.dod.unrealzaruba.ModBlocks.VehicleSpawn.VehicleSpawnData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DestroyObjectivesGamemode extends TeamGamemode {
     // Everyone is brought here when the map has loaded, before teams go to their spawns
@@ -141,6 +146,26 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             CompleteGame(server, TeamColor.RED);
         });
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
+        // The respawn points to capture are on the map from the start, so players can pick where to spawn
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            SendRespawnObjectives(player);
+        }
+    }
+
+    /** Respawn points that can be captured: their zones and state. They advance no objective. */
+    private void SendRespawnObjectives(ServerPlayer player) {
+        List<ColoredSquareZone> zones = new ArrayList<>();
+        ArrayList<HudObjective> hud = new ArrayList<>();
+        for (GameObjective objective : objectivesHandler.getObjectives()) {
+            if (objective instanceof CapturePointObjective point && point.IsRespawnOnly()) {
+                var owner = (TeamContext) point.GetOwner();
+                zones.add(new ColoredSquareZone(point.GetCaptureAreaAABB(), owner == null ? 0xDDDDEE : owner.GetIntColor()));
+                hud.add(point.ToHudObjective());
+            }
+        }
+        if (zones.isEmpty()) return;
+        PacketDistributor.sendToPlayer(player, new RenderableZonesPacket(zones));
+        PacketDistributor.sendToPlayer(player, new ClientboundObjectivesPacket(hud));
     }
 
     private void SendObjectivesDataToClients() {
@@ -162,6 +187,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     public void StartTeamSelection() {
         server.getPlayerList().getPlayers().forEach(player -> {
             player.setGameMode(GameType.ADVENTURE);
+            player.sendSystemMessage(Component.translatable("hud.unrealzaruba.respawn.pick_before_start"));
         });
     }
 
@@ -176,7 +202,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 }
             }
 
-            TeamManager.teleportToSpawnByPriority(player);
+            TeamManager.teleportToChosenOrPriority(player);
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         objectivesHandler.addRecipients(TeamManager.GetTeams());
@@ -241,6 +267,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             }
         }
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
+        SendRespawnObjectives(serverPlayer);
 
         if (server == null)
             return;
@@ -265,7 +292,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     private void ReturnToTeamSpawn(ServerPlayer serverPlayer) {
-        TeamManager.teleportToSpawnByPriority(serverPlayer);
+        TeamManager.teleportToChosenOrPriority(serverPlayer);
         serverPlayer.setGameMode(GameType.ADVENTURE);
     }
 
@@ -283,6 +310,11 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         for (ServerPlayer player : players) {
             player.setGameMode(GameType.SPECTATOR);
             player.getInventory().clearContent();
+            PacketDistributor.sendToPlayer(player, new DeleteRenderableZonesPacket(
+                    objectivesHandler.getObjectives().stream()
+                            .filter(obj -> obj instanceof CapturePointObjective)
+                            .map(obj -> ((CapturePointObjective) obj).GetCaptureAreaAABB().hashCode() + ColoredSquareZone.RenderableIDShift)
+                            .toList()));
         }
         if (gameStatistics != null) gameStatistics.SendGameData(this.getClass().getSimpleName(), TeamManager.Get(wonTeam).Members(), TeamManager.GetOppositeTeamTo(wonTeam).Members());
         TimerManager.createRealTimeTimer(3 * 1000 /*10s*/, () -> CompleteGameDelayed(server), null);
@@ -338,6 +370,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                         destructibleObjective.GetPosition()
                 );
                 hudObjectives.add(obj);
+            } else if (objective instanceof CapturePointObjective point && point.IsRespawnOnly()) {
+                hudObjectives.add(point.ToHudObjective());
             }
         }
     }

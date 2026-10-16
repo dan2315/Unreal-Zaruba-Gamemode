@@ -77,7 +77,8 @@ public class ObjectivesHandler implements IResettable {
     }
 
     public void CheckIfAllCompleted(GameObjective currentObjective) {
-        var allCompleted = objectives.stream().allMatch(GameObjective::IsCompleted);
+        var winning = objectives.stream().filter(GameObjective::CountsForVictory).toList();
+        var allCompleted = !winning.isEmpty() && winning.stream().allMatch(GameObjective::IsCompleted);
         if (allCompleted) onCompleted.run();
     }
 

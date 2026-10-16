@@ -17,6 +17,8 @@ public class HudCapturePointObjective extends HudObjective {
     private final TeamColor capturedBy;
     private float progress;
     private final BlockPos position;
+    /** A respawn point to capture, not a capture point: shown as a house and without a letter. */
+    private final boolean respawnOnly;
 
     public HudCapturePointObjective(FriendlyByteBuf buffer) {
         this.runtimeId = buffer.readByte();
@@ -27,10 +29,12 @@ public class HudCapturePointObjective extends HudObjective {
         this.capturedBy = readTeam(buffer);
         this.progress = buffer.readFloat();
         this.position = SerializationUtils.decodeBlockPos(buffer);
+        this.respawnOnly = buffer.readBoolean();
     }
 
     public HudCapturePointObjective(Byte runtimeId, String name, int ownerColor, int capturedByColor,
-                                    TeamColor owner, TeamColor capturedBy, float progress, BlockPos position) {
+                                    TeamColor owner, TeamColor capturedBy, float progress, BlockPos position,
+                                    boolean respawnOnly) {
         this.runtimeId = runtimeId;
         this.name = name;
         this.ownerColor = ownerColor;
@@ -39,6 +43,7 @@ public class HudCapturePointObjective extends HudObjective {
         this.capturedBy = capturedBy;
         this.progress = progress;
         this.position = position;
+        this.respawnOnly = respawnOnly;
     }
 
     @Override
@@ -52,6 +57,7 @@ public class HudCapturePointObjective extends HudObjective {
         writeTeam(buffer, capturedBy);
         buffer.writeFloat(progress);
         SerializationUtils.encodeBlockPos(buffer, position);
+        buffer.writeBoolean(respawnOnly);
     }
 
     private static void writeTeam(FriendlyByteBuf buffer, TeamColor team) {
@@ -86,6 +92,10 @@ public class HudCapturePointObjective extends HudObjective {
 
     public String GetName() {
         return name;
+    }
+
+    public boolean isRespawnOnly() {
+        return respawnOnly;
     }
 
     public BlockPos GetPosition() {

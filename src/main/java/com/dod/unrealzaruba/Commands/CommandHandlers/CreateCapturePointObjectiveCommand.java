@@ -16,7 +16,13 @@ import net.minecraft.network.chat.Component;
 public class CreateCapturePointObjectiveCommand implements ICommandHandler{
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("crtcpp")
+        register(dispatcher, "crtcpp", false);
+        register(dispatcher, "crtrespawn", true);
+    }
+
+    /** {@code respawnOnly}: a respawn point teams capture (blue holds it at the start) that advances no objective. */
+    private static void register(CommandDispatcher<CommandSourceStack> dispatcher, String literal, boolean respawnOnly) {
+        dispatcher.register(Commands.literal(literal)
         .requires(cs -> cs.hasPermission(3))
         .then(Commands.argument("name", StringArgumentType.string())
         .then(Commands.argument("pos1", BlockPosArgument.blockPos())
@@ -27,14 +33,14 @@ public class CreateCapturePointObjectiveCommand implements ICommandHandler{
             BlockPos pos2 = BlockPosArgument.getLoadedBlockPos(context, "pos2");
 
             BlockVolume volume = new BlockVolume(pos1, pos2);
-            CapturePointObjective objective = new CapturePointObjective(name, volume);
+            CapturePointObjective objective = new CapturePointObjective(name, volume, respawnOnly);
 
             var gm = GamemodeManager.instance.GetActiveGamemode();
             var dataHandler = GamemodeDataManager.getHandler(gm.getClass(), ObjectivesData.class);
             assert dataHandler != null;
             dataHandler.addObjective(objective);
             context.getSource().sendSuccess(
-                () -> Component.literal("Created objective: " + objective),
+                () -> Component.literal((respawnOnly ? "Created respawn point: " : "Created objective: ") + objective),
                 true
             );
             return 1;

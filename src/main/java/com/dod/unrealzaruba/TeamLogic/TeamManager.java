@@ -189,6 +189,17 @@ public class TeamManager implements IResettable {
         serverPlayer.teleportTo(WorldManager.gameLevel, x, y, z, 0, 0);
     }
 
+    /** The respawn point the player picked, if it is still the team's; otherwise the default by priority. */
+    public void teleportToChosenOrPriority(ServerPlayer serverPlayer) {
+        TeamContext team = GetPlayersTeam(serverPlayer);
+        if (team != null && PlayerContext.Get(serverPlayer.getUUID()) instanceof TeamPlayerContext context
+                && context.RespawnPointSelected() && team.RespawnPoints().contains(context.RespawnPoint())) {
+            teleportToSelectedPoint(serverPlayer);
+        } else {
+            teleportToSpawnByPriority(serverPlayer);
+        }
+    }
+
     public void teleportToSelectedPoint(ServerPlayer serverPlayer) {
         TeamPlayerContext playerContext = (TeamPlayerContext)PlayerContext.Get(serverPlayer.getUUID());
 

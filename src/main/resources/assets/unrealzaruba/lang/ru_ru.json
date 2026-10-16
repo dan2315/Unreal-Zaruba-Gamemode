@@ -75,6 +75,7 @@
     "hud.unrealzaruba.respawn.point": "Точка возрождения: %s",
     "hud.unrealzaruba.respawn.hint": "ПКМ по точке на карте — возродиться там",
     "hud.unrealzaruba.respawn.open_map": "Откройте карту, чтобы сменить точку",
+    "hud.unrealzaruba.respawn.pick_before_start": "Выберите, где появиться: откройте карту (M) и нажмите ПКМ по точке возрождения вашей команды",
     "hud.unrealzaruba.respawn.choose": "Выбрать точкой возрождения",
     "hud.unrealzaruba.respawn.current": "✔ Текущая точка возрождения",
     "hud.unrealzaruba.respawn.not_available": "Здесь нельзя возродиться",

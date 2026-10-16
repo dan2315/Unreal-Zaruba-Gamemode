@@ -42,6 +42,11 @@ public class XaeroWaypoints {
             ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "game_dim"));
     private static final String SELECTED_PREFIX = "► ";
     private static final String RESPAWN_SUFFIX = "-Resp";
+    // Waypoint initials are drawn with the game font, which has these shapes: castle for bases, star for capture
+    // points, house for respawn points
+    private static final String ICON_CASTLE = "♜";
+    private static final String ICON_STAR = "★";
+    private static final String ICON_HOUSE = "⌂";
 
     private record Wanted(String key, BlockPos pos, String name, String initials, WaypointColor color, Byte respawnId) {
         String signature() {
@@ -134,9 +139,8 @@ public class XaeroWaypoints {
         // The objectives themselves, in the colour of whoever holds them
         for (HudObjective objective : ObjectivesOverlay.INSTANCE.objectives()) {
             if (objective instanceof HudCapturePointObjective point) {
-                String letter = ObjectivesOverlay.INSTANCE.letterFor(point.GetRuntimeId());
                 wanted.add(new Wanted("objective:" + point.GetRuntimeId(), point.GetPosition(), point.GetName(),
-                        letter != null ? letter : initial(point.GetName()), teamColor(point.getOwner()), null));
+                        point.isRespawnOnly() ? ICON_HOUSE : ICON_STAR, teamColor(point.getOwner()), null));
             } else if (objective instanceof HudDestroyObjective target) {
                 wanted.add(new Wanted("objective:" + target.GetRuntimeId(), target.GetPosition(), target.GetName(),
                         initial(target.GetName()), WaypointColor.BLUE, null));
@@ -164,7 +168,7 @@ public class XaeroWaypoints {
             wanted.add(new Wanted("enemy_base:" + index++, base.position().above(),
                     net.minecraft.network.chat.Component.translatable("waypoint.unrealzaruba.enemy_base",
                             base.team().getDisplayName()).getString(),
-                    "E", teamColor(base.team()), null));
+                    ICON_CASTLE, teamColor(base.team()), null));
         }
         return wanted;
     }
@@ -174,12 +178,7 @@ public class XaeroWaypoints {
     }
 
     private static String kindInitial(RespawnPointsView.Kind kind) {
-        return switch (kind) {
-            case BASE -> "B";
-            case TENT -> "T";
-            case VEHICLE -> "V";
-            case CAPTURE_POINT -> "C";
-        };
+        return kind == RespawnPointsView.Kind.BASE ? ICON_CASTLE : ICON_HOUSE;
     }
 
     private static WaypointColor teamColor(TeamColor team) {

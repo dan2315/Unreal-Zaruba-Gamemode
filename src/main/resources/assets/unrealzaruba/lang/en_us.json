@@ -76,6 +76,7 @@
     "hud.unrealzaruba.respawn.point": "Respawn point: %s",
     "hud.unrealzaruba.respawn.hint": "Right-click a point on the map to respawn there",
     "hud.unrealzaruba.respawn.open_map": "Open the map to change it",
+    "hud.unrealzaruba.respawn.pick_before_start": "Choose where you spawn: open the map (M) and right-click a respawn point of your team",
     "hud.unrealzaruba.respawn.choose": "Choose as respawn point",
     "hud.unrealzaruba.respawn.current": "✔ Current respawn point",
     "hud.unrealzaruba.respawn.not_available": "Can't respawn here",
