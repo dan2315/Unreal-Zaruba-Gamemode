@@ -26,6 +26,13 @@ public class UfWorldCommand implements ICommandHandler {
                             + ", scanner " + rules.scanner() + ", checked " + age + " s ago"), false);
                     return 1;
                 }))
+                .then(Commands.literal("leakcheck").executes(context -> {
+                    int alive = com.dod.unrealzaruba.WorldManager.WorldManager.retiredLevelsAlive();
+                    Runtime runtime = Runtime.getRuntime();
+                    context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("Closed game levels still in memory: " + alive
+                            + ", heap used " + (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024) + " MB of " + runtime.maxMemory() / (1024 * 1024) + " MB"), false);
+                    return alive;
+                }))
                 .then(Commands.literal("world")
                         .then(Commands.literal("commit")
                                 .then(Commands.argument("slot", StringArgumentType.word())

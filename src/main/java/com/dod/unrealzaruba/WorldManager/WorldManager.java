@@ -70,6 +70,8 @@ public class WorldManager {
     private static volatile String currentMapKey;
 
     public static ServerLevel gameLevel;
+    /** Closed game levels, to see whether anything keeps them in memory (see {@link #retiredLevelsAlive()}). */
+    private static final List<java.lang.ref.WeakReference<ServerLevel>> RETIRED = new ArrayList<>();
     // Between the start of a map reload and the new level being created; the old level must not count as ready
     private static volatile boolean reloading;
     private static int reloadGeneration;
@@ -299,6 +301,7 @@ public class WorldManager {
         gameLevel = null;
 
         if (oldLevel != null) {
+            RETIRED.add(new java.lang.ref.WeakReference<>(oldLevel));
             // Nobody may stay in a level that's being closed
             for (ServerPlayer player : new ArrayList<>(oldLevel.players())) {
                 teleportPlayerToDimension(player, LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
@@ -311,8 +314,56 @@ public class WorldManager {
             } catch (IOException e) {
                 UnrealZaruba.LOGGER.error("Failed to close the old game level", e);
             }
+            // Mods keep closed levels alive in their own caches, ~500 MB each. Gadgets & Gizmos maps containers to their
+            // level in a WeakHashMap whose values hold the keys, so those entries never go; Flywheel forgets a level on
+            // Unload but caches it again while the level closes
+            forgetInOtherMods(oldLevel);
+            TimerManager.createRealTimeTimer(3000, () -> forgetInOtherMods(oldLevel), null);
         }
         closeAccess();
+    }
+
+    /** How many closed game levels are still in memory after a full collection: should be 0. */
+    public static int retiredLevelsAlive() {
+        for (int i = 0; i < 3; i++) {
+            System.gc();
+            try { Thread.sleep(300); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        }
+        RETIRED.removeIf(reference -> reference.get() == null);
+        return RETIRED.size();
+    }
+
+    private static void forgetInOtherMods(ServerLevel level) {
+        forgetInFlywheel(level);
+        // Create Aeronautics keeps a ticker list per level in a static map and does not drop it when the level closes
+        callStatic("dev.eriksonn.aeronautics.api.levitite_blend_crystallization.LevititeCrystallizerManager", "clearLevel", level);
+        try {
+            Class<?> transformations = Class.forName("com.rieno.gadgetsandgizmos.lib.item.TimedItemTransformations", false,
+                    Thread.currentThread().getContextClassLoader());
+            java.lang.reflect.Field field = transformations.getDeclaredField("CONTAINERS");
+            field.setAccessible(true);
+            ((java.util.Map<?, ?>) field.get(null)).values().removeIf(value -> value == level);
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            // other version or not installed
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            UnrealZaruba.LOGGER.warn("Could not make Gadgets and Gizmos forget a closed level: {}", e.toString());
+        }
+    }
+
+    private static void forgetInFlywheel(ServerLevel level) {
+        callStatic("dev.engine_room.flywheel.lib.util.LevelAttached", "invalidateLevel", level);
+    }
+
+    /** {@code className.method(level)} when that mod is there; closed levels must not stay in other mods' static caches. */
+    private static void callStatic(String className, String method, ServerLevel level) {
+        try {
+            Class.forName(className, false, Thread.currentThread().getContextClassLoader())
+                    .getMethod(method, net.minecraft.world.level.LevelAccessor.class).invoke(null, level);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            // other version or not installed
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            UnrealZaruba.LOGGER.warn("Could not make {} forget a closed level: {}", className, e.toString());
+        }
     }
 
     private static void closeAccess() {
