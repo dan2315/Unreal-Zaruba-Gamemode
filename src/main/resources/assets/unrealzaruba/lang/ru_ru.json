@@ -288,6 +288,7 @@
     "schematics.unrealzaruba.spawn.wait": "Готово через %s с",
     "schematics.unrealzaruba.spawn.no_answer": "Сервер не ответил. Попробуйте ещё раз",
     "schematics.unrealzaruba.spawn.disabled": "На этой карте спавн техники выключен",
+    "schematics.unrealzaruba.spawn.area_busy": "Путь занят: перед спавнером (%1$s x %1$s x %1$s) не должно быть техники",
     "schematics.unrealzaruba.spawn.too_far": "Подойдите к блоку спавна техники",
     "schematics.unrealzaruba.spawn.dead": "Сейчас нельзя заспавнить технику",
     "schematics.unrealzaruba.spawn.cooldown": "Блок перезаряжается: %s с",

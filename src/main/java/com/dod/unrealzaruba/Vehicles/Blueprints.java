@@ -36,7 +36,53 @@ public final class Blueprints {
         }
     }
 
+    /** Where the blocks of a blueprint lie in the horizontal plane, relative to the root of the vehicle (the point it is placed by). */
+    public record Footprint(double minX, double maxX, double minZ, double maxZ) {
+        public double centerX() { return (minX + maxX) / 2; }
+        public double centerZ() { return (minZ + maxZ) / 2; }
+        public double sizeX() { return maxX - minX; }
+        public double sizeZ() { return maxZ - minZ; }
+    }
+
     private static final long MAX_UNPACKED_BYTES = 32L * 1024 * 1024;
+
+    /**
+     * The footprint of the blueprint as it is placed (upright, aligned to the axes), worked out the way the hologram is,
+     * so that what the player sees is what the vehicle does. Null when it cannot be worked out.
+     */
+    @Nullable
+    public static Footprint footprint(byte[] data, @Nullable Level level) {
+        try {
+            var preview = com.enxv.aeronauticsstructuretool.PreviewBlueprintData.parse(withoutSavedRotation(data), level);
+            double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
+            double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
+            // The blocks with models; when there are none, the outline points stand in for them
+            for (int pass = 0; pass < 2 && minX == Double.POSITIVE_INFINITY; pass++) {
+                for (var sub : preview.subLevels()) {
+                    org.joml.Vector3d offset = new org.joml.Vector3d(sub.relativePosition()).sub(preview.rootRelativePosition());
+                    org.joml.Quaterniond rotation = new org.joml.Quaterniond(sub.relativeOrientation());
+                    java.util.List<org.joml.Vector3d> centers = new java.util.ArrayList<>();
+                    if (pass == 0) {
+                        for (var block : sub.previewBlocks()) centers.add(new org.joml.Vector3d(block.center()));
+                    } else {
+                        for (org.joml.Vector3d point : sub.sampleBlocks()) centers.add(new org.joml.Vector3d(point));
+                    }
+                    for (org.joml.Vector3d center : centers) {
+                        org.joml.Vector3d local = new org.joml.Vector3d(center).sub(sub.localPlotAnchor());
+                        rotation.transform(local);
+                        local.add(offset);
+                        minX = Math.min(minX, local.x - 0.5);
+                        maxX = Math.max(maxX, local.x + 0.5);
+                        minZ = Math.min(minZ, local.z - 0.5);
+                        maxZ = Math.max(maxZ, local.z + 0.5);
+                    }
+                }
+            }
+            return minX == Double.POSITIVE_INFINITY ? null : new Footprint(minX, maxX, minZ, maxZ);
+        } catch (IOException | RuntimeException | LinkageError e) {
+            return null;
+        }
+    }
 
     /**
      * Blueprints remember the world orientation their vehicle had when it was saved (root_orientation) and the toolgun

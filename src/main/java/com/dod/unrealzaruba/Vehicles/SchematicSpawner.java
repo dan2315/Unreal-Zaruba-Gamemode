@@ -128,13 +128,30 @@ public final class SchematicSpawner {
             return;
         }
 
-        // Behind the block (it faces the players using it), far enough that the vehicle clears it
+        // Behind the block (it faces the players using it): the blocks of the vehicle start a gap behind it and are centred on
+        // the axis of the block (left to right). The point a vehicle is placed by is not the middle of its blocks, so the
+        // difference is worked out from the blocks themselves.
         Direction facing = block.getBlockState().getValue(BlockStateProperties.FACING);
         Direction away = facing.getAxis().isHorizontal() ? facing.getOpposite() : Direction.NORTH;
-        double distance = 0.5 + limits.gap + Math.max(info.width(), info.depth()) / 2.0;
-        double centerX = pos.getX() + 0.5 + away.getStepX() * distance;
-        double centerZ = pos.getZ() + 0.5 + away.getStepZ() * distance;
+        Blueprints.Footprint footprint = Blueprints.footprint(data, level);
+        double centerX;
+        double centerZ;
+        if (footprint != null) {
+            double along = away.getAxis() == Direction.Axis.X ? footprint.sizeX() : footprint.sizeZ();
+            double distance = 0.5 + limits.gap + along / 2.0;
+            centerX = pos.getX() + 0.5 + away.getStepX() * distance - footprint.centerX();
+            centerZ = pos.getZ() + 0.5 + away.getStepZ() * distance - footprint.centerZ();
+        } else {
+            double distance = 0.5 + limits.gap + Math.max(info.width(), info.depth()) / 2.0;
+            centerX = pos.getX() + 0.5 + away.getStepX() * distance;
+            centerZ = pos.getZ() + 0.5 + away.getStepZ() * distance;
+        }
         double minimumBlockCenterY = pos.getY() + 1.5; // a block above the floor, so uneven ground doesn't clip it
+
+        if (!areaIsFree(level, pos, away)) {
+            fail(player, Component.translatable("schematics.unrealzaruba.spawn.area_busy", AREA));
+            return;
+        }
 
         // The first payment starts a purchase others can add to; paying everything buys the vehicle right away
         int amount = Math.max(1, Math.min(contribution, price));
@@ -150,6 +167,33 @@ public final class SchematicSpawner {
             PacketDistributor.sendToPlayer(player, new ClientboundSchematicSpawnResultPacket(true,
                     Component.translatable("schematics.unrealzaruba.purchase.started", name, Money.format(amount), Money.format(price))));
         }
+    }
+
+    /** The area in front of the spawner that has to be clear of other vehicles: this many blocks each way. */
+    private static final int AREA = 30;
+
+    /** No vehicle (nor anything else that is a sub-level) in the cube of {@link #AREA} blocks in front of the block. */
+    private static boolean areaIsFree(ServerLevel level, BlockPos pos, Direction away) {
+        var container = dev.ryanhcode.sable.api.sublevel.SubLevelContainer.getContainer(level);
+        if (container == null) return true;
+        double half = AREA / 2.0;
+        double minX = pos.getX() + 0.5 - half, maxX = pos.getX() + 0.5 + half;
+        double minZ = pos.getZ() + 0.5 - half, maxZ = pos.getZ() + 0.5 + half;
+        if (away.getStepX() > 0) { minX = pos.getX() + 1; maxX = minX + AREA; }
+        else if (away.getStepX() < 0) { maxX = pos.getX(); minX = maxX - AREA; }
+        if (away.getStepZ() > 0) { minZ = pos.getZ() + 1; maxZ = minZ + AREA; }
+        else if (away.getStepZ() < 0) { maxZ = pos.getZ(); minZ = maxZ - AREA; }
+        double minY = pos.getY();
+        double maxY = pos.getY() + AREA;
+        for (var subLevel : container.getAllSubLevels()) {
+            if (subLevel.isRemoved()) continue;
+            var box = subLevel.boundingBox();
+            if (box.maxX() > minX && box.minX() < maxX && box.maxY() > minY && box.minY() < maxY
+                    && box.maxZ() > minZ && box.minZ() < maxZ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void fail(ServerPlayer player, Component reason) {

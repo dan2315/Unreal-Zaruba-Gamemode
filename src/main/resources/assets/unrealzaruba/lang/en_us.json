@@ -289,6 +289,7 @@
     "schematics.unrealzaruba.spawn.wait": "Ready in %ss",
     "schematics.unrealzaruba.spawn.no_answer": "The server didn't answer. Try again",
     "schematics.unrealzaruba.spawn.disabled": "Spawning vehicles is off on this map",
+    "schematics.unrealzaruba.spawn.area_busy": "The way is blocked: the area in front of the spawner (%1$s x %1$s x %1$s) must be free of vehicles",
     "schematics.unrealzaruba.spawn.too_far": "Stand next to the vehicle spawner",
     "schematics.unrealzaruba.spawn.dead": "You can't spawn a vehicle right now",
     "schematics.unrealzaruba.spawn.cooldown": "This spawner is recharging: %ss",
