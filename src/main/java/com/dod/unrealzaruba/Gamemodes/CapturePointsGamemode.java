@@ -167,6 +167,7 @@ public class CapturePointsGamemode extends TeamGamemode {
             });
         }
 
+        com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
 
         List<ColoredSquareZone> zones = new ArrayList<>();
@@ -357,6 +358,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     public void StartBattle() {
+        com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         TeamManager.PlayBattleSound();
 
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {

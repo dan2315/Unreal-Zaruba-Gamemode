@@ -17,6 +17,9 @@ config="mixins.${mod_id}.json"
 [[mixins]]
 config="mixins.${mod_id}.xaero.json"
 
+[[mixins]]
+config="mixins.${mod_id}.simulated.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

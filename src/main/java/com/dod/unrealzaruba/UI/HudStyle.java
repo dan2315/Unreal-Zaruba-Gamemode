@@ -39,6 +39,40 @@ public final class HudStyle {
         };
     }
 
+    /** Left edge offset of a skewed tile on its row: the top row leans right by {@code slant}, the bottom row not at all. */
+    private static int skew(int row, int h, int slant) {
+        return h <= 1 ? 0 : Math.round((h - 1 - row) * slant / (float) (h - 1));
+    }
+
+    /** A parallelogram leaning right, drawn row by row. */
+    public static void skewedRect(GuiGraphics g, int x, int y, int w, int h, int slant, int color) {
+        for (int row = 0; row < h; row++) {
+            int left = x + skew(row, h, slant);
+            g.fill(left, y + row, left + w, y + row + 1, color);
+        }
+    }
+
+    /** The left {@code fraction} of the parallelogram, for progress. */
+    public static void skewedRectFilled(GuiGraphics g, int x, int y, int w, int h, int slant, float fraction, int color) {
+        int filled = Math.max(1, Math.round(w * Math.max(0, Math.min(1, fraction))));
+        for (int row = 0; row < h; row++) {
+            int left = x + skew(row, h, slant);
+            g.fill(left, y + row, left + filled, y + row + 1, color);
+        }
+    }
+
+    public static void skewedOutline(GuiGraphics g, int x, int y, int w, int h, int slant, int color) {
+        for (int row = 0; row < h; row++) {
+            int left = x + skew(row, h, slant);
+            if (row == 0 || row == h - 1) {
+                g.fill(left, y + row, left + w, y + row + 1, color);
+            } else {
+                g.fill(left, y + row, left + 1, y + row + 1, color);
+                g.fill(left + w - 1, y + row, left + w, y + row + 1, color);
+            }
+        }
+    }
+
     public static void panel(GuiGraphics g, int x, int y, int w, int h) {
         g.fill(x, y, x + w, y + h, PANEL);
         g.renderOutline(x, y, w, h, PANEL_BORDER);

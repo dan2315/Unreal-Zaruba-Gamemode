@@ -1,0 +1,23 @@
+{
+  "vertex": "unrealzaruba:purchase_ghost",
+  "fragment": "unrealzaruba:purchase_ghost",
+  "samplers": [
+    { "name": "Sampler0" },
+    { "name": "Sampler2" }
+  ],
+  "uniforms": [
+    { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "ChunkOffset", "type": "float", "count": 3, "values": [ 0.0, 0.0, 0.0 ] },
+    { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+    { "name": "FogStart", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "FogEnd", "type": "float", "count": 1, "values": [ 1.0 ] },
+    { "name": "FogColor", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 0.0 ] },
+    { "name": "FogShape", "type": "int", "count": 1, "values": [ 0 ] },
+    { "name": "GhostTime", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "FillHeight", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "FillSoft", "type": "float", "count": 1, "values": [ 0.35 ] },
+    { "name": "FillColor", "type": "float", "count": 3, "values": [ 0.30, 0.72, 1.0 ] },
+    { "name": "EdgeColor", "type": "float", "count": 3, "values": [ 0.333, 0.902, 1.0 ] }
+  ]
+}

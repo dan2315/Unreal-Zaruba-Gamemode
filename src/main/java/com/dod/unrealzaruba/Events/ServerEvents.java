@@ -70,6 +70,8 @@ public class ServerEvents {
         MapScan.tick(server);
         if (!isDevMode) {
             gamemodeManager.Tick();
+            com.dod.unrealzaruba.Vehicles.PurchaseSessions.tick(server);
+            com.dod.unrealzaruba.Vehicles.TrackedVehicles.tick(server);
             SideIncome.tick(server);
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }

@@ -67,6 +67,9 @@ public abstract class BaseGamemode implements IPhaseHolder {
         Wallets.reset(server);
         SideIncome.reset();
         TeamStorage.reset();
+        // A new match, or a restarted mode: the previous one leaves no vehicles or purchases on the clients
+        com.dod.unrealzaruba.Vehicles.TrackedVehicles.reset();
+        com.dod.unrealzaruba.Vehicles.PurchaseSessions.reset();
         MapPacks.select(server, this.getClass().getSimpleName());
         WorldManager.ReloadGameWorldDelayed(this);
     }

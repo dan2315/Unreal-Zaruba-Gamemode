@@ -145,6 +145,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             UnrealZaruba.LOGGER.warn("ALL OBJECTIVES COMPLETED");
             CompleteGame(server, TeamColor.RED);
         });
+        com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         WorldManager.TeleportAllPlayersTo(server, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
         // The respawn points to capture are on the map from the start, so players can pick where to spawn
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -218,6 +219,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void StartBattle() {
+        com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         gameTimer.startCountDown(System.currentTimeMillis(), GAME_DURATION_S);
         TeamManager.PlayBattleSound();
 

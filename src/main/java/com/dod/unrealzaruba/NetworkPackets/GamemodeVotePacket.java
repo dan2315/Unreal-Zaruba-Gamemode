@@ -27,12 +27,8 @@ public class GamemodeVotePacket implements ModPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                int result = GamemodeManager.instance.Vote(player.getUUID(), msg.gamemodeId);
-                if (result == 0) {
-                    player.sendSystemMessage(Component.literal("Вы сейчас не можете проголосовать за игровой режим"));
-                } else if (result == 1) {
-                    player.sendSystemMessage(Component.literal("Ваш голос за " + msg.gamemodeId + " успешно записан"));
-                }
+                // The lobby screens show the vote, no chat messages
+                GamemodeManager.instance.Vote(player.getUUID(), msg.gamemodeId);
             }
         });
         ctx.get().setPacketHandled(true);

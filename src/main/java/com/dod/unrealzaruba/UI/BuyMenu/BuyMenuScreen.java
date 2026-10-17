@@ -53,7 +53,7 @@ public class BuyMenuScreen extends Screen {
     private static final int RIGHT = 152;
     private static final int GAP = 6;
     private static final int MIN_CARD_WIDTH = 92;
-    private static final int CARD_HEIGHT = 56;
+    private static final int CARD_HEIGHT = 80;
     private static final int SET_CARD_HEIGHT = 66;
     private static final int RESULT_TICKS = 60;
 
@@ -102,6 +102,11 @@ public class BuyMenuScreen extends Screen {
                 if (cat.entries().get(i).index() == pickedIndex) { entry = i; break; }
             }
         }
+    }
+
+    @Override
+    protected void init() {
+        this.font = com.dod.unrealzaruba.UI.UiFont.get();
     }
 
     // ---------- state ----------
@@ -349,18 +354,18 @@ public class BuyMenuScreen extends Screen {
             boolean on = i == entry;
             g.fill(cx, cy, cx + cardWidth, cy + CARD_HEIGHT, on ? CARD_SELECTED : CARD);
             g.renderOutline(cx, cy, cardWidth, CARD_HEIGHT, on ? ACCENT : BORDER);
-            iconBox(g, cx + 4, cy + 4, cardWidth - 8, 26, e.stack());
+            iconBox(g, cx + 4, cy + 4, cardWidth - 8, 48, e.stack());
 
             String price = Money.format(e.price());
-            g.drawString(font, price, cx + cardWidth - 5 - font.width(price), cy + 34, ACCENT, false);
-            g.drawString(font, trim(entryName(e), cardWidth - 14 - font.width(price)), cx + 5, cy + 34, e.available() && e.compatible() ? TEXT : MUTED, false);
+            g.drawString(font, price, cx + cardWidth - 5 - font.width(price), cy + 57, ACCENT, false);
+            g.drawString(font, trim(entryName(e), cardWidth - 14 - font.width(price)), cx + 5, cy + 57, e.available() && e.compatible() ? TEXT : MUTED, false);
             if (!e.compatible()) {
                 g.fill(cx + 1, cy + 1, cx + cardWidth - 1, cy + CARD_HEIGHT - 1, 0x99101418); // greyed out
             }
-            drawSmall(g, trim(text(e.note()), (int) ((cardWidth - 10) / 0.75f)), cx + 5, cy + 46, MUTED);
+            drawSmall(g, trim(text(e.note()), (int) ((cardWidth - 10) / 0.75f)), cx + 5, cy + 69, MUTED);
 
             boolean visible = mouseY >= top && mouseY < height - 8;
-            if (visible && mouseX >= cx + 4 && mouseX < cx + cardWidth - 4 && mouseY >= cy + 4 && mouseY < cy + 30) {
+            if (visible && mouseX >= cx + 4 && mouseX < cx + cardWidth - 4 && mouseY >= cy + 4 && mouseY < cy + 52) {
                 hoveredStack = e.stack();
             }
             int index = i;
@@ -389,8 +394,8 @@ public class BuyMenuScreen extends Screen {
         g.drawString(font, Component.literal(trim(entryName(e), right - left)).withStyle(ChatFormatting.BOLD), left, y, TEXT, false);
         y += 14;
 
-        iconBox(g, left, y, right - left, 34, e.stack());
-        y += 40;
+        iconBox(g, left, y, right - left, 56, e.stack());
+        y += 62;
 
         y = renderStats(g, e.stats(), left, right, y);
         if (!e.stats().isEmpty() && !e.info().isEmpty()) {
@@ -617,7 +622,7 @@ public class BuyMenuScreen extends Screen {
             g.drawCenteredString(font, "?", x + w / 2, y + (h - 8) / 2, MUTED);
             return;
         }
-        float scale = Math.min(2.0f, (h - 4) / 16f);
+        float scale = Math.min(3.5f, (Math.min(w, h) - 4) / 16f);
         g.pose().pushPose();
         g.pose().translate(x + w / 2f - 8 * scale, y + h / 2f - 8 * scale, 0);
         g.pose().scale(scale, scale, 1);

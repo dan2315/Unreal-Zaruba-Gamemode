@@ -36,7 +36,7 @@ public class TimerOverlay implements ZarubaOverlay, IGameTimer {
             return;
         }
 
-        Font font = mc.font;
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
 
         var displayableText = String.format("%02d:%02d", this.minutes, this.seconds);
 //        int x = screenWidth / 2 - font.width(displayableText) / 2;

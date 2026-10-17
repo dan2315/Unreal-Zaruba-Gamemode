@@ -16,7 +16,8 @@
     "ServerLevelMixin"
   ],
   "client": [
-    "ClientPacketListenerMixin"
+    "ClientPacketListenerMixin",
+    "ToastComponentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

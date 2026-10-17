@@ -23,14 +23,17 @@ public class SpawnSchematicPiecePacket implements ModPacket {
     public final int totalSize;
     public final int offset;
     public final byte[] data;
+    /** What the player pays into the purchase this starts. */
+    public final int contribution;
 
-    public SpawnSchematicPiecePacket(BlockPos pos, long schematicId, String name, int totalSize, int offset, byte[] data) {
+    public SpawnSchematicPiecePacket(BlockPos pos, long schematicId, String name, int totalSize, int offset, byte[] data, int contribution) {
         this.pos = pos;
         this.schematicId = schematicId;
         this.name = name;
         this.totalSize = totalSize;
         this.offset = offset;
         this.data = data;
+        this.contribution = contribution;
     }
 
     public static void encode(SpawnSchematicPiecePacket msg, FriendlyByteBuf buf) {
@@ -40,11 +43,12 @@ public class SpawnSchematicPiecePacket implements ModPacket {
         buf.writeVarInt(msg.totalSize);
         buf.writeVarInt(msg.offset);
         buf.writeByteArray(msg.data);
+        buf.writeVarInt(msg.contribution);
     }
 
     public static SpawnSchematicPiecePacket decode(FriendlyByteBuf buf) {
         return new SpawnSchematicPiecePacket(buf.readBlockPos(), buf.readVarLong(), buf.readUtf(64), buf.readVarInt(),
-                buf.readVarInt(), buf.readByteArray(MAX_PIECE));
+                buf.readVarInt(), buf.readByteArray(MAX_PIECE), buf.readVarInt());
     }
 
     public static void handle(SpawnSchematicPiecePacket msg, Supplier<PacketContext> ctx) {

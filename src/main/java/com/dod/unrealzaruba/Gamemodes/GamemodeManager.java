@@ -24,6 +24,7 @@ public class GamemodeManager {
 
     private HashMap<UUID, String> playerVotes = new HashMap<>();
     private boolean isVoting = true;
+    private int lobbyTicks;
 
     public BaseGamemode GetActiveGamemode() {
         return activeGamemode;
@@ -39,6 +40,22 @@ public class GamemodeManager {
 
     public void StartVoting() {
         isVoting = true;
+        com.dod.unrealzaruba.Lobby.LobbyService.broadcast();
+    }
+
+    public boolean IsVoting() {
+        return isVoting;
+    }
+
+    /** Votes per mode id. */
+    public java.util.Map<String, Integer> VoteCounts() {
+        java.util.Map<String, Integer> counts = new HashMap<>();
+        playerVotes.values().forEach(vote -> counts.merge(vote, 1, Integer::sum));
+        return counts;
+    }
+
+    public String VoteOf(UUID playerId) {
+        return playerVotes.get(playerId);
     }
 
     public int Vote(UUID playerId, String vote) {
@@ -47,6 +64,7 @@ public class GamemodeManager {
         }
 
         playerVotes.put(playerId, vote);
+        com.dod.unrealzaruba.Lobby.LobbyService.broadcast();
         return 1;
     }
 
@@ -64,6 +82,10 @@ public class GamemodeManager {
         var players = server.getPlayerList().getPlayers();
         if (players.size() == 0) {
             return;
+        }
+        // Joins, leaves and ready changes reach the lobby screens within a second
+        if (++lobbyTicks % 20 == 0) {
+            com.dod.unrealzaruba.Lobby.LobbyService.broadcast();
         }
 
         boolean allPlayersReady = true;
@@ -113,6 +135,7 @@ public class GamemodeManager {
         }
 
         playerVotes.clear();
+        com.dod.unrealzaruba.Lobby.LobbyService.broadcast();
     }
 
     public void SetActiveGamemode(BaseGamemode gamemode) {
@@ -121,6 +144,8 @@ public class GamemodeManager {
 
     public void CleanupCurrentGamemode() {
         activeGamemode = null;
+        com.dod.unrealzaruba.Vehicles.PurchaseSessions.reset();
+        com.dod.unrealzaruba.Vehicles.TrackedVehicles.reset();
         Wallets.clear(ServerLifecycleHooks.getCurrentServer());
         StartVoting();
     }

@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * Objectives panel on the left, under Xaero's minimap: a lettered row per capture point (owner badge, name, status,
+ * Objectives panel on the left, under Xaero's minimap, shown while TAB is held (the minimal row is {@link ObjectivesStrip}): a lettered row per capture point (owner badge, name, status,
  * progress bar), destroy targets with their progress, and the goal text below a divider.
  */
 public class ObjectivesOverlay implements ZarubaOverlay {
@@ -28,6 +28,8 @@ public class ObjectivesOverlay implements ZarubaOverlay {
     private static final float SMALL = 0.75f;
     /** Room for Xaero's minimap and its coordinates line in the top left corner. */
     private static final int MINIMAP_SPACE = 124;
+    /** How far the panel sits below the minimap. */
+    private static final int PANEL_DROP = 16;
 
     public boolean isVisible = true;
     // Insertion order is the order the server sent them in, which gives capture points stable letters
@@ -37,8 +39,9 @@ public class ObjectivesOverlay implements ZarubaOverlay {
 
     @Override
     public void render(Gui gui, GuiGraphics g, float partialTick, int screenWidth, int screenHeight) {
-        if (!isVisible || objectivesMap.isEmpty()) return;
-        Font font = gui.getFont();
+        // The full list is for looking at the match state: shown while the player list key (TAB) is held
+        if (!isVisible || objectivesMap.isEmpty() || !net.minecraft.client.Minecraft.getInstance().options.keyPlayerList.isDown()) return;
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
 
         List<HudObjective> rows = new ArrayList<>();
         List<FormattedCharSequence> footer = new ArrayList<>();
@@ -56,8 +59,8 @@ public class ObjectivesOverlay implements ZarubaOverlay {
         if (!footer.isEmpty()) height += 1 + ROW_GAP + footer.size() * (font.lineHeight + 1);
         height += PADDING_Y - ROW_GAP + (footer.isEmpty() ? 0 : ROW_GAP);
 
-        int x = HudStyle.MARGIN;
-        int y = ModList.get().isLoaded("xaerominimap") ? MINIMAP_SPACE : HudStyle.MARGIN;
+        int x = 0; // against the left edge of the screen
+        int y = (ModList.get().isLoaded("xaerominimap") ? MINIMAP_SPACE : HudStyle.MARGIN) + PANEL_DROP;
         y = Math.max(HudStyle.MARGIN, Math.min(y, screenHeight - height - HudStyle.MARGIN));
         HudStyle.panel(g, x, y, WIDTH, height);
 

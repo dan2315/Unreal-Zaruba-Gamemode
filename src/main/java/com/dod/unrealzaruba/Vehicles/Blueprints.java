@@ -76,18 +76,20 @@ public final class Blueprints {
 
     /**
      * Places a blueprint centered on (centerX, centerZ) with its lowest blocks' centers at minimumBlockCenterY.
-     * Throws with the toolgun's reason when it refuses the blueprint or the spot.
+     * Throws with the toolgun's reason when it refuses the blueprint or the spot. Returns the id of the vehicle's main
+     * sub-level when the placement says which one it is, null otherwise.
      */
-    public static void place(ServerPlayer player, ServerLevel level, String name, byte[] data,
+    @Nullable
+    public static java.util.UUID place(ServerPlayer player, ServerLevel level, String name, byte[] data,
                              double centerX, double centerZ, double minimumBlockCenterY) throws IOException {
         data = withoutSavedRotation(data);
         if (CreatePhysicalBlueprintService.hasCreatePhysicalLayout(data)) {
             CreatePhysicalBlueprintService.placeAlignedToMinimum(player, level, name, data, centerX, centerZ, minimumBlockCenterY);
-            return;
+            return null;
         }
         double bottomY = PortableStructurePreviewData.fromBlueprintBytes(name, data, level).bottomY();
         BlockPos anchor = BlockPos.containing(centerX, minimumBlockCenterY - 1, centerZ);
-        NativeBlueprintPlacementService.place(
+        var result = NativeBlueprintPlacementService.place(
                 level,
                 anchor,
                 Direction.UP,
@@ -107,5 +109,6 @@ public final class Blueprints {
                 player.getUUID(),
                 null
         );
+        return result != null && result.rootSubLevel() != null ? result.rootSubLevel().getUniqueId() : null;
     }
 }

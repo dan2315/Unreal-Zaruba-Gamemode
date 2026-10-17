@@ -18,7 +18,7 @@ public class RespawnOverlay implements ZarubaOverlay {
     @Override
     public void render(Gui gui, GuiGraphics g, float partialTick, int screenWidth, int screenHeight) {
         if (!RespawnClientState.isDead() || Minecraft.getInstance().screen != null) return;
-        Font font = gui.getFont();
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
 
         String countdown = Component.translatable("hud.unrealzaruba.respawn.in", Math.max(0, RespawnClientState.secondsLeft())).getString().toUpperCase();
         String point = Component.translatable("hud.unrealzaruba.respawn.point", describe(RespawnClientState.view().effective())).getString();

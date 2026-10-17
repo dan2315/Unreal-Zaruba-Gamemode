@@ -73,6 +73,9 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
     @Nullable
     private final Spawner spawner;
     private int cooldownTicks;
+    /** How much of the price the player pays now: the first payment of a joint purchase, others add to it. */
+    private final com.dod.unrealzaruba.UI.AmountSlider slider = new com.dod.unrealzaruba.UI.AmountSlider();
+    private long sliderFor = -1;
     /** Waiting for the server to answer a spawn request; counts down to a timeout. */
     private int spawnWaitTicks;
 
@@ -247,7 +250,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             String name = s.name.length() > 64 ? s.name.substring(0, 64) : s.name;
             for (int offset = 0; offset < data.length; offset += SpawnSchematicPiecePacket.MAX_PIECE) {
                 byte[] piece = java.util.Arrays.copyOfRange(data, offset, Math.min(data.length, offset + SpawnSchematicPiecePacket.MAX_PIECE));
-                PacketDistributor.sendToServer(new SpawnSchematicPiecePacket(spawner.pos(), s.id, name, data.length, offset, piece));
+                PacketDistributor.sendToServer(new SpawnSchematicPiecePacket(spawner.pos(), s.id, name, data.length, offset, piece, slider.value()));
             }
         });
     }
@@ -314,6 +317,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
 
     @Override
     protected void init() {
+        this.font = com.dod.unrealzaruba.UI.UiFont.get();
         search = new EditBox(font, 0, 0, 100, 10, Component.translatable("schematics.unrealzaruba.search"));
         search.setBordered(false);
         search.setMaxLength(64);
@@ -326,6 +330,24 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             }
         });
         addRenderableWidget(search);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (spawner != null && button == 0 && slider.mouseClicked(mouseX, mouseY)) return true;
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (spawner != null && slider.mouseDragged(mouseX)) return true;
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        slider.mouseReleased();
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
@@ -527,7 +549,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         boolean own = isMine(s);
         boolean canRate = SchematicsApi.isLoggedIn() && !own;
         int bottom = height - 8;
-        int buttonsTop = bottom - 18 - (own ? 21 : 0);
+        int buttonsTop = bottom - 18 - (own ? 21 : 0) - (spawner != null ? 32 : 0);
         int ratingTop = buttonsTop - (canRate ? 26 : 0);
         int statsTop = ratingTop - 5 * 9 - 6;
 
@@ -584,18 +606,37 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         // buttons
         int actionY = buttonsTop;
         if (spawner != null) {
-            // At a vehicle spawner the one thing to do is spawn; downloading is for the browser opened with the key
+            // At a vehicle spawner the one thing to do is pay: all of the price buys it, a part starts a joint purchase
+            int price = s.price != null ? Money.charge(s.price) : 0;
+            int balance = com.dod.unrealzaruba.UI.MoneyOverlay.INSTANCE.getBalance();
+            int minimum = Math.min(Math.max(1, price), Math.max(1, price / 100));
+            int maximum = Math.min(price, balance);
+            slider.range(minimum, maximum);
+            if (sliderFor != s.id) {
+                sliderFor = s.id;
+                slider.setValue(maximum); // as much as the player can put in
+            }
+            boolean canPay = price > 0 && maximum >= minimum && maximum > 0;
+            String amountText = tr("schematics.unrealzaruba.purchase.contribute", Money.format(canPay ? slider.value() : 0));
+            g.drawString(font, amountText, left, actionY, canPay ? TEXT : MUTED, false);
+            String ofText = tr("schematics.unrealzaruba.purchase.of_price", Money.format(price));
+            g.drawString(font, ofText, left + w - font.width(ofText), actionY, MUTED, false);
+            slider.render(g, left + 3, actionY + 12, w - 6, mouseX, mouseY, slider.usable());
+            int payY = actionY + 32;
+            boolean full = canPay && slider.value() >= price;
             String label = busy ? tr("schematics.unrealzaruba.working")
                     : cooldownTicks > 0 ? tr("schematics.unrealzaruba.spawn.wait", (cooldownTicks + 19) / 20)
-                    : tr("schematics.unrealzaruba.spawn", s.price != null ? Money.format(Money.charge(s.price)) : "?");
-            button(g, left, actionY, w, 18, label, Style.PRIMARY, !busy && cooldownTicks == 0, () -> spawn(s));
+                    : !canPay ? tr("buymenu.unrealzaruba.no_funds")
+                    : full ? tr("schematics.unrealzaruba.spawn", Money.format(price))
+                    : tr("schematics.unrealzaruba.purchase.pay", Money.format(slider.value()));
+            button(g, left, payY, w, 18, label, Style.PRIMARY, !busy && cooldownTicks == 0 && canPay, () -> spawn(s));
         } else {
             button(g, left, actionY, w, 18, tr(busy ? "schematics.unrealzaruba.working" : "schematics.unrealzaruba.download"),
                     Style.PRIMARY, !busy, () -> download(s));
         }
         if (own) {
             int half = (w - 4) / 2;
-            int by2 = actionY + 21;
+            int by2 = actionY + (spawner != null ? 32 : 0) + 21;
             button(g, left, by2, half, 18, tr("schematics.unrealzaruba.edit"), Style.NORMAL, !busy && detail != null,
                     () -> minecraft.setScreen(new SchematicEditScreen(this, detail)));
             button(g, left + half + 4, by2, w - half - 4, 18,

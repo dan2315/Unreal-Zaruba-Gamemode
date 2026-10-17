@@ -26,6 +26,11 @@ public class UfWorldCommand implements ICommandHandler {
                             + ", scanner " + rules.scanner() + ", checked " + age + " s ago"), false);
                     return 1;
                 }))
+                .then(Commands.literal("clearmobs").executes(context -> {
+                    int cleared = com.dod.unrealzaruba.WorldManager.MapMobs.sweep(com.dod.unrealzaruba.WorldManager.WorldManager.gameLevel);
+                    context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal("Cleared " + cleared + " mobs from the game map"), false);
+                    return cleared;
+                }))
                 .then(Commands.literal("leakcheck").executes(context -> {
                     int alive = com.dod.unrealzaruba.WorldManager.WorldManager.retiredLevelsAlive();
                     Runtime runtime = Runtime.getRuntime();

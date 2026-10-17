@@ -19,14 +19,8 @@ public class VoteForGamemodeCommand implements ICommandHandler {
                             var player = context.getSource().getPlayer();
                             String gamemodeName = StringArgumentType.getString(context, "gamemodeName").toLowerCase();
 
-                            int result = GamemodeManager.instance.Vote(player.getUUID(), gamemodeName);
-
-                            if (result == 0) {
-                                player.sendSystemMessage(Component.literal("Сейчас не стадия голосования"));
-                            }
-
-                            player.sendSystemMessage(Component.literal("Вы успешно проголосовали за " + gamemodeName));
-                            return 1;
+                            // The lobby screens show the vote, no chat messages
+                            return GamemodeManager.instance.Vote(player.getUUID(), gamemodeName);
                 })));
     }
 

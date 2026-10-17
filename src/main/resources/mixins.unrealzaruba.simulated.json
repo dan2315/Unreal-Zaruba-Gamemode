@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.dod.unrealzaruba.mixin.simulated",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PhysicsStaffLocksMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

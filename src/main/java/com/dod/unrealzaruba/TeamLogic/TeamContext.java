@@ -240,7 +240,7 @@ public class TeamContext extends ObjectiveOwner implements IResettable {
 
     public void PlayBattleSound() {
         ServerLevel serverLevel = server.getLevel(WorldManager.GAME_DIMENSION);
-        SoundHandler.playSoundFromPosition(serverLevel, respawnPoints.get(0).getSpawnPosition(), hornSound, SoundSource.BLOCKS, 5.0F, 1.0F);
+        SoundHandler.playSoundFromPosition(serverLevel, respawnPoints.get(0).getSpawnPosition(), hornSound, SoundSource.BLOCKS, 3.0F, 1.0F);
     }
 
     @Override

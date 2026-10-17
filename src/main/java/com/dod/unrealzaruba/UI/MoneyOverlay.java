@@ -34,7 +34,7 @@ public class MoneyOverlay implements ZarubaOverlay {
             return;
         }
 
-        Font font = mc.font;
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
         String text = Money.format(balance);
         int textWidth = HudStyle.width(font, text, SCALE);
         int textHeight = Math.round(font.lineHeight * SCALE) - 1;

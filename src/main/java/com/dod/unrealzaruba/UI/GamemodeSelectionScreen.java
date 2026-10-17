@@ -1,23 +1,4 @@
 package com.dod.unrealzaruba.UI;
-import net.neoforged.neoforge.network.PacketDistributor;
-
-import com.dod.unrealzaruba.NetworkPackets.GamemodeVotePacket;
-import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Blocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,15 +6,43 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dod.unrealzaruba.Events.KeyBindings;
+import com.dod.unrealzaruba.NetworkPackets.GamemodeVotePacket;
+import com.dod.unrealzaruba.NetworkPackets.Lobby.ToggleReadyPacket;
+import com.dod.unrealzaruba.UI.Lobby.LobbyClientState;
+import com.google.gson.Gson;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+/**
+ * Lobby mode selection in the Unreal Frontiers look: a card per mode (click to vote, with the vote count and share)
+ * and one primary button that marks the player ready.
+ */
 @OnlyIn(Dist.CLIENT)
 public class GamemodeSelectionScreen extends Screen {
-    private GamemodeList gamemodeList;
-    private String selectedGamemodeId;
+    private static final Gson GSON = new Gson();
+    private static final int GAP = 12;
+    private static final int PAD = 10;
+    private static final int BUTTON_WIDTH = 220;
+    private static final int BUTTON_HEIGHT = 26;
 
-    private static final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+    private record Hit(int x0, int y0, int x1, int y1, Runnable action) {
+        boolean contains(double x, double y) {
+            return x >= x0 && x < x1 && y >= y0 && y < y1;
+        }
+    }
+
+    public record GamemodeDefinition(String id, String name, String description) {}
+
     private final List<GamemodeDefinition> gamemodes = new ArrayList<>();
+    private final List<Hit> hits = new ArrayList<>();
 
     public GamemodeSelectionScreen(Component title) {
         super(title);
@@ -41,156 +50,196 @@ public class GamemodeSelectionScreen extends Screen {
 
     @Override
     protected void init() {
+        this.font = UiFont.get();
+        gamemodes.clear();
         try {
-            var resourceManager = Minecraft.getInstance().getResourceManager();
-            var resources = resourceManager.listResources("gamemodes", path -> path.getPath().endsWith(".json"));
+            var resources = Minecraft.getInstance().getResourceManager()
+                    .listResources("gamemodes", path -> path.getPath().endsWith(".json"));
             for (var entry : resources.entrySet()) {
                 try (var reader = new InputStreamReader(entry.getValue().open(), StandardCharsets.UTF_8)) {
-                    GamemodeDefinition def = gson.fromJson(reader, GamemodeDefinition.class);
-                    if (def != null) {
-                        gamemodes.add(def);
-                    }
+                    GamemodeDefinition definition = GSON.fromJson(reader, GamemodeDefinition.class);
+                    if (definition != null) gamemodes.add(definition);
                 }
             }
         } catch (IOException exception) {
             exception.printStackTrace();
         }
-
-
-        this.gamemodeList = new GamemodeList(this.minecraft, this.width, this.height, 32, this.height - 32, 144);
-        gamemodes.forEach(gamemodeDefinition -> {
-            this.gamemodeList.addGamemode(
-                    gamemodeDefinition.id,
-                    Component.literal(gamemodeDefinition.name),
-                    Component.literal(gamemodeDefinition.description));
-        });
-        this.addRenderableWidget(this.gamemodeList);
-
-        this.addRenderableWidget(Button.builder(Component.literal("Проголосовать"),
-                btn -> {
-                    if (selectedGamemodeId != null) {
-                        PacketDistributor.sendToServer(new GamemodeVotePacket(selectedGamemodeId));
-                        Minecraft.getInstance().setScreen(null);
-                    }
-                }).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build());
+        gamemodes.sort((a, b) -> a.id().compareTo(b.id()));
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
+    public boolean isPauseScreen() {
+        return false;
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        var mc = Minecraft.getInstance();
-
-        // pick block face texture (particle = usually side)
-        var sprite = mc.getBlockRenderer()
-                .getBlockModelShaper()
-                .getParticleIcon(Blocks.STONE.defaultBlockState());
-
-        // block atlas
-        var atlas = TextureAtlas.LOCATION_BLOCKS;
-
-        int tileSize = 32; // how big each block texture will look on screen
-
-        for (int x = 0; x < this.width; x += tileSize) {
-            for (int y = 0; y < this.height; y += tileSize) {
-                guiGraphics.blit(
-                        atlas,
-                        x, y, tileSize, tileSize, // where & how big on screen
-                        sprite.getU0() * 16,      // source U start (px)
-                        sprite.getV0() * 16,      // source V start (px)
-                        16, 16,                   // how many px from atlas to copy (block face = 16x16)
-                        256, 256                  // atlas size (usually 256x256)
-                );
-            }
-        }
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        g.fill(0, 0, width, height, Brand.alpha(Brand.WINDOW, 0xE8));
+        // A faint deep-green glow at the bottom, the brand's depth colour
+        g.fillGradient(0, height / 2, width, height, 0x000A1F18, 0x660A1F18);
     }
 
-    public record GamemodeDefinition(
-            String id,
-            String name,
-            String description
-    ) {}
+    @Override
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g, mouseX, mouseY, partialTick);
+        hits.clear();
 
-    public class GamemodeList extends AbstractSelectionList<GamemodeList.GamemodeListEntry> {
-        public GamemodeList(Minecraft mc, int width, int height, int top, int bottom, int itemHeight) {
-            super(mc, width, bottom - top, top, itemHeight);
+        int contentWidth = Math.min(width - 48, 640);
+        int left = (width - contentWidth) / 2;
+
+        // Title
+        HudStyle.text(g, font, Component.translatable("lobby.unrealzaruba.mode_selection").getString().toUpperCase(),
+                (width - HudStyle.width(font, Component.translatable("lobby.unrealzaruba.mode_selection").getString().toUpperCase(), 1.4f)) / 2,
+                24, Brand.TEXT, 1.4f);
+        Brand.gradient(g, width / 2 - 24, 42, 48, 2, Brand.MINT, Brand.CYAN, Brand.BLUE);
+        String subtitle = Component.translatable("lobby.unrealzaruba.vote_hint").getString();
+        g.drawCenteredString(font, subtitle, width / 2, 52, Brand.TEXT_MUTE);
+
+        // Cards
+        int top = 74;
+        int bottomArea = 104;
+        int cardHeight = Math.max(110, Math.min(240, height - top - bottomArea));
+        int count = Math.max(1, gamemodes.size());
+        int cardWidth = (contentWidth - GAP * (count - 1)) / count;
+        int totalVotes = 0;
+        for (GamemodeDefinition mode : gamemodes) totalVotes += LobbyClientState.votesFor(mode.id());
+        String leader = LobbyClientState.leader();
+        for (int i = 0; i < gamemodes.size(); i++) {
+            renderCard(g, gamemodes.get(i), left + i * (cardWidth + GAP), top, cardWidth, cardHeight, mouseX, mouseY, totalVotes,
+                    gamemodes.get(i).id().equals(leader));
         }
 
-        @Override
-        public int getRowWidth() {
-            return (int) (this.width / 2.5f);
+        // Status line and the ready button
+        int statusY = height - 84;
+        String status = Component.translatable("lobby.unrealzaruba.ready_count", LobbyClientState.ready(), LobbyClientState.players()).getString();
+        if (LobbyClientState.players() < LobbyClientState.minPlayers()) {
+            status += "  ·  " + Component.translatable("lobby.unrealzaruba.need_players", LobbyClientState.minPlayers()).getString();
+        }
+        g.drawCenteredString(font, status, width / 2, statusY, Brand.TEXT_DIM);
+
+        renderReadyButton(g, (width - BUTTON_WIDTH) / 2, height - 66, mouseX, mouseY);
+
+        String hint = Component.translatable("lobby.unrealzaruba.close_hint",
+                KeyBindings.OPEN_GAMEMODE_MENU.getTranslatedKeyMessage().getString()).getString();
+        g.drawCenteredString(font, hint, width / 2, height - 28, Brand.TEXT_MUTE);
+    }
+
+    private void renderCard(GuiGraphics g, GamemodeDefinition mode, int x, int y, int w, int h, int mouseX, int mouseY,
+                            int totalVotes, boolean leader) {
+        boolean hover = mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
+        boolean selected = mode.id().equals(LobbyClientState.myVote());
+        g.fill(x, y, x + w, y + h, hover ? Brand.CARD_HI : Brand.CARD);
+        g.renderOutline(x, y, w, h, selected || hover ? Brand.MINT : Brand.BORDER);
+        if (selected) g.renderOutline(x + 1, y + 1, w - 2, h - 2, Brand.alpha(Brand.MINT, 0x66));
+
+        // Icon tile with the initial of the mode
+        int tile = Math.min(56, h / 3);
+        int tileX = x + PAD;
+        int tileY = y + PAD;
+        g.fill(tileX, tileY, tileX + tile, tileY + tile, 0xFF26232C);
+        g.renderOutline(tileX, tileY, tile, tile, Brand.DIVIDER);
+        String initial = mode.name().isEmpty() ? "?" : mode.name().substring(0, 1).toUpperCase();
+        float scale = tile / 14f;
+        HudStyle.text(g, font, initial, tileX + (int) ((tile - font.width(initial) * scale) / 2),
+                tileY + (int) ((tile - 8 * scale) / 2), Brand.MINT, scale);
+
+        // Tags next to the tile
+        int tagX = tileX + tile + 8;
+        if (leader) {
+            tagX += tag(g, tagX, tileY, Component.translatable("lobby.unrealzaruba.leader").getString(), Brand.WARN) + 4;
+        }
+        if (selected) {
+            tag(g, tagX, tileY, Component.translatable("lobby.unrealzaruba.your_vote").getString(), Brand.MINT);
         }
 
-        @Override
-        protected int getScrollbarPosition() {
-            return this.width / 2 + getRowWidth() / 2;
+        // Name and description
+        int textY = tileY + tile + 8;
+        g.drawString(font, Component.literal(mode.name()).withStyle(net.minecraft.ChatFormatting.BOLD), x + PAD, textY, Brand.TEXT, false);
+        textY += font.lineHeight + 4;
+        int footerTop = y + h - 34;
+        List<FormattedCharSequence> lines = font.split(Component.literal(mode.description()), w - 2 * PAD);
+        for (FormattedCharSequence line : lines) {
+            if (textY + font.lineHeight > footerTop - 2) break;
+            g.drawString(font, line, x + PAD, textY, Brand.TEXT_DIM, false);
+            textY += font.lineHeight + 1;
         }
 
-        public void addGamemode(String id, Component name, Component description) {
-            this.addEntry(new GamemodeListEntry(id, name, description));
+        // Votes and their share
+        g.fill(x + PAD, footerTop, x + w - PAD, footerTop + 1, Brand.DIVIDER);
+        int votes = LobbyClientState.votesFor(mode.id());
+        String votesText = Component.translatable("lobby.unrealzaruba.votes", votes).getString();
+        HudStyle.text(g, font, votesText, x + PAD, footerTop + 7, Brand.TEXT_DIM, 0.9f);
+        int barLeft = x + PAD;
+        int barRight = x + w - PAD;
+        int barY = footerTop + 20;
+        g.fill(barLeft, barY, barRight, barY + 3, Brand.BAR_TRACK);
+        if (totalVotes > 0 && votes > 0) {
+            int filled = Math.max(2, Math.round((barRight - barLeft) * (votes / (float) totalVotes)));
+            Brand.gradient(g, barLeft, barY, filled, 3, Brand.MINT_DIM, Brand.CYAN_DIM, Brand.BLUE);
         }
 
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+        hits.add(new Hit(x, y, x + w, y + h, () -> {
+            LobbyClientState.setMyVote(mode.id());
+            PacketDistributor.sendToServer(new GamemodeVotePacket(mode.id()));
+        }));
+    }
 
-        public class GamemodeListEntry extends AbstractSelectionList.Entry<GamemodeListEntry> {
-            private final String id;
-            private final Component name;
-            private final Component description;
-            private final ResourceLocation icon;
+    /** A small label chip; returns its width. */
+    private int tag(GuiGraphics g, int x, int y, String text, int color) {
+        int w = (int) (font.width(text) * 0.8f) + 8;
+        g.fill(x, y, x + w, y + 11, Brand.alpha(color, 0x26));
+        g.renderOutline(x, y, w, 11, Brand.alpha(color, 0x99));
+        HudStyle.text(g, font, text, x + 4, y + 2, color, 0.8f);
+        return w;
+    }
 
-            public GamemodeListEntry(String id, Component name, Component description) {
-                this.name = name;
-                this.description = description;
-                this.id = id;
-                this.icon = ResourceLocation.fromNamespaceAndPath("unrealzaruba", "textures/gui/gamemodethumbnails/default.png");
+    private void renderReadyButton(GuiGraphics g, int x, int y, int mouseX, int mouseY) {
+        boolean hover = mouseX >= x && mouseX < x + BUTTON_WIDTH && mouseY >= y && mouseY < y + BUTTON_HEIGHT;
+        String label;
+        if (!LobbyClientState.active()) {
+            g.fill(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT, Brand.DISABLED);
+            label = Component.translatable("lobby.unrealzaruba.game_running").getString();
+            g.drawCenteredString(font, label, x + BUTTON_WIDTH / 2, y + 9, Brand.TEXT_MUTE);
+            return;
+        }
+        if (LobbyClientState.myReady()) {
+            // Already ready: a calm graphite button, the gradient is for the main action only
+            g.fill(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT, hover ? Brand.BTN_HI : Brand.BTN);
+            g.renderOutline(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, hover ? Brand.MINT : Brand.BTN_BORDER);
+            label = Component.translatable("lobby.unrealzaruba.cancel_ready").getString().toUpperCase();
+            g.drawCenteredString(font, label, x + BUTTON_WIDTH / 2, y + 9, Brand.TEXT);
+        } else {
+            if (hover) {
+                Brand.gradient(g, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, Brand.MINT, Brand.CYAN, Brand.BLUE_BRIGHT);
+            } else {
+                Brand.gradient(g, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, Brand.MINT_DIM, Brand.CYAN_DIM, Brand.BLUE);
             }
+            label = Component.translatable("lobby.unrealzaruba.ready").getString().toUpperCase();
+            g.drawCenteredString(font, Component.literal(label).withStyle(net.minecraft.ChatFormatting.BOLD),
+                    x + BUTTON_WIDTH / 2, y + 9, Brand.TEXT);
+        }
+        hits.add(new Hit(x, y, x + BUTTON_WIDTH, y + BUTTON_HEIGHT, () -> PacketDistributor.sendToServer(new ToggleReadyPacket())));
+    }
 
-            @Override
-            public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height,
-                               int mouseX, int mouseY, boolean hovered, float partialTick) {
-                int color = hovered ? 0xFFFFA0 : 0xFFFFFF;
-                guiGraphics.renderOutline(left, top, width, height, 0x555555);
-
-                int iconSize = 112;
-                int iconX = left + 5;
-                int iconY = top + 5;
-
-                // Draw the icon
-                guiGraphics.blit(
-                        icon,
-                        iconX, iconY,
-                        0, 0,
-                        iconSize, iconSize,
-                        iconSize, iconSize
-                );
-
-                // Draw name under the icon
-                int nameX = iconX;
-                int nameY = iconY + iconSize + 2;
-                guiGraphics.drawCenteredString(font, name, nameX + (iconSize / 2), nameY, color);
-
-                // Draw description on the right
-                int descX = iconX + iconSize + 10;
-                int descY = top + 5;
-                int maxWidth = width - (iconSize + 20);
-
-                // Wrap description text if it's too long
-                var descLines = font.split(description, maxWidth);
-                for (int i = 0; i < descLines.size(); i++) {
-                    guiGraphics.drawString(font, descLines.get(i), descX, descY + i * font.lineHeight, 0xB5B5B5);
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            for (Hit hit : hits) {
+                if (hit.contains(mouseX, mouseY)) {
+                    hit.action().run();
+                    return true;
                 }
             }
-
-            @Override
-            public boolean mouseClicked(double mouseX, double mouseY, int button) {
-                selectedGamemodeId = id;
-                return true;
-            }
         }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (KeyBindings.OPEN_GAMEMODE_MENU.matches(keyCode, scanCode)) {
+            onClose();
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

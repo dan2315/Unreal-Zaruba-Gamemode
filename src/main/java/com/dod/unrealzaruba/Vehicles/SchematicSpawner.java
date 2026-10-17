@@ -36,7 +36,7 @@ public final class SchematicSpawner {
     private static final double MAX_DISTANCE_SQR = 8 * 8;
     private static final int MAX_BYTES = 1024 * 1024;
 
-    private record Pending(BlockPos pos, long schematicId, String name, byte[] data, int[] received) {}
+    private record Pending(BlockPos pos, long schematicId, String name, byte[] data, int[] received, int contribution) {}
 
     private static final Map<UUID, Pending> PENDING = new HashMap<>();
 
@@ -46,6 +46,12 @@ public final class SchematicSpawner {
         EconomyConfig economy = EconomyData.current();
         if (!economy.schematicSpawns.enabled) {
             player.displayClientMessage(Component.translatable("schematics.unrealzaruba.spawn.disabled"), true);
+            return;
+        }
+        // A purchase is going on here: its screen, not the vehicle list
+        PurchaseSessions.Session going = PurchaseSessions.at(block.getBlockPos());
+        if (going != null) {
+            PurchaseSessions.sendCurrent(player, going);
             return;
         }
         RulesService.get(); // warms up the price list, so the first spawn does not have to wait for it
@@ -60,7 +66,7 @@ public final class SchematicSpawner {
                 fail(player, Component.translatable("schematics.unrealzaruba.error.too_big"));
                 return;
             }
-            PENDING.put(id, new Pending(piece.pos, piece.schematicId, piece.name, new byte[piece.totalSize], new int[1]));
+            PENDING.put(id, new Pending(piece.pos, piece.schematicId, piece.name, new byte[piece.totalSize], new int[1], piece.contribution));
         }
         Pending pending = PENDING.get(id);
         if (pending == null || !pending.pos.equals(piece.pos) || pending.schematicId != piece.schematicId
@@ -72,11 +78,11 @@ public final class SchematicSpawner {
         pending.received[0] += piece.data.length;
         if (pending.received[0] == pending.data.length) {
             PENDING.remove(id);
-            spawn(player, pending.pos, pending.schematicId, pending.name, pending.data);
+            spawn(player, pending.pos, pending.schematicId, pending.name, pending.data, pending.contribution);
         }
     }
 
-    private static void spawn(ServerPlayer player, BlockPos pos, long schematicId, String name, byte[] data) {
+    private static void spawn(ServerPlayer player, BlockPos pos, long schematicId, String name, byte[] data, int contribution) {
         EconomyConfig economy = EconomyData.current();
         EconomyConfig.SchematicSpawns limits = economy.schematicSpawns;
         ServerLevel level = player.serverLevel();
@@ -116,10 +122,6 @@ public final class SchematicSpawner {
             fail(player, Component.translatable("schematics.unrealzaruba.error.not_structure"));
             return;
         }
-        if (Wallets.get(player) < price) {
-            fail(player, Component.translatable("schematics.unrealzaruba.spawn.no_money", Money.format(price)));
-            return;
-        }
         if (info.blocks() > limits.maxBlocks || info.maxSide() > limits.maxSize) {
             fail(player, Component.translatable("schematics.unrealzaruba.spawn.too_large",
                     info.blocks(), limits.maxBlocks, info.maxSide(), limits.maxSize));
@@ -134,20 +136,20 @@ public final class SchematicSpawner {
         double centerZ = pos.getZ() + 0.5 + away.getStepZ() * distance;
         double minimumBlockCenterY = pos.getY() + 1.5; // a block above the floor, so uneven ground doesn't clip it
 
-        try {
-            Blueprints.place(player, level, name, data, centerX, centerZ, minimumBlockCenterY);
-        } catch (IOException | RuntimeException e) {
-            UnrealZaruba.LOGGER.warn("[SchematicSpawner] {} failed to spawn schematic {} ({}): {}",
-                    player.getGameProfile().getName(), schematicId, name, e.getMessage());
-            fail(player, Component.translatable("schematics.unrealzaruba.spawn.failed", String.valueOf(e.getMessage())));
+        // The first payment starts a purchase others can add to; paying everything buys the vehicle right away
+        int amount = Math.max(1, Math.min(contribution, price));
+        Component refusal = PurchaseSessions.start(player, block, schematicId, name, data, price, centerX, centerZ,
+                minimumBlockCenterY, amount);
+        if (refusal != null) {
+            fail(player, refusal);
             return;
         }
-        Wallets.trySpend(player, price);
-        block.startCooldown(limits.cooldownSeconds * 20);
-        UnrealZaruba.LOGGER.info("[SchematicSpawner] {} spawned schematic {} ({}) at {}",
-                player.getGameProfile().getName(), schematicId, name, pos);
-        PacketDistributor.sendToPlayer(player, new ClientboundSchematicSpawnResultPacket(true,
-                Component.translatable("schematics.unrealzaruba.spawn.done", name, Money.format(price))));
+        UnrealZaruba.LOGGER.info("[SchematicSpawner] {} paid {} of {} for schematic {} ({}) at {}",
+                player.getGameProfile().getName(), amount, price, schematicId, name, pos);
+        if (amount < price) {
+            PacketDistributor.sendToPlayer(player, new ClientboundSchematicSpawnResultPacket(true,
+                    Component.translatable("schematics.unrealzaruba.purchase.started", name, Money.format(amount), Money.format(price))));
+        }
     }
 
     private static void fail(ServerPlayer player, Component reason) {

@@ -22,7 +22,7 @@ public class ScoreOverlay implements ZarubaOverlay {
     public void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!visible) return;
 
-        Font font = gui.getFont();
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
         int scoreHeight = Math.round(font.lineHeight * SCORE_SCALE) - 1;
         int height = scoreHeight + 8;
         int x = (screenWidth - WIDTH) / 2;
@@ -66,6 +66,12 @@ public class ScoreOverlay implements ZarubaOverlay {
                 rightScore = score;
                 break;
         }
+    }
+
+    /** Where the panel ends (or where it would start while hidden), for what is drawn under it. */
+    public int bottom(Font font) {
+        if (!visible) return HudStyle.MARGIN - 4;
+        return HudStyle.MARGIN + Math.round(font.lineHeight * SCORE_SCALE) - 1 + 8;
     }
 
     public void SetVisible(boolean visible) {

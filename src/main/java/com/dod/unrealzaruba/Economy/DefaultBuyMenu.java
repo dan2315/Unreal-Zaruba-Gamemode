@@ -103,6 +103,24 @@ final class DefaultBuyMenu {
         return tab;
     }
 
+    static Tab tools() {
+        Tab tab = tab("buymenu.unrealzaruba.tab.tools", Layout.GRID);
+        tab.groups.add(group("buymenu.unrealzaruba.group.tools",
+                category("buymenu.unrealzaruba.category.pickaxes", "buymenu.unrealzaruba.hint.tools",
+                        item("minecraft:wooden_pickaxe", 20), item("minecraft:stone_pickaxe", 40),
+                        item("minecraft:iron_pickaxe", 90), item("minecraft:diamond_pickaxe", 240)),
+                category("buymenu.unrealzaruba.category.axes", "buymenu.unrealzaruba.hint.tools",
+                        item("minecraft:wooden_axe", 20), item("minecraft:stone_axe", 40),
+                        item("minecraft:iron_axe", 90), item("minecraft:diamond_axe", 240)),
+                category("buymenu.unrealzaruba.category.shovels", "buymenu.unrealzaruba.hint.tools",
+                        item("minecraft:wooden_shovel", 10), item("minecraft:stone_shovel", 20),
+                        item("minecraft:iron_shovel", 45), item("minecraft:diamond_shovel", 120)),
+                category("buymenu.unrealzaruba.category.other_tools", "buymenu.unrealzaruba.hint.tools",
+                        item("minecraft:shears", 60), item("minecraft:flint_and_steel", 50),
+                        item("minecraft:bucket", 80), item("minecraft:fishing_rod", 30))));
+        return tab;
+    }
+
     /** Supply crate contents: mostly ammo and healing, sometimes a good gun or an optic. */
     static List<EconomyConfig.Loot> supplyLoot() {
         List<EconomyConfig.Loot> loot = new java.util.ArrayList<>();

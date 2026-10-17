@@ -16,6 +16,8 @@ public class WaypointManager {
     private final XaeroWaypoints waypoints;
     private final XaeroWorldMap worldMap;
     private int ticks;
+    private int layerTries;
+    private boolean vehicleLayerAdded;
 
     private WaypointManager() {
         waypoints = ModList.get().isLoaded("xaerominimap") ? new XaeroWaypoints() : null;
@@ -31,6 +33,9 @@ public class WaypointManager {
     }
 
     public void tick() {
+        if (worldMap != null && !vehicleLayerAdded && ++layerTries % 20 == 0) {
+            vehicleLayerAdded = worldMap.ensureVehicleLayer();
+        }
         if (waypoints == null || ++ticks % SYNC_INTERVAL_TICKS != 0) return;
         if (waypoints.sync() && worldMap != null) {
             worldMap.refresh();

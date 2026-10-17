@@ -47,6 +47,11 @@ public class ClientEvents {
         while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
             Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
         }
+        while (KeyBindings.READY.consumeClick()) {
+            if (Minecraft.getInstance().getConnection() != null && com.dod.unrealzaruba.UI.Lobby.LobbyClientState.active()) {
+                PacketDistributor.sendToServer(new com.dod.unrealzaruba.NetworkPackets.Lobby.ToggleReadyPacket());
+            }
+        }
         while (KeyBindings.OPEN_BUY_MENU.consumeClick()) {
             if (Minecraft.getInstance().getConnection() != null) {
                 PacketDistributor.sendToServer(new RequestBuyMenuPacket());
@@ -68,6 +73,10 @@ public class ClientEvents {
         ObjectivesOverlay.INSTANCE.Clear();
         MoneyOverlay.INSTANCE.set(false, 0);
         RespawnClientState.reset();
+        com.dod.unrealzaruba.UI.Lobby.LobbyClientState.reset();
+        com.dod.unrealzaruba.Schematics.PurchaseClientState.reset();
+        com.dod.unrealzaruba.UI.Vehicles.TeamVehiclesState.reset();
+        com.dod.unrealzaruba.Schematics.PurchaseGhostRenderer.reset();
         MapPackClient.reset();
     }
 }

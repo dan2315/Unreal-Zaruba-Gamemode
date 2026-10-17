@@ -45,6 +45,9 @@ public class ClientboundRemoveObjectivesPacket implements ModPacket {
             if (size == 0) {
                 ObjectivesOverlay.INSTANCE.Clear();
                 RespawnClientState.reset();
+                // the team vehicles (map diamonds, labels) and any joint purchase ghost belong to the match too
+                com.dod.unrealzaruba.UI.Vehicles.TeamVehiclesState.reset();
+                com.dod.unrealzaruba.Schematics.PurchaseClientState.reset();
             } else {
                 ObjectivesOverlay.INSTANCE.RemoveById(runtimeIds);
             }

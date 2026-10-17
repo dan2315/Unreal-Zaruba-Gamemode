@@ -48,6 +48,11 @@ public class XaeroWorldMap {
         NeoForge.EVENT_BUS.addListener(this::onScreenRender);
     }
 
+    /** Puts the vehicle diamonds on the world map as soon as Xaero has made its element list. */
+    public boolean ensureVehicleLayer() {
+        return VehicleMapLayer.register();
+    }
+
     public static boolean isOp() {
         Minecraft mc = Minecraft.getInstance();
         return mc.player != null && mc.player.hasPermissions(2);
@@ -172,7 +177,7 @@ public class XaeroWorldMap {
         if (!RespawnClientState.isDead() && view.points().isEmpty()) return;
 
         GuiGraphics g = event.getGuiGraphics();
-        Font font = Minecraft.getInstance().font;
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
         List<String> lines = new ArrayList<>();
         List<Integer> colors = new ArrayList<>();
         if (RespawnClientState.isDead()) {

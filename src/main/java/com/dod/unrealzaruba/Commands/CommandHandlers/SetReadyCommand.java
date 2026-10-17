@@ -25,28 +25,20 @@ public class SetReadyCommand implements ICommandHandler {
                     }
                     
                     PlayerContext playerContext = PlayerContext.Get(player.getUUID());
-                    playerContext.SetReady(!playerContext.IsReady());
+                    com.dod.unrealzaruba.Lobby.LobbyService.toggleReady(player);
                     context.getSource().sendSuccess(() -> Component.literal("Set ready to " + playerContext.IsReady()), true);
 
                     var players = UnrealZaruba.server.getPlayerList().getPlayers();
-
                     int playersReady = 0;
-
                     for (ServerPlayer p : players) {
-                        PlayerContext _playerContext = PlayerContext.Get(p.getUUID());
-                        if (_playerContext != null && _playerContext.IsReady()) {
-                            playersReady++;
+                        PlayerContext other = PlayerContext.Get(p.getUUID());
+                        if (other != null && other.IsReady()) playersReady++;
+                    }
+                    if (players.size() >= ConfigManager.getMainConfig().getMinPlayersToStart()) {
+                        for (ServerPlayer pl : players) {
+                            TitleMessage.sendActionbar(pl, Component.literal("§6Игроков готово [" + playersReady + "/" + players.size() + "]"));
                         }
                     }
-
-                        int minPlayersToStart = ConfigManager.getMainConfig().getMinPlayersToStart();
-                        if (players.size() < minPlayersToStart) {
-                            TitleMessage.sendActionbar(player, Component.literal("§6Чтобы начать игру, нужно минимум " + minPlayersToStart + " игроков"));
-                        } else {
-                            for (ServerPlayer pl : players) {
-                                TitleMessage.sendActionbar(pl, Component.literal("§6Игроков готово [" + playersReady + "/" + players.size() + "]"));
-                            }
-                        }
                     return 1;
                 }));
     }

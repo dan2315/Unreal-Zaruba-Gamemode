@@ -37,7 +37,7 @@ public class ContraptionReportOverlay implements ZarubaOverlay {
         if (report == null || mc.player == null || mc.level == null || mc.screen != null) {
             return;
         }
-        Font font = mc.font;
+        Font font = com.dod.unrealzaruba.UI.UiFont.get();
         int line = font.lineHeight + 2;
         int inner = WIDTH - 16;
 
