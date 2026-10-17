@@ -98,6 +98,18 @@ public class EconomyConfig {
         public int lifetimeSeconds = 900;
         public int maxActive = 3;
         public Area area = new Area();
+        /**
+         * Which way the drops lean: toward the team that is behind. The axis is the one that runs from one base to the other
+         * (X or Z; empty for no leaning). Along the other axis the spot is random. Which side belongs to which team is read from
+         * the main spawns of the teams.
+         */
+        public String biasAxis = "X";
+        /** How far the drops move toward the team that is behind: 0 stays in the middle, 1 goes to the edge of the area when the lead is full. */
+        public double biasStrength = 0.8;
+        /** A lead of this share of the score needed to win counts as full. */
+        public double biasFullLeadShare = 0.5;
+        /** Randomness left along the axis, as a share of the width of the area. */
+        public double biasJitter = 0.1;
         /** The item players carry to their base to cash in; put in the middle slot of the barrel. Empty for none. */
         public String cashItem = "unrealzaruba:supply_case";
         /** Paid to every online member of the team that hands a case in at its base, per case. */
@@ -123,6 +135,16 @@ public class EconomyConfig {
         /** An area with no width or no depth is "not set". */
         public boolean isValid() {
             return x1 != x2 && z1 != z2;
+        }
+
+        /** A spot random along one axis and at {@code fraction} (0 = the low end, 1 = the high end) of the width along the other. */
+        public net.minecraft.core.BlockPos randomSpot(net.minecraft.util.RandomSource random, boolean alongX, double fraction) {
+            int minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+            int minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
+            double f = Math.max(0, Math.min(1, fraction));
+            int x = alongX ? minX + (int) Math.round(f * (maxX - minX)) : minX + random.nextInt(maxX - minX + 1);
+            int z = alongX ? minZ + random.nextInt(maxZ - minZ + 1) : minZ + (int) Math.round(f * (maxZ - minZ));
+            return new net.minecraft.core.BlockPos(x, floorY, z);
         }
 
         public net.minecraft.core.BlockPos randomSpot(net.minecraft.util.RandomSource random) {

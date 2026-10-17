@@ -226,9 +226,48 @@ public final class SupplyParadrop {
             nextAutoTick = battleTicks + RETRY_TICKS;
             return;
         }
-        BlockPos target = settings.area.randomSpot(RANDOM);
+        BlockPos target = pickTarget(settings);
         boolean started = spawn(server, config, target);
         nextAutoTick = battleTicks + (started ? Math.max(10, settings.intervalSeconds) * 20 : RETRY_TICKS);
+    }
+
+    /** A random spot of the area, leaning along the axis toward the team that is behind (when the config asks for it). */
+    private static BlockPos pickTarget(EconomyConfig.Paradrop settings) {
+        Double fraction = leanFraction(settings);
+        if (fraction == null) return settings.area.randomSpot(RANDOM);
+        return settings.area.randomSpot(RANDOM, "X".equalsIgnoreCase(settings.biasAxis), fraction);
+    }
+
+    /** Where along the axis the drop goes (0 = the low end), or null for no leaning. */
+    private static Double leanFraction(EconomyConfig.Paradrop settings) {
+        if (settings.biasAxis == null || settings.biasStrength <= 0) return null;
+        boolean alongX = "X".equalsIgnoreCase(settings.biasAxis);
+        if (!alongX && !"Z".equalsIgnoreCase(settings.biasAxis)) return null;
+        try {
+            var gamemode = com.dod.unrealzaruba.Gamemodes.GamemodeManager.instance == null ? null
+                    : com.dod.unrealzaruba.Gamemodes.GamemodeManager.instance.GetActiveGamemode();
+            if (!(gamemode instanceof com.dod.unrealzaruba.Gamemodes.TeamGamemode teamGamemode) || teamGamemode.GetTeamManager() == null) return null;
+            var red = teamGamemode.GetTeamManager().Get(com.dod.unrealzaruba.Commands.Arguments.TeamColor.RED);
+            var blue = teamGamemode.GetTeamManager().Get(com.dod.unrealzaruba.Commands.Arguments.TeamColor.BLUE);
+            Integer redScore = gamemode.GetTeamScore(com.dod.unrealzaruba.Commands.Arguments.TeamColor.RED);
+            Integer blueScore = gamemode.GetTeamScore(com.dod.unrealzaruba.Commands.Arguments.TeamColor.BLUE);
+            if (red == null || blue == null || redScore == null || blueScore == null) return null;
+            double redAt = alongX ? red.MainSpawn().getX() : red.MainSpawn().getZ();
+            double blueAt = alongX ? blue.MainSpawn().getX() : blue.MainSpawn().getZ();
+            if (redAt == blueAt) return null;
+            // How far the team at the high end of the axis is ahead: positive means the low end is behind
+            int lowEndScore = redAt < blueAt ? redScore : blueScore;
+            int highEndScore = redAt < blueAt ? blueScore : redScore;
+            double lead = highEndScore - lowEndScore;
+            int toWin = com.dod.unrealzaruba.Gamemodes.ScoringData.of(gamemode.getClass()).pointsToWin;
+            double share = Math.min(1.0, Math.abs(lead) / Math.max(1.0, toWin * Math.max(0.01, settings.biasFullLeadShare)));
+            double fraction = 0.5 - Math.signum(lead) * 0.5 * Math.min(1.0, settings.biasStrength) * share;
+            fraction += (RANDOM.nextDouble() - 0.5) * Math.max(0, settings.biasJitter);
+            return Math.max(0.0, Math.min(1.0, fraction));
+        } catch (RuntimeException e) {
+            UnrealZaruba.LOGGER.warn("[SupplyParadrop] Could not work out which way to lean: {}", e.toString());
+            return null;
+        }
     }
 
     private static List<ChunkPos> forceChunks(ServerLevel level, BlockPos target) {

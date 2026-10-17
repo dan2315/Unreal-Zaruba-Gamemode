@@ -70,12 +70,13 @@ public class CapturePointObjective extends PositionedGameobjective {
         setProgressDisplay(new NetworkedSideHudListElement(this));
         TeamManager teamManager = ((TeamGamemode) GamemodeManager.instance.GetActiveGamemode()).GetTeamManager();
         respawnPoint = new CapturePointRespawnPoint(this);
-        if (Objects.equals(name, "Вертолётная площадка")) {
+        // initialOwner of objectives.json decides; the two names below are only for maps that do not set it
+        if (respawnOnly || initialOwner != null) {
+            owner = initialOwnerTeam(teamManager);
+        } else if (Objects.equals(name, "Вертолётная площадка")) {
             owner = teamManager.Get(TeamColor.RED);
         } else if (Objects.equals(name, "Склад боеприпасов")) {
             owner = teamManager.Get(TeamColor.BLUE);
-        } else if (respawnOnly || initialOwner != null) {
-            owner = initialOwnerTeam(teamManager);
         }
         MoveRespawnPoint(null, owner);
     }
