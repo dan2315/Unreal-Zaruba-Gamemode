@@ -37,7 +37,8 @@ public final class Blueprints {
     }
 
     /** Where the blocks of a blueprint lie in the horizontal plane, relative to the root of the vehicle (the point it is placed by). */
-    public record Footprint(double minX, double maxX, double minZ, double maxZ) {
+    public record Footprint(double minX, double maxX, double minZ, double maxZ, double minY, double maxY) {
+        public double height() { return maxY - minY; }
         public double centerX() { return (minX + maxX) / 2; }
         public double centerZ() { return (minZ + maxZ) / 2; }
         public double sizeX() { return maxX - minX; }
@@ -56,6 +57,7 @@ public final class Blueprints {
             var preview = com.enxv.aeronauticsstructuretool.PreviewBlueprintData.parse(withoutSavedRotation(data), level);
             double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
             double minZ = Double.POSITIVE_INFINITY, maxZ = Double.NEGATIVE_INFINITY;
+            double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
             // The blocks with models; when there are none, the outline points stand in for them
             for (int pass = 0; pass < 2 && minX == Double.POSITIVE_INFINITY; pass++) {
                 for (var sub : preview.subLevels()) {
@@ -75,10 +77,12 @@ public final class Blueprints {
                         maxX = Math.max(maxX, local.x + 0.5);
                         minZ = Math.min(minZ, local.z - 0.5);
                         maxZ = Math.max(maxZ, local.z + 0.5);
+                        minY = Math.min(minY, local.y - 0.5);
+                        maxY = Math.max(maxY, local.y + 0.5);
                     }
                 }
             }
-            return minX == Double.POSITIVE_INFINITY ? null : new Footprint(minX, maxX, minZ, maxZ);
+            return minX == Double.POSITIVE_INFINITY ? null : new Footprint(minX, maxX, minZ, maxZ, minY, maxY);
         } catch (IOException | RuntimeException | LinkageError e) {
             return null;
         }

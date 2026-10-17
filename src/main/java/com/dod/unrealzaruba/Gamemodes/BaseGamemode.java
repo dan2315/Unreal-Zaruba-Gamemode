@@ -26,6 +26,7 @@ import com.dod.unrealzaruba.Economy.Money;
 import com.dod.unrealzaruba.Player.PlayerContext;
 import com.dod.unrealzaruba.Player.TeamPlayerContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
@@ -63,6 +64,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
         new VehicleSpawnData(this.getClass());
         new BarrierVolumesData(this.getClass());
         new EconomyData(this.getClass());
+        new ScoringData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
         Wallets.reset(server);
         SideIncome.reset();
@@ -211,22 +213,27 @@ public abstract class BaseGamemode implements IPhaseHolder {
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
 
+    /** Players who died for real and wait for their respawn. The death is vanilla, so the Corpse mod leaves a body with their items. */
+    private final java.util.Set<java.util.UUID> dead = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /** Whether this death is a real one (a body stays, a respawn timer follows); otherwise it is undone and the player is healed. */
+    protected boolean IsRealDeath(ServerPlayer player) {
+        return currentPhase.GetPhaseId() != PhaseId.TEAM_SELECTION;
+    }
+
+    /** Where a player comes back to after dying, in the game world; null for the default. */
+    protected BlockPos DeathRespawnPosition(ServerPlayer player) {
+        return null;
+    }
+
     // Помянем усопших
     public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
-        if (currentPhase.GetPhaseId() == PhaseId.TEAM_SELECTION) {
+        if (!IsRealDeath(player)) {
             player.setHealth(20);
             player.getFoodData().setFoodLevel(20);
             event.setCanceled(true);
             return;
         }
-
-        player.setGameMode(GameType.SPECTATOR);
-
-        player.setHealth(20);
-        player.getFoodData().setFoodLevel(20);
-        player.setInvulnerable(true);
-        player.getInventory().clearContent();
-        event.setCanceled(true);
 
         var killingEntity = event.getSource().getEntity();
         if (killingEntity instanceof ServerPlayer killer) {
@@ -241,13 +248,45 @@ public abstract class BaseGamemode implements IPhaseHolder {
         }
         ServerPlayer enemyKiller = killingEntity instanceof ServerPlayer killer && isEnemy(killer, player) ? killer : null;
         SideIncome.onDeath(player, enemyKiller, server);
-
-        NBT.addEntityTag(player, "isPlayerDead", 1);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
 
-        startRespawnTimer(player);
+        java.util.UUID id = player.getUUID();
+        dead.add(id);
+        // Back at the base of the team in the game world, not at the world spawn of the lobby
+        BlockPos spawn = DeathRespawnPosition(player);
+        if (spawn != null) player.setRespawnPosition(WorldManager.GAME_DIMENSION, spawn, 0f, true, false);
+        // The player respawns at once (so there is no death screen); the waiting is done as a spectator on the base
+        TimerManager.createTickTimer(2, () -> respawnNow(id), null);
     }
-    
+
+    private void respawnNow(java.util.UUID id) {
+        ServerPlayer player = server == null ? null : server.getPlayerList().getPlayer(id);
+        if (player == null || !dead.contains(id) || !player.isDeadOrDying()) return;
+        player.connection.handleClientCommand(new net.minecraft.network.protocol.game.ServerboundClientCommandPacket(
+                net.minecraft.network.protocol.game.ServerboundClientCommandPacket.Action.PERFORM_RESPAWN));
+    }
+
+    /**
+     * The player who died has respawned (a new ServerPlayer): they wait as a spectator until the respawn timer is over.
+     * Returns false when the player is not one that died here.
+     */
+    public boolean HandleDeathRespawn(ServerPlayer player) {
+        if (!dead.contains(player.getUUID())) return false;
+        player.setGameMode(GameType.SPECTATOR);
+        player.setHealth(20);
+        player.getFoodData().setFoodLevel(20);
+        player.setInvulnerable(true);
+        player.getInventory().clearContent();
+        NBT.addEntityTag(player, "isPlayerDead", 1);
+        startRespawnTimer(player.getUUID());
+        return true;
+    }
+
+    /** A player left: they are no longer waiting for a respawn (the login brings them back to their base). */
+    public void forgetDead(java.util.UUID id) {
+        dead.remove(id);
+    }
+
     // No money for suicides and team kills
     private static boolean isEnemy(ServerPlayer killer, ServerPlayer victim) {
         if (killer == victim) return false;
@@ -260,22 +299,26 @@ public abstract class BaseGamemode implements IPhaseHolder {
         return true;
     }
 
-    private void startRespawnTimer(ServerPlayer player) {
+    private void startRespawnTimer(java.util.UUID id) {
         TimerManager.createRealTimeTimer(
-            RESPAWN_DURATION_SECONDS * 1000, 
-            () -> HandleRespawn(player),
-            ticks -> updateRespawnTimer(player, ticks)
+            RESPAWN_DURATION_SECONDS * 1000,
+            () -> {
+                dead.remove(id);
+                ServerPlayer player = server == null ? null : server.getPlayerList().getPlayer(id);
+                if (player != null) HandleRespawn(player);
+            },
+            ticks -> updateRespawnTimer(id, ticks)
         );
     }
-    
-    private void updateRespawnTimer(ServerPlayer player, int ticks) {
+
+    private void updateRespawnTimer(java.util.UUID id, int ticks) {
         if (ticks % 20 != 0) {
             return;
         }
-        
+
+        ServerPlayer player = server == null ? null : server.getPlayerList().getPlayer(id);
+        if (player == null) return;
         int remainingSeconds = RESPAWN_DURATION_SECONDS - (ticks / 20);
-        
-        PacketDistributor.sendToPlayer(player, new UpdateDeathTimerPacket(remainingSeconds)
-        );
+        PacketDistributor.sendToPlayer(player, new UpdateDeathTimerPacket(remainingSeconds));
     }
 }

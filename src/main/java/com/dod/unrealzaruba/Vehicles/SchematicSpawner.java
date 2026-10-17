@@ -152,6 +152,10 @@ public final class SchematicSpawner {
             fail(player, Component.translatable("schematics.unrealzaruba.spawn.area_busy", AREA));
             return;
         }
+        if (footprint != null && !spotIsClear(level, pos, footprint, centerX, centerZ)) {
+            fail(player, Component.translatable("schematics.unrealzaruba.spawn.blocks_in_the_way"));
+            return;
+        }
 
         // The first payment starts a purchase others can add to; paying everything buys the vehicle right away
         int amount = Math.max(1, Math.min(contribution, price));
@@ -167,6 +171,30 @@ public final class SchematicSpawner {
             PacketDistributor.sendToPlayer(player, new ClientboundSchematicSpawnResultPacket(true,
                     Component.translatable("schematics.unrealzaruba.purchase.started", name, Money.format(amount), Money.format(price))));
         }
+    }
+
+    /**
+     * The space the vehicle will take, from the floor up, has no solid block in it (grass and other things that do not stop
+     * anyone do not count). The vehicle stands a block above the spawner's level, as it is placed.
+     */
+    private static boolean spotIsClear(ServerLevel level, BlockPos pos, Blueprints.Footprint footprint, double centerX, double centerZ) {
+        int x0 = (int) Math.floor(centerX + footprint.minX());
+        int x1 = (int) Math.ceil(centerX + footprint.maxX()) - 1;
+        int z0 = (int) Math.floor(centerZ + footprint.minZ());
+        int z1 = (int) Math.ceil(centerZ + footprint.maxZ()) - 1;
+        int y0 = pos.getY() + 1;
+        int y1 = y0 + (int) Math.ceil(footprint.height()) - 1;
+        if ((long) (x1 - x0 + 1) * (z1 - z0 + 1) * (y1 - y0 + 1) > 200_000L) return false; // far bigger than any allowed vehicle
+        BlockPos.MutableBlockPos cell = new BlockPos.MutableBlockPos();
+        for (int x = x0; x <= x1; x++) {
+            for (int z = z0; z <= z1; z++) {
+                for (int y = y0; y <= y1; y++) {
+                    cell.set(x, y, z);
+                    if (!level.getBlockState(cell).getCollisionShape(level, cell).isEmpty()) return false;
+                }
+            }
+        }
+        return true;
     }
 
     /** The area in front of the spawner that has to be clear of other vehicles: this many blocks each way. */

@@ -108,18 +108,10 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
                 this::CompleteTeamSelection,
                 new CombinedOrCondition(
                         new TeamsHaveEnoughPlayersCondition(TeamManager, 10, 10),
-                        new TimePassedCondition(60)
+                        new TimePassedCondition(ScoringData.of(this.getClass()).teamSelectionSeconds)
                             .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Игра начнётся через " + integer + " секунд")))
         )))
         .AddPhase(new ConditionalPhase(
-                PhaseId.STRATEGY_TIME,
-                this::StartStrategyTime,
-                this::CompleteStrategyTime,
-                new TimePassedCondition(60)
-                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Этап подготовки: " + integer + " секунд")))
-            )
-        ).
-        AddPhase(new ConditionalPhase(
                 PhaseId.BATTLE,
                 this::StartBattle,
                 () -> { // On phase end
@@ -207,13 +199,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         objectivesHandler.addRecipients(TeamManager.GetTeams());
-    }
-
-    public void StartStrategyTime() {
         SendObjectivesDataToClients();
-    }
 
-    public void CompleteStrategyTime() {
+        // No waiting on the bases: the battle starts as soon as the teams are set
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
     }
@@ -271,6 +259,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
         SendRespawnObjectives(serverPlayer);
 
+        if (gameTimer != null) gameTimer.syncTo(serverPlayer);
+
         if (server == null)
             return;
 
@@ -278,8 +268,9 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
             TeleportToLobby(serverPlayer, server);
             return;
         }
-        if (GetCurrentPhaseId() == PhaseId.BATTLE && !isInTeam) {
-            MakePlayerSpectator(serverPlayer, server);
+        // Joining while the teams are being picked or in the middle of the match: to the zone where a team is chosen
+        if ((GetCurrentPhaseId() == PhaseId.PREPARATION || GetCurrentPhaseId() == PhaseId.BATTLE) && !isInTeam) {
+            SendToTeamSelection(serverPlayer);
             return;
         }
         if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
@@ -288,6 +279,13 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     // TODO: All methods below is like more util
+
+    /** The arrival zone of the game world, where the team blocks are: a team chosen there takes the player into the battle. */
+    private void SendToTeamSelection(ServerPlayer serverPlayer) {
+        serverPlayer.setGameMode(GameType.ADVENTURE);
+        WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
+        serverPlayer.sendSystemMessage(Component.translatable("hud.unrealzaruba.late_join.pick_team"));
+    }
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
         WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());

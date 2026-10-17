@@ -72,6 +72,13 @@ public class ScoreOverlay implements ZarubaOverlay {
         return visible;
     }
 
+    /** Back to nothing shown: the match is over or the player is somewhere else. */
+    public void reset() {
+        visible = false;
+        leftScore = 0;
+        rightScore = 0;
+    }
+
     public void SetVisible(boolean visible) {
         this.visible = visible;
     }

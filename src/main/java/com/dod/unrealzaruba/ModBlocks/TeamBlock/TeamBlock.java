@@ -63,6 +63,7 @@ public class TeamBlock extends Block {
                 
                 UnrealZaruba.LOGGER.info("Assigning player " + player.getName().getString() + " to team " + teamColor);
                 teamManager.AssignToTeam(teamColor, player);
+                teamGamemode.HandleTeamChosen(player); // a team chosen in the middle of the match takes the player into it
             }
             else {
                 UUID playerUUID = player.getUUID();

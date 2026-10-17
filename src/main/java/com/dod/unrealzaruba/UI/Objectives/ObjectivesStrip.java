@@ -40,7 +40,7 @@ public class ObjectivesStrip implements ZarubaOverlay {
         int x = (screenWidth - total) / 2;
         int above = com.dod.unrealzaruba.UI.Compass.CompassOverlay.bottom(font, Minecraft.getInstance(), screenWidth);
         // Tiles float under the top panel, with no background of their own
-        int y = above + 4;
+        int y = above + 2;
         float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 220.0);
 
         for (Tile tile : tiles) {

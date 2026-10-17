@@ -26,6 +26,10 @@ public class GeometryRenderer {
         });
     }
 
+    public void clear() {
+        renderableMap.clear();
+    }
+
     public void Remove(Integer id) {
         renderableMap.remove(id);
     }

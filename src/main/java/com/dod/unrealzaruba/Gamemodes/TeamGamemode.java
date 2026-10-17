@@ -1,6 +1,7 @@
 package com.dod.unrealzaruba.Gamemodes;
 
 import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
+import com.dod.unrealzaruba.Gamemodes.GamePhases.PhaseId;
 import com.dod.unrealzaruba.Gamemodes.GameText.StartGameText;
 import com.dod.unrealzaruba.NetworkPackets.NetworkHandler;
 import com.dod.unrealzaruba.utils.NBT;
@@ -63,16 +64,40 @@ public class TeamGamemode extends BaseGamemode {
         PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(false, 0));
     }
     
+    /** Only players of a team die for real; the rest are healed (they are still choosing). */
     @Override
-    public void HandleDeath(ServerPlayer player, LivingDeathEvent event) {
-        super.HandleDeath(player, event);
-        if (PlayerContext.Get(player.getUUID()) instanceof TeamPlayerContext teamPlayerContext) {
-            // Deaths before the battle are cancelled in BaseGamemode and don't count
-            if (teamPlayerContext.Team() == null || NBT.readEntityTag(player, "isPlayerDead") != 1) return;
-            // The client opens the map to pick a respawn point
-            RespawnPointsSync.sendTo(player);
-            PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS));
-        }
+    protected boolean IsRealDeath(ServerPlayer player) {
+        return super.IsRealDeath(player) && TeamManager != null && TeamManager.IsInTeam(player);
+    }
+
+    @Override
+    protected net.minecraft.core.BlockPos DeathRespawnPosition(ServerPlayer player) {
+        var team = TeamManager == null ? null : TeamManager.GetPlayersTeam(player);
+        return team == null ? null : team.MainSpawn();
+    }
+
+    /**
+     * A player has chosen a team by stepping on its block. While the match is on that takes them straight into the battle:
+     * to their base, with their class, as a normal player.
+     */
+    public void HandleTeamChosen(ServerPlayer player) {
+        if (GetCurrentPhaseId() != PhaseId.BATTLE || TeamManager == null || !TeamManager.IsInTeam(player)) return;
+        TeamManager.teleportToChosenOrPriority(player);
+        com.dod.unrealzaruba.CharacterClass.CharacterClassEquipper.equipPlayerWithSelectedClass(player);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setInvulnerable(false);
+        NBT.addEntityTag(player, "isPlayerDead", 0);
+        RespawnPointsSync.sendTo(player);
+    }
+
+    @Override
+    public boolean HandleDeathRespawn(ServerPlayer player) {
+        if (!super.HandleDeathRespawn(player)) return false;
+        // Waits on the base; the client opens the map to pick a respawn point
+        TeamManager.teleportToSpawnByPriority(player);
+        RespawnPointsSync.sendTo(player);
+        PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS));
+        return true;
     }
 
     @Override

@@ -52,13 +52,15 @@ public class TimerOverlay implements ZarubaOverlay, IGameTimer {
     public void startCountDown(long startTime, int durationSeconds) {
         isVisible = true;
         this.durationSeconds = durationSeconds;
+        if (timer != null) timer.dispose(true); // a repeated start (a rejoin) replaces the running countdown
         timer = TimerManager.createRealTimeTimer(durationSeconds, startTime, this::updateTime);
     }
 
     @Override
     public void stop() {
         isVisible = false;
-        timer.dispose(true);
+        if (timer != null) timer.dispose(true);
+        timer = null;
     }
 
     private void updateTime(int ticks) {

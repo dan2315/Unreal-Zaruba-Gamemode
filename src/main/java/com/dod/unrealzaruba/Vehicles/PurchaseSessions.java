@@ -267,6 +267,11 @@ public final class PurchaseSessions {
         }
     }
 
+    /** A player who connects while purchases are going gets the state of each (the ghost and the label over the block). */
+    public static void syncTo(ServerPlayer player) {
+        for (Session session : SESSIONS.values()) broadcastTo(player, session);
+    }
+
     /** A player at the block while a purchase is going: their screen shows it instead of the vehicle list. */
     public static void sendCurrent(ServerPlayer player, Session session) {
         broadcastTo(player, session);

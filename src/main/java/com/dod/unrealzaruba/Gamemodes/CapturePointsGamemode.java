@@ -52,7 +52,9 @@ public class CapturePointsGamemode extends TeamGamemode {
     // Everyone is brought here when the map has loaded, before teams go to their spawns
     private static final BlockPos ARRIVAL_POINT = new BlockPos(177, 75, -216);
     public static final String GAMEMODE_NAME = "capturepoints";
-    private static final short REQUIRED_POINTS_TO_WIN = 200;
+    /** From scoring.json of the map. */
+    private final ScoringData.Config scoring;
+    private final short requiredPointsToWin;
     private final ScorePointsObjective scorePointsObjectiveRed;
     private final ScorePointsObjective scorePointsObjectiveBlue;
 
@@ -63,6 +65,8 @@ public class CapturePointsGamemode extends TeamGamemode {
         super();
         this.gameStatistics = gameStatisticsService;
         this.gameTimer = gameTimer;
+        this.scoring = ScoringData.of(this.getClass());
+        this.requiredPointsToWin = (short) Math.min(Short.MAX_VALUE, scoring.pointsToWin);
 
         TeamManager.GetTeams().forEach((teamColor, teamContext) -> {
             teamContext.setOnObjectiveChangedNotification((objective, team) -> {
@@ -72,19 +76,19 @@ public class CapturePointsGamemode extends TeamGamemode {
 
         startGameTexts.put(TeamColor.RED, new StartGameText(
                 "§c Игра началась, в бой!",
-                "Наберите 200 очков контроля точек"));
+                "Наберите " + scoring.pointsToWin + " очков контроля точек"));
         startGameTexts.put(TeamColor.BLUE, new StartGameText(
                 "§9 Игра началась, в бой!",
-                "Наберите 200 очков контроля точек"));
+                "Наберите " + scoring.pointsToWin + " очков контроля точек"));
 
-        scorePointsObjectiveRed = new ScorePointsObjective(0, REQUIRED_POINTS_TO_WIN);
-        var topHudLeft = new NetworkedTopHud((byte) 0, REQUIRED_POINTS_TO_WIN);
+        scorePointsObjectiveRed = new ScorePointsObjective(0, requiredPointsToWin);
+        var topHudLeft = new NetworkedTopHud((byte) 0, requiredPointsToWin);
         topHudLeft.updateProgress(0);
         scorePointsObjectiveRed.setProgressDisplay(topHudLeft);
         scorePointsObjectiveRed.SubscribeOnCompleted(objective -> CompleteGame(server, TeamColor.RED));
 
-        scorePointsObjectiveBlue = new ScorePointsObjective(0, REQUIRED_POINTS_TO_WIN);
-        var topHudRight = new NetworkedTopHud((byte) 1, REQUIRED_POINTS_TO_WIN);
+        scorePointsObjectiveBlue = new ScorePointsObjective(0, requiredPointsToWin);
+        var topHudRight = new NetworkedTopHud((byte) 1, requiredPointsToWin);
         topHudRight.updateProgress(0);
         scorePointsObjectiveBlue.setProgressDisplay(topHudRight);
         scorePointsObjectiveBlue.SubscribeOnCompleted(objective -> CompleteGame(server, TeamColor.BLUE));
@@ -113,17 +117,10 @@ public class CapturePointsGamemode extends TeamGamemode {
                 PhaseId.PREPARATION,
                 this::StartTeamSelection,
                 this::CompleteTeamSelection,
-                new TimePassedCondition(60)
+                new TimePassedCondition(scoring.teamSelectionSeconds)
                     .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Игра начнётся через " + integer + " секунд")))
         ))
-        .AddPhase(new ConditionalPhase(
-                PhaseId.STRATEGY_TIME,
-                this::StartStrategyTime,
-                this::CompleteStrategyTime,
-                new TimePassedCondition(60)
-                    .OnEverySecond(integer -> TitleMessage.sendActionbarToEveryone(server, Component.literal("Этап подготовки: " + integer + " секунд")))
-        )).
-        AddPhase(new GamePhase(
+        .AddPhase(new GamePhase(
                 PhaseId.BATTLE,
                 this::StartBattle,
                 () -> { // On phase end
@@ -137,8 +134,8 @@ public class CapturePointsGamemode extends TeamGamemode {
     @Override
     public Integer GetTeamScore(TeamColor team) {
         return switch (team) {
-            case RED -> Math.round(REQUIRED_POINTS_TO_WIN * scorePointsObjectiveRed.GetProgress());
-            case BLUE -> Math.round(REQUIRED_POINTS_TO_WIN * scorePointsObjectiveBlue.GetProgress());
+            case RED -> Math.round(requiredPointsToWin * scorePointsObjectiveRed.GetProgress());
+            case BLUE -> Math.round(requiredPointsToWin * scorePointsObjectiveBlue.GetProgress());
             default -> null;
         };
     }
@@ -180,7 +177,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     private void PrepareObjectiveDataToSendToClient(ArrayList<HudObjective> hudObjectives, List<ColoredSquareZone> zones) {
-        hudObjectives.add(new HudStringObjective("Наберите 200 очков, чтобы выиграть"));
+        hudObjectives.add(new HudStringObjective("Наберите " + scoring.pointsToWin + " очков, чтобы выиграть"));
         for (GameObjective objective : objectivesHandler.getObjectives()) {
             if (objective instanceof CapturePointObjective capturePointObjective) {
                 var ownerTeam = (TeamContext) capturePointObjective.GetOwner();
@@ -203,8 +200,9 @@ public class CapturePointsGamemode extends TeamGamemode {
             }
         }
 
-        scorePointsObjectiveRed.SetIncrementationSpeed((float) (Math.max(0, redPoints - 1)) / 10);
-        scorePointsObjectiveBlue.SetIncrementationSpeed((float) (Math.max(0, bluePoints - 1)) / 10);
+        // Every team holds a few points from the start; only the ones above that number earn score
+        scorePointsObjectiveRed.SetIncrementationSpeed(Math.max(0, redPoints - scoring.defaultPointsPerTeam) * scoring.scorePerExtraPoint);
+        scorePointsObjectiveBlue.SetIncrementationSpeed(Math.max(0, bluePoints - scoring.defaultPointsPerTeam) * scoring.scorePerExtraPoint);
     }
 
     // -- DUPLICATION TODO: Think how to reduce it
@@ -222,9 +220,11 @@ public class CapturePointsGamemode extends TeamGamemode {
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundObjectivesPacket(hudObjectives));
         // Scores are only sent when they change, so a player joining during a stalemate needs them now
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundUpdateTopScorePacket((byte) 0,
-                (short) (REQUIRED_POINTS_TO_WIN * scorePointsObjectiveRed.GetProgress()), REQUIRED_POINTS_TO_WIN));
+                (short) (requiredPointsToWin * scorePointsObjectiveRed.GetProgress()), requiredPointsToWin));
         PacketDistributor.sendToPlayer(serverPlayer, new ClientboundUpdateTopScorePacket((byte) 1,
-                (short) (REQUIRED_POINTS_TO_WIN * scorePointsObjectiveBlue.GetProgress()), REQUIRED_POINTS_TO_WIN));
+                (short) (requiredPointsToWin * scorePointsObjectiveBlue.GetProgress()), requiredPointsToWin));
+
+        if (gameTimer != null) gameTimer.syncTo(serverPlayer);
 
         if (server == null)
             return;
@@ -233,13 +233,21 @@ public class CapturePointsGamemode extends TeamGamemode {
             TeleportToLobby(serverPlayer, server);
             return;
         }
-        if (GetCurrentPhaseId() == PhaseId.BATTLE && !isInTeam) {
-            MakePlayerSpectator(serverPlayer, server);
+        // Joining while the teams are being picked or in the middle of the match: to the zone where a team is chosen
+        if ((GetCurrentPhaseId() == PhaseId.PREPARATION || GetCurrentPhaseId() == PhaseId.BATTLE) && !isInTeam) {
+            SendToTeamSelection(serverPlayer);
             return;
         }
         if (GetCurrentPhaseId() == PhaseId.BATTLE && isDead == 1) {
             ReturnToTeamSpawn(serverPlayer);
         }
+    }
+
+    /** The arrival zone of the game world, where the team blocks are: a team chosen there takes the player into the battle. */
+    private void SendToTeamSelection(ServerPlayer serverPlayer) {
+        serverPlayer.setGameMode(GameType.ADVENTURE);
+        WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
+        serverPlayer.sendSystemMessage(Component.translatable("hud.unrealzaruba.late_join.pick_team"));
     }
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
@@ -347,12 +355,8 @@ public class CapturePointsGamemode extends TeamGamemode {
         }
         CharacterClassEquipper.equipTeamWithSelectedClasses(players);
         objectivesHandler.addRecipients(TeamManager.GetTeams());
-    }
 
-    public void StartStrategyTime() {
-    }
-
-    public void CompleteStrategyTime() {
+        // No waiting on the bases: the battle starts as soon as the teams are set
         TeamManager.ChangeGameModeOfAllParticipants(GameType.SURVIVAL);
         server.setDifficulty(Difficulty.NORMAL, true);
     }

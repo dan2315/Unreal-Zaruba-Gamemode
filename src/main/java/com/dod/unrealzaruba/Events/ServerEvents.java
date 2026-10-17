@@ -121,10 +121,13 @@ public class ServerEvents {
             MapPacks.offer(player);
             SupplyDrops.syncTo(player);
             SupplyCases.syncTo(player);
+            com.dod.unrealzaruba.Vehicles.PurchaseSessions.syncTo(player);
         }
         else {
             WorldManager.teleportPlayerToDimension(player, WorldManager.LOBBY_DIMENSION, MainConfig.getInstance().getLobbySpawnPoint());
             player.setGameMode(GameType.ADVENTURE);
+            // The lobby window (vote, ready) is sent now: it is otherwise only sent when something changes
+            com.dod.unrealzaruba.Lobby.LobbyService.sendTo(player);
         }
     }
 
@@ -132,14 +135,17 @@ public class ServerEvents {
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             com.dod.unrealzaruba.Vehicles.SchematicSpawner.forget(player);
+            gamemodeManager.ForGamemode(gamemode -> gamemode.forgetDead(player.getUUID()));
         }
     }
 
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.isEndConquered()) return;
-
-
+        if (!(event.getEntity() instanceof ServerPlayer player) || player.getServer() == null) return;
+        if (!player.getServer().isDedicatedServer() || isDevMode) return;
+        // A player who died has come back as a new ServerPlayer: they wait out the respawn as a spectator
+        gamemodeManager.ForGamemode(gamemode -> gamemode.HandleDeathRespawn(player));
     }
 
     @SubscribeEvent

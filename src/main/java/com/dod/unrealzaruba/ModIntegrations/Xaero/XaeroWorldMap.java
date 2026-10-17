@@ -46,6 +46,8 @@ public class XaeroWorldMap {
     public XaeroWorldMap(XaeroWaypoints waypoints) {
         this.waypoints = waypoints;
         NeoForge.EVENT_BUS.addListener(this::onScreenRender);
+        NeoForge.EVENT_BUS.addListener(this::onKeyPressed);
+        NeoForge.EVENT_BUS.addListener(this::onClientTick);
     }
 
     /** Puts the vehicle diamonds on the world map as soon as Xaero has made its element list. */
@@ -163,12 +165,48 @@ public class XaeroWorldMap {
         return options;
     }
 
+    /**
+     * Xaero's menu of the empty map, cut down to the lines that show the coordinates (they start with X:). Other lines
+     * (chunk, waypoints, teleport, sharing, export, settings) are left out, and the ones kept are renumbered.
+     */
+    public static ArrayList<RightClickOption> coordinatesOnly(ArrayList<RightClickOption> xaeroOptions, IRightClickableElement target) {
+        ArrayList<RightClickOption> options = new ArrayList<>();
+        for (RightClickOption option : xaeroOptions) {
+            String text = option.getDisplayName().getString();
+            if (text.startsWith("X:")) options.add(label(text.replace("%", "%%"), options.size(), target));
+        }
+        return options;
+    }
+
     private static RightClickOption label(String text, int index, IRightClickableElement target) {
         return new RightClickOption(text, index, target) {
             @Override
             public void onAction(Screen screen) {
             }
         }.setActive(false);
+    }
+
+    /** While the player waits to respawn the map stays open: Esc and the map key do not close it. */
+    private void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+        if (!(event.getScreen() instanceof GuiMap) || !RespawnClientState.isDead()) return;
+        if (event.getKeyCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
+            event.setCanceled(true);
+            return;
+        }
+        for (var mapping : Minecraft.getInstance().options.keyMappings) {
+            if (mapping.getName().equals("gui.xaero_open_map") && mapping.matches(event.getKeyCode(), event.getScanCode())) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+    }
+
+    /** If the map got closed anyway (another screen, a reload) while waiting, it is opened again. */
+    private void onClientTick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (!RespawnClientState.isDead() || mc.screen != null || mc.player == null || mc.level == null) return;
+        if (mc.level.getGameTime() % 20 != 0) return;
+        openForRespawn();
     }
 
     private void onScreenRender(ScreenEvent.Render.Post event) {

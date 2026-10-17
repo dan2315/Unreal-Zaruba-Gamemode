@@ -42,8 +42,17 @@ public class ClientEvents {
         MapPackClient.tick();
     }
 
+    private boolean wasInGame;
+
     @SubscribeEvent
     public void OnClientTickPost(ClientTickEvent.Post event) {
+        // Leaving the game world (the match ended, back to the lobby): the match HUD goes with it
+        var level = Minecraft.getInstance().level;
+        if (level != null) {
+            boolean inGame = level.dimension().location().equals(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "game_dim"));
+            if (wasInGame && !inGame) com.dod.unrealzaruba.UI.MatchHud.resetAll();
+            wasInGame = inGame;
+        }
         while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
             Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
         }
@@ -70,9 +79,9 @@ public class ClientEvents {
     @SubscribeEvent
     public void onClientPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
         UnrealZaruba.LOGGER.warn("Clearing objectives overlay");
-        ObjectivesOverlay.INSTANCE.Clear();
+        com.dod.unrealzaruba.UI.MatchHud.resetAll();
+        wasInGame = false;
         MoneyOverlay.INSTANCE.set(false, 0);
-        RespawnClientState.reset();
         com.dod.unrealzaruba.UI.Lobby.LobbyClientState.reset();
         com.dod.unrealzaruba.Schematics.PurchaseClientState.reset();
         com.dod.unrealzaruba.UI.Vehicles.TeamVehiclesState.reset();

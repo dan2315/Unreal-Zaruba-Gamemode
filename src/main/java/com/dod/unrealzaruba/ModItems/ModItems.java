@@ -51,7 +51,15 @@ public class ModItems {
 
     /** The case from a supply drop: carried to the base to cash in. */
     public static final DeferredHolder<Item, Item> SUPPLY_CASE = ModItems.ITEMS.register("supply_case",
-            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()) {
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, TooltipContext context,
+                                            java.util.List<net.minecraft.network.chat.Component> tooltip,
+                                            net.minecraft.world.item.TooltipFlag flag) {
+                    tooltip.add(net.minecraft.network.chat.Component.translatable("item.unrealzaruba.supply_case.desc")
+                            .withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            });
 
     /** Shows the size, price and publishing problems of a Sable contraption. */
     public static final DeferredHolder<Item, Item> CONTRAPTION_SCANNER = ModItems.ITEMS.register("contraption_scanner",
