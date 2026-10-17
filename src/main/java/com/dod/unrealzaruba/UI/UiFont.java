@@ -21,6 +21,9 @@ public final class UiFont {
     /** For headings: {@code Component.literal(text).withStyle(Style.EMPTY.withFont(UiFont.BOLD))}. */
     public static final ResourceLocation BOLD = ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "montserrat_bold");
 
+    /** Montserrat is switched off: everything uses the game font. Set to true to bring the brand font back. */
+    private static final boolean MONTSERRAT = false;
+
     private static Font font;
     private static Font vanilla;
 
@@ -28,6 +31,7 @@ public final class UiFont {
 
     public static Font get() {
         Font current = Minecraft.getInstance().font;
+        if (!MONTSERRAT) return current;
         if (font != null && vanilla == current) return font;
         vanilla = current;
         font = build(current);
@@ -35,7 +39,7 @@ public final class UiFont {
     }
 
     public static Style bold() {
-        return Style.EMPTY.withFont(BOLD);
+        return MONTSERRAT ? Style.EMPTY.withFont(BOLD) : Style.EMPTY.withBold(true);
     }
 
     @SuppressWarnings("unchecked")

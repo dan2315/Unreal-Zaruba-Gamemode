@@ -99,6 +99,7 @@ public final class SupplyParadrop {
         parts.forEach((pos, state) -> level.setBlock(pos, state, Block.UPDATE_ALL));
 
         fillBarrel(server, level, barrelPos, settings);
+        if (!ItemSpecs.parse(server.registryAccess(), settings.cashItem, 1).isEmpty()) SupplyCases.caseDropped();
         if (level.getBlockEntity(packPos) instanceof ParachutePackBlockEntity pack) {
             pack.setTerminalSpeed(settings.terminalSpeed);
             pack.setDeployed(true); // travels with the block when the body is assembled
@@ -135,11 +136,13 @@ public final class SupplyParadrop {
             UnrealZaruba.LOGGER.error("[SupplyParadrop] Could not assemble the drop above {}", target);
             for (BlockPos pos : blocks) level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
             releaseChunks(level, chunks);
+            SupplyCases.caseDropEnded(null);
             return;
         }
         subLevel.setName("supply_drop");
         UUID id = subLevel.getUniqueId();
         ACTIVE.add(new Drop(id, target, chunks));
+        SupplyCases.caseDropAssembled(id);
         if (lifetimeSeconds > 0) later(lifetimeSeconds * 20, () -> removeDrop(id));
         SupplyDrops.refreshWaypoint(level.getServer());
         UnrealZaruba.LOGGER.info("[SupplyParadrop] Drop {} assembled above {}: {} blocks, mass {}", subLevel.getUniqueId(), target,
@@ -191,6 +194,7 @@ public final class SupplyParadrop {
         if (drop == null || level == null) return;
         ACTIVE.remove(drop);
         SableShips.remove(level, id);
+        SupplyCases.caseDropEnded(id);
         releaseChunks(level, drop.chunks());
         SupplyDrops.refreshWaypoint(level.getServer());
     }
@@ -214,6 +218,11 @@ public final class SupplyParadrop {
         if (nextAutoTick < 0) nextAutoTick = Math.max(0, settings.firstDropSeconds) * 20;
         if (battleTicks < nextAutoTick) return;
         if (ACTIVE.size() >= Math.max(1, settings.maxActive)) {
+            nextAutoTick = battleTicks + RETRY_TICKS;
+            return;
+        }
+        if (SupplyCases.blocksNextDrop()) {
+            // The previous drop's case is not cashed in yet: wait, and look again in a little while
             nextAutoTick = battleTicks + RETRY_TICKS;
             return;
         }

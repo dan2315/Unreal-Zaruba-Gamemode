@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.dod.unrealzaruba.UI.Brand;
 import com.dod.unrealzaruba.UI.HudStyle;
+import com.dod.unrealzaruba.UI.ScoreOverlay;
+import com.dod.unrealzaruba.UI.UiFont;
 import com.dod.unrealzaruba.UI.ZarubaOverlay;
 import com.dod.unrealzaruba.UI.Objectives.HudCapturePointObjective;
 import com.dod.unrealzaruba.UI.Objectives.HudDestroyObjective;
@@ -13,11 +16,13 @@ import com.dod.unrealzaruba.UI.Objectives.ObjectivesOverlay;
 import com.dod.unrealzaruba.UI.Respawn.RespawnClientState;
 import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsView;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -60,35 +65,32 @@ public class CompassOverlay implements ZarubaOverlay {
     private static final ResourceLocation GAME_DIM =
             ResourceLocation.fromNamespaceAndPath("unrealzaruba", "game_dim");
 
-    public static final int MAX_WIDTH = 240;
-    public static final int MIN_WIDTH = 160;
-    /** Height of the transparent strip (marker letters + icons + degree row). */
-    public static final int STRIP_H = 18;
-    private static final int INFO_H = 9;
-    private static final int GAP = 2;
-    /** Full height incl. the bearing line below the strip. ScoreOverlay uses this to move down. */
-    public static final int TOTAL_H = STRIP_H + GAP + INFO_H;
-    private static final int TOP_Y = 4;
-    /** Small text scale for degree numbers and marker letters, so rows don't collide. */
-    private static final float SMALL = 0.7f;
+    /** Height of the panel: marker circles with their distances under them, the scale ticks and its numbers. */
+    public static final int PANEL_H = 25;
+    /** Space between the stacked top-centre panels (score, compass, objectives). */
+    public static final int GAP = 3;
+    private static final int MARKER_R = 5;
+    /** The label that stands for a base: drawn as a little house (not text), a letter would be taken for an objective. */
+    private static final String HOME = "#base";
+    /** Small text scale for degree numbers and distances. */
+    private static final float SMALL = 0.75f;
     /** Markers fade out inside this distance and hide completely up close. */
     private static final double FADE_DIST = 15.0;
 
-    // Transparent floating strip: no background panel, only text/markers/ticks.
     // Brandbook colors (tokens/colors.json): text/text-dim/text-mute, mint accent.
     private static final int MINT = 0xFF00FFA3;
     private static final int TEXT = 0xFFF2F5F3; // text
-    private static final int DIM = 0xFFB9BDC2; // text-dim
-    private static final int MUTE = 0xFF7C828A; // text-mute
-    private static final int TICK_MINOR = 0xFF4A4753;
-    private static final int TICK_MAJOR = 0xFF8E939B;
-    private static final int CENTER_LINE = 0x8000FFA3; // mint, 50%
+    private static final int DIM = 0xFFC9CDD2; // text-dim, a little lighter than the brand value for the small numbers
+    private static final int MUTE = 0xFF9AA0A8; // text-mute, lifted likewise
+    private static final int TICK_MINOR = 0xFF5B5864;
+    private static final int TICK_MAJOR = 0xFFB0B5BD;
+    private static final int ON_TILE = 0xFF0B0E12;
 
     private enum Kind { CAPTURE, DESTROY, SUPPLY, RESPAWN, RESPAWN_SELECTED, ENEMY_BASE }
 
     private record Marker(BlockPos pos, String label, int color, Kind kind, boolean capturing, double dist) {}
 
-    /** True when the strip should be drawn (also used by ScoreOverlay to shift down). */
+    /** True when the compass should be drawn (the objectives under it move with it). */
     public static boolean shouldRender(Minecraft mc) {
         if (mc == null || mc.player == null || mc.level == null) return false;
         if (mc.screen != null) return false;
@@ -106,9 +108,15 @@ public class CompassOverlay implements ZarubaOverlay {
         return v != null && (!v.points().isEmpty() || !v.enemyBases().isEmpty());
     }
 
-    /** Offset for panels below the compass (strip + gap + margin). */
-    public static int topOffset() {
-        return TOP_Y + TOTAL_H + HudStyle.MARGIN;
+    /** Top of the compass panel: it continues the score panel, or hangs from the top edge without it. */
+    private static int top(Font font) {
+        return ScoreOverlay.INSTANCE.isShown() ? ScoreOverlay.INSTANCE.bottom(font) : 0; // under the score, or at the top edge without it
+    }
+
+    /** Where the compass ends (or where it would start while hidden), for what is drawn under it. */
+    public static int bottom(Font font, Minecraft mc, int screenWidth) {
+        if (!shouldRender(mc)) return ScoreOverlay.INSTANCE.bottom(font);
+        return top(font) + PANEL_H;
     }
 
     @Override
@@ -122,21 +130,22 @@ public class CompassOverlay implements ZarubaOverlay {
         // while the yaw-interpolated ticks glide smoothly, and markers shake against the scale.
         Vec3 pp = mc.player.getPosition(partialTick);
 
-        int w = Math.min(MAX_WIDTH, screenWidth - 24);
-        if (w < MIN_WIDTH) return;
+        int w = HudStyle.topWidth(screenWidth);
+        Font font = mc.font; // the game's own font: small text stays crisp
         int x0 = (screenWidth - w) / 2;
-        int y0 = TOP_Y;
+        int y0 = top(UiFont.get()); // the score panel above is measured with the brand font
         double centerX = x0 + w / 2.0;
-        double halfW = w / 2.0 - 6.0;
+        double halfW = w / 2.0 - 10.0;
         double halfFov = CompassMath.HALF_FOV;
+        int midY = y0 + 10; // the scale runs here, and the markers sit on it, their distances under them
+
+        HudStyle.dockedPanel(g, x0, y0, w, PANEL_H, true);
+        if (ScoreOverlay.INSTANCE.isShown()) HudStyle.separator(g, x0, y0, w); // the seam with the score above
 
         List<Marker> markers = collect(pp);
-        markers.sort(Comparator.comparingDouble(m ->
-                CompassMath.relative(CompassMath.bearingTo(pp.x, pp.z, m.pos().getCenter().x, m.pos().getCenter().z), bearing)));
+        // Far ones first, so the near one is on top where two overlap
+        markers.sort(Comparator.comparingDouble((Marker m) -> m.dist()).reversed());
 
-        // Transparent: no panel fill, scissor only clips edge ticks/markers.
-
-        // Marker screen positions (null = off-screen, handled as edge arrows).
         List<Double> markerXs = new ArrayList<>(markers.size());
         for (Marker m : markers) {
             double tb = CompassMath.bearingTo(pp.x, pp.z, m.pos().getCenter().x, m.pos().getCenter().z);
@@ -144,11 +153,10 @@ public class CompassOverlay implements ZarubaOverlay {
             markerXs.add(Math.abs(rel) <= halfFov ? centerX + rel / halfFov * halfW : null);
         }
 
-        Font font = gui.getFont();
-        g.enableScissor(x0 + 1, y0 + 1, x0 + w - 1, y0 + STRIP_H - 1);
+        g.enableScissor(x0 + 2, y0 + 1, x0 + w - 2, y0 + PANEL_H - 1);
 
-        // Ticks + degree labels along the bottom; marker icons live in the top rows,
-        // so labels never sit on top of markers.
+        // The scale: a line with ticks across it, the sides of the world written on it
+        g.fill(x0 + 4, midY, x0 + w - 4, midY + 1, TICK_MINOR);
         double min = bearing - halfFov;
         double max = bearing + halfFov;
         for (double b = Math.ceil(min / 5.0) * 5.0; b <= max + 0.001; b += 5.0) {
@@ -158,108 +166,83 @@ public class CompassOverlay implements ZarubaOverlay {
             boolean cardinal = r % 90 == 0;
             boolean inter = !cardinal && r % 45 == 0;
             boolean numbered = r % 15 == 0;
-            int tickTop;
-            int tickColor;
-            int tickBottom = y0 + STRIP_H - 3;
+            int reach = cardinal || inter ? 0 : numbered ? 3 : 2;
+            int tickColor = numbered || cardinal || inter ? TICK_MAJOR : TICK_MINOR;
+            int tx = (int) Math.round(x);
             if (cardinal || inter) {
-                tickTop = y0 + STRIP_H - 8;
-                tickColor = TICK_MAJOR;
-            } else if (numbered) {
-                tickTop = y0 + STRIP_H - 6;
-                tickColor = TICK_MAJOR;
-            } else {
-                tickTop = y0 + STRIP_H - 5;
-                tickColor = TICK_MINOR;
-            }
-            g.fill((int) Math.round(x), tickTop, (int) Math.round(x) + 1, tickBottom, tickColor);
-
-            if (numbered) {
                 String label = CompassMath.labelFor(n);
                 if (label == null) continue;
-                boolean nearMarker = false;
+                // The sides of the world replace the tick, on a patch of the panel colour so the line does not cross them
+                Component text = cardinal ? Component.literal(label).withStyle(ChatFormatting.BOLD) : Component.literal(label);
+                int tw = font.width(text);
+                // A marker always wins: a side of the world that a marker would touch is left out, the line stays
+                boolean taken = false;
                 for (Double mx : markerXs) {
-                    if (mx != null && Math.abs(mx - x) < 8) {
-                        nearMarker = true;
+                    if (mx != null && Math.abs(mx - x) < MARKER_R + 4 + tw / 2.0) {
+                        taken = true;
                         break;
                     }
                 }
-                if (nearMarker) continue;
-                int color = cardinal ? TEXT : (inter ? MINT : DIM);
-                int lx = (int) Math.round(x) - HudStyle.width(font, label, SMALL) / 2;
-                smallText(g, font, label, lx, y0 + 11, color, SMALL);
+                if (taken) continue;
+                g.fill(tx - tw / 2 - 2, midY - 5, tx + (tw + 1) / 2 + 2, midY + 6, HudStyle.PANEL);
+                g.drawString(font, text, tx - tw / 2, midY - 3, cardinal ? TEXT : MINT, true);
+            } else {
+                g.fill(tx, midY - reach, tx + 1, midY + reach + 1, tickColor);
             }
         }
 
-        // Markers: letter row on top, icon below it, distance at the bottom.
-        // Colliding neighbours alternate into a lower slot; their distance is skipped.
-        double lastX = Double.NaN;
-        boolean alt = false;
+        // The markers: a circle in the colour of the point on the scale, the distance under it
         for (int i = 0; i < markers.size(); i++) {
             Marker m = markers.get(i);
             Double mx = markerXs.get(i);
             if (mx == null) continue;
-            if (!Double.isNaN(lastX) && Math.abs(mx - lastX) < 13) {
-                alt = !alt;
-            } else {
-                alt = false;
-            }
-            lastX = mx;
             int cx = (int) Math.round(mx);
-            int letterY = y0 + (alt ? 5 : 0);
-            int iconY = y0 + (alt ? 13 : 9);
-            int color = m.color();
-            if (m.capturing() && (System.currentTimeMillis() / 500) % 2 == 0) {
-                color = TEXT; // blink white while being captured
-            }
-            color = fade(color, m.dist());
+            int color = fade(m.color(), m.dist());
             if ((color >>> 24) <= 4) continue; // standing on the marker: hide it entirely
-            int labelW = HudStyle.width(font, m.label(), SMALL);
-            switch (m.kind()) {
-                case CAPTURE, DESTROY, SUPPLY, ENEMY_BASE -> {
-                    diamond(g, cx, iconY, 2, color);
-                    smallText(g, font, m.label(), cx - labelW / 2, letterY, color, SMALL);
-                }
-                case RESPAWN -> {
-                    triangleUp(g, cx, iconY, 2, color);
-                    smallText(g, font, m.label(), cx - labelW / 2, letterY, color, SMALL);
-                }
-                case RESPAWN_SELECTED -> {
-                    diamond(g, cx, iconY, 3, fade(0x40E8B83A, m.dist())); // soft gold halo for the chosen point
-                    diamond(g, cx, iconY, 2, color);
-                    smallText(g, font, m.label(), cx - labelW / 2, letterY, color, SMALL);
+            int cy = midY + 0;
+            int rim = m.capturing() && (System.currentTimeMillis() / 400) % 2 == 0 ? fade(TEXT, m.dist())
+                    : m.kind() == Kind.RESPAWN_SELECTED ? fade(TEXT, m.dist()) : fade(0xFF000000, m.dist());
+            disc(g, cx, cy, MARKER_R + 1, rim);
+            disc(g, cx, cy, MARKER_R, color);
+            if (HOME.equals(m.label())) {
+                house(g, cx, cy, fade(ON_TILE, m.dist()), color);
+            } else {
+                Component letter = Component.literal(m.label()).withStyle(ChatFormatting.BOLD);
+                g.drawString(font, letter, cx - font.width(letter) / 2, cy - 3, fade(ON_TILE, m.dist()), false);
+            }
+
+            // The distance, unless a nearer marker stands on it
+            boolean covered = false;
+            for (int j = i + 1; j < markers.size(); j++) {
+                Double ox = markerXs.get(j);
+                if (ox != null && Math.abs(ox - mx) < 20) {
+                    covered = true;
+                    break;
                 }
             }
-            if (!alt) {
+            if (!covered) {
                 String d = Math.round(m.dist()) + "m";
-                int dc = fade(MUTE, m.dist());
+                int dc = fade(DIM, m.dist());
                 if ((dc >>> 24) > 4) {
-                    smallText(g, font, d, cx - HudStyle.width(font, d, SMALL) / 2, y0 + 11, dc, SMALL);
+                    scaledText(g, font, Component.literal(d), cx - Math.round(font.width(d) * SMALL) / 2, cy + MARKER_R + 3, dc, SMALL);
                 }
             }
         }
-
-        // Center caret: mint wedge + translucent vertical.
-        g.fill((int) Math.round(centerX), y0 + 5, (int) Math.round(centerX) + 1, y0 + STRIP_H - 1, CENTER_LINE);
         g.disableScissor();
 
+        // Centre: the bearing in a small chip
         int ccx = (int) Math.round(centerX);
-        g.fill(ccx - 4, y0 + 1, ccx + 5, y0 + 2, MINT);
-        g.fill(ccx - 3, y0 + 2, ccx + 4, y0 + 3, MINT);
-        g.fill(ccx - 1, y0 + 3, ccx + 2, y0 + 5, MINT);
-
-        // Current bearing below the strip: cardinal in mint, degrees in main text.
-        float infoScale = 0.8f;
         String card = CompassMath.cardinalFor(bearing);
         long deg = Math.round(CompassMath.normalize360(bearing)) % 360;
-        String degText = deg + "°";
-        String sep = " · ";
-        int cardW = HudStyle.width(font, card, infoScale);
-        int sepW = HudStyle.width(font, sep, infoScale);
-        int sx = ccx - (cardW + sepW + HudStyle.width(font, degText, infoScale)) / 2;
-        int sy = y0 + STRIP_H + GAP;
-        smallText(g, font, card, sx, sy, MINT, infoScale);
-        smallText(g, font, sep, sx + cardW, sy, MUTE, infoScale);
-        smallText(g, font, degText, sx + cardW + sepW, sy, TEXT, infoScale);
+        Component chip = Component.literal(card).withStyle(ChatFormatting.BOLD).withStyle(s -> s.withColor(0x00FFA3))
+                .append(Component.literal(" " + deg + "°").withStyle(s -> s.withColor(0xF2F5F3)));
+        int cw = font.width(chip);
+        int bx = ccx - cw / 2;
+        // On the seam with the score above (or at the top edge without it), over a patch of the panel colour
+        int chipTop = ScoreOverlay.INSTANCE.isShown() ? y0 - 5 : y0;
+        g.fill(bx - 3, chipTop, bx + cw + 3, chipTop + 10, HudStyle.PANEL);
+        g.renderOutline(bx - 3, chipTop, cw + 6, 10, HudStyle.SEPARATOR);
+        g.drawString(font, chip, bx, chipTop + 1, 0xFFFFFFFF, false);
     }
 
     private static List<Marker> collect(Vec3 pp) {
@@ -302,7 +285,7 @@ public class CompassOverlay implements ZarubaOverlay {
                         selected ? Kind.RESPAWN_SELECTED : Kind.RESPAWN, false, dist(pp, e.position())));
             }
             for (RespawnPointsView.EnemyBase b : view.enemyBases()) {
-                out.add(new Marker(b.position(), "E", HudStyle.teamColor(b.team()), Kind.ENEMY_BASE, false, dist(pp, b.position())));
+                out.add(new Marker(b.position(), HOME, HudStyle.teamColor(b.team()), Kind.ENEMY_BASE, false, dist(pp, b.position())));
             }
         }
         if (DEBUG_FORCE && out.isEmpty()) {
@@ -334,7 +317,7 @@ public class CompassOverlay implements ZarubaOverlay {
         demo.add(demoMarker(new BlockPos(ax - 30, ay, az - 5), "$", HudStyle.YELLOW, Kind.SUPPLY, false, pp));
         demo.add(demoMarker(new BlockPos(ax - 15, ay, az + 18), "T", 0xFF4CC24C, Kind.RESPAWN, false, pp));
         demo.add(demoMarker(new BlockPos(ax + 12, ay, az - 22), "B", 0xFFE8B83A, Kind.RESPAWN_SELECTED, false, pp));
-        demo.add(demoMarker(new BlockPos(ax + 150, ay, az + 40), "E", HudStyle.RED, Kind.ENEMY_BASE, false, pp));
+        demo.add(demoMarker(new BlockPos(ax + 150, ay, az + 40), HOME, HudStyle.RED, Kind.ENEMY_BASE, false, pp));
         return demo;
     }
 
@@ -352,11 +335,28 @@ public class CompassOverlay implements ZarubaOverlay {
 
     private static String kindInitial(RespawnPointsView.Kind kind) {
         return switch (kind) {
-            case BASE -> "B";
+            case BASE -> HOME;
             case TENT -> "T";
             case VEHICLE -> "V";
             case CAPTURE_POINT -> "C";
         };
+    }
+
+    /** A little house of pixels: a roof, walls and a door that shows the colour of the circle. */
+    private static void house(GuiGraphics g, int cx, int cy, int ink, int door) {
+        g.fill(cx, cy - 3, cx + 1, cy - 2, ink);
+        g.fill(cx - 1, cy - 2, cx + 2, cy - 1, ink);
+        g.fill(cx - 2, cy - 1, cx + 3, cy, ink);
+        g.fill(cx - 2, cy, cx + 3, cy + 3, ink);
+        g.fill(cx, cy + 1, cx + 1, cy + 3, door);
+    }
+
+    /** A filled circle, a pixel row at a time. */
+    private static void disc(GuiGraphics g, int cx, int cy, int r, int color) {
+        for (int dy = -r; dy <= r; dy++) {
+            int half = (int) Math.round(Math.sqrt((r + 0.5) * (r + 0.5) - dy * dy));
+            g.fill(cx - half, cy + dy, cx + half + 1, cy + dy + 1, color);
+        }
     }
 
     private static void diamond(GuiGraphics g, int cx, int cy, int r, int color) {
@@ -366,8 +366,8 @@ public class CompassOverlay implements ZarubaOverlay {
         }
     }
 
-    /** Scaled text with shadow (readable over bright sky on the transparent strip). */
-    private static void smallText(GuiGraphics g, Font font, String text, int x, int y, int color, float scale) {
+    /** Scaled text with a shadow, so it reads over the panel and the world alike. */
+    private static void scaledText(GuiGraphics g, Font font, Component text, int x, int y, int color, float scale) {
         g.pose().pushPose();
         g.pose().translate(x, y, 0);
         g.pose().scale(scale, scale, 1);

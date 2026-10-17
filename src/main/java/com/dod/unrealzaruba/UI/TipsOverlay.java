@@ -32,8 +32,13 @@ public class TipsOverlay implements ZarubaOverlay {
         Font font = UiFont.get();
         int inner = WIDTH - 2 * PAD;
 
-        List<KeyMapping> keys = List.of(KeyBindings.OPEN_BUY_MENU, KeyBindings.OPEN_SCHEMATICS,
-                KeyBindings.OPEN_TEAM_STORAGE, KeyBindings.OPEN_GAMEMODE_MENU, KeyBindings.READY);
+        List<KeyMapping> keys = new ArrayList<>();
+        // The map comes first: it is the key a player looks for most. It is Xaero's own key, so it is looked up by name
+        for (KeyMapping key : minecraft.options.keyMappings) {
+            if (key.getName().equals("gui.xaero_open_map")) keys.add(key);
+        }
+        keys.addAll(List.of(KeyBindings.OPEN_BUY_MENU, KeyBindings.OPEN_SCHEMATICS,
+                KeyBindings.OPEN_TEAM_STORAGE, KeyBindings.OPEN_GAMEMODE_MENU, KeyBindings.READY));
         List<FormattedCharSequence> tips = new ArrayList<>();
         for (int i = 1; i <= TIP_COUNT; i++) {
             tips.addAll(font.split(Component.literal("• ").append(Component.translatable("hud.unrealzaruba.tips.tip" + i)), inner));

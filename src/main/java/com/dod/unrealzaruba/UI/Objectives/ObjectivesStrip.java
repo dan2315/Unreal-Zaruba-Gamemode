@@ -38,7 +38,9 @@ public class ObjectivesStrip implements ZarubaOverlay {
 
         int total = tiles.size() * TILE_WIDTH + (tiles.size() - 1) * GAP + SLANT;
         int x = (screenWidth - total) / 2;
-        int y = ScoreOverlay.INSTANCE.bottom(font) + 4;
+        int above = com.dod.unrealzaruba.UI.Compass.CompassOverlay.bottom(font, Minecraft.getInstance(), screenWidth);
+        // Tiles float under the top panel, with no background of their own
+        int y = above + 4;
         float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 220.0);
 
         for (Tile tile : tiles) {
@@ -59,6 +61,11 @@ public class ObjectivesStrip implements ZarubaOverlay {
             g.drawString(font, label, textX, y + (TILE_HEIGHT - 8) / 2 + 1, Brand.TEXT, true);
             x += TILE_WIDTH + GAP;
         }
+    }
+
+    /** True when the row is drawn (the panels above it and their borders depend on it). */
+    public static boolean isShown() {
+        return !tiles().isEmpty();
     }
 
     private static List<Tile> tiles() {

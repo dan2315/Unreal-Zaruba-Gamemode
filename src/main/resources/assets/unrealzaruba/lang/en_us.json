@@ -75,7 +75,7 @@
     "economy.unrealzaruba.kill_reward": "Killed %s: +%s",
     "economy.unrealzaruba.kill": "Killed %s",
     "economy.unrealzaruba.income": "Income: +%s",
-    "economy.unrealzaruba.income_catch_up": "Income: +%s, catch-up +%s",
+    "economy.unrealzaruba.income_catch_up": "Income: +%s, Пособие по инвалидности +%s",
     "economy.unrealzaruba.bounty_placed": "%s is on a %s kill streak! Bounty: %s",
     "economy.unrealzaruba.bounty_claimed": "%s claimed a %s bounty on %s",
     "supplydrop.unrealzaruba.waypoint": "Supply drop",
@@ -106,6 +106,7 @@
     "supplydrop.unrealzaruba.case_picked": "%s picked up the supply case for %s! Stop them before it reaches their base",
     "supplydrop.unrealzaruba.case_cashed": "%s delivered the supply case: %s for everyone in %s, %s extra for the carrier",
 
+        "gui.xaero_open_map.hint": "Map",
         "key.unrealzaruba.open_buy_menu.hint": "Buy menu",
     "key.unrealzaruba.open_schematics.hint": "Vehicle schematics",
     "key.unrealzaruba.open_team_storage.hint": "Team storage",

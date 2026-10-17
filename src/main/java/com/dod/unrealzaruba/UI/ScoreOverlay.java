@@ -1,7 +1,5 @@
 package com.dod.unrealzaruba.UI;
 
-import com.dod.unrealzaruba.UI.Compass.CompassOverlay;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
@@ -10,8 +8,7 @@ import net.minecraft.client.gui.Gui;
 public class ScoreOverlay implements ZarubaOverlay {
     public static final ScoreOverlay INSTANCE = new ScoreOverlay();
 
-    private static final int WIDTH = 190;
-    private static final float SCORE_SCALE = 1.4f;
+    private static final float SCORE_SCALE = 1.0f;
 
     boolean visible;
     short leftScore;
@@ -24,24 +21,21 @@ public class ScoreOverlay implements ZarubaOverlay {
 
         Font font = com.dod.unrealzaruba.UI.UiFont.get();
         int scoreHeight = Math.round(font.lineHeight * SCORE_SCALE) - 1;
-        int height = scoreHeight + 8;
-        int x = (screenWidth - WIDTH) / 2;
-        // The compass strip lives at the very top; drop the score panel below it when visible.
-        int y = HudStyle.MARGIN;
-        if (CompassOverlay.shouldRender(Minecraft.getInstance())) {
-            y = CompassOverlay.topOffset();
-        }
-        HudStyle.panel(guiGraphics, x, y, WIDTH, height);
+        int height = scoreHeight + 6;
+        int width = HudStyle.topWidth(screenWidth);
+        int x = (screenWidth - width) / 2;
+        int y = 0; // glued to the top edge
+        HudStyle.dockedPanel(guiGraphics, x, y, width, height, !com.dod.unrealzaruba.UI.Compass.CompassOverlay.shouldRender(net.minecraft.client.Minecraft.getInstance()));
 
         int scoreBox = HudStyle.width(font, "000", SCORE_SCALE);
-        int textY = y + 4;
+        int textY = y + 3;
         String left = String.valueOf(leftScore);
         String right = String.valueOf(rightScore);
         HudStyle.text(guiGraphics, font, left, x + 7 + scoreBox - HudStyle.width(font, left, SCORE_SCALE), textY, HudStyle.RED, SCORE_SCALE);
-        HudStyle.text(guiGraphics, font, right, x + WIDTH - 7 - scoreBox, textY, HudStyle.BLUE, SCORE_SCALE);
+        HudStyle.text(guiGraphics, font, right, x + width - 7 - scoreBox, textY, HudStyle.BLUE, SCORE_SCALE);
 
         int barLeft = x + 7 + scoreBox + 6;
-        int barRight = x + WIDTH - 7 - scoreBox - 6;
+        int barRight = x + width - 7 - scoreBox - 6;
         int barY = y + height / 2 - 1;
         int center = (barLeft + barRight) / 2;
         int half = center - barLeft;
@@ -70,8 +64,12 @@ public class ScoreOverlay implements ZarubaOverlay {
 
     /** Where the panel ends (or where it would start while hidden), for what is drawn under it. */
     public int bottom(Font font) {
-        if (!visible) return HudStyle.MARGIN - 4;
-        return HudStyle.MARGIN + Math.round(font.lineHeight * SCORE_SCALE) - 1 + 8;
+        if (!visible) return 0;
+        return Math.round(font.lineHeight * SCORE_SCALE) - 1 + 6;
+    }
+
+    public boolean isShown() {
+        return visible;
     }
 
     public void SetVisible(boolean visible) {

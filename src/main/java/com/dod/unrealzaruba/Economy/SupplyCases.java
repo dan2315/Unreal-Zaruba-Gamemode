@@ -10,6 +10,7 @@ import com.dod.unrealzaruba.Commands.Arguments.TeamColor;
 import com.dod.unrealzaruba.ModItems.ModItems;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyCasePacket;
 import com.dod.unrealzaruba.TeamLogic.TeamContext;
+import com.dod.unrealzaruba.UnrealZaruba;
 import com.dod.unrealzaruba.WorldManager.WorldManager;
 
 import net.minecraft.core.component.DataComponents;
@@ -35,6 +36,12 @@ public final class SupplyCases {
 
     private static final Set<UUID> CARRIERS = new HashSet<>();
     private static List<ClientboundSupplyCasePacket.Entry> lastSent = List.of();
+
+    /** A drop's case that has not been cashed in yet: no new automatic drop comes down until it is. */
+    private static boolean outstanding;
+    /** Whether that case has been seen outside the barrel (carried or lying): when it later is nowhere, it is lost. */
+    private static boolean seen;
+    private static UUID outstandingDrop;
 
     private SupplyCases() {}
 
@@ -68,13 +75,45 @@ public final class SupplyCases {
         CARRIERS.clear();
         CARRIERS.addAll(carriers);
 
+        int lying = 0;
         for (ItemEntity item : level.getEntities(EntityTypeTest.forClass(ItemEntity.class), entity -> isCase(entity.getItem()))) {
             item.setUnlimitedLifetime(); // a dropped case must not despawn
             item.setInvulnerable(true);
+            lying++;
             entries.add(new ClientboundSupplyCasePacket.Entry(item.getId(), item.getX(), item.getY(), item.getZ(),
                     rgb(teamOf(item.getItem()))));
         }
         publish(entries);
+
+        // A case that was taken out of the barrel and is now nowhere (destroyed, lost in the void) no longer holds the drops back
+        if (outstanding) {
+            if (!carriers.isEmpty() || lying > 0) seen = true;
+            else if (seen) {
+                outstanding = false;
+                UnrealZaruba.LOGGER.info("[SupplyCases] The case is lost, the next drop is free to come");
+            }
+        }
+    }
+
+    /** A drop with a case has been started: until it is cashed in the next automatic drop waits. */
+    static void caseDropped() {
+        outstanding = true;
+        seen = false;
+        outstandingDrop = null;
+    }
+
+    /** The drop has been assembled and has its id now. */
+    static void caseDropAssembled(UUID id) {
+        if (outstanding) outstandingDrop = id;
+    }
+
+    /** The drop could not be built, or went away: its untouched case went with it. */
+    static void caseDropEnded(UUID id) {
+        if (outstanding && !seen && (id == null || id.equals(outstandingDrop))) outstanding = false;
+    }
+
+    static boolean blocksNextDrop() {
+        return outstanding;
     }
 
     /** Nothing is going on (no battle): make sure no stale beams stay up. */
@@ -83,6 +122,9 @@ public final class SupplyCases {
     }
 
     public static void reset() {
+        outstanding = false;
+        seen = false;
+        outstandingDrop = null;
         CARRIERS.clear();
         lastSent = List.of();
         if (WorldManager.server != null) {
@@ -105,6 +147,7 @@ public final class SupplyCases {
                 player.inventoryMenu.getCraftSlots());
         if (count <= 0) return;
         player.containerMenu.broadcastChanges();
+        outstanding = false; // the case is cashed in: the next drop may come
 
         int teamReward = Math.max(0, settings.caseTeamReward) * count;
         int bonus = Math.max(0, settings.caseCarrierBonus) * count;

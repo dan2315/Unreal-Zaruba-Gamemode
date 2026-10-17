@@ -74,7 +74,7 @@
     "economy.unrealzaruba.kill_reward": "Убит %s: +%s",
     "economy.unrealzaruba.kill": "Убит %s",
     "economy.unrealzaruba.income": "Доход: +%s",
-    "economy.unrealzaruba.income_catch_up": "Доход: +%s, догоняющий бонус +%s",
+    "economy.unrealzaruba.income_catch_up": "Доход: +%s, Пособие по инвалидности +%s",
     "economy.unrealzaruba.bounty_placed": "%s: серия из %s убийств! Награда за голову: %s",
     "economy.unrealzaruba.bounty_claimed": "%s получает награду %s за голову %s",
     "supplydrop.unrealzaruba.waypoint": "Сброс снабжения",
@@ -105,6 +105,7 @@
     "supplydrop.unrealzaruba.case_picked": "%s подобрал кейс снабжения для %s! Остановите его, пока он не добрался до базы",
     "supplydrop.unrealzaruba.case_cashed": "%s доставил кейс снабжения: %s каждому в %s, ещё %s носителю",
 
+        "gui.xaero_open_map.hint": "Карта",
         "key.unrealzaruba.open_buy_menu.hint": "Магазин",
     "key.unrealzaruba.open_schematics.hint": "Схематики техники",
     "key.unrealzaruba.open_team_storage.hint": "Командное хранилище",

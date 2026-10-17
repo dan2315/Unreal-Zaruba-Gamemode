@@ -24,7 +24,15 @@ public final class HudStyle {
     public static final int PURPLE = 0xFFB07CFF;
     public static final int NEUTRAL = 0xFF8D97A3;
 
+    /** The line between the rows of the top panel: lighter than the panel border so the rows read as separate. */
+    public static final int SEPARATOR = 0xFF5E6B78;
+
     public static final int MARGIN = 8;
+
+    /** One width for the stacked top-centre panels (score, compass, objectives), as wide as the screen allows. */
+    public static int topWidth(int screenWidth) {
+        return Math.max(160, Math.min(380, screenWidth - 24));
+    }
 
     private HudStyle() {}
 
@@ -71,6 +79,18 @@ public final class HudStyle {
                 g.fill(left + w - 1, y + row, left + w, y + row + 1, color);
             }
         }
+    }
+
+    public static void separator(GuiGraphics g, int x, int y, int w) {
+        g.fill(x + 1, y, x + w - 1, y + 1, SEPARATOR);
+    }
+
+    /** A panel hanging from the top edge of the screen (no top border); {@code bottomBorder} false lets another continue it below. */
+    public static void dockedPanel(GuiGraphics g, int x, int y, int w, int h, boolean bottomBorder) {
+        g.fill(x, y, x + w, y + h, PANEL);
+        g.fill(x, y, x + 1, y + h, PANEL_BORDER);
+        g.fill(x + w - 1, y, x + w, y + h, PANEL_BORDER);
+        if (bottomBorder) g.fill(x, y + h - 1, x + w, y + h, PANEL_BORDER);
     }
 
     public static void panel(GuiGraphics g, int x, int y, int w, int h) {
