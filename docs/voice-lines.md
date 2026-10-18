@@ -33,9 +33,8 @@ A resource pack can replace the files without touching the mod.
 |---|---|---|
 | `match_win` / `match_lose` | the match is over | the winners / the rest |
 | `point_captured_ally` | a point was taken by your team | the team that took it |
-| `point_captured_enemy` | the enemy took a point that nobody held | the rest |
-| `point_lost` | the enemy took a point your team held | the team that lost it |
-| `score_50_ally` / `_enemy`, `score_75_...`, `score_90_...` | a team reached that share of the score it needs | the team / the rest |
+| `point_captured_enemy` | the enemy took a point (also one that was yours) | everybody except the team that took it |
+| `score_50_ally` / `_enemy`, `score_90_...` | a team was the first to reach that share of the score it needs | that team / the rest |
 | `supply_incoming` | a supply drop appeared | everybody |
 | `case_picked_ally` / `case_picked_enemy` | somebody picked up the supply case | their team / the rest |
 

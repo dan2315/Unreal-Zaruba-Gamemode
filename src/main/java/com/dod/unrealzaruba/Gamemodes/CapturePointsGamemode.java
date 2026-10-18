@@ -140,22 +140,26 @@ public class CapturePointsGamemode extends TeamGamemode {
         if (IsBattleActive() && ++announceTicks % 20 == 0) announceScoreMarks();
     }
 
-    /** Everybody hears when a team reaches a mark of the score it needs (see scoring.json), once per team and mark. */
+    /**
+     * Everybody is told when a team is the first to reach a mark of the score it needs (see scoring.json): the team that did hears
+     * the "ally" line, the other one the "enemy" line. The team that reaches the mark second is not announced.
+     */
     private void announceScoreMarks() {
-        for (TeamColor color : new TeamColor[]{TeamColor.RED, TeamColor.BLUE}) {
-            Integer score = GetTeamScore(color);
-            if (score == null) continue;
-            for (int percent : scoring.announceScoreAtPercent) {
-                if (score * 100 >= percent * requiredPointsToWin && announcedScores.add(color.name() + ":" + percent)) {
-                    com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.SCORE, com.dod.unrealzaruba.Feed.Feed.colorOf(color), "feed.score_mark",
-                            color.getDisplayName(), String.valueOf(score), String.valueOf(requiredPointsToWin));
-                    com.dod.unrealzaruba.SoundHandler.VoiceLine ally = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ALLY : percent >= 75 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_75_ALLY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ALLY : null;
-                    com.dod.unrealzaruba.SoundHandler.VoiceLine enemy = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ENEMY : percent >= 75 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_75_ENEMY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ENEMY : null;
-                    com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, color, ally, enemy);
-                    for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                        player.playNotifySound(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL.value(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, percent >= 90 ? 0.6f : 1.0f);
-                    }
+        for (int percent : scoring.announceScoreAtPercent) {
+            if (announcedScores.contains(String.valueOf(percent))) continue;
+            for (TeamColor color : new TeamColor[]{TeamColor.RED, TeamColor.BLUE}) {
+                Integer score = GetTeamScore(color);
+                if (score == null || score * 100 < percent * requiredPointsToWin) continue;
+                announcedScores.add(String.valueOf(percent));
+                com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.SCORE, com.dod.unrealzaruba.Feed.Feed.colorOf(color), "feed.score_mark",
+                        color.getDisplayName(), String.valueOf(score), String.valueOf(requiredPointsToWin));
+                com.dod.unrealzaruba.SoundHandler.VoiceLine ally = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ALLY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ALLY : null;
+                com.dod.unrealzaruba.SoundHandler.VoiceLine enemy = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ENEMY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ENEMY : null;
+                com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, color, ally, enemy);
+                for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                    player.playNotifySound(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL.value(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, percent >= 90 ? 0.6f : 1.0f);
                 }
+                break; // the other team is not announced for the same mark
             }
         }
     }

@@ -29,8 +29,8 @@ public class ScoringData extends AbstractGamemodeData<ScoringData.Config> {
         public float ownerRestoreShare = 0.5f;
         /** A point nobody stands on loses the capture progress at this share of the speed of one capturer. */
         public float emptyDecayShare = 0.25f;
-        /** The share of the score needed to win at which every player is told how it stands (once per team and mark). */
-        public int[] announceScoreAtPercent = {50, 75, 90};
+        /** The shares of the score needed to win at which everybody is told which team got there first (once per mark). */
+        public int[] announceScoreAtPercent = {50, 90};
     }
 
     public ScoringData(Class<? extends BaseGamemode> gamemodeClass) {

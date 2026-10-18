@@ -53,19 +53,10 @@
   "voice.point_captured_enemy": {
     "sounds": []
   },
-  "voice.point_lost": {
-    "sounds": []
-  },
   "voice.score_50_ally": {
     "sounds": []
   },
   "voice.score_50_enemy": {
-    "sounds": []
-  },
-  "voice.score_75_ally": {
-    "sounds": []
-  },
-  "voice.score_75_enemy": {
     "sounds": []
   },
   "voice.score_90_ally": {

@@ -217,11 +217,9 @@ public class CapturePointObjective extends PositionedGameobjective {
         if (server == null) return;
         com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.POINT, com.dod.unrealzaruba.Feed.Feed.colorOf(captured.Color()), "feed.point_captured",
                 captured.Color().getDisplayName(), GetName());
-        var previousColor = previousOwner == null ? null : previousOwner.Color();
         com.dod.unrealzaruba.SoundHandler.Voice.playEach(server, player -> {
             var color = com.dod.unrealzaruba.Feed.Feed.teamOf(player);
             if (color == captured.Color()) return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_CAPTURED_ALLY;
-            if (color != null && color == previousColor) return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_LOST;
             return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_CAPTURED_ENEMY;
         });
         playToTeam(server, captured, net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP);
