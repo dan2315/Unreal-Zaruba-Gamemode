@@ -63,9 +63,11 @@ public class EconomyConfig {
         public int growthAmount = 50;
     }
 
-    /** From killStreak kills without dying, a player carries a bounty paid to the enemy who kills them. */
+    /**
+     * Every enemy a player kills adds amountPerKill to what they are worth; the enemy who kills them takes all of it (at most
+     * maxAmount) on top of killReward, and it starts again from nothing.
+     */
     public static class Bounties {
-        public int killStreak = 3;
         public int amountPerKill = 150;
         public int maxAmount = 1500;
     }

@@ -209,7 +209,6 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
 
     public void StartBattle() {
         com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.MATCH, 0xFFFFFF, "feed.match_started");
-        com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_START);
         com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         gameTimer.startCountDown(System.currentTimeMillis(), GAME_DURATION_S);
         TeamManager.PlayBattleSound();

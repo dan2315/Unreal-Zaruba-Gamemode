@@ -157,7 +157,6 @@ public final class SupplyCases {
         if (!SideIncome.onlineMembers(server, team).contains(player)) Wallets.add(player, bonus);
         com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.CASE, com.dod.unrealzaruba.Feed.Feed.colorOf(team.Color()), "feed.case_cashed",
                 player.getGameProfile().getName(), Money.format(teamReward + bonus));
-        com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, team.Color(), com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_CASHED_ALLY, com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_CASHED_ENEMY);
     }
 
     private static List<ItemStack> casesOf(ServerPlayer player) {

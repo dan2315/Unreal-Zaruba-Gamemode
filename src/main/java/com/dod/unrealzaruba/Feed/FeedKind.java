@@ -7,7 +7,6 @@ public enum FeedKind {
     SCORE,
     SUPPLY,
     CASE,
-    BOUNTY,
     VEHICLE,
     MATCH
 }

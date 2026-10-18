@@ -41,37 +41,10 @@
       "unrealzaruba:select2"
     ]
   },
-  "voice.match_start": {
-    "sounds": []
-  },
   "voice.match_win": {
     "sounds": []
   },
   "voice.match_lose": {
-    "sounds": []
-  },
-  "voice.first_blood": {
-    "sounds": []
-  },
-  "voice.killstreak_3": {
-    "sounds": []
-  },
-  "voice.killstreak_5": {
-    "sounds": []
-  },
-  "voice.killstreak_7": {
-    "sounds": []
-  },
-  "voice.killstreak_10": {
-    "sounds": []
-  },
-  "voice.bounty_placed_ally": {
-    "sounds": []
-  },
-  "voice.bounty_placed_enemy": {
-    "sounds": []
-  },
-  "voice.bounty_claimed": {
     "sounds": []
   },
   "voice.point_captured_ally": {
@@ -108,18 +81,6 @@
     "sounds": []
   },
   "voice.case_picked_enemy": {
-    "sounds": []
-  },
-  "voice.case_cashed_ally": {
-    "sounds": []
-  },
-  "voice.case_cashed_enemy": {
-    "sounds": []
-  },
-  "voice.vehicle_bought_ally": {
-    "sounds": []
-  },
-  "voice.vehicle_bought_enemy": {
     "sounds": []
   }
 }

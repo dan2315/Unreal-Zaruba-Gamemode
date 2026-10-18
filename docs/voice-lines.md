@@ -31,27 +31,23 @@ A resource pack can replace the files without touching the mod.
 
 | Id | When | Who hears |
 |---|---|---|
-| `match_start` | the battle starts | everybody |
 | `match_win` / `match_lose` | the match is over | the winners / the rest |
-| `first_blood` | the first kill of the match | everybody |
-| `killstreak_3`, `_5`, `_7`, `_10` | a player reaches that many kills in a row | everybody |
-| `bounty_placed_ally` / `bounty_placed_enemy` | a player's streak is worth a bounty | the streaker's team / the rest |
-| `bounty_claimed` | a player with a bounty is killed | everybody |
 | `point_captured_ally` | a point was taken by your team | the team that took it |
-| `point_captured_enemy` | a point was taken by the other team | the rest, except the team that lost it |
-| `point_lost` | a point your team held was taken | the team that lost it |
+| `point_captured_enemy` | the enemy took a point that nobody held | the rest |
+| `point_lost` | the enemy took a point your team held | the team that lost it |
 | `score_50_ally` / `_enemy`, `score_75_...`, `score_90_...` | a team reached that share of the score it needs | the team / the rest |
 | `supply_incoming` | a supply drop appeared | everybody |
-| `case_picked_ally` / `_enemy` | somebody picked up the supply case | their team / the rest |
-| `case_cashed_ally` / `_enemy` | a case was cashed in | their team / the rest |
-| `vehicle_bought_ally` / `_enemy` | a vehicle was bought | their team / the rest |
+| `case_picked_ally` / `case_picked_enemy` | somebody picked up the supply case | their team / the rest |
+
+Everything else (kills, streaks, bounties, a case cashed in, a vehicle bought, the start of the match) has no voice line, only a line in the
+event feed. The phrases to record are in `voice-phrases.md`.
 
 The ids are the enum `VoiceLine` (`src/main/java/com/dod/unrealzaruba/SoundHandler/VoiceLine.java`); to add an event, add a constant there,
 an entry in `sounds.json`, and a call to `Voice.playAll`, `Voice.playSplit` or `Voice.playEach` where it happens.
 
 ## Where the events happen in the code
 
-- kills, streaks, bounties: `Economy/SideIncome.onDeath`
+- kills and what they pay: `Economy/SideIncome.onDeath` (feed only)
 - points: `Gamemodes/Objectives/CapturePointObjective.announceCapture`
 - score marks and match start/end: `Gamemodes/CapturePointsGamemode`, `Gamemodes/DestroyObjectivesGamemode`
 - supply drop and case: `Economy/SupplyParadrop`, `Economy/SupplyCases`
