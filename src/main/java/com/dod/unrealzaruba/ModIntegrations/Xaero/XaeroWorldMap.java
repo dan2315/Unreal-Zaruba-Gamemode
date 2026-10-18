@@ -145,14 +145,14 @@ public class XaeroWorldMap {
         if (isOp()) {
             options.addAll(xaeroOptions);
         } else {
-            options.add(label(element.getName(), options.size(), target));
+            options.add(info(element.getName(), ChatFormatting.WHITE, options.size(), target));
         }
 
         RespawnPointsView view = RespawnClientState.view();
         if (respawnId == null) {
             options.add(label("hud.unrealzaruba.respawn.not_available", options.size(), target));
         } else if (view.effectiveId() != null && view.effectiveId().byteValue() == respawnId) {
-            options.add(label("hud.unrealzaruba.respawn.current", options.size(), target));
+            options.add(info("hud.unrealzaruba.respawn.current", ChatFormatting.GREEN, options.size(), target));
         } else {
             byte id = respawnId;
             options.add(new RightClickOption("hud.unrealzaruba.respawn.choose", Style.EMPTY.withColor(ChatFormatting.GOLD), options.size(), target) {
@@ -173,11 +173,24 @@ public class XaeroWorldMap {
         ArrayList<RightClickOption> options = new ArrayList<>();
         for (RightClickOption option : xaeroOptions) {
             String text = option.getDisplayName().getString();
-            if (text.startsWith("X:")) options.add(label(text.replace("%", "%%"), options.size(), target));
+            if (text.startsWith("X:")) options.add(info(text.replace("%", "%%"), ChatFormatting.AQUA, options.size(), target));
         }
         return options;
     }
 
+    /**
+     * A line that only tells something (the name of a waypoint, coordinates, the current respawn point). It is drawn in its own colour like an
+     * option that can be used, not greyed out the way Xaero draws a disabled one; choosing it does nothing.
+     */
+    private static RightClickOption info(String text, ChatFormatting color, int index, IRightClickableElement target) {
+        return new RightClickOption(text, Style.EMPTY.withColor(color), index, target) {
+            @Override
+            public void onAction(Screen screen) {
+            }
+        };
+    }
+
+    /** A line that is greyed out: something that is not available. */
     private static RightClickOption label(String text, int index, IRightClickableElement target) {
         return new RightClickOption(text, index, target) {
             @Override
