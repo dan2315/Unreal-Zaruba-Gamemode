@@ -13,8 +13,8 @@ import xaero.hud.minimap.element.render.MinimapElementRenderLocation;
 import xaero.hud.minimap.waypoint.render.world.WaypointWorldRenderer;
 
 /**
- * On the game map the waypoints are not drawn in the world, so they do not clutter the view; they appear while the
- * player list key (TAB) is held. Only the drawing is skipped: Xaero's settings and the minimap are left alone.
+ * On the game map the waypoints are not drawn in the world, so they do not clutter the view; they appear while Alt is
+ * held. Only the drawing is skipped: Xaero's settings and the minimap are left alone.
  *
  * {@code shouldRender} is the renderer's own switch (it reads the "waypoints in world" option), so this is the
  * place that is consulted for every frame.
@@ -27,7 +27,7 @@ public class WorldWaypointsMixin {
     private void unrealzaruba$onlyWithTab(MinimapElementRenderLocation location, CallbackInfoReturnable<Boolean> cir) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && GAME_DIM.equals(minecraft.level.dimension().location())
-                && !minecraft.options.keyPlayerList.isDown()) {
+                && !net.minecraft.client.gui.screens.Screen.hasAltDown()) {
             cir.setReturnValue(false);
         }
     }
