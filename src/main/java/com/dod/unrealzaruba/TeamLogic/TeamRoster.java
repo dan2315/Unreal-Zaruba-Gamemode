@@ -47,7 +47,9 @@ public final class TeamRoster {
         if (server == null) return entries;
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             TeamColor team = Feed.teamOf(player);
-            if (team != null) entries.add(new ClientboundTeamRosterPacket.Entry(player.getUUID(), (byte) team.ordinal()));
+            if (team != null) entries.add(new ClientboundTeamRosterPacket.Entry(player.getUUID(), (byte) team.ordinal(),
+                        (short) Math.min(Short.MAX_VALUE, com.dod.unrealzaruba.Feed.MatchStats.kills(player.getUUID())),
+                        (short) Math.min(Short.MAX_VALUE, com.dod.unrealzaruba.Feed.MatchStats.deaths(player.getUUID()))));
         }
         return entries;
     }

@@ -15,6 +15,8 @@
     "schematics.unrealzaruba.purchase.started": "%s: you paid %s of %s, others can add the rest in 15 seconds",
     "schematics.unrealzaruba.purchase.done": "%s bought",
     "schematics.unrealzaruba.purchase.refunded": "%s was not paid in time, your money is back",
+    "key.unrealzaruba.open_gamemode_menu": "Vote for a game mode (lobby)",
+    "key.categories.unrealzaruba": "Unreal Zaruba",
     "key.unrealzaruba.ready": "Ready / not ready",
     "lobby.unrealzaruba.title": "Lobby",
     "lobby.unrealzaruba.mode_selection": "Mode selection",

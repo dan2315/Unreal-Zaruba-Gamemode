@@ -250,6 +250,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
         }
         ServerPlayer enemyKiller = killerPlayer != null && isEnemy(killerPlayer, player) ? killerPlayer : null;
         int bounty = SideIncome.onDeath(player, enemyKiller, server);
+        com.dod.unrealzaruba.Feed.MatchStats.onDeath(player, enemyKiller);
         int streak = enemyKiller == null ? 0 : SideIncome.streakOf(enemyKiller);
         // The kill line of the event feed: the weapon, the teams, what it paid
         com.dod.unrealzaruba.Feed.Feed.kill(server, player, killerPlayer != player ? killerPlayer : null, event.getSource(), reward, bounty, streak);

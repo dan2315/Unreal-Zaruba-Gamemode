@@ -16,7 +16,7 @@ import net.minecraft.network.FriendlyByteBuf;
  * and the load of the server, as ticks per second and the time of a tick in milliseconds.
  */
 public class ClientboundTeamRosterPacket implements ModPacket {
-    public record Entry(UUID player, byte team) {}
+    public record Entry(UUID player, byte team, short kills, short deaths) {}
 
     private final List<Entry> entries;
     private final float tps;
@@ -35,6 +35,8 @@ public class ClientboundTeamRosterPacket implements ModPacket {
         for (Entry entry : msg.entries) {
             buf.writeUUID(entry.player());
             buf.writeByte(entry.team());
+            buf.writeShort(entry.kills());
+            buf.writeShort(entry.deaths());
         }
     }
 
@@ -43,7 +45,7 @@ public class ClientboundTeamRosterPacket implements ModPacket {
         float mspt = buf.readFloat();
         int count = Math.min(buf.readVarInt(), 512);
         List<Entry> entries = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) entries.add(new Entry(buf.readUUID(), buf.readByte()));
+        for (int i = 0; i < count; i++) entries.add(new Entry(buf.readUUID(), buf.readByte(), buf.readShort(), buf.readShort()));
         return new ClientboundTeamRosterPacket(entries, tps, mspt);
     }
 

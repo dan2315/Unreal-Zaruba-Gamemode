@@ -29,6 +29,7 @@ public final class SideIncome {
     public static void reset() {
         STREAKS.clear();
         battleTicks = 0;
+        com.dod.unrealzaruba.Feed.MatchStats.reset();
         SupplyDrops.reset();
     }
 

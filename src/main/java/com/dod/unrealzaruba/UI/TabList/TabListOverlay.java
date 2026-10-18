@@ -36,8 +36,11 @@ public class TabListOverlay implements ZarubaOverlay {
     private static final int GAP = 10;
     private static final int HISTORY_ROW = FeedOverlay.ROW_HEIGHT + 1;
     private static final int AGE_WIDTH = 32;
+    /** Room for the ping (right aligned at the edge) and for each of the columns of kills and deaths. */
+    private static final int PING_WIDTH = 38;
+    private static final int STAT_WIDTH = 24;
 
-    private record Entry(String name, int ping, boolean me) {}
+    private record Entry(String name, int ping, boolean me, int kills, int deaths) {}
 
     private static boolean wasDown;
     /** How many history lines the panel shows now, for the scrolling. */
@@ -65,7 +68,8 @@ public class TabListOverlay implements ZarubaOverlay {
         List<Entry> blue = new ArrayList<>();
         List<Entry> rest = new ArrayList<>();
         for (PlayerInfo info : connection.getOnlinePlayers()) {
-            Entry entry = new Entry(info.getProfile().getName(), info.getLatency(), info.getProfile().getId().equals(mc.player.getUUID()));
+            Entry entry = new Entry(info.getProfile().getName(), info.getLatency(), info.getProfile().getId().equals(mc.player.getUUID()),
+                    TeamRosterState.kills(info.getProfile().getId()), TeamRosterState.deaths(info.getProfile().getId()));
             TeamColor team = TeamRosterState.teamOf(info.getProfile().getId());
             if (team == TeamColor.RED) red.add(entry);
             else if (team == TeamColor.BLUE) blue.add(entry);
@@ -170,15 +174,26 @@ public class TabListOverlay implements ZarubaOverlay {
         g.fill(x, y, x + width, y + HEADER, 0xCC000000 | (color & 0xFFFFFF));
         g.fill(x, y + HEADER - 1, x + width, y + HEADER, 0x66000000);
         String count = String.valueOf(players.size());
-        g.drawString(font, title, x + 6, y + (HEADER - 8) / 2 + 1, 0xFFFFFFFF, true);
-        g.drawString(font, count, x + width - 6 - font.width(count), y + (HEADER - 8) / 2 + 1, 0xFFFFFFFF, true);
+        int headerY = y + (HEADER - 8) / 2 + 1;
+        g.drawString(font, title + "  " + count, x + 6, headerY, 0xFFFFFFFF, true);
+        // The columns of kills and deaths sit left of the ping
+        int deathsRight = x + width - 6 - PING_WIDTH;
+        int killsRight = deathsRight - STAT_WIDTH;
+        g.drawString(font, "K", killsRight - font.width("K"), headerY, 0xFFFFFFFF, true);
+        g.drawString(font, "D", deathsRight - font.width("D"), headerY, 0xFFFFFFFF, true);
 
         int shown = Math.min(rows, players.size());
         for (int i = 0; i < shown; i++) {
             Entry entry = players.get(i);
             int ry = y + HEADER + 2 + i * ROW;
             if (entry.me()) g.fill(x + 2, ry - 1, x + width - 2, ry + ROW - 1, 0x33FFFFFF);
-            g.drawString(font, HudStyle.trim(font, entry.name(), width - 50), x + 6, ry, entry.me() ? Brand.WARN : Brand.TEXT, false);
+            g.drawString(font, HudStyle.trim(font, entry.name(), width - 12 - PING_WIDTH - 2 * STAT_WIDTH), x + 6, ry, entry.me() ? Brand.WARN : Brand.TEXT, false);
+            if (entry.kills() >= 0) {
+                String kills = String.valueOf(entry.kills());
+                String deaths = String.valueOf(entry.deaths());
+                g.drawString(font, kills, killsRight - font.width(kills), ry, Brand.TEXT, false);
+                g.drawString(font, deaths, deathsRight - font.width(deaths), ry, Brand.TEXT_DIM, false);
+            }
             String ping = entry.ping() + "ms";
             int pingColor = entry.ping() < 80 ? Brand.OK : entry.ping() < 160 ? Brand.WARN : 0xFFFF5C61;
             g.drawString(font, ping, x + width - 6 - font.width(ping), ry, pingColor, false);
