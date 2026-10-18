@@ -137,6 +137,7 @@
     "hud.unrealzaruba.rules.hint_title": "Зажмите TAB",
     "hud.unrealzaruba.rules.hint_subtitle": "там правила, цели и управление",
     "hud.unrealzaruba.rules.hint": "Зажмите TAB: как играть, цели и управление.",
+    "hud.unrealzaruba.tab.feed_hint": "Прокрутка: колесо мыши",
     "hud.unrealzaruba.objectives": "Объективы",
     "hud.unrealzaruba.respawn.in": "Возрождение через %s с",
     "hud.unrealzaruba.respawn.point": "Точка возрождения: %s",

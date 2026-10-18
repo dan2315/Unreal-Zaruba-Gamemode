@@ -11,15 +11,21 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 
-/** The lines of the event feed the client has, newest last. Lines go away on their own (see {@link FeedOverlay}). */
+/**
+ * The lines of the event feed the client has, newest last. The corner of the screen ({@link FeedOverlay}) shows the fresh ones for a
+ * while; the whole history stays here for the TAB panel, which scrolls through it.
+ */
 public final class FeedState {
-    public static final int MAX_LINES = 7;
+    /** How many lines are kept. */
+    public static final int HISTORY = 150;
 
     /** One line. {@code icon} is empty for lines that have none. Colours are RGB. */
     public record Line(FeedKind kind, int colorA, int colorB, String nameA, String nameB, ItemStack icon, int reward, int bounty,
                        int streak, String key, List<String> args, long createdAt) {}
 
     private static final List<Line> LINES = new ArrayList<>();
+    /** How many lines the TAB panel is scrolled up from the newest one. */
+    private static int scroll;
 
     private FeedState() {}
 
@@ -29,13 +35,30 @@ public final class FeedState {
 
     public static synchronized void clear() {
         LINES.clear();
+        scroll = 0;
+    }
+
+    public static synchronized int scroll() {
+        return scroll;
+    }
+
+    /** Scrolls the TAB panel by lines (positive: toward older ones); returns the new position. */
+    public static synchronized int scrollBy(int lines, int visible) {
+        scroll = Math.max(0, Math.min(Math.max(0, LINES.size() - visible), scroll + lines));
+        return scroll;
+    }
+
+    public static synchronized void resetScroll() {
+        scroll = 0;
     }
 
     public static synchronized void add(FeedKind kind, int colorA, int colorB, String nameA, String nameB, CompoundTag iconTag,
                                         int reward, int bounty, int streak, String key, List<String> args) {
         LINES.add(new Line(kind, colorA, colorB, nameA, nameB, decode(iconTag), reward, bounty, streak, key, List.copyOf(args),
                 System.currentTimeMillis()));
-        while (LINES.size() > MAX_LINES) LINES.remove(0);
+        // A panel that is scrolled up keeps showing the same lines when new ones come
+        if (scroll > 0) scroll++;
+        while (LINES.size() > HISTORY) LINES.remove(0);
     }
 
     private static ItemStack decode(CompoundTag tag) {

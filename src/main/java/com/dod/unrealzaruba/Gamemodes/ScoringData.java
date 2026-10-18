@@ -15,8 +15,8 @@ public class ScoringData extends AbstractGamemodeData<ScoringData.Config> {
         public int pointsToWin = 200;
         /** Capture points each team holds from the start; they earn nothing, only the points above this number do. */
         public int defaultPointsPerTeam = 2;
-        /** Score a team earns per half second for every point it holds above defaultPointsPerTeam (the score ticks twice a second). */
-        public float scorePerExtraPoint = 0.1f;
+        /** Score a team earns per half second for every point it holds above defaultPointsPerTeam (the score ticks twice a second). 1/12 makes three points win in 20 minutes. */
+        public float scorePerExtraPoint = 1f / 12f;
         /** How long players have to pick a team at the start of the match. */
         public int teamSelectionSeconds = 60;
         /** Seconds one player alone needs to capture a point (from the first tick of the capture to the end). */

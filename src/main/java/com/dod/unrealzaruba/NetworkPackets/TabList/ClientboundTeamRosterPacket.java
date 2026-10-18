@@ -11,17 +11,26 @@ import com.dod.unrealzaruba.UI.TabList.TeamRosterState;
 
 import net.minecraft.network.FriendlyByteBuf;
 
-/** The players that are in a team and which one, for the player list on TAB. Players not listed are in no team. */
+/**
+ * What the player list on TAB shows from the server: the players that are in a team and which one (players not listed are in no team),
+ * and the load of the server, as ticks per second and the time of a tick in milliseconds.
+ */
 public class ClientboundTeamRosterPacket implements ModPacket {
     public record Entry(UUID player, byte team) {}
 
     private final List<Entry> entries;
+    private final float tps;
+    private final float mspt;
 
-    public ClientboundTeamRosterPacket(List<Entry> entries) {
+    public ClientboundTeamRosterPacket(List<Entry> entries, float tps, float mspt) {
         this.entries = entries;
+        this.tps = tps;
+        this.mspt = mspt;
     }
 
     public static void encode(ClientboundTeamRosterPacket msg, FriendlyByteBuf buf) {
+        buf.writeFloat(msg.tps);
+        buf.writeFloat(msg.mspt);
         buf.writeVarInt(msg.entries.size());
         for (Entry entry : msg.entries) {
             buf.writeUUID(entry.player());
@@ -30,14 +39,16 @@ public class ClientboundTeamRosterPacket implements ModPacket {
     }
 
     public static ClientboundTeamRosterPacket decode(FriendlyByteBuf buf) {
+        float tps = buf.readFloat();
+        float mspt = buf.readFloat();
         int count = Math.min(buf.readVarInt(), 512);
         List<Entry> entries = new ArrayList<>(count);
         for (int i = 0; i < count; i++) entries.add(new Entry(buf.readUUID(), buf.readByte()));
-        return new ClientboundTeamRosterPacket(entries);
+        return new ClientboundTeamRosterPacket(entries, tps, mspt);
     }
 
     public static void handle(ClientboundTeamRosterPacket msg, Supplier<PacketContext> ctx) {
-        ctx.get().enqueueWork(() -> TeamRosterState.set(msg.entries));
+        ctx.get().enqueueWork(() -> TeamRosterState.set(msg.entries, msg.tps, msg.mspt));
         ctx.get().setPacketHandled(true);
     }
 }
