@@ -100,12 +100,6 @@
     "supplydrop.unrealzaruba.case_picked": "%s подобрал кейс снабжения для %s! Остановите его, пока он не добрался до базы",
     "supplydrop.unrealzaruba.case_cashed": "%s доставил кейс снабжения: %s каждому в %s, ещё %s носителю",
 
-        "gui.xaero_open_map.hint": "Карта",
-        "key.unrealzaruba.open_buy_menu.hint": "Магазин",
-    "key.unrealzaruba.open_schematics.hint": "Схематики техники",
-    "key.unrealzaruba.open_team_storage.hint": "Командное хранилище",
-    "key.unrealzaruba.open_gamemode_menu.hint": "Голосование за режим (лобби)",
-    "key.unrealzaruba.ready.hint": "Готов (лобби)",
     "hud.unrealzaruba.tips.controls": "Управление",
     "hud.unrealzaruba.tips.title": "Подсказки",
     "hud.unrealzaruba.tips.tip1": "Магазин и возрождение работают только в зоне вашей команды.",

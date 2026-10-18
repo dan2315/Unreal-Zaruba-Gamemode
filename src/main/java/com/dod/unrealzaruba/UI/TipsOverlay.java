@@ -56,7 +56,7 @@ public class TipsOverlay implements ZarubaOverlay {
         g.drawString(font, Component.translatable("hud.unrealzaruba.tips.controls").getString().toUpperCase(), left, cy, HudStyle.ACCENT, false);
         cy += line;
         for (KeyMapping key : keys) {
-            String name = key.getTranslatedKeyMessage().getString().toUpperCase();
+            String name = englishKeyName(key);
             int nameWidth = font.width(name);
             g.fill(right - nameWidth - 6, cy - 2, right, cy + font.lineHeight + 1, HudStyle.BAR_BG);
             g.drawString(font, name, right - nameWidth - 3, cy, HudStyle.TEXT, false);
@@ -74,5 +74,20 @@ public class TipsOverlay implements ZarubaOverlay {
             HudStyle.text(g, font, tip, left, cy, HudStyle.MUTED);
             cy += font.lineHeight + 1;
         }
+    }
+
+    /**
+     * The name of the key as it is written in English whatever the language of the game is (the game would translate the names of the
+     * keys): CAPS LOCK, LEFT BRACKET, MOUSE LEFT, with the modifier in front (SHIFT+B).
+     */
+    private static String englishKeyName(KeyMapping mapping) {
+        if (mapping.isUnbound()) return "-";
+        String name = mapping.getKey().getName();
+        String rest = name.startsWith("key.keyboard.") ? name.substring("key.keyboard.".length())
+                : name.startsWith("key.mouse.") ? "mouse " + name.substring("key.mouse.".length())
+                : name.startsWith("key.") ? name.substring(4) : name;
+        rest = rest.replace('.', ' ').toUpperCase(java.util.Locale.ROOT);
+        var modifier = mapping.getKeyModifier();
+        return modifier == net.neoforged.neoforge.client.settings.KeyModifier.NONE ? rest : modifier.name() + "+" + rest;
     }
 }
