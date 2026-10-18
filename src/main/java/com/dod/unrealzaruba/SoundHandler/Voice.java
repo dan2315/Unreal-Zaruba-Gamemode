@@ -7,7 +7,7 @@ import com.dod.unrealzaruba.Feed.Feed;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /** Plays the voice lines ({@link VoiceLine}) to the players they are for. */
 public final class Voice {
@@ -47,6 +47,7 @@ public final class Voice {
 
     private static void send(ServerPlayer player, VoiceLine line) {
         var sound = ModSounds.voice(line);
-        if (sound != null) player.playNotifySound(sound.get(), SoundSource.VOICE, 1.0f, 1.0f);
+        // Not a sound in the world (it would stay where the player was and fade with the distance): the client plays it in the head
+        if (sound != null) PacketDistributor.sendToPlayer(player, new com.dod.unrealzaruba.NetworkPackets.Voice.ClientboundVoicePacket(sound.getId()));
     }
 }

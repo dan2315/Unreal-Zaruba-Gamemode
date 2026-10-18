@@ -38,6 +38,7 @@ import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyDropPacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundSupplyCasePacket;
 import com.dod.unrealzaruba.NetworkPackets.Feed.ClientboundFeedPacket;
 import com.dod.unrealzaruba.NetworkPackets.TabList.ClientboundTeamRosterPacket;
+import com.dod.unrealzaruba.NetworkPackets.Voice.ClientboundVoicePacket;
 import com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundContraptionReportPacket;
 import com.dod.unrealzaruba.NetworkPackets.Camera.CameraShotResultPacket;
 import com.dod.unrealzaruba.NetworkPackets.Camera.ClientboundCameraShotPacket;
@@ -103,6 +104,7 @@ public class NetworkHandler {
         toClient("supply_drop", ClientboundSupplyDropPacket.class, ClientboundSupplyDropPacket::encode, ClientboundSupplyDropPacket::decode, ClientboundSupplyDropPacket::handle);
         toClient("supply_case", ClientboundSupplyCasePacket.class, ClientboundSupplyCasePacket::encode, ClientboundSupplyCasePacket::decode, ClientboundSupplyCasePacket::handle);
         toClient("feed", ClientboundFeedPacket.class, ClientboundFeedPacket::encode, ClientboundFeedPacket::decode, ClientboundFeedPacket::handle);
+        toClient("voice", ClientboundVoicePacket.class, ClientboundVoicePacket::encode, ClientboundVoicePacket::decode, ClientboundVoicePacket::handle);
         toClient("team_roster", ClientboundTeamRosterPacket.class, ClientboundTeamRosterPacket::encode, ClientboundTeamRosterPacket::decode, ClientboundTeamRosterPacket::handle);
         toClient("contraption_report", ClientboundContraptionReportPacket.class, ClientboundContraptionReportPacket::encode, ClientboundContraptionReportPacket::decode, ClientboundContraptionReportPacket::handle);
         toClient("respawn_points", ClientboundRespawnPointsPacket.class, ClientboundRespawnPointsPacket::encode, ClientboundRespawnPointsPacket::decode, ClientboundRespawnPointsPacket::handle);
