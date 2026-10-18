@@ -212,6 +212,10 @@ public final class PurchaseSessions {
         }
         block.startCooldown(EconomyData.current().schematicSpawns.cooldownSeconds * 20);
         broadcast(session, level, false, true);
+        var boughtBy = teamOf(session.initiator, completer);
+        com.dod.unrealzaruba.Feed.Feed.event(level.getServer(), com.dod.unrealzaruba.Feed.FeedKind.VEHICLE, com.dod.unrealzaruba.Feed.Feed.colorOf(boughtBy), "feed.vehicle_bought",
+                session.initiatorName, session.name, com.dod.unrealzaruba.Economy.Money.format(session.price));
+        com.dod.unrealzaruba.SoundHandler.Voice.playSplit(level.getServer(), boughtBy, com.dod.unrealzaruba.SoundHandler.VoiceLine.VEHICLE_BOUGHT_ALLY, com.dod.unrealzaruba.SoundHandler.VoiceLine.VEHICLE_BOUGHT_ENEMY);
         Component done = Component.translatable("schematics.unrealzaruba.purchase.done", session.name);
         for (UUID id : session.contributions.keySet()) {
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(id);

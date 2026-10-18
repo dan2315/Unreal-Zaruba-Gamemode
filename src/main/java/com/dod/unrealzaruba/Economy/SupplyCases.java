@@ -67,8 +67,8 @@ public final class SupplyCases {
             for (ItemStack stack : cases) paint(stack, color);
             carriers.add(player.getUUID());
             if (!CARRIERS.contains(player.getUUID())) {
-                SideIncome.broadcast(server, Component.translatable("supplydrop.unrealzaruba.case_picked",
-                        player.getDisplayName(), color.getDisplayName()));
+                com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.CASE, com.dod.unrealzaruba.Feed.Feed.colorOf(color), "feed.case_picked", player.getGameProfile().getName());
+                com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, color, com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_PICKED_ALLY, com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_PICKED_ENEMY);
             }
             entries.add(new ClientboundSupplyCasePacket.Entry(player.getId(), player.getX(), player.getY(), player.getZ(), rgb(color)));
         }
@@ -155,8 +155,9 @@ public final class SupplyCases {
             Wallets.add(member, teamReward + (member.getUUID().equals(player.getUUID()) ? bonus : 0));
         }
         if (!SideIncome.onlineMembers(server, team).contains(player)) Wallets.add(player, bonus);
-        SideIncome.broadcast(server, Component.translatable("supplydrop.unrealzaruba.case_cashed",
-                player.getDisplayName(), team.Color().getDisplayName(), Money.format(teamReward), Money.format(bonus)));
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.CASE, com.dod.unrealzaruba.Feed.Feed.colorOf(team.Color()), "feed.case_cashed",
+                player.getGameProfile().getName(), Money.format(teamReward + bonus));
+        com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, team.Color(), com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_CASHED_ALLY, com.dod.unrealzaruba.SoundHandler.VoiceLine.CASE_CASHED_ENEMY);
     }
 
     private static List<ItemStack> casesOf(ServerPlayer player) {

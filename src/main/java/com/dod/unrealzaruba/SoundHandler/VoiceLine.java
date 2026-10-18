@@ -1,0 +1,47 @@
+package com.dod.unrealzaruba.SoundHandler;
+
+/**
+ * The voice lines of the match: one sound event each ({@code unrealzaruba:voice.<id>}). They have no sound files yet, so they play
+ * nothing until files are added to {@code sounds.json} (see docs/voice-lines.md). "Ally" and "enemy" lines are heard by the team the
+ * event is for and by everybody else.
+ */
+public enum VoiceLine {
+    MATCH_START("match_start"),
+    MATCH_WIN("match_win"),
+    MATCH_LOSE("match_lose"),
+    FIRST_BLOOD("first_blood"),
+    KILLSTREAK_3("killstreak_3"),
+    KILLSTREAK_5("killstreak_5"),
+    KILLSTREAK_7("killstreak_7"),
+    KILLSTREAK_10("killstreak_10"),
+    BOUNTY_PLACED_ALLY("bounty_placed_ally"),
+    BOUNTY_PLACED_ENEMY("bounty_placed_enemy"),
+    BOUNTY_CLAIMED("bounty_claimed"),
+    POINT_CAPTURED_ALLY("point_captured_ally"),
+    POINT_CAPTURED_ENEMY("point_captured_enemy"),
+    POINT_LOST("point_lost"),
+    SCORE_50_ALLY("score_50_ally"),
+    SCORE_50_ENEMY("score_50_enemy"),
+    SCORE_75_ALLY("score_75_ally"),
+    SCORE_75_ENEMY("score_75_enemy"),
+    SCORE_90_ALLY("score_90_ally"),
+    SCORE_90_ENEMY("score_90_enemy"),
+    SUPPLY_INCOMING("supply_incoming"),
+    CASE_PICKED_ALLY("case_picked_ally"),
+    CASE_PICKED_ENEMY("case_picked_enemy"),
+    CASE_CASHED_ALLY("case_cashed_ally"),
+    CASE_CASHED_ENEMY("case_cashed_enemy"),
+    VEHICLE_BOUGHT_ALLY("vehicle_bought_ally"),
+    VEHICLE_BOUGHT_ENEMY("vehicle_bought_enemy");
+
+    public final String id;
+
+    VoiceLine(String id) {
+        this.id = id;
+    }
+
+    /** The name of the sound event. */
+    public String soundName() {
+        return "voice." + id;
+    }
+}

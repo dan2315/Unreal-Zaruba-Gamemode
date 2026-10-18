@@ -24,6 +24,8 @@ public final class MatchHud {
         TimerOverlay.OVERLAY_INSTANCE.stop();
         RespawnClientState.reset();
         TeamVehiclesState.reset();
+        com.dod.unrealzaruba.UI.Feed.FeedState.clear();
+        com.dod.unrealzaruba.UI.TabList.TeamRosterState.reset();
         PurchaseClientState.reset();
         PurchaseGhostRenderer.reset();
         SupplyCaseClientState.set(List.of());

@@ -72,6 +72,7 @@ public class ServerEvents {
             gamemodeManager.Tick();
             com.dod.unrealzaruba.Vehicles.PurchaseSessions.tick(server);
             com.dod.unrealzaruba.Vehicles.TrackedVehicles.tick(server);
+            com.dod.unrealzaruba.TeamLogic.TeamRoster.tick(server);
             SideIncome.tick(server);
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }
@@ -113,6 +114,7 @@ public class ServerEvents {
             return;
 
         player.getInventory().clearContent();
+        com.dod.unrealzaruba.TeamLogic.TeamRoster.syncTo(player);
         var activeGamemode = gamemodeManager.GetActiveGamemode();
         if (activeGamemode != null) {
             activeGamemode.HandleConnectedPlayer(event.getEntity());

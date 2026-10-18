@@ -236,18 +236,23 @@ public abstract class BaseGamemode implements IPhaseHolder {
         }
 
         var killingEntity = event.getSource().getEntity();
-        if (killingEntity instanceof ServerPlayer killer) {
-            int reward = isEnemy(killer, player) ? EconomyData.current().killReward : 0;
+        ServerPlayer killerPlayer = killingEntity instanceof ServerPlayer k ? k : null;
+        int reward = 0;
+        if (killerPlayer != null) {
+            reward = isEnemy(killerPlayer, player) ? EconomyData.current().killReward : 0;
             if (reward > 0) {
-                Wallets.add(killer, reward);
-                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill_reward", player.getDisplayName(), Money.format(reward)), true);
+                Wallets.add(killerPlayer, reward);
+                killerPlayer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill_reward", player.getDisplayName(), Money.format(reward)), true);
             } else {
-                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill", player.getDisplayName()), true);
+                killerPlayer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill", player.getDisplayName()), true);
             }
-            player.displayClientMessage(Component.literal("You have been killed by " + killer.getDisplayName().getString()), true);
+            player.displayClientMessage(Component.literal("You have been killed by " + killerPlayer.getDisplayName().getString()), true);
         }
-        ServerPlayer enemyKiller = killingEntity instanceof ServerPlayer killer && isEnemy(killer, player) ? killer : null;
-        SideIncome.onDeath(player, enemyKiller, server);
+        ServerPlayer enemyKiller = killerPlayer != null && isEnemy(killerPlayer, player) ? killerPlayer : null;
+        int bounty = SideIncome.onDeath(player, enemyKiller, server);
+        int streak = enemyKiller == null ? 0 : SideIncome.streakOf(enemyKiller);
+        // The kill line of the event feed: the weapon, the teams, what it paid
+        com.dod.unrealzaruba.Feed.Feed.kill(server, player, killerPlayer != player ? killerPlayer : null, event.getSource(), reward, bounty, streak);
         SoundHandler.playSoundToPlayer(player, ModSounds.DEATH.get(), 1.0f, 1.0f);
 
         java.util.UUID id = player.getUUID();

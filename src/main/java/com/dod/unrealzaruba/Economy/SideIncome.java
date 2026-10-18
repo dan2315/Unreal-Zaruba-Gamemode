@@ -22,6 +22,7 @@ import net.minecraft.server.level.ServerPlayer;
 public final class SideIncome {
     private static final Map<UUID, Integer> STREAKS = new HashMap<>();
     private static int battleTicks;
+    private static boolean firstBlood;
 
     private SideIncome() {}
 
@@ -29,6 +30,7 @@ public final class SideIncome {
     public static void reset() {
         STREAKS.clear();
         battleTicks = 0;
+        firstBlood = false;
         SupplyDrops.reset();
     }
 
@@ -76,25 +78,45 @@ public final class SideIncome {
      * Called for every death in a match. {@code enemyKiller} is the killing player when they're on another team,
      * otherwise null (suicide, team kill, environment): the streak ends but nobody collects.
      */
-    public static void onDeath(ServerPlayer victim, ServerPlayer enemyKiller, MinecraftServer server) {
+    public static int onDeath(ServerPlayer victim, ServerPlayer enemyKiller, MinecraftServer server) {
         EconomyConfig.Bounties bounties = EconomyData.current().bounties;
         int victimStreak = STREAKS.getOrDefault(victim.getUUID(), 0);
         STREAKS.remove(victim.getUUID());
-        if (enemyKiller == null || bounties == null) return;
+        if (enemyKiller == null || bounties == null) return 0;
 
-        int bounty = bountyFor(victimStreak, bounties);
-        if (bounty > 0) {
-            Wallets.add(enemyKiller, bounty);
-            broadcast(server, Component.translatable("economy.unrealzaruba.bounty_claimed",
-                    enemyKiller.getDisplayName(), Money.format(bounty), victim.getDisplayName()));
+        // The bounty of the victim goes to the killer (it is shown on the kill line of the feed)
+        int claimed = bountyFor(victimStreak, bounties);
+        if (claimed > 0) {
+            Wallets.add(enemyKiller, claimed);
+            com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, com.dod.unrealzaruba.SoundHandler.VoiceLine.BOUNTY_CLAIMED);
         }
 
         int streak = STREAKS.merge(enemyKiller.getUUID(), 1, Integer::sum);
+        if (!firstBlood) {
+            firstBlood = true;
+            com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, com.dod.unrealzaruba.SoundHandler.VoiceLine.FIRST_BLOOD);
+        }
+        com.dod.unrealzaruba.SoundHandler.VoiceLine streakLine = switch (streak) {
+            case 3 -> com.dod.unrealzaruba.SoundHandler.VoiceLine.KILLSTREAK_3;
+            case 5 -> com.dod.unrealzaruba.SoundHandler.VoiceLine.KILLSTREAK_5;
+            case 7 -> com.dod.unrealzaruba.SoundHandler.VoiceLine.KILLSTREAK_7;
+            case 10 -> com.dod.unrealzaruba.SoundHandler.VoiceLine.KILLSTREAK_10;
+            default -> null;
+        };
+        if (streakLine != null) com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, streakLine);
+
         int newBounty = bountyFor(streak, bounties);
         if (newBounty > 0) {
-            broadcast(server, Component.translatable("economy.unrealzaruba.bounty_placed",
-                    enemyKiller.getDisplayName(), streak, Money.format(newBounty)));
+            com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.BOUNTY, com.dod.unrealzaruba.Feed.Feed.colorOf(enemyKiller), "feed.bounty_placed",
+                    enemyKiller.getGameProfile().getName(), String.valueOf(streak), Money.format(newBounty));
+            com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, com.dod.unrealzaruba.Feed.Feed.teamOf(enemyKiller), com.dod.unrealzaruba.SoundHandler.VoiceLine.BOUNTY_PLACED_ALLY, com.dod.unrealzaruba.SoundHandler.VoiceLine.BOUNTY_PLACED_ENEMY);
         }
+        return claimed;
+    }
+
+    /** How many enemies the player has killed in a row. */
+    public static int streakOf(ServerPlayer player) {
+        return STREAKS.getOrDefault(player.getUUID(), 0);
     }
 
     private static int bountyFor(int streak, EconomyConfig.Bounties bounties) {

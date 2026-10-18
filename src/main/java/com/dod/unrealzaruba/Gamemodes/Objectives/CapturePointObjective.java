@@ -215,9 +215,15 @@ public class CapturePointObjective extends PositionedGameobjective {
     private void announceCapture(TeamContext captured, TeamContext previousOwner) {
         var server = UnrealZaruba.server;
         if (server == null) return;
-        net.minecraft.network.chat.MutableComponent team = net.minecraft.network.chat.Component.literal(captured.Color().getDisplayName())
-                .withStyle(net.minecraft.ChatFormatting.valueOf(captured.Color().getColorCode()));
-        server.getPlayerList().broadcastSystemMessage(team.append(net.minecraft.network.chat.Component.translatable("hud.unrealzaruba.point_captured", GetName())), false);
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.POINT, com.dod.unrealzaruba.Feed.Feed.colorOf(captured.Color()), "feed.point_captured",
+                captured.Color().getDisplayName(), GetName());
+        var previousColor = previousOwner == null ? null : previousOwner.Color();
+        com.dod.unrealzaruba.SoundHandler.Voice.playEach(server, player -> {
+            var color = com.dod.unrealzaruba.Feed.Feed.teamOf(player);
+            if (color == captured.Color()) return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_CAPTURED_ALLY;
+            if (color != null && color == previousColor) return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_LOST;
+            return com.dod.unrealzaruba.SoundHandler.VoiceLine.POINT_CAPTURED_ENEMY;
+        });
         playToTeam(server, captured, net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP);
         if (previousOwner != null) playToTeam(server, previousOwner, net.minecraft.sounds.SoundEvents.ANVIL_LAND);
     }

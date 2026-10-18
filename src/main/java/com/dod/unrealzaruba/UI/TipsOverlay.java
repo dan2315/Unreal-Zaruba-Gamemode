@@ -41,7 +41,7 @@ public class TipsOverlay implements ZarubaOverlay {
                 KeyBindings.OPEN_TEAM_STORAGE, KeyBindings.OPEN_GAMEMODE_MENU, KeyBindings.READY));
         List<FormattedCharSequence> tips = new ArrayList<>();
         for (int i = 1; i <= TIP_COUNT; i++) {
-            tips.addAll(font.split(Component.literal("• ").append(Component.translatable("hud.unrealzaruba.tips.tip" + i)), inner));
+            tips.addAll(font.split(Component.literal("• ").append(Component.translatable("hud.unrealzaruba.rules.line" + i)), inner));
         }
 
         int line = font.lineHeight + 3;
@@ -68,7 +68,7 @@ public class TipsOverlay implements ZarubaOverlay {
         cy += 2;
         g.fill(left, cy, right, cy + 1, HudStyle.DIVIDER);
         cy += 5;
-        g.drawString(font, Component.translatable("hud.unrealzaruba.tips.title").getString().toUpperCase(), left, cy, HudStyle.ACCENT, false);
+        g.drawString(font, Component.translatable("hud.unrealzaruba.rules.title").getString().toUpperCase(), left, cy, HudStyle.ACCENT, false);
         cy += line;
         for (FormattedCharSequence tip : tips) {
             HudStyle.text(g, font, tip, left, cy, HudStyle.MUTED);

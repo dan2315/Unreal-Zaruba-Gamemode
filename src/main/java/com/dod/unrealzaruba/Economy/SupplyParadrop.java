@@ -148,8 +148,8 @@ public final class SupplyParadrop {
         UnrealZaruba.LOGGER.info("[SupplyParadrop] Drop {} assembled above {}: {} blocks, mass {}", subLevel.getUniqueId(), target,
                 blocks.size(), subLevel.getMassTracker().getMass());
         trace(level, subLevel.getUniqueId(), 0);
-        SideIncome.broadcast(level.getServer(), Component.translatable("supplydrop.unrealzaruba.incoming",
-                target.getX(), target.getZ()));
+        com.dod.unrealzaruba.Feed.Feed.event(level.getServer(), com.dod.unrealzaruba.Feed.FeedKind.SUPPLY, 0xFFD60A, "feed.supply_incoming", String.valueOf(target.getX()), String.valueOf(target.getZ()));
+        com.dod.unrealzaruba.SoundHandler.Voice.playAll(level.getServer(), com.dod.unrealzaruba.SoundHandler.VoiceLine.SUPPLY_INCOMING);
     }
 
     /** Runs after a number of server ticks (server.tell with a TickTask would run it right away). */

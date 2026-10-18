@@ -147,8 +147,11 @@ public class CapturePointsGamemode extends TeamGamemode {
             if (score == null) continue;
             for (int percent : scoring.announceScoreAtPercent) {
                 if (score * 100 >= percent * requiredPointsToWin && announcedScores.add(color.name() + ":" + percent)) {
-                    var team = Component.literal(color.getDisplayName()).withStyle(ChatFormatting.valueOf(color.getColorCode()));
-                    server.getPlayerList().broadcastSystemMessage(team.append(Component.translatable("hud.unrealzaruba.score_mark", score, requiredPointsToWin)), false);
+                    com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.SCORE, com.dod.unrealzaruba.Feed.Feed.colorOf(color), "feed.score_mark",
+                            color.getDisplayName(), String.valueOf(score), String.valueOf(requiredPointsToWin));
+                    com.dod.unrealzaruba.SoundHandler.VoiceLine ally = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ALLY : percent >= 75 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_75_ALLY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ALLY : null;
+                    com.dod.unrealzaruba.SoundHandler.VoiceLine enemy = percent >= 90 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_90_ENEMY : percent >= 75 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_75_ENEMY : percent >= 50 ? com.dod.unrealzaruba.SoundHandler.VoiceLine.SCORE_50_ENEMY : null;
+                    com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, color, ally, enemy);
                     for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                         player.playNotifySound(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL.value(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, percent >= 90 ? 0.6f : 1.0f);
                     }
@@ -342,6 +345,8 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.MATCH, com.dod.unrealzaruba.Feed.Feed.colorOf(wonTeam), "feed.match_won", wonTeam.getDisplayName());
+        com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, wonTeam, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_WIN, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_LOSE);
         String colorCode = wonTeam.getColorCode();
         Component titleText = Component.literal("Команда ")
                 .append(Component.literal(wonTeam.getDisplayName()).withStyle(ChatFormatting.valueOf(colorCode)))
@@ -390,6 +395,8 @@ public class CapturePointsGamemode extends TeamGamemode {
     }
 
     public void StartBattle() {
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.MATCH, 0xFFFFFF, "feed.match_started");
+        com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_START);
         com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         TeamManager.PlayBattleSound();
 

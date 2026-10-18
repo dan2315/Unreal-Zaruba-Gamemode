@@ -1,19 +1,22 @@
 package com.dod.unrealzaruba.Gamemodes;
 
+import com.dod.unrealzaruba.Title.TitleMessage;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-/** A few lines about how the match works, said to a player when they come to pick a team. */
+/**
+ * The rules of the match are on the TAB panel, not in the chat. A player who comes to pick a team is asked, loudly and once, to open it:
+ * a big title and a single line.
+ */
 public final class MatchRules {
-    private static final int LINES = 5;
-
     private MatchRules() {}
 
     public static void tell(ServerPlayer player) {
-        player.sendSystemMessage(Component.translatable("hud.unrealzaruba.rules.title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-        for (int i = 1; i <= LINES; i++) {
-            player.sendSystemMessage(Component.literal("\u2022 ").withStyle(ChatFormatting.GRAY).append(Component.translatable("hud.unrealzaruba.rules.line" + i)));
-        }
+        TitleMessage.showTitle(player,
+                Component.translatable("hud.unrealzaruba.rules.hint_title").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD),
+                Component.translatable("hud.unrealzaruba.rules.hint_subtitle"), 100);
+        player.sendSystemMessage(Component.translatable("hud.unrealzaruba.rules.hint").withStyle(ChatFormatting.GOLD));
     }
 }

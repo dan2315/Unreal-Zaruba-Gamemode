@@ -208,6 +208,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void StartBattle() {
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.MATCH, 0xFFFFFF, "feed.match_started");
+        com.dod.unrealzaruba.SoundHandler.Voice.playAll(server, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_START);
         com.dod.unrealzaruba.WorldManager.MapMobs.sweep(WorldManager.gameLevel);
         gameTimer.startCountDown(System.currentTimeMillis(), GAME_DURATION_S);
         TeamManager.PlayBattleSound();
@@ -343,6 +345,8 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
     }
 
     public void ShowEndText(MinecraftServer server, TeamColor wonTeam) {
+        com.dod.unrealzaruba.Feed.Feed.event(server, com.dod.unrealzaruba.Feed.FeedKind.MATCH, com.dod.unrealzaruba.Feed.Feed.colorOf(wonTeam), "feed.match_won", wonTeam.getDisplayName());
+        com.dod.unrealzaruba.SoundHandler.Voice.playSplit(server, wonTeam, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_WIN, com.dod.unrealzaruba.SoundHandler.VoiceLine.MATCH_LOSE);
         String colorCode = wonTeam.getColorCode();
         Component titleText = Component.literal("Команда ")
                 .append(Component.literal(wonTeam.getDisplayName()).withStyle(ChatFormatting.valueOf(colorCode)))

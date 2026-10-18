@@ -24,6 +24,17 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SELECT1 = registerSound("select1");
     public static final DeferredHolder<SoundEvent, SoundEvent> SELECT2 = registerSound("select2");
 
+    private static final java.util.Map<VoiceLine, DeferredHolder<SoundEvent, SoundEvent>> VOICE = new java.util.EnumMap<>(VoiceLine.class);
+
+    static {
+        for (VoiceLine line : VoiceLine.values()) VOICE.put(line, registerSound(line.soundName()));
+    }
+
+    /** The sound event of a voice line. */
+    public static DeferredHolder<SoundEvent, SoundEvent> voice(VoiceLine line) {
+        return VOICE.get(line);
+    }
+
     private static DeferredHolder<SoundEvent, SoundEvent> registerSound(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, name)));
     }
