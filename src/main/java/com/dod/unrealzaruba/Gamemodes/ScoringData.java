@@ -19,6 +19,18 @@ public class ScoringData extends AbstractGamemodeData<ScoringData.Config> {
         public float scorePerExtraPoint = 0.1f;
         /** How long players have to pick a team at the start of the match. */
         public int teamSelectionSeconds = 60;
+        /** Seconds one player alone needs to capture a point (from the first tick of the capture to the end). */
+        public float captureSeconds = 30f;
+        /** Every extra player on the point multiplies the speed by this: 2 means two players take half the time, three a quarter, and so on. */
+        public float extraCapturerSpeedFactor = 2f;
+        /** The speed is never more than this many times that of one player. */
+        public float maxCaptureSpeedMultiplier = 16f;
+        /** The owner standing alone on the point takes back the capture at this share of the capture speed (the point itself is held anyway). */
+        public float ownerRestoreShare = 0.5f;
+        /** A point nobody stands on loses the capture progress at this share of the speed of one capturer. */
+        public float emptyDecayShare = 0.25f;
+        /** The share of the score needed to win at which every player is told how it stands (once per team and mark). */
+        public int[] announceScoreAtPercent = {50, 75, 90};
     }
 
     public ScoringData(Class<? extends BaseGamemode> gamemodeClass) {
@@ -31,6 +43,9 @@ public class ScoringData extends AbstractGamemodeData<ScoringData.Config> {
         config.pointsToWin = Math.max(1, config.pointsToWin);
         config.defaultPointsPerTeam = Math.max(0, config.defaultPointsPerTeam);
         config.teamSelectionSeconds = Math.max(0, config.teamSelectionSeconds);
+        config.captureSeconds = Math.max(1f, config.captureSeconds);
+        config.extraCapturerSpeedFactor = Math.max(1f, config.extraCapturerSpeedFactor);
+        config.maxCaptureSpeedMultiplier = Math.max(1f, config.maxCaptureSpeedMultiplier);
         saveData();
         return config;
     }

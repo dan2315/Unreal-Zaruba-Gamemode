@@ -131,6 +131,32 @@ public class CapturePointsGamemode extends TeamGamemode {
         ProceedToPhaseForced(PhaseId.MAP_INITIALIZATION);
     }
 
+    private final java.util.Set<String> announcedScores = new java.util.HashSet<>();
+    private int announceTicks;
+
+    @Override
+    public void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Pre event) {
+        super.onServerTick(event);
+        if (IsBattleActive() && ++announceTicks % 20 == 0) announceScoreMarks();
+    }
+
+    /** Everybody hears when a team reaches a mark of the score it needs (see scoring.json), once per team and mark. */
+    private void announceScoreMarks() {
+        for (TeamColor color : new TeamColor[]{TeamColor.RED, TeamColor.BLUE}) {
+            Integer score = GetTeamScore(color);
+            if (score == null) continue;
+            for (int percent : scoring.announceScoreAtPercent) {
+                if (score * 100 >= percent * requiredPointsToWin && announcedScores.add(color.name() + ":" + percent)) {
+                    var team = Component.literal(color.getDisplayName()).withStyle(ChatFormatting.valueOf(color.getColorCode()));
+                    server.getPlayerList().broadcastSystemMessage(team.append(Component.translatable("hud.unrealzaruba.score_mark", score, requiredPointsToWin)), false);
+                    for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                        player.playNotifySound(net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL.value(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, percent >= 90 ? 0.6f : 1.0f);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public Integer GetTeamScore(TeamColor team) {
         return switch (team) {
@@ -248,6 +274,7 @@ public class CapturePointsGamemode extends TeamGamemode {
         serverPlayer.setGameMode(GameType.ADVENTURE);
         WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
         serverPlayer.sendSystemMessage(Component.translatable("hud.unrealzaruba.late_join.pick_team"));
+        MatchRules.tell(serverPlayer);
     }
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {
@@ -337,6 +364,7 @@ public class CapturePointsGamemode extends TeamGamemode {
         server.getPlayerList().getPlayers().forEach(player -> {
             player.setGameMode(GameType.ADVENTURE);
             player.sendSystemMessage(Component.translatable("hud.unrealzaruba.respawn.pick_before_start"));
+            MatchRules.tell(player);
         });
     }
 

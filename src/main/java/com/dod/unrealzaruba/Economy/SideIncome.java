@@ -56,15 +56,17 @@ public final class SideIncome {
             Integer score = gamemode.GetTeamScore(color);
             if (score != null) leaderScore = Math.max(leaderScore, score);
         }
+        int grown = income.growthEverySeconds > 0 ? (battleTicks / 20 / income.growthEverySeconds) * Math.max(0, income.growthAmount) : 0;
+        int base = income.amount + grown;
         for (Map.Entry<TeamColor, TeamContext> team : teams.entrySet()) {
             Integer score = gamemode.GetTeamScore(team.getKey());
             int catchUp = score == null || leaderScore == Integer.MIN_VALUE ? 0
                     : Math.min(income.maxCatchUp, Math.max(0, leaderScore - score) * income.catchUpPerPoint);
             Component message = catchUp > 0
-                    ? Component.translatable("economy.unrealzaruba.income_catch_up", Money.format(income.amount), Money.format(catchUp))
-                    : Component.translatable("economy.unrealzaruba.income", Money.format(income.amount));
+                    ? Component.translatable("economy.unrealzaruba.income_catch_up", Money.format(base), Money.format(catchUp))
+                    : Component.translatable("economy.unrealzaruba.income", Money.format(base));
             for (ServerPlayer player : onlineMembers(server, team.getValue())) {
-                Wallets.add(player, income.amount + catchUp);
+                Wallets.add(player, base + catchUp);
                 player.displayClientMessage(message, true);
             }
         }

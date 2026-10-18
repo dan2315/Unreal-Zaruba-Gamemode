@@ -151,26 +151,32 @@ public class CapturePointObjective extends PositionedGameobjective {
     }
 
     private boolean AdvanceCapturingProgress(TeamContext team, int playerAmount) {
-        double factor = Math.log(playerAmount + 1); // shared scaling
+        // One step is half a second. One player alone needs captureSeconds; every extra player multiplies the speed
+        // (by default two players take half the time, three a quarter), up to a cap, so teamwork pays
+        var gamemode = GamemodeManager.instance == null ? null : GamemodeManager.instance.GetActiveGamemode();
+        var rules = gamemode == null ? new com.dod.unrealzaruba.Gamemodes.ScoringData.Config()
+                : com.dod.unrealzaruba.Gamemodes.ScoringData.of(gamemode.getClass());
+        double step = 0.5 / rules.captureSeconds;
+        double speed = Math.min(rules.maxCaptureSpeedMultiplier, Math.pow(rules.extraCapturerSpeedFactor, Math.max(0, playerAmount - 1)));
         float delta = 0;
         var progress = GetProgress();
 
         if (team == null) {                         // decay when no players
-            delta = -0.005F;
+            delta = (float) (-step * rules.emptyDecayShare);
             captureStatus = CaptureStatus.None;
             if (progress + delta <= 0) {
                 beingCapturedBy = null;
             }
         }
         else if (team.equals(owner)) {              // restore by owner
-            delta = (float) (-0.01 * factor);
+            delta = (float) (-step * speed * rules.ownerRestoreShare);
             captureStatus = CaptureStatus.None;
             if (progress + delta <= 0) {
                 beingCapturedBy = null;
             }
         }
         else if (!team.equals(beingCapturedBy)) {   // new opponent contesting
-            delta = (float) (-0.1 * factor);
+            delta = (float) (-step * speed);
             captureStatus = CaptureStatus.Capturing;
             if (progress + delta <= 0) {
                 beingCapturedBy = team;
@@ -178,7 +184,7 @@ public class CapturePointObjective extends PositionedGameobjective {
             }
         }
         else {                                      // being captured by current opponent
-            delta = (float) (0.1 * factor);
+            delta = (float) (step * speed);
             captureStatus = CaptureStatus.Capturing;
         }
 
@@ -194,12 +200,32 @@ public class CapturePointObjective extends PositionedGameobjective {
     }
 
     private void Capture() {
+        TeamContext previousOwner = owner instanceof TeamContext previous ? previous : null;
         MoveRespawnPoint(owner, beingCapturedBy);
         owner = beingCapturedBy;
+        if (owner instanceof TeamContext captured) announceCapture(captured, previousOwner);
         var ownerTeam = (TeamContext) this.GetOwner();
         int color = ownerTeam == null ? 0xDDDDEE : ownerTeam.GetIntColor();
         for(var player : UnrealZaruba.server.getPlayerList().getPlayers()) {
             PacketDistributor.sendToPlayer(player, new RenderableZonesPacket(List.of(new ColoredSquareZone(captureAreaAABB, color))));
+        }
+    }
+
+    /** Everybody is told, and the two teams hear it: a point changed hands. */
+    private void announceCapture(TeamContext captured, TeamContext previousOwner) {
+        var server = UnrealZaruba.server;
+        if (server == null) return;
+        net.minecraft.network.chat.MutableComponent team = net.minecraft.network.chat.Component.literal(captured.Color().getDisplayName())
+                .withStyle(net.minecraft.ChatFormatting.valueOf(captured.Color().getColorCode()));
+        server.getPlayerList().broadcastSystemMessage(team.append(net.minecraft.network.chat.Component.translatable("hud.unrealzaruba.point_captured", GetName())), false);
+        playToTeam(server, captured, net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP);
+        if (previousOwner != null) playToTeam(server, previousOwner, net.minecraft.sounds.SoundEvents.ANVIL_LAND);
+    }
+
+    private static void playToTeam(net.minecraft.server.MinecraftServer server, TeamContext team, net.minecraft.sounds.SoundEvent sound) {
+        for (UUID id : List.copyOf(team.Members())) {
+            var player = server.getPlayerList().getPlayer(id);
+            if (player != null) player.playNotifySound(sound, net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.0f);
         }
     }
 

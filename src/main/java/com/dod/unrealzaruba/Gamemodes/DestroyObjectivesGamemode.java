@@ -181,6 +181,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         server.getPlayerList().getPlayers().forEach(player -> {
             player.setGameMode(GameType.ADVENTURE);
             player.sendSystemMessage(Component.translatable("hud.unrealzaruba.respawn.pick_before_start"));
+            MatchRules.tell(player);
         });
     }
 
@@ -285,6 +286,7 @@ public class DestroyObjectivesGamemode extends TeamGamemode {
         serverPlayer.setGameMode(GameType.ADVENTURE);
         WorldManager.teleportPlayerToDimension(serverPlayer, WorldManager.GAME_DIMENSION, ARRIVAL_POINT);
         serverPlayer.sendSystemMessage(Component.translatable("hud.unrealzaruba.late_join.pick_team"));
+        MatchRules.tell(serverPlayer);
     }
 
     private void TeleportToLobby(ServerPlayer serverPlayer, MinecraftServer server) {

@@ -58,6 +58,9 @@ public class EconomyConfig {
         /** Extra per point the team is behind the leader, up to maxCatchUp. */
         public int catchUpPerPoint = 2;
         public int maxCatchUp = 300;
+        /** The income grows by growthAmount every growthEverySeconds of the battle (0 for no growth), so late minutes can afford more. */
+        public int growthEverySeconds = 300;
+        public int growthAmount = 50;
     }
 
     /** From killStreak kills without dying, a player carries a bounty paid to the enemy who kills them. */
