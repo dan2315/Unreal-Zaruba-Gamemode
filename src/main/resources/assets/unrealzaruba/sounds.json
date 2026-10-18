@@ -42,16 +42,24 @@
     ]
   },
   "voice.match_win": {
-    "sounds": []
+    "sounds": [
+      "unrealzaruba:voice/match_win_1"
+    ]
   },
   "voice.match_lose": {
-    "sounds": []
+    "sounds": [
+      "unrealzaruba:voice/match_lose_1"
+    ]
   },
   "voice.point_captured_ally": {
-    "sounds": []
+    "sounds": [
+      "unrealzaruba:voice/point_captured_ally_1"
+    ]
   },
   "voice.point_captured_enemy": {
-    "sounds": []
+    "sounds": [
+      "unrealzaruba:voice/point_captured_enemy_1"
+    ]
   },
   "voice.score_50_ally": {
     "sounds": []
@@ -66,7 +74,9 @@
     "sounds": []
   },
   "voice.supply_incoming": {
-    "sounds": []
+    "sounds": [
+      "unrealzaruba:voice/supply_incoming_1"
+    ]
   },
   "voice.case_picked_ally": {
     "sounds": []
