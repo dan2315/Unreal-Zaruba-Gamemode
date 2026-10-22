@@ -41,6 +41,10 @@ public class SelectRespawnPointPacket implements ModPacket {
                 player.SelectRespawnPoint(respawnPoint);
             }
             RespawnPointsSync.sendTo(sender);
+            // For a player whose waiting is over, choosing a point is the confirmation: they come back there
+            if (respawnPoint != null) {
+                com.dod.unrealzaruba.Gamemodes.GamemodeManager.instance.ForGamemode(gamemode -> gamemode.confirmRespawn(sender));
+            }
         });
         ctx.get().setPacketHandled(true);
     }

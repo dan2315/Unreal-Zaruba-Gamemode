@@ -211,21 +211,11 @@ public class CompassOverlay implements ZarubaOverlay {
                 g.drawString(font, letter, cx - font.width(letter) / 2, cy - 3, fade(ON_TILE, m.dist()), false);
             }
 
-            // The distance, unless a nearer marker stands on it
-            boolean covered = false;
-            for (int j = i + 1; j < markers.size(); j++) {
-                Double ox = markerXs.get(j);
-                if (ox != null && Math.abs(ox - mx) < 20) {
-                    covered = true;
-                    break;
-                }
-            }
-            if (!covered) {
-                String d = Math.round(m.dist()) + "m";
-                int dc = fade(DIM, m.dist());
-                if ((dc >>> 24) > 4) {
-                    scaledText(g, font, Component.literal(d), cx - Math.round(font.width(d) * SMALL) / 2, cy + MARKER_R + 3, dc, SMALL);
-                }
+            // The distance is always drawn, even where markers overlap
+            String d = Math.round(m.dist()) + "m";
+            int dc = fade(DIM, m.dist());
+            if ((dc >>> 24) > 4) {
+                scaledText(g, font, Component.literal(d), cx - Math.round(font.width(d) * SMALL) / 2, cy + MARKER_R + 3, dc, SMALL);
             }
         }
         g.disableScissor();

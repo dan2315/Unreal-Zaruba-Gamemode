@@ -151,7 +151,7 @@ public class XaeroWorldMap {
         RespawnPointsView view = RespawnClientState.view();
         if (respawnId == null) {
             options.add(label("hud.unrealzaruba.respawn.not_available", options.size(), target));
-        } else if (view.effectiveId() != null && view.effectiveId().byteValue() == respawnId) {
+        } else if (!RespawnClientState.isChoosing() && view.effectiveId() != null && view.effectiveId().byteValue() == respawnId) {
             options.add(info("hud.unrealzaruba.respawn.current", ChatFormatting.GREEN, options.size(), target));
         } else {
             byte id = respawnId;
@@ -201,7 +201,7 @@ public class XaeroWorldMap {
 
     /** While the player waits to respawn the map stays open: Esc and the map key do not close it. */
     private void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
-        if (!(event.getScreen() instanceof GuiMap) || !RespawnClientState.isDead()) return;
+        if (!(event.getScreen() instanceof GuiMap) || !RespawnClientState.isChoosing()) return;
         if (event.getKeyCode() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
             event.setCanceled(true);
             return;
@@ -217,7 +217,7 @@ public class XaeroWorldMap {
     /** If the map got closed anyway (another screen, a reload) while waiting, it is opened again. */
     private void onClientTick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
-        if (!RespawnClientState.isDead() || mc.screen != null || mc.player == null || mc.level == null) return;
+        if (!RespawnClientState.isChoosing() || mc.screen != null || mc.player == null || mc.level == null) return;
         if (mc.level.getGameTime() % 20 != 0) return;
         openForRespawn();
     }
@@ -232,11 +232,12 @@ public class XaeroWorldMap {
         List<String> lines = new ArrayList<>();
         List<Integer> colors = new ArrayList<>();
         if (RespawnClientState.isDead()) {
-            lines.add(Component.translatable("hud.unrealzaruba.respawn.in", Math.max(0, RespawnClientState.secondsLeft())).getString().toUpperCase());
+            lines.add(Component.translatable("hud.unrealzaruba.respawn.choose_now").getString().toUpperCase());
             colors.add(HudStyle.ACCENT);
+        } else {
+            lines.add(Component.translatable("hud.unrealzaruba.respawn.point", describe(view.effective())).getString());
+            colors.add(HudStyle.TEXT);
         }
-        lines.add(Component.translatable("hud.unrealzaruba.respawn.point", describe(view.effective())).getString());
-        colors.add(HudStyle.TEXT);
         lines.add(Component.translatable("hud.unrealzaruba.respawn.hint").getString());
         colors.add(HudStyle.MUTED);
 

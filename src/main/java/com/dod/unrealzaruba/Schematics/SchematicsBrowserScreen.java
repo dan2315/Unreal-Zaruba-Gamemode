@@ -92,8 +92,20 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
 
     // ---------- loading ----------
 
+    /** How many schematics the player has of the allowed number, or null while not known. */
+    private SchematicsApi.Limit uploadLimit;
+
+    private void refreshLimit() {
+        if (!SchematicsApi.isLoggedIn()) {
+            uploadLimit = null;
+            return;
+        }
+        SchematicsApi.then(SchematicsApi.limit(), result -> uploadLimit = result.ok() ? result.value() : null);
+    }
+
     private void reload() {
         int request = ++listRequest;
+        refreshLimit();
         listLoading = true;
         listError = null;
         SchematicsApi.then(SchematicsApi.list(mine, query, sort, page), result -> {
@@ -392,8 +404,21 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         tab(g, x, tr("schematics.unrealzaruba.tab.mine"), mine, () -> setTab(true));
 
         String upload = "+ " + tr("schematics.unrealzaruba.upload");
-        int uploadWidth = font.width(upper(upload)) + 16;
+        if (uploadLimit != null) {
+            upload += uploadLimit.limit() != null ? "  " + uploadLimit.count() + "/" + uploadLimit.limit() : "  " + uploadLimit.count();
+        }
+        int uploadWidth = buttonWidth(upload);
         button(g, width - 10 - uploadWidth, 5, uploadWidth, HEADER - 10, upload, Style.PRIMARY, true, this::openUpload);
+        // A guide on getting a vehicle from the world to this list
+        String guide = tr("schematics.unrealzaruba.guide.button");
+        int guideWidth = buttonWidth(guide);
+        int guideX = width - 10 - uploadWidth - 8 - guideWidth;
+        button(g, guideX, 5, guideWidth, HEADER - 10, guide, Style.NORMAL, true, () -> minecraft.setScreen(new SchematicGuideScreen(this)));
+        // On a server in a match: how much money the player has now
+        if (com.dod.unrealzaruba.UI.MoneyOverlay.INSTANCE.isVisible()) {
+            String wallet = Money.format(com.dod.unrealzaruba.UI.MoneyOverlay.INSTANCE.getBalance());
+            g.drawString(font, wallet, guideX - 12 - font.width(wallet), (HEADER - 8) / 2, ACCENT, false);
+        }
 
         int detailW = detailWidth();
         int right = width - detailW - 10;

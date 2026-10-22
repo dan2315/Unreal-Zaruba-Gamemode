@@ -56,6 +56,11 @@ public class ClientEvents {
         while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
             Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
         }
+        // Held beside an overturned vehicle: the server counts the ticks
+        if (KeyBindings.FLIP_VEHICLE.isDown() && Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null
+                && Minecraft.getInstance().player != null && !Minecraft.getInstance().player.isSpectator()) {
+            PacketDistributor.sendToServer(new com.dod.unrealzaruba.NetworkPackets.Vehicles.FlipVehiclePacket());
+        }
         while (KeyBindings.READY.consumeClick()) {
             if (Minecraft.getInstance().getConnection() != null && com.dod.unrealzaruba.UI.Lobby.LobbyClientState.active()) {
                 PacketDistributor.sendToServer(new com.dod.unrealzaruba.NetworkPackets.Lobby.ToggleReadyPacket());

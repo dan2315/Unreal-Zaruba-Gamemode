@@ -20,6 +20,8 @@ public final class ClientRespawnHandlers {
         RespawnClientState.setDead(dead, seconds);
         Minecraft mc = Minecraft.getInstance();
         if (dead) {
+            // While the camera flies over the body nothing opens; the map comes when the waiting is over
+            if (!RespawnClientState.isChoosing()) return;
             if (!WaypointManager.INSTANCE.openMapForRespawn()) {
                 List<CustomDeathScreen.RespawnUiElement> points = RespawnClientState.view().points().stream()
                         .map(point -> new CustomDeathScreen.RespawnUiElement(point.id(), point.name()))

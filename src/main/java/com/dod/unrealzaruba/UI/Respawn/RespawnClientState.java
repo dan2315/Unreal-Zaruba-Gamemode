@@ -6,6 +6,8 @@ import com.dod.unrealzaruba.Gamemodes.RespawnPoints.RespawnPointsView;
 public final class RespawnClientState {
     private static RespawnPointsView view = RespawnPointsView.EMPTY;
     private static boolean dead;
+    /** The waiting is over and a respawn point has to be chosen (while it is not, the camera flies over the body). */
+    private static boolean choosing;
     private static int secondsLeft;
     private static net.minecraft.core.BlockPos supplyDrop;
 
@@ -27,8 +29,13 @@ public final class RespawnClientState {
         return secondsLeft;
     }
 
+    public static boolean isChoosing() {
+        return dead && choosing;
+    }
+
     public static void setDead(boolean isDead, int seconds) {
         dead = isDead;
+        choosing = isDead && seconds <= 0;
         secondsLeft = seconds;
     }
 
@@ -59,6 +66,7 @@ public final class RespawnClientState {
         supplyDrop = null;
         view = RespawnPointsView.EMPTY;
         dead = false;
+        choosing = false;
         secondsLeft = 0;
     }
 }

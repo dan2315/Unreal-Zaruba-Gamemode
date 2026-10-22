@@ -20,17 +20,21 @@ public class RespawnOverlay implements ZarubaOverlay {
         if (!RespawnClientState.isDead() || Minecraft.getInstance().screen != null) return;
         Font font = com.dod.unrealzaruba.UI.UiFont.get();
 
-        String countdown = Component.translatable("hud.unrealzaruba.respawn.in", Math.max(0, RespawnClientState.secondsLeft())).getString().toUpperCase();
-        String point = Component.translatable("hud.unrealzaruba.respawn.point", describe(RespawnClientState.view().effective())).getString();
-        String hint = Component.translatable("hud.unrealzaruba.respawn.open_map").getString();
+        boolean choosing = RespawnClientState.isChoosing();
+        String countdown = choosing ? Component.translatable("hud.unrealzaruba.respawn.choose_now").getString().toUpperCase()
+                : Component.translatable("hud.unrealzaruba.respawn.in", Math.max(0, RespawnClientState.secondsLeft())).getString().toUpperCase();
+        // During the flyover there is only the countdown; once it is over the map has to be opened to pick a point
+        String point = choosing ? Component.translatable("hud.unrealzaruba.respawn.hint").getString() : "";
+        String hint = choosing ? Component.translatable("hud.unrealzaruba.respawn.open_map").getString() : "";
 
         int width = Math.max(font.width(countdown), Math.max(font.width(point), font.width(hint))) + 16;
-        int height = 3 * (font.lineHeight + 3) + 9;
+        int height = (choosing ? 3 : 1) * (font.lineHeight + 3) + 9;
         int x = (screenWidth - width) / 2;
         int y = screenHeight / 3;
         HudStyle.panel(g, x, y, width, height);
         int lineY = y + 6;
         g.drawCenteredString(font, countdown, screenWidth / 2, lineY, HudStyle.ACCENT);
+        if (!choosing) return;
         lineY += font.lineHeight + 3;
         g.drawCenteredString(font, point, screenWidth / 2, lineY, HudStyle.TEXT);
         lineY += font.lineHeight + 3;

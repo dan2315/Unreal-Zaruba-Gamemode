@@ -74,6 +74,7 @@ public class ServerEvents {
             com.dod.unrealzaruba.Vehicles.TrackedVehicles.tick(server);
             com.dod.unrealzaruba.TeamLogic.TeamRoster.tick(server);
             SideIncome.tick(server);
+            com.dod.unrealzaruba.Vehicles.VehicleFlip.tick(server);
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }
     }
@@ -113,11 +114,14 @@ public class ServerEvents {
         if (isDevMode)
             return;
 
-        player.getInventory().clearContent();
-        com.dod.unrealzaruba.TeamLogic.TeamRoster.syncTo(player);
         var activeGamemode = gamemodeManager.GetActiveGamemode();
+        // A player of a team who comes back into the running match keeps their inventory; everyone else starts empty
+        boolean rejoin = activeGamemode instanceof com.dod.unrealzaruba.Gamemodes.TeamGamemode teamGamemode && teamGamemode.isInTeam(player);
+        if (!rejoin) player.getInventory().clearContent();
+        com.dod.unrealzaruba.TeamLogic.TeamRoster.syncTo(player);
         if (activeGamemode != null) {
             activeGamemode.HandleConnectedPlayer(event.getEntity());
+            activeGamemode.ApplyLeavePenalty(player);
             Wallets.sync(player);
             RespawnPointsSync.sendTo(player);
             MapPacks.offer(player);
@@ -137,6 +141,8 @@ public class ServerEvents {
     public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             com.dod.unrealzaruba.Vehicles.SchematicSpawner.forget(player);
+            com.dod.unrealzaruba.Vehicles.VehicleFlip.forget(player.getUUID());
+            if (!isDevMode) gamemodeManager.ForGamemode(gamemode -> gamemode.HandleLeaveInMatch(player));
             gamemodeManager.ForGamemode(gamemode -> gamemode.forgetDead(player.getUUID()));
         }
     }

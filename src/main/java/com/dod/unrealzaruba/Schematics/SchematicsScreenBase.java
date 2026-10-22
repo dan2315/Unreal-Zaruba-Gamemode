@@ -127,6 +127,11 @@ abstract class SchematicsScreenBase extends Screen {
         return w;
     }
 
+    /** The width a button with this label needs: the label is drawn in bold capitals. */
+    protected int buttonWidth(String label) {
+        return font.width(Component.literal(upper(label)).withStyle(ChatFormatting.BOLD)) + 16;
+    }
+
     protected void button(GuiGraphics g, int x, int y, int w, int h, String label, Style style, boolean enabled, Runnable action) {
         int bg = !enabled ? BORDER : switch (style) {
             case PRIMARY -> ACCENT;

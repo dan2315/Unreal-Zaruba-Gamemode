@@ -48,7 +48,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 
 public abstract class BaseGamemode implements IPhaseHolder {
-    protected static final int RESPAWN_DURATION_SECONDS = 10;
+    protected static final int RESPAWN_DURATION_SECONDS = 5;
     protected ObjectivesHandler objectivesHandler;
     protected AbstractGamePhase currentPhase;
     // Smotri, kakuyu huinyu ya pridumal
@@ -213,6 +213,12 @@ public abstract class BaseGamemode implements IPhaseHolder {
         SoundHandler.playSoundToPlayer(player, ModSounds.RESPAWN2.get(), 1.0f, 1.0f);
     }
 
+    /** Where each dead player's body lies: the camera of the flyover rises over it. */
+    private final java.util.Map<java.util.UUID, net.minecraft.world.phys.Vec3> deathSpots = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Map<java.util.UUID, Float> deathYaws = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Dead players whose waiting is over: they return when they confirm a respawn point. */
+    private final java.util.Set<java.util.UUID> awaiting = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     /** Players who died for real and wait for their respawn. The death is vanilla, so the Corpse mod leaves a body with their items. */
     private final java.util.Set<java.util.UUID> dead = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
@@ -235,8 +241,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
             return;
         }
 
-        var killingEntity = event.getSource().getEntity();
-        ServerPlayer killerPlayer = killingEntity instanceof ServerPlayer k ? k : null;
+        ServerPlayer killerPlayer = resolveKiller(player, event.getSource());
         int reward = 0;
         if (killerPlayer != null) {
             reward = isEnemy(killerPlayer, player) ? EconomyData.current().killReward : 0;
@@ -258,6 +263,10 @@ public abstract class BaseGamemode implements IPhaseHolder {
 
         java.util.UUID id = player.getUUID();
         dead.add(id);
+        deathSpots.put(id, player.position());
+        deathYaws.put(id, player.getYRot());
+        // Every respawn is chosen again: the point from the last life does not carry over
+        if (PlayerContext.Get(id) instanceof TeamPlayerContext deadContext) deadContext.DeselectRespawnPoint();
         // Back at the base of the team in the game world, not at the world spawn of the lobby
         BlockPos spawn = DeathRespawnPosition(player);
         if (spawn != null) player.setRespawnPosition(WorldManager.GAME_DIMENSION, spawn, 0f, true, false);
@@ -288,9 +297,61 @@ public abstract class BaseGamemode implements IPhaseHolder {
         return true;
     }
 
+    /** Players who left in the middle of the battle: what they carried is lost, and they come back as after a death. */
+    private final java.util.Set<java.util.UUID> leftInBattle = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    /**
+     * A player leaves while alive in the battle: leaving counts as a death (their things stay on the ground, the death is counted), so
+     * a way out cannot be used to keep the inventory or to dodge a death.
+     */
+    public void HandleLeaveInMatch(ServerPlayer player) {
+        if (server == null || !server.isRunning() || !IsBattleActive() || !IsRealDeath(player)) return;
+        if (dead.contains(player.getUUID()) || player.isSpectator() || player.isDeadOrDying()) return;
+        player.getInventory().dropAll();
+        com.dod.unrealzaruba.Feed.MatchStats.onDeath(player, null);
+        leftInBattle.add(player.getUUID());
+    }
+
+    /** A player who left in the battle has come back: they return to the base with their class, as after a death. */
+    public void ApplyLeavePenalty(ServerPlayer player) {
+        if (!leftInBattle.remove(player.getUUID())) return;
+        player.setHealth(player.getMaxHealth());
+        HandleRespawn(player);
+    }
+
     /** A player left: they are no longer waiting for a respawn (the login brings them back to their base). */
     public void forgetDead(java.util.UUID id) {
         dead.remove(id);
+        awaiting.remove(id);
+        deathSpots.remove(id);
+        deathYaws.remove(id);
+    }
+
+    /**
+     * Who gets the kill. Normally the player who dealt the damage; for a shot from a vehicle or an explosion that does not name a player
+     * (a cannon shell, a blast) the owner of the projectile, then whoever last hurt the victim, and failing that the nearest enemy of the
+     * victim in reach of the weapon. Falls, the void and the like are nobody's kill.
+     */
+    private ServerPlayer resolveKiller(ServerPlayer victim, net.minecraft.world.damagesource.DamageSource source) {
+        if (source.getEntity() instanceof ServerPlayer k) return k;
+        for (net.minecraft.world.entity.Entity cause : new net.minecraft.world.entity.Entity[]{source.getEntity(), source.getDirectEntity()}) {
+            if (cause instanceof net.minecraft.world.entity.projectile.Projectile projectile && projectile.getOwner() instanceof ServerPlayer owner) return owner;
+        }
+        if (victim.getKillCredit() instanceof ServerPlayer credit && credit != victim) return credit;
+        boolean weapon = source.getEntity() != null || source.getDirectEntity() != null
+                || source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION) || source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE);
+        if (!weapon || server == null) return null;
+        ServerPlayer nearest = null;
+        double best = 100.0 * 100.0;
+        for (ServerPlayer other : server.getPlayerList().getPlayers()) {
+            if (other == victim || other.level() != victim.level() || other.isSpectator() || !isEnemy(other, victim)) continue;
+            double distance = other.distanceToSqr(victim);
+            if (distance < best) {
+                best = distance;
+                nearest = other;
+            }
+        }
+        return nearest;
     }
 
     // No money for suicides and team kills
@@ -309,15 +370,56 @@ public abstract class BaseGamemode implements IPhaseHolder {
         TimerManager.createRealTimeTimer(
             RESPAWN_DURATION_SECONDS * 1000,
             () -> {
-                dead.remove(id);
                 ServerPlayer player = server == null ? null : server.getPlayerList().getPlayer(id);
-                if (player != null) HandleRespawn(player);
+                if (player == null || !dead.contains(id)) return;
+                awaiting.add(id);
+                OnRespawnReady(player);
             },
             ticks -> updateRespawnTimer(id, ticks)
         );
     }
 
+    /**
+     * The waiting is over. By default the player returns at once; a team mode waits until the player has chosen where
+     * (see {@link #confirmRespawn}).
+     */
+    protected void OnRespawnReady(ServerPlayer player) {
+        confirmRespawn(player);
+    }
+
+    /** The player confirmed their respawn point: they come back. Nothing happens unless their waiting is over. */
+    public boolean confirmRespawn(ServerPlayer player) {
+        java.util.UUID id = player.getUUID();
+        if (!awaiting.remove(id)) return false;
+        dead.remove(id);
+        deathSpots.remove(id);
+        deathYaws.remove(id);
+        HandleRespawn(player);
+        return true;
+    }
+
+    /** Where the body of a dead player lies, or null. */
+    protected net.minecraft.world.phys.Vec3 deathSpotOf(java.util.UUID id) {
+        return deathSpots.get(id);
+    }
+
+    protected float deathYawOf(java.util.UUID id) {
+        return deathYaws.getOrDefault(id, 0f);
+    }
+
+    /** The camera of a dead player: a slow rise over the place of the body, turning a little. */
+    private void flyOverBody(ServerPlayer player, int ticks) {
+        net.minecraft.world.phys.Vec3 spot = deathSpots.get(player.getUUID());
+        if (spot == null || server == null) return;
+        net.minecraft.server.level.ServerLevel level = server.getLevel(WorldManager.GAME_DIMENSION);
+        if (level == null) return;
+        // Placed over the body once; the rise itself is drawn by the client (a teleport every tick would be jerky)
+        if (ticks == 0) player.teleportTo(level, spot.x, spot.y + 1.5, spot.z, deathYaws.getOrDefault(player.getUUID(), 0f), 70f);
+    }
+
     private void updateRespawnTimer(java.util.UUID id, int ticks) {
+        ServerPlayer flyer = server == null ? null : server.getPlayerList().getPlayer(id);
+        if (flyer != null && dead.contains(id)) flyOverBody(flyer, ticks);
         if (ticks % 20 != 0) {
             return;
         }

@@ -64,6 +64,11 @@ public class TeamGamemode extends BaseGamemode {
         PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(false, 0));
     }
     
+    /** Whether the player is in a team of this match (a player who comes back keeps what they carry). */
+    public boolean isInTeam(ServerPlayer player) {
+        return TeamManager != null && TeamManager.IsInTeam(player);
+    }
+
     /** Only players of a team die for real; the rest are healed (they are still choosing). */
     @Override
     protected boolean IsRealDeath(ServerPlayer player) {
@@ -93,11 +98,20 @@ public class TeamGamemode extends BaseGamemode {
     @Override
     public boolean HandleDeathRespawn(ServerPlayer player) {
         if (!super.HandleDeathRespawn(player)) return false;
-        // Waits on the base; the client opens the map to pick a respawn point
+        // The camera flies over the body for the waiting time (the base class moves it); the map opens when it is over
+        RespawnPointsSync.sendTo(player);
+        var spot = deathSpotOf(player.getUUID());
+        PacketDistributor.sendToPlayer(player, spot == null ? new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS)
+                : new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS, spot.x, spot.y, spot.z, deathYawOf(player.getUUID())));
+        return true;
+    }
+
+    /** The waiting is over: the player picks a respawn point on the map, and returns only when they confirm one. */
+    @Override
+    protected void OnRespawnReady(ServerPlayer player) {
         TeamManager.teleportToSpawnByPriority(player);
         RespawnPointsSync.sendTo(player);
-        PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, RESPAWN_DURATION_SECONDS));
-        return true;
+        PacketDistributor.sendToPlayer(player, new ClientboundDeathStatePacket(true, 0));
     }
 
     @Override

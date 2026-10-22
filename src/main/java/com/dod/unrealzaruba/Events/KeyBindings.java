@@ -54,6 +54,13 @@ public class KeyBindings {
             CATEGORY
     );
 
+    /** Held beside a vehicle that lies on its roof: after ten seconds it is lifted and turned onto its wheels. */
+    public static final KeyMapping FLIP_VEHICLE = new KeyMapping(
+            "key.unrealzaruba.flip_vehicle",
+            InputConstants.KEY_RBRACKET,
+            CATEGORY
+    );
+
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         event.register(OPEN_GAMEMODE_MENU);
@@ -61,5 +68,6 @@ public class KeyBindings {
         event.register(OPEN_TEAM_STORAGE);
         event.register(OPEN_SCHEMATICS);
         event.register(READY);
+        event.register(FLIP_VEHICLE);
     }
 }

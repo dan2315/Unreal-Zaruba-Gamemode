@@ -70,6 +70,13 @@ public final class SchematicsApi {
         return json(UFHttpClient.get(path.toString()), SchematicDto.Page.class);
     }
 
+    /** How many schematics the player has uploaded and how many they may have (limit is null when there is no limit). */
+    public record Limit(int count, Integer limit, Integer remaining) {}
+
+    public static CompletableFuture<Result<Limit>> limit() {
+        return json(UFHttpClient.get("/schematics/limit"), Limit.class);
+    }
+
     public static CompletableFuture<Result<SchematicDto>> get(long id) {
         return json(UFHttpClient.get("/schematics/" + id), SchematicDto.class);
     }

@@ -126,8 +126,11 @@ public final class PurchaseSessions {
         if (session.paid >= session.price) {
             finish(session, player, (ServerLevel) player.level(), block);
         } else {
+            // No window opens for the one who made the first contribution: the ghost and the label over the block show the purchase
             broadcast(session, player.serverLevel(), true, false);
-            PacketDistributor.sendToPlayer(player, new ClientboundOpenPurchaseSessionPacket(pos));
+            // The vehicle browser closes, the player is told what they paid
+            PacketDistributor.sendToPlayer(player, new ClientboundSchematicSpawnResultPacket(true,
+                    Component.translatable("schematics.unrealzaruba.purchase.started", name, Money.format(amount), Money.format(price))));
         }
         return null;
     }

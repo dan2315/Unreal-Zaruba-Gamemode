@@ -46,7 +46,7 @@ public class FeedOverlay implements ZarubaOverlay {
         String me = mc.player.getGameProfile().getName();
         long now = System.currentTimeMillis();
         // Under the money panel, which has its own height
-        int y = HudStyle.MARGIN + Math.round(font.lineHeight * 1.5f) - 1 + 8 + 6;
+        int y = com.dod.unrealzaruba.UI.MoneyOverlay.INSTANCE.bottom(font, screenWidth) + 6;
         int right = screenWidth - HudStyle.MARGIN;
 
         // The newest few that have not expired

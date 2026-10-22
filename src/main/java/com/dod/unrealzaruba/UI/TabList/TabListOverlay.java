@@ -90,10 +90,17 @@ public class TabListOverlay implements ZarubaOverlay {
         int panelX;
         int panelWidth;
         int bottom;
+        // The tips panel takes the right side; the list is centred on the screen when it fits left of it, and otherwise fits itself to the room left
+        int room_right = com.dod.unrealzaruba.UI.TipsOverlay.leftEdge(screenWidth, screenHeight) - 6;
         if (TeamRosterState.any()) {
             int colWidth = Math.max(130, Math.min(170, (screenWidth - 2 * HudStyle.MARGIN - GAP) / 2));
             panelWidth = 2 * colWidth + GAP;
             panelX = (screenWidth - panelWidth) / 2;
+            if (panelX + panelWidth > room_right) {
+                colWidth = Math.max(104, (room_right - HudStyle.MARGIN - GAP) / 2);
+                panelWidth = 2 * colWidth + GAP;
+                panelX = Math.max(HudStyle.MARGIN, HudStyle.MARGIN + (room_right - HudStyle.MARGIN - panelWidth) / 2);
+            }
             int rows = Math.min(room, Math.max(red.size(), blue.size()));
             int height = column(g, font, panelX, top, colWidth, "RED", Feed.colorOf(TeamColor.RED), red, rows);
             column(g, font, panelX + colWidth + GAP, top, colWidth, "BLUE", Feed.colorOf(TeamColor.BLUE), blue, rows);
@@ -105,8 +112,13 @@ public class TabListOverlay implements ZarubaOverlay {
         } else {
             panelWidth = Math.max(300, Math.min(340, screenWidth - 2 * HudStyle.MARGIN));
             panelX = (screenWidth - panelWidth) / 2;
-            int colWidth = Math.max(160, Math.min(220, screenWidth / 3));
-            bottom = top + column(g, font, (screenWidth - colWidth) / 2, top, colWidth, "PLAYERS", 0x8D97A3, rest, Math.min(rest.size(), room + 3));
+            if (panelX + panelWidth > room_right) {
+                panelWidth = Math.max(180, room_right - HudStyle.MARGIN);
+                panelX = HudStyle.MARGIN;
+            }
+            int colWidth = Math.max(160, Math.min(220, panelWidth));
+            colWidth = Math.min(colWidth, panelWidth);
+            bottom = top + column(g, font, panelX + (panelWidth - colWidth) / 2, top, colWidth, "PLAYERS", 0x8D97A3, rest, Math.min(rest.size(), room + 3));
         }
         serverLoad(g, font, panelX + panelWidth, top - 12);
         history(g, font, panelX, bottom + GAP, panelWidth, screenHeight, mc.player.getGameProfile().getName());

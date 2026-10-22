@@ -45,7 +45,6 @@ public class XaeroWaypoints {
     // Waypoint initials are drawn with the game font, which has these shapes: castle for bases, star for capture
     // points, house for respawn points
     private static final String ICON_CASTLE = "♜";
-    private static final String ICON_STAR = "★";
     private static final String ICON_HOUSE = "⌂";
 
     private record Wanted(String key, BlockPos pos, String name, String initials, WaypointColor color, Byte respawnId) {
@@ -59,6 +58,12 @@ public class XaeroWaypoints {
     private final Map<String, Tracked> tracked = new HashMap<>();
     private final Map<Waypoint, Byte> respawnByWaypoint = new IdentityHashMap<>();
     private Object trackedSession;
+
+    /** The letter of a capture point (A, B, ...), the same one the compass and the row of points show. */
+    private static String pointLetter(HudCapturePointObjective point) {
+        String letter = ObjectivesOverlay.INSTANCE.letterFor(point.GetRuntimeId());
+        return letter == null ? "?" : letter;
+    }
 
     /** Returns true when waypoints were added or removed. */
     public boolean sync() {
@@ -140,7 +145,7 @@ public class XaeroWaypoints {
         for (HudObjective objective : ObjectivesOverlay.INSTANCE.objectives()) {
             if (objective instanceof HudCapturePointObjective point) {
                 wanted.add(new Wanted("objective:" + point.GetRuntimeId(), point.GetPosition(), point.GetName(),
-                        point.isRespawnOnly() ? ICON_HOUSE : ICON_STAR, teamColor(point.getOwner()), null));
+                        point.isRespawnOnly() ? ICON_HOUSE : pointLetter(point), teamColor(point.getOwner()), null));
             } else if (objective instanceof HudDestroyObjective target) {
                 wanted.add(new Wanted("objective:" + target.GetRuntimeId(), target.GetPosition(), target.GetName(),
                         initial(target.GetName()), WaypointColor.BLUE, null));

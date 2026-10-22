@@ -4,6 +4,7 @@
   "package": "com.dod.unrealzaruba.mixin.simulated",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "PhysicsStaffClientLocksMixin",
     "PhysicsStaffLocksMixin"
   ],
   "injectors": {

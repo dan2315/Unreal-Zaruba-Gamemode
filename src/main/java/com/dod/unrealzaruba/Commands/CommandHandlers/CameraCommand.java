@@ -26,7 +26,7 @@ public class CameraCommand implements ICommandHandler {
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("camera")
-                .requires(cs -> cs.hasPermission(3))
+                .requires(cs -> cs.hasPermission(2)) // any operator
                 .then(Commands.literal("register")
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(context -> setCamera(context, true))))
