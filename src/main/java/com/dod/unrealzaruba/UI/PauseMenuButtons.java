@@ -28,20 +28,22 @@ public final class PauseMenuButtons {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
 
-        // The width and the left edge of the column of buttons, and where it begins and ends
-        int left = Integer.MAX_VALUE, right = Integer.MIN_VALUE, top = Integer.MAX_VALUE, bottom = Integer.MIN_VALUE;
+        // Right under "Back to game", as wide as it is; the buttons below it move down to make room
+        Button back = null;
         for (GuiEventListener listener : event.getListenersList()) {
-            if (!(listener instanceof Button button)) continue;
-            left = Math.min(left, button.getX());
-            right = Math.max(right, button.getX() + button.getWidth());
-            top = Math.min(top, button.getY());
-            bottom = Math.max(bottom, button.getY() + button.getHeight());
+            if (listener instanceof Button button && button.getMessage().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents key
+                    && key.getKey().equals("menu.returnToGame")) {
+                back = button;
+                break;
+            }
         }
-        if (left == Integer.MAX_VALUE) return;
-
-        // Above the first button when there is room under the title, otherwise under the last one
-        int y = top - HEIGHT - GAP >= 48 ? top - HEIGHT - GAP : bottom + GAP;
-        event.addListener(new GradientButton(left, y, right - left, HEIGHT, Component.translatable("menu.unrealzaruba.schematics").append(" [" + TipsOverlay.englishKeyName(com.dod.unrealzaruba.Events.KeyBindings.OPEN_SCHEMATICS) + "]"),
+        if (back == null) return;
+        int y = back.getY() + back.getHeight() + GAP;
+        for (GuiEventListener listener : event.getListenersList()) {
+            if (listener instanceof Button button && button != back && button.getY() >= y - GAP) button.setY(button.getY() + HEIGHT + GAP);
+        }
+        event.addListener(new GradientButton(back.getX(), y, back.getWidth(), HEIGHT,
+                Component.translatable("menu.unrealzaruba.schematics").append(" [" + TipsOverlay.englishKeyName(com.dod.unrealzaruba.Events.KeyBindings.OPEN_SCHEMATICS) + "]"),
                 b -> mc.setScreen(new SchematicsBrowserScreen())));
     }
 
