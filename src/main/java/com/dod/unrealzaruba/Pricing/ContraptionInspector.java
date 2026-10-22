@@ -24,14 +24,14 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * Backs the contraption scanner item. Using it on a Sable contraption scans its blocks (and what is stored inside them)
- * on the server, prices and checks the result with the backend rules ({@link RulesService}), and sends it to the
+ * Backs the contraption scanner item. Using it on a Sable contraption scans its blocks (and what is stored inside them), together with
+ * everything the Tool Gun would save with it (bearings, springs, pistons and other attached sub-levels), on the server, prices and checks the result with the backend rules ({@link RulesService}), and sends it to the
  * player, who keeps seeing it (also without holding the scanner) until they Shift-click with it. The same
- * contraption is scanned again every second while the player is near, so edits show up at once. Everything is computed on the server because clients do not know what is inside containers.
+ * contraption is scanned again every two seconds while the player is near, so edits show up at once. Everything is computed on the server because clients do not know what is inside containers.
  */
 @EventBusSubscriber(modid = UnrealZaruba.MOD_ID)
 public final class ContraptionInspector {
-    private static final int REFRESH_TICKS = 20;
+    private static final int REFRESH_TICKS = 40;
     /** Farther than this the contraption is not rescanned (it may not even be loaded); the last report stays on screen. */
     private static final double RESCAN_DISTANCE = 160;
     /** A scan walks every position of the contraption box; refuse absurd boxes instead of stalling the server. */
@@ -102,8 +102,12 @@ public final class ContraptionInspector {
                     List.of("Конструкция слишком велика для сканирования"), false, false);
         }
 
-        Composition composition = CompositionScanner.scanLive(level,
-                new BlockPos(box.minX(), box.minY(), box.minZ()), new BlockPos(box.maxX(), box.maxY(), box.maxZ()));
+        Composition composition = captured(level, subLevel, name);
+        if (composition == null) {
+            // The Tool Gun is not there to ask: this one sub-level only
+            composition = CompositionScanner.scanLive(level,
+                    new BlockPos(box.minX(), box.minY(), box.minZ()), new BlockPos(box.maxX(), box.maxY(), box.maxZ()));
+        }
         if (rules == null) {
             return new ContraptionReport(name, composition.size, null, 0, 0, 0, 0, List.of(), 0, List.of(), false, true);
         }
@@ -118,6 +122,28 @@ public final class ContraptionInspector {
         return new ContraptionReport(name, composition.size, rules.maxSize(), price.total().doubleValue(),
                 price.blocks().doubleValue(), price.items().doubleValue(), price.fluids().doubleValue(), lines,
                 price.unpriced().size(), check.problems(), check.isAllowed(), false);
+    }
+
+    /**
+     * What the Tool Gun would save for this contraption: the blueprint is captured the way its Save does it (the sub-levels joined by
+     * bearings, springs, constraints and pistons come along, with the same reach for a neighbour) and read by the code that reads uploaded
+     * files, so the price, the checks and the size are those of the file. Null when the Tool Gun cannot be asked.
+     */
+    private static Composition captured(ServerLevel level, SubLevel subLevel, String name) {
+        if (!(subLevel instanceof ServerSubLevel root)) return null;
+        try {
+            var archive = com.enxv.aeronauticsstructuretool.blueprint.capture.NativeBlueprintCaptureService.captureById(level, root.getUniqueId(),
+                    name.isBlank() ? "scan" : name,
+                    com.enxv.aeronauticsstructuretool.blueprint.capture.NativeBlueprintCaptureService.DEFAULT_CONNECTED_SUBLEVEL_PROXIMITY_BLOCKS);
+            byte[] data = archive.fileContents();
+            Composition composition = BlueprintScanner.scan(data);
+            var info = com.dod.unrealzaruba.Vehicles.Blueprints.read(name, data, level);
+            if (info != null) composition.size = new int[]{info.width(), info.height(), info.depth()};
+            return composition;
+        } catch (java.io.IOException | RuntimeException | LinkageError e) {
+            UnrealZaruba.LOGGER.debug("[Scanner] capture through the Tool Gun failed, scanning the sub-level alone: {}", e.toString());
+            return null;
+        }
     }
 
     private static int kindCode(String kind) {
