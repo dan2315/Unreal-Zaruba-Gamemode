@@ -65,10 +65,15 @@ public class SchematicGuideScreen extends SchematicsScreenBase {
         // The Tool Gun is for a single-player world only, where blueprints are made; on a server it is not given out
         boolean singleplayer = minecraft.getSingleplayerServer() != null;
         button(g, x, y, half, 20, tr("schematics.unrealzaruba.guide.get_toolgun"), Style.PRIMARY, singleplayer, () -> {
-            PacketDistributor.sendToServer(new GiveToolGunPacket());
+            PacketDistributor.sendToServer(new GiveToolGunPacket(GiveToolGunPacket.TOOL_GUN));
             showStatus(Component.translatable("schematics.unrealzaruba.guide.toolgun_asked"), false);
         });
-        button(g, x + half + 6, y, w - half - 6, 20, tr("schematics.unrealzaruba.guide.open_upload"), Style.NORMAL, true,
+        button(g, x + half + 6, y, w - half - 6, 20, tr("schematics.unrealzaruba.guide.get_scanner"), Style.PRIMARY, singleplayer, () -> {
+            PacketDistributor.sendToServer(new GiveToolGunPacket(GiveToolGunPacket.SCANNER));
+            showStatus(Component.translatable("schematics.unrealzaruba.guide.toolgun_asked"), false);
+        });
+        y += 24;
+        button(g, x, y, w, 20, tr("schematics.unrealzaruba.guide.open_upload"), Style.NORMAL, true,
                 () -> minecraft.setScreen(new SchematicEditScreen(parent, null)));
         if (!singleplayer) {
             g.drawCenteredString(font, Component.translatable("schematics.unrealzaruba.guide.singleplayer_only"), width / 2, y + 26, MUTED);
