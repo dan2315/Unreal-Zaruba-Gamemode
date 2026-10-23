@@ -293,6 +293,8 @@ public abstract class BaseGamemode implements IPhaseHolder {
         player.setInvulnerable(true);
         player.getInventory().clearContent();
         NBT.addEntityTag(player, "isPlayerDead", 1);
+        // The respawned player stands wherever vanilla put them (the overworld spawn): over the body at once, not when the timer first ticks
+        flyOverBody(player, 0);
         startRespawnTimer(player.getUUID());
         return true;
     }
