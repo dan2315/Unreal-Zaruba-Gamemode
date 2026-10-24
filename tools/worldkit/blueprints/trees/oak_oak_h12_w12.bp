@@ -1,0 +1,188 @@
+# worldkit blueprint v1
+name oak_oak_h12_w12
+size 8 13 12
+ground 0
+source -1024 32 -340
+tags tree nature
+palette
+0 minecraft:oak_leaves[distance=2,persistent=true,waterlogged=false]
+1 minecraft:birch_leaves[distance=3,persistent=true,waterlogged=false]
+2 minecraft:birch_leaves[distance=1,persistent=true,waterlogged=false]
+3 minecraft:oak_leaves[distance=1,persistent=true,waterlogged=false]
+4 minecraft:oak_wood[axis=y]
+5 minecraft:oak_leaves[distance=3,persistent=true,waterlogged=false]
+6 minecraft:birch_leaves[distance=2,persistent=true,waterlogged=false]
+7 minecraft:birch_leaves[distance=5,persistent=true,waterlogged=false]
+8 minecraft:oak_leaves[distance=5,persistent=true,waterlogged=false]
+9 minecraft:oak_leaves[distance=4,persistent=true,waterlogged=false]
+10 minecraft:birch_leaves[distance=6,persistent=true,waterlogged=false]
+11 minecraft:birch_leaves[distance=4,persistent=true,waterlogged=false]
+layer 0
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 1
+. . . . . . . .
+. . . . . . . .
+. 4 . . . . . .
+4 4 4 . . . . .
+4 4 4 4 . . . .
+4 4 4 4 . . . .
+4 4 4 . . . . .
+4 4 4 4 . . . .
+4 4 . . . . . .
+4 . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 2
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. 4 . . . . . .
+4 4 4 . . . . .
+4 4 4 . . . . .
+4 4 4 . . . . .
+4 4 4 . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 3
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. 4 4 . . . . .
+4 4 . . . . . .
+4 4 4 . . . . .
+. 4 . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 4
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+4 4 . . . . . .
+4 4 . . . . . .
+4 . . . . . . .
+4 . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 5
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+4 4 . . . . . .
+4 . . . . . . .
+4 . . . . . . .
+4 4 . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 6
+. . . . . . . .
+. . . . . . . .
+. . . 6 . . . .
+0 2 3 2 . . . .
+3 4 4 . . . . .
+4 4 4 . . . . .
+4 . . . . . . .
+4 4 . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 7
+. . . . . . . .
+. . . . . . . .
+. 6 2 2 3 . . .
+0 3 4 4 2 . . .
+6 3 4 2 . . . .
+2 2 2 . . . . .
+3 . . . . . . .
+3 4 . . . . . .
+2 4 4 . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 8
+. . . . . . . .
+. . . 2 3 . . .
+9 . 3 4 4 3 . .
+5 0 2 4 4 2 . .
+5 0 2 3 2 . . .
+0 0 0 0 6 . . .
+0 0 0 0 . . . .
+0 2 2 2 . . . .
+0 2 4 4 3 . . .
+. 3 4 4 2 0 . .
+. . 2 2 3 . . .
+. . 6 0 6 . . .
+layer 9
+. . . . . . . .
+. . . 3 3 3 . .
+. . 3 4 4 3 . .
+11 5 0 3 4 3 . .
+9 5 6 6 2 . . .
+5 1 5 5 0 . . .
+1 5 1 6 . . . .
+5 6 0 2 . . . .
+5 6 3 4 2 . . .
+. . 3 4 4 3 . .
+. . 2 4 4 3 . .
+. . 0 2 3 . . .
+layer 10
+. . . . 2 3 . .
+. . . 2 4 4 2 .
+. . . 3 4 4 3 .
+. 9 . . 3 3 . .
+7 11 5 . 6 . . .
+9 9 9 . . . . .
+9 11 11 . . . . .
+11 1 . . . . . .
+. 5 . 2 3 . . .
+. . 0 2 4 2 . .
+. . 2 4 4 2 . .
+. . 6 3 2 . . .
+layer 11
+. . . . . 2 . .
+. . . . 3 4 2 .
+. . . . 2 2 . .
+. . . . . . . .
+. 8 . . . . . .
+8 8 . . . . . .
+. 7 . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . 2 . . .
+. . . 2 3 . . .
+. . 1 . . . . .
+layer 12
+. . . . . . . .
+. . . . . 3 . .
+. . . . . . . 10
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . 9 . . . . .

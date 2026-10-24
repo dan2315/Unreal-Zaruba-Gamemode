@@ -38,8 +38,22 @@ public class Canvas {
         draw(x, y, z, x, y, z, block, PLACE);
     }
 
+    /** When set, ground() reads the world: cells holding a natural surface block the mod's ground rule does not cover
+     *  (this map paints grass with terracotta and concrete powder, shores are stone) become swaps of exactly that block. */
+    public Region region;
+    static final Set<String> SURFACE = new HashSet<>(Arrays.asList("lime_terracotta", "green_concrete_powder", "diorite", "granite",
+            "andesite", "stone", "tuff", "calcite", "moss_block", "cobblestone", "mossy_cobblestone", "clay", "dripstone_block"));
+
     public void ground(int x0, int y0, int z0, int x1, int y1, int z1, String block) {
-        draw(x0, y0, z0, x1, y1, z1, block, GROUND);
+        if (region == null) { draw(x0, y0, z0, x1, y1, z1, block, GROUND); return; }
+        for (int x = Math.min(x0, x1); x <= Math.max(x0, x1); x++)
+            for (int y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
+                for (int z = Math.min(z0, z1); z <= Math.max(z0, z1); z++) {
+                    String s;
+                    try { s = Region.name(region.state(cx + x, y, cz + z)); } catch (java.io.IOException e) { throw new java.io.UncheckedIOException(e); }
+                    if (SURFACE.contains(s.replace("minecraft:", "")) && !s.equals(Region.name(id(block)))) swap(x, y, z, s, block);
+                    else draw(x, y, z, x, y, z, block, GROUND);
+                }
     }
 
     /** Replace exactly the block "from" (read from the region files) at one spot; anything else there is left. */

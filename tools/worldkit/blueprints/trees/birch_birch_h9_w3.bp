@@ -1,0 +1,68 @@
+# worldkit blueprint v1
+name birch_birch_h9_w3
+size 5 11 4
+ground 0
+source 394 32 17
+tags tree nature
+palette
+0 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:birch_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+2 minecraft:birch_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+3 minecraft:birch_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+4 minecraft:birch_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+5 minecraft:birch_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+layer 0
+. . . . .
+. . . . .
+. . . . .
+. . . . .
+layer 1
+. . . . .
+. . 1 . .
+. . . . .
+. . . . .
+layer 2
+. . . . .
+. . 1 . .
+. . . . .
+. . . . .
+layer 3
+. . . . .
+. . 2 . .
+. . 5 0 .
+. . . . .
+layer 4
+. . . . .
+. . 1 . .
+. . 0 . .
+. . . . .
+layer 5
+. . . 0 .
+. . 3 4 .
+. . . . .
+. . . . .
+layer 6
+. . . . .
+. 0 1 0 .
+. . 0 . .
+. . . . .
+layer 7
+. 0 0 . .
+0 0 1 0 0
+. 0 0 0 .
+. . 0 . .
+layer 8
+0 0 0 0 .
+. 0 0 0 .
+0 0 0 0 .
+. . . . .
+layer 9
+. . 0 . .
+. 0 0 0 .
+. 0 0 . .
+. 0 . . .
+layer 10
+. . . . .
+. . 0 . .
+. . 0 . .
+. . . . .

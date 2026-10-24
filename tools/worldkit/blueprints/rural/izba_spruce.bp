@@ -1,0 +1,691 @@
+# worldkit blueprint v1
+name izba_spruce
+size 13 29 20
+ground 9
+source 475 30 333
+tags house rural izba spruce
+palette
+0 minecraft:dirt_path
+1 minecraft:spruce_stairs[facing=east,half=bottom,shape=straight,waterlogged=false]
+2 minecraft:stripped_spruce_wood[axis=y]
+3 minecraft:spruce_stairs[facing=west,half=bottom,shape=straight,waterlogged=false]
+4 minecraft:spruce_planks
+5 minecraft:flowering_azalea
+6 minecraft:spruce_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]
+7 minecraft:stripped_spruce_wood[axis=z]
+8 create:copycat_step[facing=south,half=bottom,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+9 minecraft:spruce_log[axis=y]
+10 minecraft:spruce_log[axis=x]
+11 create:copycat_step[facing=east,half=bottom,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+12 minecraft:spruce_log[axis=z]
+13 create:copycat_step[facing=west,half=bottom,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+14 minecraft:stripped_spruce_wood[axis=x]
+15 minecraft:spruce_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]
+16 create:copycat_step[facing=north,half=bottom,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+17 minecraft:oak_log[axis=x]
+18 minecraft:dark_oak_log[axis=z]
+19 create:copycat_step[facing=south,half=top,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+20 minecraft:dark_oak_log[axis=x]
+21 minecraft:spruce_door[facing=south,half=lower,hinge=right,open=false,powered=false]
+22 minecraft:crafting_table
+23 minecraft:barrel[facing=south,open=false]{Items:[],id:"minecraft:barrel"}
+24 minecraft:composter[level=0]
+25 create:copycat_step[facing=east,half=top,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+26 create:copycat_step[facing=west,half=top,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+27 minecraft:barrel[facing=up,open=false]{Items:[],id:"minecraft:barrel"}
+28 minecraft:barrel[facing=north,open=false]{Items:[],id:"minecraft:barrel"}
+29 minecraft:ladder[facing=north,waterlogged=false]
+30 minecraft:spruce_door[facing=south,half=lower,hinge=left,open=false,powered=false]
+31 create:white_seat[waterlogged=false]
+32 minecraft:red_bed[facing=north,occupied=false,part=head]{id:"minecraft:bed"}
+33 minecraft:oak_stairs[facing=south,half=top,shape=straight,waterlogged=false]
+34 minecraft:furnace[facing=north,lit=false]{CookTime:0,BurnTime:0,Items:[],id:"minecraft:furnace",CookTimeTotal:0,RecipesUsed:{}}
+35 minecraft:red_bed[facing=north,occupied=false,part=foot]{id:"minecraft:bed"}
+36 minecraft:oak_stairs[facing=north,half=top,shape=straight,waterlogged=false]
+37 minecraft:calcite
+38 minecraft:spruce_door[facing=north,half=lower,hinge=left,open=false,powered=false]
+39 minecraft:red_bed[facing=east,occupied=false,part=foot]{id:"minecraft:bed"}
+40 minecraft:red_bed[facing=east,occupied=false,part=head]{id:"minecraft:bed"}
+41 create:copycat_step[facing=north,half=top,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_planks"},EnableCT:1b,Material:{Name:"minecraft:spruce_planks"},id:"create:copycat"}
+42 copycats:copycat_layer[facing=north,layers=7,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_log"},EnableCT:1b,Material:{Properties:{axis:"z"},Name:"minecraft:spruce_log"},id:"copycats:copycat"}
+43 copycats:copycat_beam[axis=y,waterlogged=false]{Item:{count:1,id:"minecraft:stripped_spruce_wood"},EnableCT:1b,Material:{Properties:{axis:"z"},Name:"minecraft:stripped_spruce_wood"},id:"copycats:copycat"}
+44 minecraft:spruce_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+45 copycats:copycat_layer[facing=west,layers=7,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_log"},EnableCT:1b,Material:{Properties:{axis:"x"},Name:"minecraft:spruce_log"},id:"copycats:copycat"}
+46 minecraft:spruce_door[facing=south,half=upper,hinge=right,open=false,powered=false]
+47 create:spruce_window_pane[east=true,north=false,south=false,waterlogged=false,west=true]
+48 copycats:copycat_layer[facing=east,layers=7,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_log"},EnableCT:1b,Material:{Properties:{axis:"x"},Name:"minecraft:spruce_log"},id:"copycats:copycat"}
+49 minecraft:spruce_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+50 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+51 create:spruce_window_pane[east=false,north=true,south=true,waterlogged=false,west=false]
+52 minecraft:spruce_door[facing=south,half=upper,hinge=left,open=false,powered=false]
+53 minecraft:polished_diorite
+54 minecraft:spruce_door[facing=north,half=upper,hinge=left,open=false,powered=false]
+55 copycats:copycat_layer[facing=south,layers=7,waterlogged=false]{Item:{count:1,id:"minecraft:spruce_log"},EnableCT:1b,Material:{Properties:{axis:"z"},Name:"minecraft:spruce_log"},id:"copycats:copycat"}
+56 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+57 minecraft:spruce_fence[east=true,north=false,south=true,waterlogged=false,west=false]
+58 minecraft:spruce_fence[east=true,north=true,south=false,waterlogged=false,west=false]
+59 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=true]
+60 minecraft:spruce_fence[east=false,north=false,south=true,waterlogged=false,west=true]
+61 minecraft:spruce_slab[type=bottom,waterlogged=false]
+62 minecraft:spruce_slab[type=top,waterlogged=false]
+63 minecraft:spruce_slab[type=double,waterlogged=false]
+64 minecraft:spruce_stairs[facing=west,half=top,shape=straight,waterlogged=false]
+65 minecraft:spruce_stairs[facing=east,half=top,shape=straight,waterlogged=false]
+66 minecraft:cobblestone
+67 minecraft:barrel[facing=east,open=false]{Items:[],id:"minecraft:barrel"}
+68 minecraft:barrel[facing=west,open=false]{Items:[],id:"minecraft:barrel"}
+69 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=false,top_northwest=true,top_southeast=false,top_southwest=false,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"minecraft:spruce_planks"},enableCT:1b,consumedItem:{count:1,id:"minecraft:spruce_planks"}},top_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+70 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=true,top_northwest=false,top_southeast=false,top_southwest=false,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"minecraft:spruce_planks"},enableCT:1b,consumedItem:{count:1,id:"minecraft:spruce_planks"}},top_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+71 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=false,top_northwest=false,top_southeast=false,top_southwest=true,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southwest:{material:{Name:"minecraft:spruce_planks"},enableCT:1b,consumedItem:{count:1,id:"minecraft:spruce_planks"}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+72 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=false,top_northwest=false,top_southeast=true,top_southwest=false,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southeast:{material:{Name:"minecraft:spruce_planks"},enableCT:1b,consumedItem:{count:1,id:"minecraft:spruce_planks"}}},id:"copycats:multistate_copycat"}
+73 copycats:copycat_beam[axis=y,waterlogged=false]{Item:{count:1,id:"minecraft:cobblestone"},EnableCT:1b,Material:{Name:"minecraft:cobblestone"},id:"copycats:copycat"}
+74 copycats:copycat_stone_pressure_plate[powered=false]{Item:{count:1,id:"minecraft:cobblestone"},EnableCT:1b,Material:{Name:"minecraft:cobblestone"},id:"copycats:copycat"}
+layer 0
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 1
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 2
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 3
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 4
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 5
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 6
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 7
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 8
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 9
+. . . . . . 0 0 0 . . . 0
+. . . . . . 0 0 0 . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 10
+. . . 1 2 3 . . . . . . .
+. . . 1 4 3 . . . . . . .
+5 . 6 7 7 7 8 8 8 8 6 . .
+. 1 9 10 2 10 10 10 10 10 9 3 .
+. 11 12 2 4 4 4 4 4 4 12 13 .
+. 11 12 4 14 4 4 4 2 4 12 13 .
+. 11 12 4 4 2 4 4 4 4 12 13 .
+. 1 9 4 4 4 4 4 4 4 9 3 .
+. 11 12 4 4 4 4 4 4 4 12 13 .
+. 11 12 4 7 4 4 4 4 4 12 13 .
+. 11 12 2 4 2 4 4 4 14 12 13 .
+. 11 12 4 4 4 4 4 7 4 12 13 .
+. 11 12 4 4 4 4 4 4 4 12 13 .
+. 11 12 14 4 4 14 4 4 4 12 13 .
+. 11 12 4 14 4 4 14 4 4 12 13 .
+. 1 9 10 10 10 10 10 10 10 9 3 .
+. . 15 16 16 16 16 16 16 16 15 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+17 17 17 9 17 17 17 17 9 17 17 17 17
+layer 11
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . 18 7 . 7 . 19 19 . 18 . .
+. 20 9 20 21 20 20 20 20 20 9 20 .
+. . 18 . . 22 23 23 24 24 18 . .
+. 25 18 . . . . . . . 18 26 .
+. . 18 27 28 . 27 27 29 27 18 . .
+. 20 9 4 4 30 4 4 4 4 9 20 .
+. . 18 31 . . . 4 22 32 18 . .
+. 25 18 33 . . 34 4 . 35 18 26 .
+. 25 18 36 31 . . 4 . . 18 26 .
+. . 18 2 2 30 37 4 38 2 18 . .
+. 25 18 . . . . . . . 18 26 .
+. 25 18 . . . . . . 22 18 26 .
+. . 18 . . . . . 39 40 18 . .
+. 20 9 20 20 20 20 20 20 20 9 20 .
+. . 18 . 41 41 . 41 41 . 18 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . 9 . . . . 9 . . . .
+layer 12
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . 42 43 . 43 44 . . 44 42 . .
+. 45 9 10 46 10 10 47 47 10 9 48 .
+. 49 12 . . . . . . . 12 50 .
+. . 51 . . . . . . . 51 . .
+. 49 12 28 . . . 28 29 27 12 50 .
+. 45 9 4 2 52 14 4 4 4 9 48 .
+. 49 12 . . . . 4 . . 12 50 .
+. . 51 . . . 53 4 . . 51 . .
+. . 51 . . . 37 4 . . 51 . .
+. 49 12 14 4 52 53 4 54 14 12 50 .
+. . 51 . . . . . . . 51 . .
+. . 51 . . . . . . . 51 . .
+. 49 12 . . . . . . . 12 50 .
+. 45 9 10 47 47 10 47 47 10 9 48 .
+. . 55 56 . . 56 . . 56 55 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . 9 . . . . 9 . . . .
+layer 13
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . 18 43 . 43 44 . . 57 18 . .
+. 20 9 20 20 20 20 47 47 20 9 20 .
+. 58 18 . . . . . . . 18 59 .
+. . 51 . . . . . . . 51 . .
+. 57 18 . . . . . 29 . 18 60 .
+. 20 9 14 4 14 4 4 14 2 9 20 .
+. 58 18 . . . . 4 . . 18 59 .
+. . 51 . . . . 2 . . 51 . .
+. . 51 . . . . 4 . . 51 . .
+. 49 18 4 4 4 53 4 4 4 18 50 .
+. . 51 . . . . . . . 51 . .
+. . 51 . . . . . . . 51 . .
+. 57 18 . . . . . . . 18 60 .
+. 20 9 20 47 47 20 47 47 20 9 20 .
+. . 18 59 . . 56 . . 58 18 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 14
+. . . 61 61 61 . . . . . . .
+. . . 62 62 62 . . . . . . .
+. . 42 63 62 63 61 62 62 61 42 . .
+. 45 9 10 10 10 10 10 10 10 9 48 .
+. 61 12 . . . . . . . 12 61 .
+. 62 12 . . . . . . . 12 62 .
+. 61 12 . . . . . 29 . 12 61 .
+. 45 9 14 4 4 4 2 4 4 9 48 .
+. 61 12 . . . . 4 . . 12 61 .
+. 62 12 . . . . 4 . . 12 62 .
+. 62 12 . . . . 2 . . 12 62 .
+. 61 12 4 2 2 37 4 2 2 12 61 .
+. 62 12 . . . . . . . 12 62 .
+. 62 12 . . . . . . . 12 62 .
+. 61 12 . . . . . . . 12 61 .
+. 45 9 10 10 10 10 10 10 10 9 48 .
+. . 55 61 62 62 61 62 62 61 55 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 15
+. . . . . . . . . . . . .
+. 1 64 . . . . . . . 65 3 .
+. 1 18 . . . . . . . 18 3 .
+. 1 18 20 20 20 20 20 20 20 18 3 .
+. 1 18 4 4 14 4 4 14 4 18 3 .
+. 1 18 4 4 4 4 4 14 4 18 3 .
+. 1 18 4 4 4 4 4 29 4 18 3 .
+. 1 18 4 4 4 4 2 4 4 18 3 .
+. 1 18 4 4 4 14 4 4 4 18 3 .
+. 1 18 4 14 4 4 4 4 4 18 3 .
+. 1 18 4 7 4 4 4 4 4 18 3 .
+. 1 18 4 4 4 66 4 4 4 18 3 .
+. 1 18 4 14 4 4 2 4 4 18 3 .
+. 1 18 4 4 4 4 4 4 4 18 3 .
+. 1 18 4 4 4 4 14 4 4 18 3 .
+. 1 18 20 20 20 20 20 20 20 18 3 .
+. 1 18 . . . . . . . 18 3 .
+. 1 64 . . . . . . . 65 3 .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 16
+. . . . . . . . . . . . .
+. . 1 64 . . . . . 65 3 . .
+. . 1 64 . . 19 . . 65 3 . .
+. . 1 10 10 10 10 10 10 10 3 . .
+. . 1 64 67 . . . . 65 3 . .
+. . 1 64 67 . 67 . . 65 3 . .
+. . 1 64 . 67 23 . . 65 3 . .
+. . 1 64 . 67 . . . 65 3 . .
+. . 1 64 . . . . . 65 3 . .
+. . 1 64 . . 27 27 . 65 3 . .
+. . 1 64 . 27 27 . . 65 3 . .
+. . 1 64 . . 66 . 68 65 3 . .
+. . 1 64 . . . . 68 65 3 . .
+. . 1 64 . 27 28 . . 65 3 . .
+. . 1 64 . . . . 68 65 3 . .
+. . 1 10 10 10 10 10 10 10 3 . .
+. . 1 64 . . 41 . . 65 3 . .
+. . 1 64 . . . . . 65 3 . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 17
+. . . . . . . . . . . . .
+. . . 1 64 . . . 65 3 . . .
+. . . 1 64 69 . 70 65 3 . . .
+. . . 1 20 20 47 20 20 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . 67 67 . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . 67 23 . . 3 . . .
+. . . 1 . . 66 . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 . 28 28 . . 3 . . .
+. . . 1 . . . . . 3 . . .
+. . . 1 20 20 47 20 20 3 . . .
+. . . 1 64 71 . 72 65 3 . . .
+. . . 1 64 . . . 65 3 . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 18
+. . . . . . . . . . . . .
+. . . . 1 64 . 65 3 . . . .
+. . . . 1 64 8 65 3 . . . .
+. . . . 1 10 10 10 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 62 66 . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 . . . 3 . . . .
+. . . . 1 10 10 10 3 . . . .
+. . . . 1 64 16 65 3 . . . .
+. . . . 1 64 . 65 3 . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 19
+. . . . . . . . . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 63 3 . . . . .
+. . . . . 1 20 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 66 66 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . 1 20 3 . . . . .
+. . . . . 1 63 3 . . . . .
+. . . . . 1 62 3 . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 20
+. . . . . . 15 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . 66 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . 61 . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 21
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . 66 . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 22
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . 66 . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 23
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . 66 . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 24
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . 73 . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 25
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . 74 . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 26
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 27
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+layer 28
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .
+. . . . . . . . . . . . .

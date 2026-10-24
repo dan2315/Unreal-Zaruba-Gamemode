@@ -1,0 +1,149 @@
+# worldkit blueprint v1
+name copycat_wall_dark_oak_h9_w9
+size 10 11 9
+ground 0
+source 180 42 -80
+tags tree nature
+palette
+0 minecraft:dark_oak_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:dark_oak_leaves[distance=6,persistent=true,waterlogged=false]
+2 minecraft:acacia_leaves[distance=3,persistent=true,waterlogged=false]
+3 minecraft:acacia_leaves[distance=7,persistent=true,waterlogged=false]
+4 copycats:copycat_wall[east=none,north=low,south=none,up=true,waterlogged=false,west=none]
+5 minecraft:oak_log[axis=y]
+6 copycats:copycat_wall[east=tall,north=none,south=none,up=true,waterlogged=false,west=tall]
+7 copycats:copycat_wall[east=none,north=tall,south=tall,up=true,waterlogged=false,west=tall]
+8 copycats:copycat_wall[east=tall,north=none,south=none,up=false,waterlogged=false,west=tall]
+9 copycats:copycat_wall[east=tall,north=tall,south=tall,up=true,waterlogged=false,west=none]
+10 copycats:copycat_wall[east=tall,north=tall,south=tall,up=false,waterlogged=false,west=tall]
+11 minecraft:dark_oak_leaves[distance=4,persistent=true,waterlogged=false]
+12 minecraft:dark_oak_leaves[distance=3,persistent=true,waterlogged=false]
+13 minecraft:dark_oak_leaves[distance=2,persistent=true,waterlogged=false]
+14 copycats:copycat_wall[east=none,north=none,south=tall,up=true,waterlogged=false,west=tall]
+15 minecraft:dark_oak_leaves[distance=1,persistent=true,waterlogged=false]
+16 minecraft:acacia_leaves[distance=4,persistent=true,waterlogged=false]
+17 minecraft:dark_oak_leaves[distance=5,persistent=true,waterlogged=false]
+18 minecraft:acacia_leaves[distance=6,persistent=true,waterlogged=false]
+19 minecraft:spruce_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+20 minecraft:acacia_leaves[distance=2,persistent=true,waterlogged=false]
+21 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=true]
+22 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+23 minecraft:spruce_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+24 copycats:copycat_wall[east=tall,north=none,south=tall,up=true,waterlogged=false,west=none]
+25 copycats:copycat_wall[east=tall,north=none,south=low,up=true,waterlogged=false,west=none]
+26 copycats:copycat_wall[east=low,north=tall,south=tall,up=true,waterlogged=false,west=tall]
+27 minecraft:spruce_fence[east=true,north=true,south=true,waterlogged=false,west=false]
+28 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+29 copycats:copycat_wall[east=tall,north=tall,south=none,up=true,waterlogged=false,west=tall]
+30 minecraft:spruce_fence[east=true,north=false,south=true,waterlogged=false,west=false]
+31 minecraft:spruce_fence[east=false,north=true,south=true,waterlogged=false,west=false]
+layer 0
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+layer 1
+. . . . 11 . . . . .
+. . . 11 2 16 . . . .
+. 17 11 12 20 2 11 19 18 0
+3 . . . 15 20 . 21 17 .
+3 . 10 8 5 . 4 2 . .
+0 0 . 13 15 13 12 11 . .
+. . 16 12 13 . 11 . . .
+. . . 11 12 . 17 . . .
+. . . . . . . . . .
+layer 2
+. . . . . 1 0 . . .
+. . . . 11 17 . 0 . .
+. 18 . 30 . 11 17 1 0 .
+. 0 0 31 9 . 1 0 . .
+0 0 . . 5 . 24 . 0 .
+. . 3 27 21 . . 21 . .
+. . . 28 12 . 17 1 . .
+. . . 17 11 17 . . . .
+. . . . 17 . . . . .
+layer 3
+. . . . 1 . 0 . . .
+. . . . 17 1 0 . . .
+. . 3 0 . 6 . 0 . .
+. 3 3 . . 0 0 . . .
+3 0 0 . 5 . . 0 . .
+. 3 0 0 9 14 0 3 . .
+. . 0 0 . 10 . 0 3 .
+. . . . 17 . 0 0 . .
+. . . . 1 0 . . . .
+layer 4
+. . . . . 3 . . . .
+. . . 0 1 . 0 0 . .
+. . 0 0 . 29 . 0 . .
+. . 0 . 0 0 0 . . .
+. . 0 19 25 . 0 0 0 .
+. . 3 27 . . 0 . . .
+. . . 28 0 . 3 3 0 .
+. . . 0 1 0 0 3 0 .
+. . . . . 0 0 0 . .
+layer 5
+. . . . . 0 . . . .
+. . . . . 0 0 0 . .
+. 0 0 19 0 . 0 0 3 .
+. . 3 . . 0 23 22 3 .
+. 3 3 9 6 . 3 3 . .
+. 3 3 . . 0 3 . . .
+. . 0 . 0 0 0 3 . .
+. . . . . 0 3 0 . .
+. . . . . . . . . .
+layer 6
+. . . . . . . . . .
+. . . 0 . 0 . . . .
+. . . 3 3 3 . 3 . .
+. 0 3 0 . 0 0 0 . .
+. 0 . . 26 . 0 . . .
+0 3 3 0 . 0 . . . .
+. 3 0 0 0 0 3 0 . .
+. . . 0 0 0 . . . .
+. . . . . . . . . .
+layer 7
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . 0 3 0 . . .
+. . 3 0 . 0 . 3 . .
+. 0 0 . 7 0 0 . . .
+. . 0 0 . 0 0 0 . .
+. . . 0 0 0 . . . .
+. . . . 0 . . . . .
+. . . . . . . . . .
+layer 8
+. . . . . . . . . .
+. . . . . . . . . .
+. . . 3 3 . . . . .
+. . . 0 0 0 . . . .
+. . . 3 . 0 . . . .
+. . 0 3 0 0 0 . . .
+. . . 0 0 . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+layer 9
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . 0 3 . . . . .
+. . 3 3 0 3 . . . .
+. . . . 3 . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+layer 10
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . 3 3 . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .

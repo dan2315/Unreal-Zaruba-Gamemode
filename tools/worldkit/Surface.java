@@ -37,6 +37,8 @@ public class Surface {
     }
 
     static Map<Long, Map<String, Object>> cache = new HashMap<>();
+    /** Region files read once per run (the whole map is about 150 MB). */
+    static final Map<Path, byte[]> REGIONS = new HashMap<>();
 
     static String[] top(Path dir, int x, int z) throws IOException {
         TreeMap<Integer, String> col = column(dir, x, z);
@@ -82,7 +84,7 @@ public class Surface {
         Path mca = dir.resolve("r." + Math.floorDiv(cx, 32) + "." + Math.floorDiv(cz, 32) + ".mca");
         Map<String, Object> result = null;
         if (Files.exists(mca)) {
-            byte[] data = Files.readAllBytes(mca);
+            byte[] data = REGIONS.computeIfAbsent(mca, p -> { try { return Files.readAllBytes(p); } catch (IOException e) { throw new UncheckedIOException(e); } });
             int i = Math.floorMod(cx, 32) + Math.floorMod(cz, 32) * 32;
             int loc = ((data[i * 4] & 0xFF) << 16) | ((data[i * 4 + 1] & 0xFF) << 8) | (data[i * 4 + 2] & 0xFF);
             if (loc != 0) {

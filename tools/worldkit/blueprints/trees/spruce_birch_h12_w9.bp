@@ -1,0 +1,118 @@
+# worldkit blueprint v1
+name spruce_birch_h12_w9
+size 9 12 7
+ground 0
+source 461 32 -195
+tags tree nature
+palette
+0 minecraft:acacia_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+2 minecraft:azalea_leaves[distance=7,persistent=true,waterlogged=false]
+3 minecraft:birch_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+4 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+5 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+6 copycats:copycat_beam[axis=y,waterlogged=false]
+7 minecraft:spruce_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+8 minecraft:spruce_fence[east=false,north=true,south=false,waterlogged=false,west=true]
+9 minecraft:spruce_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+10 minecraft:birch_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+11 minecraft:birch_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+12 minecraft:birch_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+13 minecraft:birch_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+14 minecraft:azalea_leaves[distance=6,persistent=true,waterlogged=false]
+layer 0
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+layer 1
+. . . . . 1 1 . 0
+. . . . 0 0 0 0 .
+. . . . . 1 1 . .
+. . . . . 0 . 0 .
+. . 6 . . . 12 . .
+. . . . . . . . .
+. . . . . . . . .
+layer 2
+. . . . . 1 . . .
+. . . . . 1 1 . .
+. . . . . 1 . . .
+. . . . . . . . .
+. . 6 . . . 12 . .
+. . . . . . . . .
+. . . . . . . . .
+layer 3
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . 4 . . . 11 . .
+. . . . . . 3 1 .
+. . . . . . . . .
+layer 4
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+2 . 4 2 . . 12 . .
+. . . . . . 1 . .
+. . . . . . . . .
+layer 5
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . 2 . . . . 1 .
+2 . 7 2 . . 13 10 .
+. 1 5 2 . . . . .
+. . . . . . . . .
+layer 6
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+2 2 4 2 1 1 12 1 .
+. 1 1 2 . . 1 . .
+. . 1 . . . . . .
+layer 7
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+2 9 8 14 1 1 12 1 1
+1 1 2 4 1 1 1 1 .
+. . 1 2 . . 1 . .
+layer 8
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . 1 .
+2 4 2 2 1 1 1 1 .
+2 2 1 4 1 1 1 1 .
+. . 2 . . . . . .
+layer 9
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+2 4 2 2 1 1 1 1 .
+. 2 1 2 . 1 1 . .
+. . . . . 1 . . .
+layer 10
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. 2 2 2 . . 1 . .
+. 1 2 . . . 1 . .
+. . . . . . . . .
+layer 11
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. 1 2 . . . . . .
+. . . . . . . . .
+. . . . . . . . .

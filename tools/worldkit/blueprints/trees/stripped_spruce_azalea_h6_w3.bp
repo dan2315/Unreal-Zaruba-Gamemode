@@ -1,0 +1,34 @@
+# worldkit blueprint v1
+name stripped_spruce_azalea_h6_w3
+size 3 6 2
+ground 0
+source 545 30 7
+tags tree nature
+palette
+0 minecraft:birch_leaves[distance=5,persistent=true,waterlogged=false]
+1 minecraft:birch_leaves[distance=3,persistent=true,waterlogged=false]
+2 minecraft:birch_leaves[distance=4,persistent=true,waterlogged=false]
+3 minecraft:azalea_leaves[distance=4,persistent=true,waterlogged=false]
+4 minecraft:azalea_leaves[distance=5,persistent=true,waterlogged=false]
+5 minecraft:azalea_leaves[distance=6,persistent=true,waterlogged=false]
+6 minecraft:stripped_spruce_wood[axis=y]
+7 minecraft:birch_leaves[distance=1,persistent=true,waterlogged=false]
+8 minecraft:azalea_leaves[distance=2,persistent=true,waterlogged=false]
+layer 0
+. . .
+. . .
+layer 1
+. . 6
+. . .
+layer 2
+. . 7
+. . 8
+layer 3
+. 1 8
+0 2 .
+layer 4
+. 3 .
+. 4 .
+layer 5
+. . .
+. 5 .

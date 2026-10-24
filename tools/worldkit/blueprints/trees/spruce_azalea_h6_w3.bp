@@ -1,0 +1,34 @@
+# worldkit blueprint v1
+name spruce_azalea_h6_w3
+size 3 6 3
+ground 0
+source 456 32 -236
+tags tree nature
+palette
+0 minecraft:azalea_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+2 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+layer 0
+. . .
+. . .
+. . .
+layer 1
+. . .
+. 2 .
+1 . 1
+layer 2
+1 1 .
+1 2 0
+0 0 0
+layer 3
+. 0 1
+1 0 0
+. 1 .
+layer 4
+. . .
+. 0 1
+. . .
+layer 5
+. . .
+. 0 .
+. . .

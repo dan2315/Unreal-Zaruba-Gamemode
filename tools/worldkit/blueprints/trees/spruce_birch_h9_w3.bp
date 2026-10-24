@@ -1,0 +1,73 @@
+# worldkit blueprint v1
+name spruce_birch_h9_w3
+size 4 10 5
+ground 0
+source 456 32 -192
+tags tree nature
+palette
+0 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:acacia_leaves[distance=7,persistent=true,waterlogged=false]
+2 minecraft:azalea_leaves[distance=7,persistent=true,waterlogged=false]
+3 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+4 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+5 minecraft:spruce_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+layer 0
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 1
+. 1 0 0
+. 4 1 .
+0 0 1 .
+. 0 . .
+0 . . .
+layer 2
+. . . .
+. 4 . .
+. . . .
+. . . .
+. . . .
+layer 3
+. 2 0 .
+0 4 2 .
+. 2 2 .
+. . . .
+. . . .
+layer 4
+0 2 0 .
+2 5 3 .
+2 0 2 .
+. . . .
+. . . .
+layer 5
+0 4 . .
+0 1 2 .
+. 2 . .
+. . . .
+. . . .
+layer 6
+. . . .
+2 4 0 .
+. . . .
+. . . .
+. . . .
+layer 7
+. . . .
+. 2 . .
+. . . .
+. . . .
+. . . .
+layer 8
+. . . .
+. 0 . .
+. . . .
+. . . .
+. . . .
+layer 9
+. . . .
+. 2 . .
+. . . .
+. . . .
+. . . .

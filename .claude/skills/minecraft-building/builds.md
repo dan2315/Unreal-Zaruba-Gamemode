@@ -134,3 +134,69 @@ to y 61. Nothing of it is left (verified with `check` and a camera shot). The bu
   `examples/decor-migration-mapping.txt` and `copycatfix`), whole template, offline.
 - Old 1.18/1.20 chunks still hold unknown blocks of removed mods underground (scguns ores, vs_clockwork ore): harmless,
   they turn to air when those chunks are saved.
+
+## Session 2026-10-24 (dev server `testing-zaruba`, data `X:\Projects\UnrealFrontiers\unrealfrontiers-testing\data\zaruba`)
+
+All applied with BuildKit in DEV mode on the open capturepoints template; each is undoable by its build name.
+Generators in `tools/worldkit/generators/`, blueprints in `tools/worldkit/blueprints/`.
+
+### Vehicle spawn plots, standard 30x30x30 (generator `SpawnPlots`)
+
+One plot: 30x30 pad (TFMG `yellow_caution_block` border, polished andesite / andesite / gravel or cobblestone inside),
+the vehicle purchase block 3 blocks in front of the pad facing away from it (vehicles spawn on the pad: the spawner's gap
+of 2 is the 2 blocks between), lamp posts of `tfmg:steel_frame` + lantern beside it, a paved apron in front of the row.
+Scaffold gantries on both sides of each pad (shared between neighbours): `tfmg:steel_frame` columns at z 0/9/19/29,
+createdeco industrial iron catwalk decks at ground+4/9/14/19, railings on the outer side and the ends, an industrial iron
+ladder at the front of each gantry. Style of the small plots at the RED base (blueprint `bases/red_vehicle_plots_small`).
+- RED (`spawnplots_red`, applied): `SpawnPlots east -862 32 374 3 red`: pads x -862..-833, z 374..403 / 409..438 /
+  444..473, terminals at x -865 z 388 / 423 / 458 facing west, right outside the base's east gate (gate z 414..434: the
+  middle terminal is straight ahead). Old track sleepers at x -869..-859 z 421..428 left in place (43 blocks skipped).
+- BLUE (`spawnplots_blue`, NOT applied): `SpawnPlots south 893 32 -333 3 blue --cut`: pads z -333..-304, x 893..922 /
+  928..957 / 963..992, terminals z -336. Needs `apply spawnplots_blue clear`: 1,429 terrain columns of the hill south
+  of the base cut down to y 32 (incl. two decorative trees at x 904..912) — waiting for the user's OK. Plus build
+  `bluegate` (also needs clear): an 11-wide opening x 937..947 in the base's south wall (z -355..-347, wall, curb and the
+  barrier blocks on top), paved, with tuff pillars and lanterns.
+- Blueprint: `bases/spawn_plots_red`.
+
+### Fishing hut west of the lake (generator `FishingHut -430 32 22 28 <region>`, build `fishinghut`)
+
+Izba-style hut (spruce log walls, dark oak corners, spruce stair roof, chimney with a campfire), door x -430 z 22, net
+rack and barrels, a 9-wide slipway road z 26..34 from the yard down the gravel shore into the water (cobblestone/
+andesite/gravel, stripped spruce curbs, lantern posts at x -414), a plank pier on log posts z 15..19 out to x -398.
+Blueprint `lake/fishing_hut`.
+
+### Shore path from Дорожный аванпост to Насосная станция (build `shorepath`)
+
+`Pathway <region> 4 -462 328 -445 295 -418 262 -385 238 -340 224 -295 222 -255 208 -222 182 -196 150 -176 115 -170 80
+-165 52 -152 40 --density=0.85`: ~9 wide dirt path just outside the gravel beach, around the south and east shore to the
+station's south road. A first version on the gravel itself was invisible and was undone.
+
+### Border hills and forests (generator `BorderHills`)
+
+- Left and right edges (`LR 110 26 10`, excluding the RED base + plots, the BLUE base + plots, and 60 around the helipad
+  capture point): rolling hills up to 26 high at the edge, fading to nothing over 110 blocks with a wandering inner edge,
+  12 blocks clear of every built block / road / water / tree trunk; forest of ~830 library trees + bushes with clearings.
+  Applied in parts `bh_L1..bh_L4`, `bh_R5..bh_R8` (BuildKit limit is 500,000 blocks per build).
+- Top and bottom edges (`TB 80 20 0`, no trees; corners and the snowy mountain excluded): parts `bhtb_1..bhtb_8`.
+
+### Garbage fields in the city (generator `GarbageFill`, build `garbagefill`)
+
+The piles' bottom layer had been a removed mod's block (turned to air), so the junk floated. Fields x 594..711 z -141..8
+and x 582..650 z -250..-167: air under every pile filled down to the ground, plus a patchy 1-2 high junk layer on the open
+field ground. Palette: gravel, cobbled deepslate, tuff, soul soil, coarse dirt, create andesite casing.
+
+### Rural infill (generator `RuralInfill`, build `ruralinfill`)
+
+12 copies of the village izbas (blueprints `rural/izba_*`) on empty land beside the basalt roads of the rural area
+(x 230..760, z 100..470): door turned to the road, cobblestone foundation, oak fence around the yard following the
+ground, dirt path to the road, vegetable rows and a library tree at the back. Positions are printed by the generator.
+
+### Blueprint library (`tools/worldkit/blueprints/`)
+
+Format and tools: `Blueprint.java` (text format, rotation of block states), `Export` (box -> blueprint, `--built-only`,
+ground `auto`), `generators/Stamp` (blueprints -> build, with foundation), `Trees` (finds trees and saves one per kind),
+`Lots` (houses and their fenced lots), `Find`, `MapImage` (top-down picture of the map from the region files).
+- `bases/`: red_vehicle_plots_small, spawn_plots_red. `lake/`: fishing_hut.
+- `rural/`: izba_birch, izba_spruce, izba_spruce_darkoak, izba_oak_log, izba_oak_stripped, house_darkoak_stone, house_brick.
+- `trees/`: 30 kinds picked from the ~1,400 trees on the map (the map's own oak trunk + dark oak leaves is by far the most
+  common), from bushes to 24-high.

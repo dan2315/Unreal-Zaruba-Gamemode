@@ -1,0 +1,104 @@
+# worldkit blueprint v1
+name spruce_azalea_h9_w6
+size 8 10 8
+ground 0
+source 433 32 -30
+tags tree nature
+palette
+0 minecraft:azalea_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+2 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+3 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+4 copycats:copycat_beam[axis=y,waterlogged=false]
+5 minecraft:spruce_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+6 minecraft:oak_log[axis=y]
+layer 0
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 1
+. . . . . . . .
+. . . . . . . .
+. . . . . 4 . .
+. . . . . . . .
+. . . . . . . .
+. . . 6 . . . .
+. . . . . . . .
+. . . . . . . .
+layer 2
+. . . . . . . .
+. . . . . . . .
+. . . . . 4 . .
+. . . . . . . .
+. . . . . . . .
+. . . 4 . . . .
+. . . . . . . .
+. . . . . . . .
+layer 3
+. . . . . . . .
+. . . . . . . .
+. . . . . 2 1 .
+. . . . . . . .
+. . . 1 . . . .
+. . . 4 . . . .
+. . . . . . . .
+. . . . . . . .
+layer 4
+. . . . . . . .
+. . . . . . . .
+. . . . 0 2 0 .
+. . . . . . 0 .
+. . . 0 . . . .
+. . 0 2 0 . . .
+. . . . . . . .
+. . . . . . . .
+layer 5
+. . . . . . . .
+. . . . . 0 1 .
+. . . . 5 3 1 .
+. . . 1 1 . 1 .
+. . 0 1 0 . 0 .
+. . 5 3 1 0 . .
+. . 1 1 . . . .
+. . . . . . . .
+layer 6
+. . . . 0 0 . .
+. . . 1 . 1 0 1
+. . . 1 0 0 2 .
+. . 1 1 0 . 0 .
+. 0 1 5 3 0 0 .
+. 1 0 0 0 0 . .
+. 1 2 0 0 . . .
+. . 1 . . . . .
+layer 7
+. . . . 0 0 . .
+. . . 0 0 2 0 0
+. . . 0 0 0 0 .
+. . . 0 1 . 1 .
+0 0 2 0 1 0 . .
+. 0 0 0 1 . . .
+. 0 0 1 0 . . .
+. . 0 0 . . . .
+layer 8
+. . . . 0 . . .
+. . . 0 . 0 . .
+. . . 0 0 1 1 .
+. . . . 1 . 0 .
+0 . 1 1 . . . .
+. 0 0 1 0 . . .
+. . 0 1 . . . .
+. . . . . . . .
+layer 9
+. . . . . . . .
+. . . . . . . .
+. . . . 0 1 0 .
+. . . . 0 . . .
+. . . . . . . .
+. . 0 1 . . . .
+. . . 0 . . . .
+. . . . . . . .

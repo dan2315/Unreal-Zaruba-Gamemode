@@ -1,0 +1,90 @@
+# worldkit blueprint v1
+name oak_dark_oak_h9_w6
+size 3 11 6
+ground 0
+source -1024 32 -347
+tags tree nature
+palette
+0 minecraft:oak_wood[axis=y]
+1 minecraft:dark_oak_leaves[distance=1,persistent=true,waterlogged=false]
+2 minecraft:dark_oak_leaves[distance=2,persistent=true,waterlogged=false]
+3 minecraft:dark_oak_leaves[distance=3,persistent=true,waterlogged=false]
+4 minecraft:dark_oak_leaves[distance=4,persistent=true,waterlogged=false]
+5 minecraft:dark_oak_leaves[distance=5,persistent=true,waterlogged=false]
+layer 0
+. . .
+. . .
+. . .
+. . .
+. . .
+. . .
+layer 1
+. . .
+0 . .
+0 0 .
+. 0 .
+. 0 0
+. . 0
+layer 2
+. . .
+. . .
+. . .
+. 0 .
+. . .
+. . .
+layer 3
+. . .
+. . .
+. 0 .
+. 0 .
+. . .
+. . .
+layer 4
+. . .
+. . .
+0 0 .
+. . .
+. . .
+. . .
+layer 5
+. . .
+1 . .
+0 . .
+. . .
+. . .
+. . .
+layer 6
+2 . .
+1 2 .
+0 1 2
+1 2 .
+2 . .
+. . .
+layer 7
+2 3 .
+1 2 3
+0 1 2
+1 2 3
+2 3 .
+3 . .
+layer 8
+3 . .
+2 3 4
+1 2 3
+2 3 .
+3 4 .
+4 5 .
+layer 9
+. . .
+3 . .
+2 3 .
+3 4 .
+. . .
+. . .
+layer 10
+. . .
+. . .
+3 . .
+. . .
+. . .
+. . .
