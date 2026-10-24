@@ -641,7 +641,8 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
                 sliderFor = s.id;
                 slider.setValue(maximum); // as much as the player can put in
             }
-            boolean canPay = price > 0 && maximum >= minimum && maximum > 0;
+            boolean unpriced = breakdown != null && breakdownId == s.id && !breakdown.unpriced.isEmpty();
+            boolean canPay = price > 0 && maximum >= minimum && maximum > 0 && !unpriced;
             String amountText = tr("schematics.unrealzaruba.purchase.contribute", Money.format(canPay ? slider.value() : 0));
             g.drawString(font, amountText, left, actionY, canPay ? TEXT : MUTED, false);
             String ofText = tr("schematics.unrealzaruba.purchase.of_price", Money.format(price));
@@ -651,6 +652,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
             boolean full = canPay && slider.value() >= price;
             String label = busy ? tr("schematics.unrealzaruba.working")
                     : cooldownTicks > 0 ? tr("schematics.unrealzaruba.spawn.wait", (cooldownTicks + 19) / 20)
+                    : unpriced ? tr("schematics.unrealzaruba.spawn.unpriced_short")
                     : !canPay ? tr("buymenu.unrealzaruba.no_funds")
                     : full ? tr("schematics.unrealzaruba.spawn", Money.format(price))
                     : tr("schematics.unrealzaruba.purchase.pay", Money.format(slider.value()));

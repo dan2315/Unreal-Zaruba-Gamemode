@@ -117,7 +117,23 @@ public final class SchematicSpawner {
         }
         int price;
         try {
-            price = Money.charge(Pricer.price(BlueprintScanner.scan(data), rules.catalog()).total());
+            var composition = BlueprintScanner.scan(data);
+            composition.size = new int[]{info.width(), info.height(), info.depth()};
+            // The same rules the website applies to an upload: nothing forbidden, nothing too big. A file sent by hand is held to them too.
+            var check = com.dod.unrealzaruba.Pricing.Validator.check(composition, rules.catalog(), rules.maxSize());
+            if (!check.isAllowed()) {
+                fail(player, Component.translatable("schematics.unrealzaruba.spawn.not_allowed", String.join("; ", check.problems())));
+                UnrealZaruba.LOGGER.warn("[Purchase] {} tried to spawn a blueprint that breaks the rules: {}", player.getGameProfile().getName(), check.problems());
+                return;
+            }
+            var breakdown = Pricer.price(composition, rules.catalog());
+            // A block, item or fluid without a price would be free: such a vehicle is not sold at all
+            if (!breakdown.unpriced().isEmpty()) {
+                fail(player, Component.translatable("schematics.unrealzaruba.spawn.unpriced", breakdown.unpriced().get(0).id()));
+                UnrealZaruba.LOGGER.warn("[Purchase] {} tried to spawn a blueprint with unpriced entries: {}", player.getGameProfile().getName(), breakdown.unpriced());
+                return;
+            }
+            price = Money.charge(breakdown.total());
         } catch (IOException e) {
             fail(player, Component.translatable("schematics.unrealzaruba.error.not_structure"));
             return;
