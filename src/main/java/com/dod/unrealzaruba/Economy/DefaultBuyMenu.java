@@ -113,6 +113,12 @@ final class DefaultBuyMenu {
         return tab;
     }
 
+    /** The basic paraglider of the Gliders mod (the leather one: its paper is made with leather). */
+    private static Category glidersCategory() {
+        return category("buymenu.unrealzaruba.category.gliders", "buymenu.unrealzaruba.hint.gliders", item("vc_gliders:paraglider_wood", GLIDER_PRICE));
+    }
+
+    static final int GLIDER_PRICE = 150;
     static final String FOOD_TAB = "buymenu.unrealzaruba.tab.food";
 
     private static Item stack(String item, int count, int price) {
@@ -130,6 +136,15 @@ final class DefaultBuyMenu {
         if (config.buyMenu.stream().noneMatch(t -> FOOD_TAB.equals(t.name))) {
             config.buyMenu.add(Math.min(2, config.buyMenu.size()), food());
             changed = true;
+        }
+        for (Tab tab : config.buyMenu) {
+            if (!"buymenu.unrealzaruba.tab.tools".equals(tab.name)) continue;
+            boolean hasGlider = tab.groups.stream().flatMap(g -> g.categories.stream()).flatMap(c -> c.items.stream())
+                    .anyMatch(i -> i.item != null && i.item.startsWith("vc_gliders:"));
+            if (!hasGlider && !tab.groups.isEmpty()) {
+                tab.groups.get(0).categories.add(glidersCategory());
+                changed = true;
+            }
         }
         for (Tab tab : config.buyMenu) {
             if (!"buymenu.unrealzaruba.tab.weapons".equals(tab.name)) continue;
@@ -176,7 +191,8 @@ final class DefaultBuyMenu {
                         item("minecraft:iron_shovel", 45), item("minecraft:diamond_shovel", 120)),
                 category("buymenu.unrealzaruba.category.other_tools", "buymenu.unrealzaruba.hint.tools",
                         item("minecraft:shears", 60), item("minecraft:flint_and_steel", 50),
-                        item("minecraft:bucket", 80), item("minecraft:fishing_rod", 30))));
+                        item("minecraft:bucket", 80), item("minecraft:fishing_rod", 30)),
+                glidersCategory()));
         return tab;
     }
 
