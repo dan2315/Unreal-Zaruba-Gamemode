@@ -81,11 +81,11 @@ public class SpawnPlots {
     static void gantry(int gx, String outer) {
         int[] cols = {0, 9, 19, PAD - 1};
         int top = G + DECKS[DECKS.length - 1];
-        for (int z : cols) for (int x : new int[] {gx, gx + 2}) for (int y = G + 1; y < top; y++) set(x, y, z, "tfmg:steel_frame[waterlogged=false]");
+        for (int z : cols) for (int x : new int[] {gx, gx + 2}) for (int y = G + 1; y <= top; y++) set(x, y, z, "tfmg:steel_frame[waterlogged=false]");
         for (int d : DECKS) {
             int y = G + d;
             for (int x = gx; x <= gx + 2; x++) for (int z = 0; z < PAD; z++) {
-                final int zz = z; boolean column = (x == gx || x == gx + 2) && Arrays.stream(cols).anyMatch(cz -> cz == zz) && y < top;
+                final int zz = z; boolean column = (x == gx || x == gx + 2) && Arrays.stream(cols).anyMatch(cz -> cz == zz) && y <= top;
                 if (!column) set(x, y, z, "createdeco:industrial_iron_catwalk[bottom=false,waterlogged=false]");
             }
             for (int x = gx; x <= gx + 2; x++) for (int z = 0; z < PAD; z++) {
