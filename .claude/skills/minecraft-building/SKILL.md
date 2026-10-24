@@ -115,6 +115,7 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `Farmstead <region> <rural dir> cx cz q [izbaA izbaB] [--no-mill]` | Khutor: imported windmill, two izbas facing a yard, well, haystacks, log pile, fenced field; prints the gate for a Pathway trail |
 | `ClearTrees <region> x0 z0 x1 z1` | Removes whole trees whose trunk base is in the box (wood incl. fence/copycat branches, their own leaves; neighbours keep their crowns), forest floor back to grass. Apply with `clear` |
 | `Meadow <region> x0 z0 x1 z1 [--avoid ...] [--density d]` | Grass, flower patches, bushes on open natural ground; ferns/berries at forest edges, verges by roads. Plants only, into air. Run last, in strips of 256 |
+| `Entities list <entities dir>` / `Entities strip <dir> <out> item,hostile,...` | Saved entities by id; writes the region files without the given ids (dropped items, mobs saved while the map was open). Offline, map closed |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)
@@ -236,6 +237,12 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
 - createdeco catwalk stairs face their low end (opposite of vanilla stairs); catwalk floors sit at the top of their
   block (catwalk at y = stand at y+1); railings are separate blocks above the catwalk with per-side booleans.
 - The capture points lake: surface y 28, bottom about y -31 (60 blocks deep), roughly x -404..-212, z -100..160.
+- **Plants cannot stand on the painted grass** (lime terracotta, green concrete powder), stone or gravel: only on
+  `#minecraft:dirt` (grass, dirt, podzol, coarse/rooted dirt, moss, mud). BuildKit places them anyway, and they pop
+  off as items at the first neighbour update (the next plant placed beside them). Those items, and any dropped while a
+  map is open in DEV, are **saved into the template and load into every match** (2026-10-24: 19,065 items, lag). Use
+  `BorderHills.holdsPlants` for any plant placement; mushrooms only on podzol. After a DEV session check
+  `java Entities list <game_dim/entities>` and strip items with `Entities strip` (map closed / GAME mode).
 - Water next to the map's painted grass hardens `green_concrete_powder` into `green_concrete` the moment it is placed,
   so swaps of neighbouring powder cells then fail ("in the way: green_concrete"). For builds that place water, append
   a second swap `green_concrete -> <same block>` for those cells at the end of the file; an undo restores powder next

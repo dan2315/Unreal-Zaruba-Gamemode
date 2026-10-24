@@ -446,11 +446,12 @@ public class Forest {
             String w = r.state(x, top + 1, z);
             if (!Region.isAir(w) && !BorderHills.plant(n(w))) continue;
             double p = BorderHills.hash(x * 5 + 3, z * 11 + 2);
+            if (!BorderHills.holdsPlants(b)) continue; // painted grass cannot hold plants
             if (woods) {
                 if (p < 0.13) c.set(x, top + 1, z, "fern");
                 else if (p < 0.17 && Region.isAir(r.state(x, top + 2, z))) { c.set(x, top + 1, z, "large_fern[half=lower]"); c.set(x, top + 2, z, "large_fern[half=upper]"); }
                 else if (p < 0.185 && !b.equals("moss_block")) c.set(x, top + 1, z, "sweet_berry_bush[age=3]");
-                else if (p < 0.195 && shade) c.set(x, top + 1, z, p < 0.19 ? "brown_mushroom" : "red_mushroom");
+                else if (p < 0.195 && shade && b.equals("podzol")) c.set(x, top + 1, z, p < 0.19 ? "brown_mushroom" : "red_mushroom");
                 else if (p < 0.27) c.set(x, top + 1, z, "short_grass");
             } else {
                 if (p < 0.2) c.set(x, top + 1, z, "short_grass");

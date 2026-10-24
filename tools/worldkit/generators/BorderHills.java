@@ -102,7 +102,7 @@ public class BorderHills {
                     : n < 0.6 ? "grass_block" : n < 0.85 ? "lime_terracotta" : n < 0.95 ? "green_concrete_powder" : "moss_block";
             c.set(x, top, z, surface);
             blocks += h;
-            if (steep < 3) {
+            if (steep < 3 && holdsPlants(surface)) {
                 double p = hash(x * 7 + 3, z * 5 + 1);
                 if (p < 0.22) c.set(x, top + 1, z, "short_grass");
                 else if (p < 0.24) { c.set(x, top + 1, z, "tall_grass[half=lower]"); c.set(x, top + 2, z, "tall_grass[half=upper]"); }
@@ -152,6 +152,12 @@ public class BorderHills {
         }
         System.err.println("hills: " + blocks + " blocks of earth; trees " + planted + ", bushes " + bushCount);
         c.print(new String[0]);
+    }
+
+    /** Blocks plants can stand on (the #minecraft:dirt tag). The map's painted grass (lime terracotta, green concrete
+     *  powder) and stone cannot hold them: plants placed there pop off as dropped items at the next block update. */
+    static boolean holdsPlants(String n) {
+        return Set.of("grass_block", "dirt", "coarse_dirt", "podzol", "rooted_dirt", "moss_block", "mud", "mycelium", "muddy_mangrove_roots").contains(n.replace("minecraft:", ""));
     }
 
     static boolean plant(String n) {

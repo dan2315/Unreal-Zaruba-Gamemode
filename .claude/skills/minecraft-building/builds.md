@@ -332,3 +332,18 @@ ground `auto`), `generators/Stamp` (blueprints -> build, with foundation), `Tree
 - `rural/`: izba_birch, izba_spruce, izba_spruce_darkoak, izba_oak_log, izba_oak_stripped, house_darkoak_stone, house_brick.
 - `trees/`: 30 kinds picked from the ~1,400 trees on the map (the map's own oak trunk + dark oak leaves is by far the most
   common), from bushes to 24-high.
+
+### Lag fix: saved items, plants on painted grass (2026-10-24, after switching dev to GAME)
+
+The user saw lag and red dots on the map. Cause: my vegetation passes (Meadow, Forest floor, BorderHills) put plants on
+painted grass (lime terracotta / green concrete powder), where plants cannot stand; placing neighbours broke them, and
+the dropped items (19,065: flowers, wheat seeds from grass, berries, mushrooms) were saved into the template's
+`entities/` and loaded into every match. The ~45 hostile mobs (zombies, skeletons, creepers) are live spawns
+(`doMobSpawning true`, Normal), not saved ones; the dense forests give them dark spots.
+- Template `entities/` stripped of `minecraft:item` with `Entities strip` (backup of the files:
+  `X:\Projects\UnrealFrontiers\unrealfrontiers-testing\backups\capturepoints_entities_before_strip_2026-10-24_2325`);
+  left: 3 armor stands, 1 simulated:honey_glue (as in the 21:53 backup). Live match: items and mobs killed by RCON.
+- Generators fixed (`BorderHills.holdsPlants`). Prepared, NOT applied yet (needs DEV mode): `plantfix_0..3`
+  (strips of 512 along x; scratchpad PlantFix): 12,997 flowers get a grass block under them, 40,012 grass/fern plants on
+  painted cells removed, 604 mushrooms outside podzol removed. Apply with `clear`, then `save-all flush`.
+  The original map (v3) had ~400 such plants.

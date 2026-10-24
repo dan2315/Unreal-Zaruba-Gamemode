@@ -11,6 +11,7 @@ import java.util.*;
  *   - edges blend: near trees (forest edges) ferns, large ferns, berry bushes and more bushes; along roads a verge of
  *     tall grass and ferns; around buildings tall grass and ferns grown up to the walls.
  * Only plants and bushes are added (into air); nothing is replaced. Columns that already carry a plant are left.
+ * Plants go only on blocks that can hold them (grass, dirt, podzol, moss...); bushes (leaves) go anywhere.
  * Usage: java Meadow <region> x0 z0 x1 z1 [--avoid x0 z0 x1 z1]... [--part k n] [--density d]
  */
 public class Meadow {
@@ -122,6 +123,7 @@ public class Meadow {
                 else if (p < grass + 0.006) plant = new String[] {"dandelion", "poppy", "oxeye_daisy", "cornflower", "azure_bluet"}[(int) (BorderHills.hash(x, z * 5) * 5)];
             }
             if (plant == null) continue;
+            if (!BorderHills.holdsPlants(top[i][j])) continue; // painted grass (terracotta, concrete powder) cannot hold plants: they pop off as items
             if (tall) {
                 c.set(x, gy + 1, z, plant + "[half=lower]");
                 c.set(x, gy + 2, z, plant + "[half=upper]");
