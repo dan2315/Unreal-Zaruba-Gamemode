@@ -7,8 +7,11 @@ import java.util.*;
  * cobblestone foundation), an oak fence around the yard following the ground with a gap in front, a dirt path from the
  * road to the door, a small vegetable patch and a fruit-tree-sized tree from the library at the back.
  * A spot is used only if the whole lot is natural ground (no builds, trees, water, roads) varying by at most 2 in height,
- * 3-7 blocks from a road (the roads of this area are basalt), and at least `gap` blocks from other houses.
- * Usage: java RuralInfill <region dir> <rural blueprints dir> <trees dir> x0 z0 x1 z1 <max houses> [gap]
+ * 3-7 blocks from a road, and at least `gap` blocks from other houses. A road is a column whose top block name contains
+ * one of the --road words (default basalt, the village roads) with such columns in 8 of the 25 cells around it (dirt
+ * roads elsewhere: --road=rooted_dirt,coarse_dirt,podzol,cyan_terracotta,cobbled_deepslate). --designs picks the house
+ * blueprints by name prefix (default izba_; e.g. --designs=izba_,house_ for the brick and stone houses too).
+ * Usage: java RuralInfill <region dir> <rural blueprints dir> <trees dir> x0 z0 x1 z1 <max houses> [gap] [--road=a,b] [--designs=p,q] [--seed=n: first design to use]
  */
 public class RuralInfill {
     static Region r;
@@ -20,10 +23,18 @@ public class RuralInfill {
         Path rural = Path.of(a[1]), treesDir = Path.of(a[2]);
         int x0 = Integer.parseInt(a[3]), z0 = Integer.parseInt(a[4]), x1 = Integer.parseInt(a[5]), z1 = Integer.parseInt(a[6]);
         int max = Integer.parseInt(a[7]);
-        int gap = a.length > 8 ? Integer.parseInt(a[8]) : 10;
+        int gap = a.length > 8 && !a[8].startsWith("--") ? Integer.parseInt(a[8]) : 10;
+        List<String> roadBlocks = List.of("basalt"), prefixes = List.of("izba_");
+        int seed = 0;
+        for (String opt : a) {
+            if (opt.startsWith("--road=")) roadBlocks = List.of(opt.substring(7).split(","));
+            if (opt.startsWith("--designs=")) prefixes = List.of(opt.substring(10).split(","));
+            if (opt.startsWith("--seed=")) seed = Integer.parseInt(opt.substring(7));
+        }
+        final List<String> designPrefixes = prefixes;
         List<Blueprint> designs = new ArrayList<>();
         try (var files = Files.list(rural)) {
-            for (Path p : (Iterable<Path>) files::iterator) if (p.getFileName().toString().startsWith("izba_")) designs.add(Blueprint.load(p));
+            for (Path p : (Iterable<Path>) files::iterator) if (designPrefixes.stream().anyMatch(p.getFileName().toString()::startsWith)) designs.add(Blueprint.load(p));
         }
         designs.sort(Comparator.comparing(b -> b.name));
         List<Blueprint> trees = new ArrayList<>();
@@ -37,7 +48,7 @@ public class RuralInfill {
         // the land: ground height, road, free
         int w = x1 - x0 + 1, d = z1 - z0 + 1;
         int[][] ground = new int[d][w];
-        boolean[][] road = new boolean[d][w], free = new boolean[d][w];
+        boolean[][] road = new boolean[d][w], free = new boolean[d][w], roadlike = new boolean[d][w];
         for (int z = z0; z <= z1; z++) for (int x = x0; x <= x1; x++) {
             int g = Integer.MIN_VALUE;
             boolean ok = true, isRoad = false;
@@ -47,14 +58,24 @@ public class RuralInfill {
                 String n = Region.name(s).replace("minecraft:", "");
                 if (BorderHills.plant(n)) continue;
                 if (n.equals("water") || n.endsWith("leaves") || n.endsWith("_log") || n.endsWith("_wood")) { ok = false; break; }
-                if (n.contains("basalt")) { isRoad = true; ok = false; g = y; break; }
+                final String bn = n;
+                if (roadBlocks.stream().anyMatch(bn::contains)) { isRoad = true; ok = false; g = y; break; }
                 if (!Export.natural(s)) { ok = false; break; }
                 g = y;
                 break;
             }
             ground[z - z0][x - x0] = g;
-            road[z - z0][x - x0] = isRoad;
+            roadlike[z - z0][x - x0] = isRoad;
             free[z - z0][x - x0] = ok && g != Integer.MIN_VALUE;
+        }
+        // a road: road blocks in at least 8 of the 25 cells around (single dirt patches in a field are not roads)
+        for (int gz = 0; gz < d; gz++) for (int gx = 0; gx < w; gx++) {
+            int count = 0;
+            for (int dz = -2; dz <= 2; dz++) for (int dx = -2; dx <= 2; dx++) {
+                int px = gx + dx, pz = gz + dz;
+                if (px >= 0 && pz >= 0 && px < w && pz < d && roadlike[pz][px]) count++;
+            }
+            road[gz][gx] = count >= 8;
         }
         // distance to the nearest road (BFS, capped)
         int[][] roadDist = new int[d][w];
@@ -76,7 +97,7 @@ public class RuralInfill {
         Canvas c = new Canvas(0, 0);
         c.region = r;
         boolean[][] used = new boolean[d][w];
-        int placed = 0, designIndex = 0;
+        int placed = 0, designIndex = seed;
         String[] dirs = {"north", "east", "south", "west"};
         int[][] step = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
         search:

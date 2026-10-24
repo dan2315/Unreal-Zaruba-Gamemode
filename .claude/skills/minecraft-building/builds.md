@@ -226,6 +226,38 @@ Gameplay: covered infantry approach from RED's side (outpost, helipad) to the we
 north–south routes (T1, T3) besides the roads, and the slipway crossing; hills give firing positions over T1/T3.
 Undo order if ever needed: westleaves2, westleaves, westtrack3..1, westforest (then check `green_concrete` below).
 
+### Filling the bare land (2026-10-24, user: "fill the empty boring places with what the map already has")
+
+Backup before it: `X:\Projects\UnrealFrontiers\unrealfrontiers-testing\backups\capturepoints_game_dim_2026-10-24_2153`
+(game_dim + gamemodedata). Bare places found with `Empty` (distance from open ground to the nearest tree, build, road
+or water; largest bare disks listed). Order: farmsteads and houses, then forests/groves (they keep away from builds),
+then the meadow last.
+- Windmill: the user's download "molino de viento" by F3deMatt25 (`props/windmill_molino.bp`, imported with
+  `ImportNbt`: the Create sails and a rotating harvester were contraption entities, added as static blocks at angle 0;
+  1.21.9+ blocks replaced: cinnabar stairs/slabs -> mangrove, shelves -> open trapdoors, iron_chain -> chain, copper
+  chest -> chest). Standalone build `millbp` at -620 -330 (NW field).
+- Farmsteads (`Farmstead`): `farm_nw` around that mill, yard -612 -306 (`--no-mill`, izba_spruce + izba_oak_log);
+  `farm_e` 870 95 (mill, izba_spruce_darkoak + izba_birch); `farm_s` 168 238 (mill, izba_oak_stripped + izba_spruce).
+  Each: two izbas facing the yard, well, haystacks, log pile, trodden yard, fenced wheat/carrot field to the south.
+  Trails to the roads (`Pathway` half width 2.5): `trail_nw` to the deepslate road at -784 -232, `trail_e` to the
+  village basalt road at 768 98, `trail_s` to the dirt road at 150 302.
+- Lone houses (`lonehouses`, `RuralInfill` one per box, `--road=coarse_dirt,rooted_dirt,podzol,cobbled_deepslate,
+  cyan_terracotta,deepslate,basalt,dirt_path,gravel --designs=izba_,house_ --seed=3i`): izba_oak_log -783 -272,
+  izba_spruce_darkoak -679 -148, izba_birch -847 -48, izba_spruce -933 161, house_darkoak_stone 114 317, house_brick
+  526 131, izba_birch -344 331, izba_spruce -183 290 (door positions), each with fence, path, garden and a tree.
+- Forests (`Forest`, trees `trees,trees/spruce_grove` = mixed: oak, birch, dark oak, spruce; args in this order):
+  dense belts on the bare border hills `f1_north -60 -505 740 -395`, `f2_nwtop -900 -505 -450 -432`, `f3_south 140 425
+  570 511` (density 0.85, clearings 0.3); groves with low hills and three small swamps `f4_west -930 -120 -790 370`,
+  `f5_east 780 -250 990 420`, `f6_midsouth -20 60 270 430`, `f7_mid 270 20 720 140`, `f8_nwfield -880 -430 -460 -150`,
+  `f9_southlake -600 250 -150 430` (density 0.3-0.5, clearings 0.45-0.55; --avoid around the helipad, its respawn,
+  the farmsteads, the outpost capture area, the power station). ~2,800 trees. Swamps at 830 -60, 0 260, -820 -200.
+  `concretefix2`: painted grass hardened by the swamp water, swapped back to powder.
+- Meadow (`Meadow`, `meadow_0..7`, strips of 256 along x over the whole map, plus `meadowtest` on the NW field):
+  ~430k plants: grass, flower patches, bushes, ferns and berries at forest edges, verges along roads.
+- Not placed: the drawn watchtower / chapel ruin / car wreck / bus stop (`Props`): the user finds them weak and offered
+  to find better structures (asked for: watchtower, ruined chapel, barn, well, abandoned houses, Soviet bus stop,
+  car/truck wreck or tractor, water tower).
+
 ### Border hills and forests (generator `BorderHills`)
 
 - Left and right edges (`LR 110 26 10`, excluding the RED base + plots, the BLUE base + plots, and 60 around the helipad

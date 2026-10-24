@@ -14,13 +14,17 @@ import java.util.*;
  *     muddy, mossy ring with reeds, tall grass and ferns, lily pads, a few dead trunks standing in it. Flat ground only.
  *   - --track hw x z x z ...: a corridor of half width hw along the curve (same curve as Pathway) kept free of trees and
  *     hills. Lay the track surface afterwards with Pathway using the same points.
- *   - Trees: a jittered grid (spacing 6) thinned by a forest density: a wandering edge 30 blocks deep inside the box,
- *     clearings from noise, fewer near swamps. Tall kinds in the core, small ones at edges and clearings. A tree is only
- *     planted where all its wood and nearly all its leaves fit into air (old trees around keep their crowns).
+ *   - Trees: a jittered grid (--spacing, 6) thinned by a forest density (--density, 0.85): a wandering edge --edge (30)
+ *     blocks deep inside the box, clearings where noise is below --clearings (0.22; 0 = none), fewer near swamps. Tall
+ *     kinds in the core, small ones at edges and clearings. Tree folders are comma-separated; the mix favours broadleaves
+ *     (oak 1.6, birch 1.4, spruce 1, copycat-wall trees 0.7, azalea bushes 0.6, each spruce_grove variant 0.5). A tree
+ *     is only planted where all its wood and nearly all its leaves fit into air (old trees around keep their crowns).
+ *     Low density (below 0.5) gives scattered single trees in open land.
  *   - Floor: podzol, moss, coarse dirt patches under the trees, ferns, large ferns, berry bushes, mushrooms in the shade;
  *     grass and a few flowers in clearings.
- * Usage: java Forest <region> <trees dir> x0 z0 x1 z1 [--track hw x z ...]... [--hill x z r h]... [--swamp x z r]...
- *        [--avoid x0 z0 x1 z1]... [--part k n]   (part: only the k-th of n stripes along x, for the BuildKit size limit)
+ * Usage: java Forest <region> <trees dir[,dir...]> x0 z0 x1 z1 [--track hw x z ...]... [--hill x z r h]... [--swamp x z r]...
+ *        [--avoid x0 z0 x1 z1]... [--density d] [--spacing s] [--edge e] [--clearings c]
+ *        [--part k n]   (part: only the k-th of n stripes along x, for the BuildKit size limit)
  */
 public class Forest {
     static final int PAD = 16;
@@ -36,12 +40,14 @@ public class Forest {
     static double[][] dBlocked, dWater, dTrack, dSwamp;
     static Canvas c = new Canvas(0, 0);
     static Set<Long> treeBlocks = new HashSet<>();
+    static double density = 0.85, edgeDepth = 30, clearings = 0.22;
+    static int spacing = 6;
 
     record Track(double hw, List<double[]> curve) {}
 
     public static void main(String[] a) throws Exception {
         r = new Region(Path.of(a[0]));
-        Path treesDir = Path.of(a[1]);
+        String treesDir = a[1];
         bx0 = Integer.parseInt(a[2]); bz0 = Integer.parseInt(a[3]); bx1 = Integer.parseInt(a[4]); bz1 = Integer.parseInt(a[5]);
         List<Track> tracks = new ArrayList<>();
         List<double[]> hills = new ArrayList<>(), swamps = new ArrayList<>(), avoids = new ArrayList<>();
@@ -60,6 +66,10 @@ public class Forest {
                 case "--swamp" -> swamps.add(new double[] {v.get(0), v.get(1), v.get(2)});
                 case "--avoid" -> avoids.add(new double[] {v.get(0), v.get(1), v.get(2), v.get(3)});
                 case "--part" -> { part = v.get(0).intValue(); parts = v.get(1).intValue(); }
+                case "--density" -> density = v.get(0);
+                case "--spacing" -> spacing = v.get(0).intValue();
+                case "--edge" -> edgeDepth = v.get(0);
+                case "--clearings" -> clearings = v.get(0);
                 default -> throw new IllegalArgumentException(opt);
             }
         }
@@ -263,19 +273,27 @@ public class Forest {
 
     // ---------- trees
 
-    record Kind(Blueprint bp, int height, int radius) {}
+    record Kind(Blueprint bp, int height, int radius, double species) {}
 
-    static int[] trees(Path dir, double[][] dTrunk) throws Exception {
+    // a mixed forest by default: broadleaves weigh more, the many spruce-grove variants less each
+    static double species(Path p) {
+        String n = p.getFileName().toString();
+        if (p.getParent() != null && p.getParent().getFileName().toString().equals("spruce_grove")) return 0.5;
+        return n.startsWith("oak_") ? 1.6 : n.startsWith("birch") ? 1.4 : n.startsWith("copycat") ? 0.7 : n.contains("azalea") ? 0.6 : 1.0;
+    }
+
+    static int[] trees(String dirs, double[][] dTrunk) throws Exception {
         List<Kind> kinds = new ArrayList<>();
-        try (var files = Files.list(dir)) {
-            for (Path p : (Iterable<Path>) files::iterator) {
-                if (!p.toString().endsWith(".bp")) continue;
-                Blueprint bp = Blueprint.load(p);
-                kinds.add(new Kind(bp, bp.h, (Math.max(bp.w, bp.d) + 1) / 2));
+        for (String dir : dirs.split(","))
+            try (var files = Files.list(Path.of(dir))) {
+                for (Path p : (Iterable<Path>) files::iterator) {
+                    if (!p.toString().endsWith(".bp")) continue;
+                    Blueprint bp = Blueprint.load(p);
+                    kinds.add(new Kind(bp, bp.h, (Math.max(bp.w, bp.d) + 1) / 2, species(p)));
+                }
             }
-        }
         kinds.sort(Comparator.comparing(k -> k.bp().name));
-        int planted = 0, skipped = 0, spacing = 6;
+        int planted = 0, skipped = 0;
         for (int cz = bz0; cz <= bz1; cz += spacing) for (int cx = bx0; cx <= bx1; cx += spacing) {
             int x = cx + (int) (BorderHills.hash(cx, cz * 3) * spacing * 0.8), z = cz + (int) (BorderHills.hash(cx * 5, cz) * spacing * 0.8);
             if (x > bx1 || z > bz1) continue;
@@ -283,7 +301,7 @@ public class Forest {
             double f = forestness(x, z);
             if (swamp[i][j] >= 2) continue;
             if (swamp[i][j] == 1 || dSwamp[i][j] < 6) f *= 0.35;
-            if (f < 0.12 || BorderHills.hash(x * 7 + 3, z * 3 + 7) > f * 0.85) continue;
+            if (f < 0.12 || BorderHills.hash(x * 7 + 3, z * 3 + 7) > f * density) continue;
             if (dBlocked[i][j] < 4 || dWater[i][j] < 10 || dTrunk[i][j] < 5) continue;
             // size: tall in the core, small at edges, clearings and swamps
             double core = f, pick = BorderHills.hash(x * 13, z * 17);
@@ -293,7 +311,7 @@ public class Forest {
                 double wgt = k.height() >= 15 ? 0.2 + 1.6 * core * core : k.height() >= 9 ? 1.0 : 1.3 - core;
                 if (k.height() <= 7) wgt *= 0.5; // low, wide spruce shrubs: undergrowth
                 pool.add(k);
-                wts.add(Math.max(0.05, wgt));
+                wts.add(Math.max(0.05, wgt) * k.species());
             }
             double total = wts.stream().mapToDouble(Double::doubleValue).sum(), v = pick * total;
             int idx = 0;
@@ -308,9 +326,8 @@ public class Forest {
     }
 
     /**
-     * Puts a tree with its trunk at (x, z): the trunk's lowest layer stands on the ground there, which must be level
-     * under the whole trunk (a hillside step under a wide trunk would leave it hanging). All its wood and 97% of its
-     * leaves must fit.
+     * Puts a tree with its trunk at (x, z): the trunk's lowest layer stands on the highest ground under the trunk (at most 2
+     * above the lowest; lower trunk cells are carried down to their ground). All its wood and 94% of its leaves must fit.
      */
     static boolean stamp(Blueprint bp, int x, int z) throws Exception {
         int base = -1;
@@ -324,15 +341,26 @@ public class Forest {
         int[] anchor = trunk.get(0);
         for (int[] t : trunk)
             if (Math.hypot(t[0] - bp.w / 2.0, t[1] - bp.d / 2.0) < Math.hypot(anchor[0] - bp.w / 2.0, anchor[1] - bp.d / 2.0)) anchor = t;
-        int ox = x - anchor[0], oz = z - anchor[1], gy = Integer.MIN_VALUE;
+        int ox = x - anchor[0], oz = z - anchor[1], gy = Integer.MIN_VALUE, low = Integer.MAX_VALUE;
         for (int[] t : trunk) {
             int i = ox + t[0] - gx0, j = oz + t[1] - gz0;
             if (!in(i, j) || swamp[i][j] >= 2) return false;
             int top = ground[i][j] + add[i][j];
-            if (gy != Integer.MIN_VALUE && top != gy) return false;
-            gy = top;
+            gy = Math.max(gy, top);
+            low = Math.min(low, top);
         }
+        if (gy - low > 2) return false;
         List<long[]> place = new ArrayList<>();
+        // on a slope the trunk stands on the highest ground under it; lower trunk cells reach down to their ground (roots)
+        for (int[] t : trunk) {
+            int i = ox + t[0] - gx0, j = oz + t[1] - gz0, top = ground[i][j] + add[i][j];
+            for (int y = top + 1; y <= gy; y++) {
+                long key = Canvas.key(ox + t[0], y, oz + t[1]);
+                if (c.cells.containsKey(key) || !Region.isAir(r.state(ox + t[0], y, oz + t[1]))) continue;
+                place.add(new long[] {key, 0});
+                c.set(ox + t[0], y, oz + t[1], bp.at(t[0], base, t[1]));
+            }
+        }
         int leaves = 0, blocked = 0;
         for (int y = 0; y < bp.h; y++) for (int zz = 0; zz < bp.d; zz++) for (int xx = 0; xx < bp.w; xx++) {
             String s = bp.at(xx, y, zz);
@@ -361,7 +389,7 @@ public class Forest {
             if (there != null) displaced.put(key, there);
             c.set(wx, wy, wz, s);
         }
-        if (blocked > leaves * 0.03 + 1) return undo(place);
+        if (blocked > leaves * 0.06 + 1) return undo(place); // a few leaves may meet a hillside
         for (long[] p : place) { treeBlocks.add(p[0]); displaced.remove(p[0]); }
         return true;
     }
@@ -380,8 +408,8 @@ public class Forest {
 
     static double forestness(int x, int z) {
         double edge = Math.min(Math.min(x - bx0, bx1 - x), Math.min(z - bz0, bz1 - z)) + 24 * (BorderHills.valueNoise(x / 30.0, z / 30.0, 3) - 0.5);
-        double e = fade(edge, 30);
-        double clearing = fade((BorderHills.valueNoise(x / 38.0, z / 38.0, 4) - 0.22) * 100, 15);
+        double e = edgeDepth <= 0 ? 1 : fade(edge, edgeDepth);
+        double clearing = clearings <= 0 ? 1 : fade((BorderHills.valueNoise(x / 38.0, z / 38.0, 4) - clearings) * 100, 15);
         return e * clearing;
     }
 
@@ -401,12 +429,12 @@ public class Forest {
             if (swamp[i][j] > 0 || dBlocked[i][j] < 2 || dTrack[i][j] < 1 || dWater[i][j] < 6) continue;
             int g = ground[i][j], top = g + add[i][j];
             double f = forestness(x, z);
-            boolean shade = dTree[i][j] <= 4;
+            boolean shade = dTree[i][j] <= 4, woods = shade || f > 0.6 && density >= 0.5; // scattered trees: no forest floor between them
             String cur = add[i][j] > 0 ? Region.name(c.cells.get(Canvas.key(x, top, z)).block()).replace("minecraft:", "") : n(r.state(x, g, z));
             if (!GRASS.contains(cur)) continue;
             double h = BorderHills.hash(x * 3 + 1, z * 7 + 5);
             String b = cur;
-            if (shade || f > 0.6) b = h < 0.3 ? "podzol" : h < 0.38 ? "coarse_dirt" : h < 0.58 ? "moss_block" : h < 0.8 ? "grass_block" : cur;
+            if (woods) b = h < 0.3 ? "podzol" : h < 0.38 ? "coarse_dirt" : h < 0.58 ? "moss_block" : h < 0.8 ? "grass_block" : cur;
             else if (add[i][j] > 0) b = h < 0.6 ? "grass_block" : h < 0.85 ? "lime_terracotta" : "green_concrete_powder";
             if (!b.equals(cur)) {
                 if (add[i][j] > 0) c.set(x, top, z, b);
@@ -418,7 +446,7 @@ public class Forest {
             String w = r.state(x, top + 1, z);
             if (!Region.isAir(w) && !BorderHills.plant(n(w))) continue;
             double p = BorderHills.hash(x * 5 + 3, z * 11 + 2);
-            if (shade || f > 0.6) {
+            if (woods) {
                 if (p < 0.13) c.set(x, top + 1, z, "fern");
                 else if (p < 0.17 && Region.isAir(r.state(x, top + 2, z))) { c.set(x, top + 1, z, "large_fern[half=lower]"); c.set(x, top + 2, z, "large_fern[half=upper]"); }
                 else if (p < 0.185 && !b.equals("moss_block")) c.set(x, top + 1, z, "sweet_berry_bush[age=3]");
