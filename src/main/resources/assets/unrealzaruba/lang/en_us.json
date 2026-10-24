@@ -208,6 +208,12 @@
 
     "buymenu.unrealzaruba.tab.weapons": "Weapons",
     "buymenu.unrealzaruba.tab.armor": "Armor",
+    "buymenu.unrealzaruba.tab.food": "Food",
+    "buymenu.unrealzaruba.group.food": "Food",
+    "buymenu.unrealzaruba.category.food": "Food",
+    "buymenu.unrealzaruba.category.potions": "Potions",
+    "buymenu.unrealzaruba.hint.food": "Food and golden apples to heal on the move",
+    "buymenu.unrealzaruba.hint.potions": "Instant healing and speed",
     "buymenu.unrealzaruba.tab.tools": "Tools",
     "buymenu.unrealzaruba.group.tools": "Tools",
     "buymenu.unrealzaruba.category.pickaxes": "Pickaxes",

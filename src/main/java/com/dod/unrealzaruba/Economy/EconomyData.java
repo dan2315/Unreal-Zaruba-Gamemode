@@ -22,6 +22,7 @@ public class EconomyData extends AbstractGamemodeData<EconomyConfig> {
         if (config.buyMenu == null || config.buyMenu.isEmpty()) {
             config.buyMenu = EconomyConfig.createDefault().buyMenu; // a file with no menu gets the stock one
         }
+        DefaultBuyMenu.addMissing(config); // new stock entries reach maps that were saved before them
         saveData();
         return config;
     }

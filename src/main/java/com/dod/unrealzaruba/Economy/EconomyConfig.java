@@ -220,6 +220,7 @@ public class EconomyConfig {
         config.vehicles.addAll(List.of("pt", "car", "tank"));
         config.buyMenu.add(DefaultBuyMenu.weapons());
         config.buyMenu.add(DefaultBuyMenu.armor());
+        config.buyMenu.add(DefaultBuyMenu.food());
         config.buyMenu.add(DefaultBuyMenu.tools());
         return config;
     }

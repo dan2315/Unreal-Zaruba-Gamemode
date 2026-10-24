@@ -52,7 +52,9 @@ final class DefaultBuyMenu {
                         gun("spas_12", "SEMI", "12 gauge", 5, 1140),
                         gun("aa12", "SEMI", "12 gauge", 8, 750)),
                 category("buymenu.unrealzaruba.category.machine_guns", "buymenu.unrealzaruba.hint.guns",
-                        gun("m249", "AUTO", "5.56x45mm", 75, 1240))));
+                        gun("m249", "AUTO", "5.56x45mm", 75, 1240)),
+                category("buymenu.unrealzaruba.category.launchers", "buymenu.unrealzaruba.hint.guns",
+                        gun("m320", "SEMI", "40mm", 1, LAUNCHER_PRICE))));
 
         String attachmentHint = "buymenu.unrealzaruba.hint.attachments";
         tab.groups.add(group("buymenu.unrealzaruba.group.attachments",
@@ -89,8 +91,65 @@ final class DefaultBuyMenu {
                         ammo("792x57", 20, 60),
                         ammo("30_06", 20, 70),
                         ammo("338", 20, 100),
-                        ammo("12g", 24, 60))));
+                        ammo("12g", 24, 60),
+                        ammo("40mm", 1, GRENADE_PRICE))));
         return tab;
+    }
+
+    /** The grenade launcher is cheap to own and dear to fire: every grenade costs as much as a good rifle. */
+    static final int LAUNCHER_PRICE = 1400;
+    static final int GRENADE_PRICE = 2000;
+
+    static Tab food() {
+        Tab tab = tab(FOOD_TAB, Layout.GRID);
+        tab.groups.add(group("buymenu.unrealzaruba.group.food",
+                category("buymenu.unrealzaruba.category.food", "buymenu.unrealzaruba.hint.food",
+                        stack("minecraft:cooked_beef", 4, 60),
+                        stack("minecraft:golden_apple", 1, 200)),
+                category("buymenu.unrealzaruba.category.potions", "buymenu.unrealzaruba.hint.potions",
+                        item("minecraft:potion[potion_contents={potion:\"minecraft:strong_healing\"}]", 220),
+                        item("minecraft:potion[potion_contents={potion:\"minecraft:swiftness\"}]", 90),
+                        item("minecraft:potion[potion_contents={potion:\"minecraft:strong_swiftness\"}]", 140))));
+        return tab;
+    }
+
+    static final String FOOD_TAB = "buymenu.unrealzaruba.tab.food";
+
+    private static Item stack(String item, int count, int price) {
+        Item entry = item(item, price);
+        entry.count = count;
+        return entry;
+    }
+
+    /**
+     * Adds what a map's saved menu may lack (the menu in economy.json is written once and then only edited by hand): the Food tab, and the
+     * grenade launcher with its grenades. Returns true when something was added. Nothing the map has is changed or removed.
+     */
+    static boolean addMissing(EconomyConfig config) {
+        boolean changed = false;
+        if (config.buyMenu.stream().noneMatch(t -> FOOD_TAB.equals(t.name))) {
+            config.buyMenu.add(Math.min(2, config.buyMenu.size()), food());
+            changed = true;
+        }
+        for (Tab tab : config.buyMenu) {
+            if (!"buymenu.unrealzaruba.tab.weapons".equals(tab.name)) continue;
+            boolean hasLauncher = tab.groups.stream().flatMap(g -> g.categories.stream()).flatMap(c -> c.items.stream())
+                    .anyMatch(i -> i.item != null && i.item.contains("tacz:m320"));
+            if (!hasLauncher) {
+                for (Group group : tab.groups) {
+                    if ("buymenu.unrealzaruba.group.guns".equals(group.name)) {
+                        group.categories.add(category("buymenu.unrealzaruba.category.launchers", "buymenu.unrealzaruba.hint.guns", gun("m320", "SEMI", "40mm", 1, LAUNCHER_PRICE)));
+                        changed = true;
+                    }
+                    if ("buymenu.unrealzaruba.group.ammunition".equals(group.name)) {
+                        for (Category category : group.categories) {
+                            if ("buymenu.unrealzaruba.category.ammo".equals(category.name)) category.items.add(ammo("40mm", 1, GRENADE_PRICE));
+                        }
+                    }
+                }
+            }
+        }
+        return changed;
     }
 
     static Tab armor() {

@@ -195,6 +195,12 @@
 
     "buymenu.unrealzaruba.tab.weapons": "Оружие",
     "buymenu.unrealzaruba.tab.armor": "Броня",
+    "buymenu.unrealzaruba.tab.food": "Еда",
+    "buymenu.unrealzaruba.group.food": "Еда",
+    "buymenu.unrealzaruba.category.food": "Еда",
+    "buymenu.unrealzaruba.category.potions": "Зелья",
+    "buymenu.unrealzaruba.hint.food": "Еда и золотые яблоки, чтобы лечиться на ходу",
+    "buymenu.unrealzaruba.hint.potions": "Мгновенное лечение и скорость",
     "buymenu.unrealzaruba.tab.tools": "Инструменты",
     "buymenu.unrealzaruba.group.tools": "Инструменты",
     "buymenu.unrealzaruba.category.pickaxes": "Кирки",
