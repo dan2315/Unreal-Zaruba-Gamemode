@@ -169,6 +169,16 @@ rack and barrels, a 9-wide slipway road z 26..34 from the yard down the gravel s
 andesite/gravel, stripped spruce curbs, lantern posts at x -414), a plank pier on log posts z 15..19 out to x -398.
 Blueprint `lake/fishing_hut`.
 
+### Road from the BLUE spawn plots to the main road (builds `blueroad`, `blueramp2`, `bluebank`)
+
+`LaneRoad <region> 860 996 -303 -292 32 869` (applied with clear): a 12-wide road along the south edge of the pads, in the
+style of the main road west of the base (worn brown edges, yellow terracotta lines, grey lanes of stone / andesite / cut
+andesite with light grey wool, limestone, dead fire coral, bone block patches). Level with the pads (y 32) so vehicles
+roll off the pads straight onto it; at the west end it crosses the ditch and climbs to the main road (y 33) over a
+2-wide band of smooth stone slabs at x 869..870. The hill ramp was moved behind the road: `Ramp 889 996 -291 1 32 3 80`
+(`blueramp2`, clear). `BankFill <region> 866 -345 888 -304 32` (`bluebank`): the ditch between pad 1 and the main road
+filled level with grass.
+
 ### Shore road from Дорожный аванпост to Насосная станция (builds `shoreroad`, `shoremounds`)
 
 Vehicle road, about 13 wide (user asked for 12+ so vehicles can pass): `Pathway <region> 6 ... --density=0.75
