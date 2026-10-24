@@ -157,6 +157,9 @@ ladder at the front of each gantry. Style of the small plots at the RED base (bl
   `bluegate`: 11-wide opening x 937..947 in the base's south wall (wall, curb, barrier blocks), paved, tuff pillars and
   lanterns. `blueramp` (generator `Ramp 889 996 -303 1 32 3 60`, clear): a 108-wide ramp from the pads' south edge up the
   hill, 1 block per 3, so vehicles can drive out forward.
+  `bluetowerout` (clear, user's request): the deepslate lift tower x 937..944 z -369..-362 (up to y 68 with its antenna)
+  that stood between the base's main avenue and the south gate was removed, so the avenue runs straight to the gate and
+  the plots; its plating/iron foundation at y 34 swapped to the yard's slab mix. Blueprint `bases/blue_lift_tower`.
 - Old small plots removed in both bases (`oldplots_remove`, clear): RED x -969..-956 z 415..447, BLUE x 909..925
   z -470..-438: towers, ladders, catwalks, purchase blocks; caution borders swapped back to the yard floor. Blueprints
   `bases/red_vehicle_plots_small`, `bases/blue_vehicle_plots_small`.
