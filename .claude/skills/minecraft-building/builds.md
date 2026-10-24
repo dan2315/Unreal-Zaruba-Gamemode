@@ -258,6 +258,17 @@ then the meadow last.
   to find better structures (asked for: watchtower, ruined chapel, barn, well, abandoned houses, Soviet bus stop,
   car/truck wreck or tractor, water tower).
 
+### City tower cranes (build `craneA_fix`)
+
+Four identical brass tower cranes in the city: A masts 404/408 z -175/-171 (boom along +x to 442), B 431/435 z -99/-95
+(turned 180°), C 511/515 z -243/-239, D 535/539 z -299/-295 (boom along z); two more at 592..600 z -304..-296 and
+642..646 z -172..-168 have their booms hanging to the ground (left as they are). The jib is only vertical
+`createdeco:brass_support` posts (y 79-81) every 3 blocks with nothing between, and the counterweight (stone, x 393-397)
+floats 7 blocks from the mast: from below it reads as floating chunks. Same in all source map versions (v1-v3).
+`craneA_fix` (crane A only, user's request): horizontal chords `brass_support[facing=east]` at y 79 and 81 on both
+sides (x 397..437 between the posts), floor cross members `facing=south` at y 79 every 3, two posts on the counter-jib.
+Same recipe for B-D if wanted (rotate the directions for D).
+
 ### Border hills and forests (generator `BorderHills`)
 
 - Left and right edges (`LR 110 26 10`, excluding the RED base + plots, the BLUE base + plots, and 60 around the helipad
