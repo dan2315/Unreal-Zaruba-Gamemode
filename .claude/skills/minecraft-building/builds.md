@@ -185,6 +185,9 @@ ladder at the front of each gantry. Style of the small plots at the RED base (bl
   scratchpad generator): the yellow outline swapped back to its neighbours' blocks, a zebra crossing (white concrete
   bars on even x 720..740, z -221..-217) from the plaza's east gate to the terminal, the old purchase block at
   713 34 -222 and its "Спавн техники" sign removed (lantern on the freed post), plants and bushes cleared off the plot.
+  `groveD_clear` (user: "remove this grove"), `ClearTrees <region> 780 -250 817 -206`: the grove east of the plot
+  (14 trees of the f5_east forest edge, x 782..815 z -245..-210) removed whole, podzol/moss under it back to grass;
+  `groveD_leaves`: 9 loose leaves left in the air (ClearTrees now clears those itself). The tree at 820 -200 stays.
 
 ### Fishing hut west of the lake (generator `FishingHut -430 32 22 28 <region>`, build `fishinghut`)
 

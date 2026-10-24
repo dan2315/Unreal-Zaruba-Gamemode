@@ -113,6 +113,7 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `ImportNbt <file.nbt> <out.bp> <name> --known known.txt [--replace old=new\|keep,props+k:v,...]` | Imports a structure-block file (downloads) into the library: ground layer detected, Create bearing contraptions (sails) added as static blocks, newer-version blocks replaced or listed. known.txt = vanilla ids from the server jar's block loot tables + wall variants + mod blockstates |
 | `Props place <region> <type\|file.bp> x z q ...` | Puts library blueprints on the ground (highest ground under the footprint, earth/cobblestone under lower columns; skipped if the footprint isn't open). Its drawn designs are placeholders; use imported ones |
 | `Farmstead <region> <rural dir> cx cz q [izbaA izbaB] [--no-mill]` | Khutor: imported windmill, two izbas facing a yard, well, haystacks, log pile, fenced field; prints the gate for a Pathway trail |
+| `ClearTrees <region> x0 z0 x1 z1` | Removes whole trees whose trunk base is in the box (wood incl. fence/copycat branches, their own leaves; neighbours keep their crowns), forest floor back to grass. Apply with `clear` |
 | `Meadow <region> x0 z0 x1 z1 [--avoid ...] [--density d]` | Grass, flower patches, bushes on open natural ground; ferns/berries at forest edges, verges by roads. Plants only, into air. Run last, in strips of 256 |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
