@@ -108,7 +108,7 @@ public class SchematicsBrowserScreen extends SchematicsScreenBase {
         refreshLimit();
         listLoading = true;
         listError = null;
-        SchematicsApi.then(SchematicsApi.list(mine, query, sort, page), result -> {
+        SchematicsApi.then(SchematicsApi.list(mine, query, sort, page, spawner != null), result -> {
             if (request != listRequest) return;
             listLoading = false;
             if (!result.ok()) {

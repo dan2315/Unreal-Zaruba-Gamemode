@@ -59,10 +59,16 @@ public final class SchematicsApi {
     }
 
     public static CompletableFuture<Result<SchematicDto.Page>> list(boolean mine, String query, Sort sort, int page) {
+        return list(mine, query, sort, page, false);
+    }
+
+    /** {@code onlyAllowedInGame}: only blueprints that pass the rules of the game and have a price for everything in them (at a vehicle block). */
+    public static CompletableFuture<Result<SchematicDto.Page>> list(boolean mine, String query, Sort sort, int page, boolean onlyAllowedInGame) {
         StringBuilder path = new StringBuilder(mine ? "/schematics/my" : "/schematics")
                 .append("?sort=").append(sort.param)
                 .append("&page=").append(page)
                 .append("&pageSize=").append(PAGE_SIZE);
+        if (onlyAllowedInGame) path.append("&isAllowedToSpawnInGame=true");
         if (query != null && !query.isBlank()) {
             String q = query.strip();
             path.append("&q=").append(encode(q.length() > 64 ? q.substring(0, 64) : q));
