@@ -284,6 +284,14 @@ D = A turned a quarter clockwise (364-z, x-703; east->south, south->west).
 The piles' bottom layer had been a removed mod's block (turned to air), so the junk floated. Fields x 594..711 z -141..8
 and x 582..650 z -250..-167: air under every pile filled down to the ground, plus a patchy 1-2 high junk layer on the open
 field ground. Palette: gravel, cobbled deepslate, tuff, soul soil, coarse dirt, create andesite casing.
+That first pass took the road through the big field (deepslate / cyan terracotta / cut tuff with white dashes, worn with
+rooted dirt and podzol) for field ground and piled junk on it, and only filled air directly on the ground.
+Second pass, user's request ("roads clean, no air under the piles"): `GarbageFix <region> 32 1 592 -146 714 14 581 -250
+650 -166 --avoid 650 -144 674 -118` (build `garbagefix`, clear): 1,134 junk blocks cleared off the road columns (road
+surface detected in the field, widened by 1), 7,915 air/plant/carpet cells under pile tops filled (mix without gravel).
+`garbageground`: 151 hidden voids in the ground layer (y 31 under x 594..602 z -39..-25, y 32 at 623..625 z -64..-58)
+filled with dirt / coarse dirt. Left alone: the shack at 654..670 z -140..-122 (doors, levers, smokestack), the field
+fences, trees over the west strip.
 
 ### Rural infill (generator `RuralInfill`, build `ruralinfill`)
 
