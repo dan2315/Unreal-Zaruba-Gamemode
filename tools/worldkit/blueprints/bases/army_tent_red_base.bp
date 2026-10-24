@@ -1,0 +1,84 @@
+# worldkit blueprint v1
+name army_tent_red_base
+size 10 6 7
+ground 0
+source -925 33 449
+tags base tent military
+palette
+0 copycats:copycat_slab[axis=z,type=bottom,waterlogged=false]{material_data:{top:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}}},id:"copycats:multistate_copycat"}
+1 minecraft:spruce_trapdoor[facing=west,half=bottom,open=true,powered=false,waterlogged=false]
+2 minecraft:furnace[facing=south,lit=false]{CookTime:0,BurnTime:0,Items:[],id:"minecraft:furnace",CookTimeTotal:0,RecipesUsed:{}}
+3 minecraft:spruce_trapdoor[facing=east,half=bottom,open=true,powered=false,waterlogged=false]
+4 minecraft:oak_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+5 minecraft:barrel[facing=north,open=false]{Items:[],id:"minecraft:barrel"}
+6 copycats:copycat_slab[axis=z,type=top,waterlogged=false]{material_data:{top:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},bottom:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+7 copycats:copycat_half_panel[facing=west,offset=east,waterlogged=false]{Item:{count:1,id:"minecraft:white_wool"},EnableCT:1b,Material:{Name:"minecraft:white_wool"},id:"copycats:copycat"}
+8 minecraft:red_bed[facing=west,occupied=false,part=head]{id:"minecraft:bed"}
+9 minecraft:red_bed[facing=west,occupied=false,part=foot]{id:"minecraft:bed"}
+10 copycats:copycat_stairs[facing=south,half=bottom,shape=straight,waterlogged=false]{Item:{count:1,id:"minecraft:white_wool"},EnableCT:1b,Material:{Name:"minecraft:white_wool"},id:"copycats:copycat"}
+11 minecraft:white_wool
+12 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=false,top_northwest=true,top_southeast=false,top_southwest=true,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},top_southwest:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+13 copycats:copycat_byte[bottom_northeast=false,bottom_northwest=false,bottom_southeast=false,bottom_southwest=false,top_northeast=true,top_northwest=false,top_southeast=true,top_southwest=false,waterlogged=false]{material_data:{bottom_southeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_southwest:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom_northeast:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},top_northeast:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},top_southeast:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+14 copycats:copycat_stairs[facing=north,half=bottom,shape=straight,waterlogged=false]{Item:{count:1,id:"minecraft:white_wool"},EnableCT:1b,Material:{Name:"minecraft:white_wool"},id:"copycats:copycat"}
+15 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=8,positive_layers=2,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+16 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=6,positive_layers=1,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+17 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=5,positive_layers=2,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+18 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=2,positive_layers=5,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+19 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=4,positive_layers=1,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+20 copycats:copycat_stairs[facing=west,half=bottom,shape=outer_right,waterlogged=false]{Item:{count:1,id:"minecraft:white_wool"},EnableCT:1b,Material:{Name:"minecraft:white_wool"},id:"copycats:copycat"}
+21 minecraft:oak_fence[east=false,north=true,south=true,waterlogged=false,west=false]
+22 copycats:copycat_slab[axis=y,type=top,waterlogged=false]{material_data:{top:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},bottom:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+23 copycats:copycat_half_panel[facing=west,offset=west,waterlogged=false]{Item:{count:1,id:"minecraft:white_wool"},EnableCT:1b,Material:{Name:"minecraft:white_wool"},id:"copycats:copycat"}
+24 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=4,positive_layers=2,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+25 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=1,positive_layers=2,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+26 copycats:copycat_slab[axis=y,type=bottom,waterlogged=false]{material_data:{top:{material:{Name:"create:copycat_base"},enableCT:1b,consumedItem:{}},bottom:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}}},id:"copycats:multistate_copycat"}
+27 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=2,positive_layers=3,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+28 copycats:copycat_half_layer[axis=z,half=bottom,negative_layers=2,positive_layers=2,waterlogged=false]{material_data:{negative_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{count:1,id:"minecraft:white_wool"}},positive_layers:{material:{Name:"minecraft:white_wool"},enableCT:1b,consumedItem:{}}},id:"copycats:multistate_copycat"}
+layer 0
+. 0 0 0 0 0 0 0 0 .
+1 . . 2 . . 2 . . 3
+. . . . . . . . . .
+. 4 . . . . . . 4 .
+. . . . . . . . . .
+1 . . 5 . . 5 . . 3
+. 6 6 6 6 6 6 6 6 7
+layer 1
+. 0 0 0 0 0 0 0 0 .
+1 8 9 2 8 9 2 8 9 3
+. . . . . . . . . .
+. 4 . . . . . . 4 .
+. . . . . . . . . .
+1 8 9 5 8 9 5 8 9 3
+. 6 6 6 6 6 6 6 6 .
+layer 2
+. 10 11 10 10 10 . . 10 .
+. 12 12 12 12 12 12 12 12 .
+. . . . . . . . . .
+. 4 . . . . . . 4 .
+. . . . . . . . . .
+. 13 13 13 13 13 13 11 11 .
+. 14 15 11 14 14 14 16 17 .
+layer 3
+. . . . . . . . . .
+. 10 11 11 10 . 10 10 18 .
+. 12 12 12 12 12 12 12 12 .
+. 4 . . . . . . 4 .
+. 13 13 13 13 13 11 13 13 .
+. 14 14 14 11 14 19 14 20 .
+. . . . . . . . . .
+layer 4
+. . . . . . . . . .
+. . . . . . . . . .
+. 10 10 10 10 10 10 10 10 .
+. 21 22 22 22 22 22 22 21 23
+. 14 24 14 14 14 11 14 14 .
+. . . . . . . . . .
+. . . . . . . . . .
+layer 5
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. 25 26 25 27 28 25 27 26 .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .

@@ -1,0 +1,464 @@
+# worldkit blueprint v1
+name blue_flag
+size 4 31 13
+ground 0
+source 955 34 -392
+tags base blue flag
+palette
+0 minecraft:polished_andesite_slab[type=bottom,waterlogged=false]
+1 minecraft:smooth_stone_slab[type=bottom,waterlogged=false]
+2 minecraft:stone_brick_wall[east=none,north=none,south=tall,up=true,waterlogged=false,west=none]
+3 create:cut_andesite_slab[type=bottom,waterlogged=false]
+4 minecraft:stone_bricks
+5 minecraft:stone_brick_wall[east=none,north=none,south=none,up=true,waterlogged=false,west=tall]
+6 minecraft:stone_brick_wall[east=none,north=tall,south=none,up=true,waterlogged=false,west=none]
+7 minecraft:iron_bars[east=false,north=false,south=true,waterlogged=false,west=false]
+8 minecraft:iron_bars[east=false,north=false,south=false,waterlogged=false,west=true]
+9 minecraft:iron_bars[east=false,north=true,south=false,waterlogged=false,west=false]
+10 minecraft:chiseled_stone_bricks
+11 minecraft:stone_brick_wall[east=none,north=none,south=none,up=true,waterlogged=false,west=none]
+12 minecraft:andesite_wall[east=none,north=none,south=none,up=true,waterlogged=false,west=none]
+13 minecraft:spruce_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+14 minecraft:end_rod[facing=east]
+15 minecraft:end_rod[facing=west]
+16 minecraft:lever[face=ceiling,facing=east,powered=false]
+17 minecraft:smooth_quartz_slab[type=bottom,waterlogged=false]
+18 minecraft:blue_wool
+19 minecraft:iron_bars[east=false,north=true,south=true,waterlogged=false,west=false]
+20 minecraft:lapis_block
+21 minecraft:blue_concrete_powder
+22 minecraft:stone_brick_wall[east=none,north=low,south=low,up=true,waterlogged=false,west=none]
+layer 0
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 1
+. . . .
+. 7 . .
+. 4 8 .
+. 9 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 2
+. . . .
+. 7 . .
+. 10 5 .
+. 9 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 3
+. . . .
+. . . .
+. 10 1 .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 4
+. . . .
+. . . .
+. 11 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 5
+. . . .
+. . . .
+. 12 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 6
+. . . .
+. . . .
+. 12 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 7
+. . . .
+. . . .
+. 12 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 8
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 9
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 10
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 11
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 12
+. . . .
+14 15 16 .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 13
+. . . .
+. . 17 .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 14
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 15
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 16
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 17
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 18
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 19
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 20
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 21
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 22
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 23
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 24
+. . . .
+. . . .
+. 12 . .
+. . . .
+. . . .
+. . . .
+. . . .
+18 . . .
+. 18 . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 25
+. . . .
+. 7 . .
+. 10 . .
+. 19 . .
+. 18 . .
+. 20 . .
+18 . . .
+21 . . .
+. 21 . .
+. 20 . .
+. 18 . .
+. . . .
+. . . .
+layer 26
+. 7 . .
+. 9 . .
+. 13 . .
+. . . .
+. 21 . .
+. 18 . .
+21 . . .
+18 . . .
+. 20 . .
+. 18 . .
+. 21 . .
+. 18 . .
+. . . .
+layer 27
+. 7 . .
+. 9 . .
+. 13 . .
+. . . .
+. 20 . .
+. 18 . .
+20 . . .
+20 . . .
+. . . .
+. 18 . .
+. 18 . .
+. . . .
+. . . .
+layer 28
+. . . .
+. 7 . .
+. 22 . .
+. 19 . .
+. 20 . .
+. 21 . .
+18 . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 29
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+layer 30
+. . . .
+. . . .
+. 13 . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .
+. . . .

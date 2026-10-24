@@ -1,0 +1,51 @@
+# worldkit blueprint v1
+name blue_street_lamp
+size 6 15 1
+ground 0
+source 934 33 -436
+tags base blue lamp
+palette
+0 minecraft:cobblestone
+1 minecraft:polished_andesite
+2 create:cut_andesite
+3 create:polished_cut_tuff_slab[type=bottom,waterlogged=false]
+4 create:cut_limestone_wall[east=none,north=none,south=none,up=true,waterlogged=false,west=none]
+5 copycats:copycat_fence[east=false,north=false,south=false,waterlogged=false,west=false]{Item:{count:1,id:"create:cut_limestone"},EnableCT:1b,Material:{Name:"create:cut_limestone"},id:"copycats:copycat"}
+6 createbigcannons:unbored_very_small_nethersteel_cannon_layer[facing=down]{Connections:[],Facing:"down",Welds:[],id:"createbigcannons:cannon_end"}
+7 minecraft:smooth_quartz_slab[type=double,waterlogged=false]
+8 minecraft:smooth_quartz_slab[type=top,waterlogged=false]
+9 minecraft:lever[face=ceiling,facing=west,powered=false]
+10 minecraft:end_rod[facing=east]
+11 minecraft:end_rod[facing=west]
+12 minecraft:lever[face=ceiling,facing=east,powered=false]
+13 minecraft:smooth_quartz_slab[type=bottom,waterlogged=false]
+layer 0
+. . . . . .
+layer 1
+1 . . . . .
+layer 2
+4 . . . . .
+layer 3
+4 . . . . .
+layer 4
+4 . . . . .
+layer 5
+4 . . . . .
+layer 6
+4 . . . . .
+layer 7
+5 . . . . .
+layer 8
+5 . . . . .
+layer 9
+5 . . . . .
+layer 10
+5 . . . . .
+layer 11
+4 . . . . .
+layer 12
+6 . . . . .
+layer 13
+7 8 9 10 11 12
+layer 14
+. . 13 . . 13

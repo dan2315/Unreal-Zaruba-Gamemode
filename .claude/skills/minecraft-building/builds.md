@@ -40,6 +40,14 @@ cx+R+2 to cx+R+1+padLen, half-width R, yellow border.
 
 D is an open outpost on the existing paved area next to the ammo depot: blackstone-ringed plaza with the lodestone at
 the centre, flag and supplies on the west side, spawner on the east edge, pad markings painted east of it.
+`respawnD_dress` (user: "make it nicer"; it is BLUE's point, so BLUE base style), generator `RespawnDress <region>
+bases 33 701 -228 713 -216 702 -222 --west -228 -225 --north 706 710 --south 706 710 --east -225 -219` (clear): the old
+fence pole with a white banner replaced by the BLUE base's flag (blueprint `bases/blue_flag`: stone brick pedestal,
+30-high spruce mast, blue wool/lapis flag), four BLUE street lamps (`bases/blue_street_lamp`, limestone poles with
+quartz double heads) at x 704/712 z -230/-214, a low cut limestone wall with tuff pillar posts round the plaza with
+openings on all sides (east one in front of the purchase block, toward the pad), Create brown seat benches in the east
+corners. Respawn spot (707 34 -222) and the purchase block untouched. Also saved: `bases/army_tent_red_base` (RED's
+white tent, for RED-side points).
 
 ### Removed: the first base "at X"
 
