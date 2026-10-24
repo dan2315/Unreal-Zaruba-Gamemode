@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class ColoredSquareZone implements Renderable {
     AABB zone;
@@ -52,6 +53,11 @@ public class ColoredSquareZone implements Renderable {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
+        // set the depth state explicitly: other renderers at this stage (Sable, Veil...) can leave the depth test off,
+        // and the zone then shows through blocks; translucent, so it does not write depth itself
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        RenderSystem.depthMask(false);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
         BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
@@ -89,7 +95,7 @@ public class ColoredSquareZone implements Renderable {
 
         BufferUploader.drawWithShader(buffer.buildOrThrow());
 
-        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
