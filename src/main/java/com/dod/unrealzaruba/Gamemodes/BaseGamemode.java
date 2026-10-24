@@ -269,7 +269,7 @@ public abstract class BaseGamemode implements IPhaseHolder {
         if (PlayerContext.Get(id) instanceof TeamPlayerContext deadContext) deadContext.DeselectRespawnPoint();
         // Back at the base of the team in the game world, not at the world spawn of the lobby
         BlockPos spawn = DeathRespawnPosition(player);
-        if (spawn != null) player.setRespawnPosition(WorldManager.GAME_DIMENSION, spawn, 0f, true, false);
+        if (spawn != null) player.setRespawnPosition(WorldManager.GAME_DIMENSION, spawn.above(), 0f, true, false); // the block the player stands in: vanilla refuses a solid one ("no bed") and sends them to the overworld
         // The player respawns at once (so there is no death screen); the waiting is done as a spectator on the base
         TimerManager.createTickTimer(2, () -> respawnNow(id), null);
     }
