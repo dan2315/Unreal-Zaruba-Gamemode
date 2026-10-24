@@ -47,7 +47,12 @@ fence pole with a white banner replaced by the BLUE base's flag (blueprint `base
 quartz double heads) at x 704/712 z -230/-214, a low cut limestone wall with tuff pillar posts round the plaza with
 openings on all sides (east one in front of the purchase block, toward the pad), Create brown seat benches in the east
 corners. Respawn spot (707 34 -222) and the purchase block untouched. Also saved: `bases/army_tent_red_base` (RED's
-white tent, for RED-side points).
+white tent, for RED-side points). The user meant only the plaza itself ("зона спавна"); the lamps were approved
+("такими фонари должны быть"), the rest kept.
+`respawnD_plaza` (`RespawnPlaza <region> 707 33 -222 6`): the plaza floor inside the blackstone ring re-laid as swaps:
+polished cut limestone diamond round the lodestone, a blue concrete ring (d 3, the BLUE flag's colour; blue terracotta
+was tried and read purple), smooth stone / polished andesite checker outside, cut limestone brick paths on the axes;
+moss + flowering azalea planters in the inner corners; the hay bale became an ammo container.
 
 ### Removed: the first base "at X"
 
