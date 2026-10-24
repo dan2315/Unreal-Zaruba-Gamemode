@@ -265,9 +265,11 @@ Four identical brass tower cranes in the city: A masts 404/408 z -175/-171 (boom
 642..646 z -172..-168 have their booms hanging to the ground (left as they are). The jib is only vertical
 `createdeco:brass_support` posts (y 79-81) every 3 blocks with nothing between, and the counterweight (stone, x 393-397)
 floats 7 blocks from the mast: from below it reads as floating chunks. Same in all source map versions (v1-v3).
-`craneA_fix` (crane A only, user's request): horizontal chords `brass_support[facing=east]` at y 79 and 81 on both
-sides (x 397..437 between the posts), floor cross members `facing=south` at y 79 every 3, two posts on the counter-jib.
-Same recipe for B-D if wanted (rotate the directions for D).
+`craneA_fix` (user's request): horizontal chords `brass_support[facing=east]` at y 79 and 81 on both sides (x 397..437
+between the posts), floor cross members `facing=south` at y 79 every 3, two posts on the counter-jib.
+`craneB_fix`, `craneC_fix`, `craneD_fix`: the same file transformed, checked block by block against the cranes first
+(`DiffT`: only the 152 fix blocks differ): C = A shifted (x+107, z-68); B = A mirrored in x (839-x, z+76; east<->west);
+D = A turned a quarter clockwise (364-z, x-703; east->south, south->west).
 
 ### Border hills and forests (generator `BorderHills`)
 
