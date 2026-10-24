@@ -177,6 +177,14 @@ ladder at the front of each gantry. Style of the small plots at the RED base (bl
   z -470..-438: towers, ladders, catwalks, purchase blocks; caution borders swapped back to the yard floor. Blueprints
   `bases/red_vehicle_plots_small`, `bases/blue_vehicle_plots_small`.
 - Blueprint: `bases/spawn_plots_red`.
+- Склад боеприпасов (respawn D), user: "the vehicle spawn zone needs redoing" (the old one was only a yellow outline
+  painted across the N-S road and the grass east of it, x 715..744 z -234..-210, terminal on the plaza's east edge).
+  `padD_plot`: `SpawnPlots east 750 33 -232 1 blue --region <r> --cut`: one standard plot east of the road on the
+  meadow, pad x 750..779 z -232..-203, gantries z -236..-234 and -202..-200, apron x 743..749 on the worn road edge
+  (apron cells on road blocks skipped: they blend in), terminal 747 34 -218 facing west. `padD_tidy` (clear, one-off
+  scratchpad generator): the yellow outline swapped back to its neighbours' blocks, a zebra crossing (white concrete
+  bars on even x 720..740, z -221..-217) from the plaza's east gate to the terminal, the old purchase block at
+  713 34 -222 and its "Спавн техники" sign removed (lantern on the freed post), plants and bushes cleared off the plot.
 
 ### Fishing hut west of the lake (generator `FishingHut -430 32 22 28 <region>`, build `fishinghut`)
 
