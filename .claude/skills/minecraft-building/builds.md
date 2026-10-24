@@ -151,11 +151,15 @@ ladder at the front of each gantry. Style of the small plots at the RED base (bl
 - RED (`spawnplots_red`, applied): `SpawnPlots east -862 32 374 3 red`: pads x -862..-833, z 374..403 / 409..438 /
   444..473, terminals at x -865 z 388 / 423 / 458 facing west, right outside the base's east gate (gate z 414..434: the
   middle terminal is straight ahead). Old track sleepers at x -869..-859 z 421..428 left in place (43 blocks skipped).
-- BLUE (`spawnplots_blue`, NOT applied): `SpawnPlots south 893 32 -333 3 blue --cut`: pads z -333..-304, x 893..922 /
-  928..957 / 963..992, terminals z -336. Needs `apply spawnplots_blue clear`: 1,429 terrain columns of the hill south
-  of the base cut down to y 32 (incl. two decorative trees at x 904..912) — waiting for the user's OK. Plus build
-  `bluegate` (also needs clear): an 11-wide opening x 937..947 in the base's south wall (z -355..-347, wall, curb and the
-  barrier blocks on top), paved, with tuff pillars and lanterns.
+- BLUE (`spawnplots_blue`, applied with clear on the user's OK): `SpawnPlots south 893 32 -333 3 blue --cut`: pads z -333..-304,
+  x 893..922 / 928..957 / 963..992, terminals z -336 facing north. The hill south of the base was cut down to y 32 under
+  the plots (two decorative trees at x 904..912 went with it; tree remains over the pads removed by build `padtrees`).
+  `bluegate`: 11-wide opening x 937..947 in the base's south wall (wall, curb, barrier blocks), paved, tuff pillars and
+  lanterns. `blueramp` (generator `Ramp 889 996 -303 1 32 3 60`, clear): a 108-wide ramp from the pads' south edge up the
+  hill, 1 block per 3, so vehicles can drive out forward.
+- Old small plots removed in both bases (`oldplots_remove`, clear): RED x -969..-956 z 415..447, BLUE x 909..925
+  z -470..-438: towers, ladders, catwalks, purchase blocks; caution borders swapped back to the yard floor. Blueprints
+  `bases/red_vehicle_plots_small`, `bases/blue_vehicle_plots_small`.
 - Blueprint: `bases/spawn_plots_red`.
 
 ### Fishing hut west of the lake (generator `FishingHut -430 32 22 28 <region>`, build `fishinghut`)
@@ -165,11 +169,13 @@ rack and barrels, a 9-wide slipway road z 26..34 from the yard down the gravel s
 andesite/gravel, stripped spruce curbs, lantern posts at x -414), a plank pier on log posts z 15..19 out to x -398.
 Blueprint `lake/fishing_hut`.
 
-### Shore path from Дорожный аванпост to Насосная станция (build `shorepath`)
+### Shore road from Дорожный аванпост to Насосная станция (builds `shoreroad`, `shoremounds`)
 
-`Pathway <region> 4 -462 328 -445 295 -418 262 -385 238 -340 224 -295 222 -255 208 -222 182 -196 150 -176 115 -170 80
--165 52 -152 40 --density=0.85`: ~9 wide dirt path just outside the gravel beach, around the south and east shore to the
-station's south road. A first version on the gravel itself was invisible and was undone.
+Vehicle road, about 13 wide (user asked for 12+ so vehicles can pass): `Pathway <region> 6 ... --density=0.75
+--clear-trees` (applied with clear: trees standing in the corridor removed whole), then `LevelMounds <region> 32 6 <same
+waypoints>` (small rock/flower mounds in the corridor levelled). Waypoints: `-462 328 -445 295 -418 262 -385 238 -340 224 -295 222 -255 208 -222 182 -196 150 -176 115 -170 80
+-165 52 -152 40`. It runs just outside the gravel beach, around the south and east shore to the station's south road.
+Earlier versions (a 9-wide footpath `shorepath`, and one on the gravel itself) were undone.
 
 ### Border hills and forests (generator `BorderHills`)
 
