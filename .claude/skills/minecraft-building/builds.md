@@ -169,15 +169,24 @@ rack and barrels, a 9-wide slipway road z 26..34 from the yard down the gravel s
 andesite/gravel, stripped spruce curbs, lantern posts at x -414), a plank pier on log posts z 15..19 out to x -398.
 Blueprint `lake/fishing_hut`.
 
-### Road from the BLUE spawn plots to the main road (builds `blueroad`, `blueramp2`, `bluebank`)
+### Road from the BLUE spawn plots to the main road (builds `blueroad`, `blueroadstep`, `blueramp2`, `bluebank`, `bluetidy`)
 
-`LaneRoad <region> 860 996 -303 -292 32 869` (applied with clear): a 12-wide road along the south edge of the pads, in the
-style of the main road west of the base (worn brown edges, yellow terracotta lines, grey lanes of stone / andesite / cut
-andesite with light grey wool, limestone, dead fire coral, bone block patches). Level with the pads (y 32) so vehicles
-roll off the pads straight onto it; at the west end it crosses the ditch and climbs to the main road (y 33) over a
-2-wide band of smooth stone slabs at x 869..870. The hill ramp was moved behind the road: `Ramp 889 996 -291 1 32 3 80`
-(`blueramp2`, clear). `BankFill <region> 866 -345 888 -304 32` (`bluebank`): the ditch between pad 1 and the main road
-filled level with grass.
+`LaneRoad <region> 845 996 -303 -279 32 869` (applied with clear): a 25-wide road along the south edge of the pads, in
+the style of the main road west of the base (worn brown edges, yellow terracotta edge lines, grey lanes of stone /
+andesite / cut andesite with limestone, dead fire coral and cut dripstone patches) and a white dashed centre line of bone
+blocks (3 on, 4 off, a few worn away; the user's "white blocks are the centre dashes"). Level with the pads (y 32) so
+vehicles roll off the pads straight onto it; west of x 869 it is at the main road's y 33, with a 2-wide band of smooth
+stone slabs at x 869..870 (`blueroadstep` adds 4 slabs at z -278). Old main-road blocks inside it were kept.
+The hill ramp is behind the road: `Ramp <region> 889 996 -278 1 32 3 80 0 24` (`blueramp2`, clear), 1 block per 3
+rows, with a bank on the east side rising 1 per block. `BankFill <region> 866 -345 888 -304 32` (`bluebank`): the
+ditch between pad 1 and the main road filled level with grass.
+
+Leftovers levelled with `Tidy <region> 840 -334 1023 -196 1 20 4  845 -303 868 -279 33  869 -303 996 -279 32  889 -278
+996 -199 auto` (`bluetidy`, clear; plus `bluetidypits`, 2 cells): the 7-28 high cut face where the road ends against
+the east border hill is now a 1:1 bank up to the map edge (x 997..1023, ~11,600 blocks cut), the 1-deep ditch along the
+road's south edge at x 846..868 filled to y 33, ragged one-block steps at the ramp's edges smoothed, 20 broken trees
+(fence/copycat trunks left on pillars, half-cut crowns) and 46 floating leaf clumps removed. Kept: the twisted oak at
+955 -269 (intact library tree), the library trees on the ramp. The jagged stone face visible at x 1023 is the map edge.
 
 ### Shore road from Дорожный аванпост to Насосная станция (builds `shoreroad`, `shoremounds`)
 
