@@ -1,0 +1,69 @@
+# worldkit blueprint v1
+name dark_oak_spruce_h9_w3_1
+size 5 9 5
+ground 0
+source 746 33 -50
+tags tree nature
+palette
+0 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+1 minecraft:spruce_leaves[distance=7,persistent=true,waterlogged=false]
+2 minecraft:dark_oak_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+3 minecraft:dark_oak_fence[east=false,north=false,south=false,waterlogged=false,west=true]
+4 minecraft:dark_oak_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+5 minecraft:dark_oak_fence[east=false,north=true,south=true,waterlogged=false,west=false]
+6 minecraft:dark_oak_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+7 minecraft:dark_oak_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+layer 0
+. . . . .
+. . . . .
+. . . . .
+. . . . .
+. . . . .
+layer 1
+. . . . .
+. . . . .
+. . 4 . .
+. . . . .
+. . . . .
+layer 2
+. 0 1 . .
+1 1 7 1 1
+0 1 5 1 1
+. 1 2 1 .
+. . 0 1 .
+layer 3
+. . . 0 .
+. 1 1 1 .
+. 1 6 3 1
+. . 0 1 0
+. . 1 . .
+layer 4
+. . 1 . .
+. 1 1 1 0
+. 1 4 1 .
+. 1 1 1 .
+. . . . .
+layer 5
+. . . . .
+. . 0 . .
+. 1 4 0 .
+. . 1 . .
+. . . . .
+layer 6
+. . . . .
+. . 1 . .
+. . 0 1 .
+. . 0 . .
+. . . . .
+layer 7
+. . . . .
+. . . . .
+. . 0 . .
+. . . . .
+. . . . .
+layer 8
+. . . . .
+. . . . .
+. . 1 . .
+. . . . .
+. . . . .

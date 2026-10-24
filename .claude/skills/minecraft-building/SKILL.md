@@ -108,6 +108,7 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `LaneRoad <region> xWest xEast z0 z1 y xRise` | Straight paved road along x in the main road's style (brown edges, yellow lines, grey lanes, white dashed bone-block centre line from 9 wide); one higher west of xRise with a slab band. Apply with `clear` |
 | `Ramp <region> x0 x1 zStart dir y run rows [taperW taperE]` | Driveable ramp up a hillside (1 per `run` rows) with side banks; cuts earth above, fills dips. Apply with `clear` |
 | `Tidy <region> x0 z0 x1 z1 slope smoothDist treeClear ref...` | Levels leftovers around new surfaces (ref = `x0 z0 x1 z1 y` or `auto` for a ramp): walls become banks rising `slope` per block, ditches by the road filled, small bumps/pits median-smoothed, broken/floating trees and leaf clumps removed (fence/copycat trunks count as trees). Run after a road or ramp; apply with `clear` |
+| `Forest <region> <trees dir> x0 z0 x1 z1 [--track hw x z ...] [--hill x z r h] [--swamp x z r] [--avoid ...] [--part k n]` | Forest with relief in open land: hills, small swamps flush with the ground, corridors kept clear for tracks (then lay them with Pathway, same points), trees from a blueprint folder anchored by their trunk on level ground, forest floor and undergrowth. Keeps away from builds, roads, water, old trunks |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)
@@ -229,3 +230,12 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
 - createdeco catwalk stairs face their low end (opposite of vanilla stairs); catwalk floors sit at the top of their
   block (catwalk at y = stand at y+1); railings are separate blocks above the catwalk with per-side booleans.
 - The capture points lake: surface y 28, bottom about y -31 (60 blocks deep), roughly x -404..-212, z -100..160.
+- Water next to the map's painted grass hardens `green_concrete_powder` into `green_concrete` the moment it is placed,
+  so swaps of neighbouring powder cells then fail ("in the way: green_concrete"). For builds that place water, append
+  a second swap `green_concrete -> <same block>` for those cells at the end of the file; an undo restores powder next
+  to water that is still there and it hardens again: after it, find `green_concrete` and swap it back to powder.
+- Library trees come in pieces: trunks with gaps, fence branches, crowns joined only by leaves, floating cross tips on
+  the spruces. Anchor a tree by its lowest trunk layer (not the blueprint centre), and don't treat detached pieces or
+  tips as "floating" (Tidy handles both).
+- Pathway `--clear-trees` removes leaves within 6 of the cut wood: big crowns leave pieces in the air. Run `Tidy` with
+  no references over the area afterwards and keep only the clears near the track.

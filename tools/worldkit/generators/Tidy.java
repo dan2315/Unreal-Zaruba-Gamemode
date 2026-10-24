@@ -9,10 +9,14 @@ import java.util.*;
  *   - Fill: ground within 2 of a fixed-height reference is raised to its level, within 5 to one below (ditches).
  *   - Smooth: within smoothDist of a fixed reference, two passes of a 3x3 median remove one- and two-block bumps,
  *     pits and ragged edges (slopes and straight edges are kept); columns with a tree trunk stay as they are.
- *   - Trees: a tree (logs connected to each other, with the leaves and vines nearest to them) goes whole when its trunk
- *     loses the ground under it, when the ground cut passes through it, when it stands within treeClear of a fixed
- *     reference, or when it is a bare stump (1-3 upright logs, no leaves). Leaves reaching no log and touching nothing
- *     solid (crowns left in the air by earlier clears) go too. Trees crossing the edge of the area are kept.
+ *   - Trees: a tree piece (wood connected to each other, fences and copycat walls included, with the leaves and vines
+ *     nearest to it) stands when it rests on the ground or hangs on a standing piece (wood within 4, or leaves touching
+ *     its leaves: big crowns and library trunks come in pieces). A piece goes whole when nothing holds it, when the
+ *     ground cut passes through it, when it stands within treeClear of a fixed reference, or when it is a bare stump
+ *     (1-3 upright logs, no leaves); pieces held only by a piece that went go with it. Leaves reaching no wood and
+ *     touching nothing solid or standing, not even at an edge or corner and not as a tip 1-3 above a crown (library
+ *     spruces have speckled crowns and floating tips), go too: crowns left in the air by earlier clears. Pieces
+ *     crossing the edge of the area are kept. With no references only this tree pass runs (after Pathway --clear-trees).
  * New tops get the map's grass mix. Lowering and tree removal are clears: apply with `/buildkit apply <name> clear`.
  * Usage: java Tidy <region> x0 z0 x1 z1 slope smoothDist treeClear  ref...   (ref = x0 z0 x1 z1 y|auto)
  */
@@ -232,14 +236,23 @@ public class Tidy {
             }
         }
         int removed = 0, stumps = 0, clumps = 0;
+        boolean[] grounded = new boolean[logs.size()], gone = new boolean[logs.size()], atEdge = new boolean[logs.size()];
+        for (int t = 0; t < logs.size(); t++) for (int e : logs.get(t)) if (e % H > 0 && kind[e - 1] == 3) grounded[t] = true;
+        boolean[] standing = grounded.clone();
+        // a branch of a standing tree is not loose: big crowns and library trunks have wood pieces that do not touch
+        // (base, middle, top joined by leaves), so attachment carries from piece to piece
+        for (boolean changed = true; changed; ) {
+            changed = false;
+            for (int t = 0; t < logs.size(); t++)
+                if (!grounded[t] && attached(t, logs.get(t), leaves.get(t), tree, kind, grounded, H)) { grounded[t] = true; changed = true; }
+        }
         for (int t = 0; t < logs.size(); t++) {
+            atEdge[t] = true;
             List<Integer> lg = logs.get(t);
-            boolean edge = false, supported = false, cutThrough = false, nearRoad = false, upright = true;
+            boolean edge = false, supported = grounded[t], cutThrough = false, nearRoad = false, upright = true;
             for (int e : lg) {
                 int i = e / (h * H), j = e / H % h, y = e % H + Y0;
                 if (!editable(i, j) || y >= Y1 - 1) edge = true;
-                int below = e - 1;
-                if (y > Y0 && kind[below] == 3) supported = true;
                 if (lowered[i][j] && y <= old[i][j] + 3) cutThrough = true;
                 if (fdist[i][j] <= treeClear && !fixed[i][j] && leaves.get(t).size() >= 5) nearRoad = true;
                 String s = r.state(ax0 + i, y, az0 + j);
@@ -250,6 +263,7 @@ public class Tidy {
                 if (!editable(i, j)) edge = true;
             }
             if (edge) continue;
+            atEdge[t] = false;
             boolean stump = upright && lg.size() <= 3 && leaves.get(t).isEmpty() && supported;
             if (supported && !cutThrough && !nearRoad && !stump) continue;
             // road and floor blocks made of wood (stripped wood patches) sit in a surface: only clear free-standing wood
@@ -258,7 +272,22 @@ public class Tidy {
             if (inSurface && leaves.get(t).isEmpty()) continue;
             clearAll(c, lg, H, "broken or stray tree by the road");
             clearAll(c, leaves.get(t), H, "broken or stray tree by the road");
+            gone[t] = true;
             if (stump) stumps++; else removed++;
+        }
+        // branches held only by a tree that went: they go too (pieces at the edge of the area stay)
+        for (boolean changed = true; changed; ) {
+            changed = false;
+            boolean[] alive = new boolean[logs.size()];
+            for (int t = 0; t < logs.size(); t++) alive[t] = grounded[t] && !gone[t];
+            for (int t = 0; t < logs.size(); t++) {
+                if (gone[t] || atEdge[t] || standing[t] || attached(t, logs.get(t), leaves.get(t), tree, kind, alive, H)) continue;
+                clearAll(c, logs.get(t), H, "broken or stray tree by the road");
+                clearAll(c, leaves.get(t), H, "broken or stray tree by the road");
+                gone[t] = true;
+                removed++;
+                changed = true;
+            }
         }
         // leaves that reached no log: clear the clumps that touch nothing solid
         boolean[] seen = new boolean[kind.length];
@@ -273,10 +302,20 @@ public class Tidy {
                 comp.add(e);
                 int i = e / (h * H), j = e / H % h;
                 if (!editable(i, j)) edge = true;
-                for (int f : six(e)) {
-                    if (f < 0) continue;
-                    if (kind[f] == 3 || kind[f] == 1) touches = true;
-                    if (kind[f] == 2 && tree[f] < 0 && !seen[f]) { seen[f] = true; cq.add(f); }
+                for (int f : six(e)) if (f >= 0 && kind[f] == 2 && tree[f] < 0 && !seen[f]) { seen[f] = true; cq.add(f); }
+                // touching (sides, edges or corners) the ground, wood, or the leaves of a tree that stays: part of a
+                // crown (library crowns are speckled, single leaves meet only at edges) or a bush
+                int ly = e % H;
+                for (int di = -1; di <= 1; di++) for (int dj = -1; dj <= 1; dj++) for (int dy = -1; dy <= 1; dy++) {
+                    int pi = i + di, pj = j + dj, yy = ly + dy;
+                    if (pi < 0 || pj < 0 || yy < 0 || pi >= w || pj >= h || yy >= H) continue;
+                    int f = (pi * h + pj) * H + yy;
+                    if (kind[f] == 3 || kind[f] == 1 || kind[f] == 2 && tree[f] >= 0 && !gone[tree[f]]) touches = true;
+                }
+                // spruce tips: library spruces carry a small cross of leaves a block or two above the crown
+                for (int dy = 1; dy <= 3 && e % H - dy >= 0; dy++) {
+                    int f = e - dy;
+                    if (kind[f] == 1 || kind[f] == 2 && tree[f] >= 0 && !gone[tree[f]]) touches = true;
                 }
             }
             if (touches || edge) continue;
@@ -284,6 +323,22 @@ public class Tidy {
             clumps++;
         }
         return new int[] {removed, stumps, clumps};
+    }
+
+    // wood within 4 blocks, or leaves touching leaves, of a tree that stands on the ground
+    static boolean attached(int t, List<Integer> wood, List<Integer> leaves, int[] tree, byte[] kind, boolean[] grounded, int H) {
+        for (int e : wood) {
+            int i = e / (h * H), j = e / H % h, y = e % H;
+            for (int di = -4; di <= 4; di++) for (int dj = -4; dj <= 4; dj++) for (int dy = -4; dy <= 4; dy++) {
+                int p = i + di, q = j + dj, yy = y + dy;
+                if (p < 0 || q < 0 || yy < 0 || p >= w || q >= h || yy >= H) continue;
+                int f = (p * h + q) * H + yy;
+                if (kind[f] == 1 && tree[f] >= 0 && tree[f] != t && grounded[tree[f]]) return true;
+            }
+        }
+        for (int e : leaves) for (int f : six(e))
+            if (f >= 0 && kind[f] == 2 && tree[f] >= 0 && tree[f] != t && grounded[tree[f]]) return true;
+        return false;
     }
 
     static int idx(int i, int y, int j) { return (i * h + j) * (Y1 - Y0 + 1) + (y - Y0); }

@@ -199,6 +199,33 @@ waypoints>` (small rock/flower mounds in the corridor levelled). Waypoints: `-46
 -165 52 -152 40`. It runs just outside the gravel beach, around the south and east shore to the station's south road.
 Earlier versions (a 9-wide footpath `shorepath`, and one on the gravel itself) were undone.
 
+### Spruce forest west of the lake (generator `Forest`, builds `westforest`, `westtrack1..3`, `westleaves`, `westleaves2`)
+
+User's request: take the spruces of the planted grove by the BLUE ammo depot (x 733..752, z -56..4: dark oak trunks,
+spruce needles flecked with birch leaves, fence branches, floating cross tips) and make a pine forest left of the lake,
+with some relief: small swamps, hillocks, alternative vehicle routes to key places. The grove is untouched; its 14
+kinds are the blueprints `trees/spruce_grove/` (Trees scan, up to 3 per size class).
+
+`Forest <region> trees/spruce_grove -775 -150 -445 292` with (also in this order for re-runs):
+- tracks (half width 6, ~13 wide, surface by `Pathway ... 6 <same points> --density=0.75 --clear-trees`):
+  - T1 west forest road, south road ↔ north road: `-600 308 -606 265 -628 215 -640 160 -622 105 -604 60 -618 5
+    -646 -45 -650 -95 -632 -140 -622 -168` (no old trees in the way);
+  - T2 to the fishing hut's slipway (boats/amphibious across the lake to the pumping station): `-606 62 -570 48
+    -530 40 -492 36 -462 31 -440 30` (12 old deciduous trees removed);
+  - T3 along the edge of the old woodland, south road west of the bunker ↔ hut ↔ north road by the bridge: `-490 307
+    -500 265 -510 215 -512 165 -503 115 -494 70 -492 36 -505 -15 -520 -70 -505 -120 -480 -160 -462 -184` (20 removed);
+- swamps `-690 95 16`, `-565 -60 13`, `-560 205 10` (water flush with the ground, 2 deep in the middle, mud/clay
+  bottom, reeds, lily pads, dead dark oak trunks);
+- hills `-705 225 30 7`, `-555 130 24 6`, `-705 -40 26 8`, `-560 -125 18 5`, `-745 140 18 5`, `-660 30 14 4`,
+  `-680 -120 20 6`, `-560 270 16 4` (mossy boulders on top, meadows on several);
+- `--avoid -440 8 -395 40` (hut, slipway, pier).
+Result: 1,382 spruces, ~365k blocks; clearings from noise; forest floor of podzol/moss/coarse dirt, ferns, berries,
+mushrooms. The ground here was flat at y 32. `westleaves`, `westleaves2`: crown pieces of the old trees cut for T2/T3
+left in the air (found with `Tidy` without references, filtered to the tracks).
+Gameplay: covered infantry approach from RED's side (outpost, helipad) to the west shore; vehicles have two
+north–south routes (T1, T3) besides the roads, and the slipway crossing; hills give firing positions over T1/T3.
+Undo order if ever needed: westleaves2, westleaves, westtrack3..1, westforest (then check `green_concrete` below).
+
 ### Border hills and forests (generator `BorderHills`)
 
 - Left and right edges (`LR 110 26 10`, excluding the RED base + plots, the BLUE base + plots, and 60 around the helipad

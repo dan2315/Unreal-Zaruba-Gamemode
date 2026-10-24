@@ -1,0 +1,158 @@
+# worldkit blueprint v1
+name dark_oak_spruce_h12_w6_2
+size 8 14 8
+ground 0
+source 734 39 -2
+tags tree nature
+palette
+0 minecraft:spruce_leaves[distance=6,persistent=true,waterlogged=false]
+1 minecraft:spruce_leaves[distance=5,persistent=true,waterlogged=false]
+2 minecraft:birch_leaves[distance=4,persistent=true,waterlogged=false]
+3 minecraft:birch_leaves[distance=6,persistent=true,waterlogged=false]
+4 minecraft:birch_leaves[distance=5,persistent=true,waterlogged=false]
+5 minecraft:spruce_leaves[distance=3,persistent=true,waterlogged=false]
+6 minecraft:spruce_leaves[distance=2,persistent=true,waterlogged=false]
+7 minecraft:spruce_leaves[distance=7,persistent=true,waterlogged=false]
+8 minecraft:birch_leaves[distance=7,persistent=true,waterlogged=false]
+9 minecraft:dark_oak_fence[east=false,north=true,south=true,waterlogged=false,west=false]
+10 minecraft:spruce_leaves[distance=1,persistent=true,waterlogged=false]
+11 minecraft:dark_oak_fence[east=true,north=true,south=false,waterlogged=false,west=true]
+12 minecraft:dark_oak_fence[east=false,north=true,south=false,waterlogged=false,west=false]
+13 minecraft:dark_oak_fence[east=false,north=true,south=false,waterlogged=false,west=true]
+14 minecraft:spruce_leaves[distance=4,persistent=true,waterlogged=false]
+15 minecraft:dark_oak_fence[east=true,north=true,south=true,waterlogged=false,west=false]
+16 minecraft:birch_leaves[distance=2,persistent=true,waterlogged=false]
+17 minecraft:dark_oak_fence[east=false,north=false,south=true,waterlogged=false,west=false]
+18 minecraft:birch_leaves[distance=3,persistent=true,waterlogged=false]
+19 minecraft:dark_oak_fence[east=true,north=false,south=false,waterlogged=false,west=true]
+20 minecraft:dark_oak_fence[east=true,north=false,south=false,waterlogged=false,west=false]
+21 minecraft:dark_oak_fence[east=false,north=false,south=true,waterlogged=false,west=true]
+22 minecraft:spruce_log[axis=y]
+23 minecraft:spruce_wood[axis=y]
+24 minecraft:dark_oak_fence[east=false,north=false,south=false,waterlogged=false,west=false]
+layer 0
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 1
+. . . 0 1 . . .
+. 1 14 17 14 2 4 .
+0 4 . 15 . 5 14 .
+0 . 19 22 10 6 5 14
+1 14 5 9 6 5 14 .
+. 1 14 . 5 14 1 .
+. 0 1 3 . 1 . .
+. . 0 . . . . .
+layer 2
+. . . . . . . .
+. . 14 5 14 . . .
+. 14 5 . 5 14 . .
+. 1 . 22 19 . 14 .
+. 14 5 . 5 14 . .
+. . 14 1 14 1 . .
+. . . 0 4 . . .
+. . . . . . . .
+layer 3
+. . . . . . . .
+. . . 6 . . . .
+. . 6 10 16 . . .
+. 14 . 23 . 14 . .
+14 5 6 10 6 5 14 .
+4 14 5 . 5 . . .
+. . 2 . . . . .
+. . . . . . . .
+layer 4
+. . . 2 . . . .
+. . 14 18 2 . . .
+1 14 5 . 5 14 . .
+0 1 14 15 . 1 3 .
+. 14 . 11 13 14 . .
+. . 14 1 . 1 . .
+. . . 3 . . . .
+. . . . . . . .
+layer 5
+. . . . . . . .
+. . . . . . . .
+. 1 . 1 2 . . .
+. . 20 21 1 . . .
+. 4 0 . 0 1 . .
+. . 1 0 8 . . .
+. . . . . . . .
+. . . . . . . .
+layer 6
+. . . . . . . .
+. . . 8 . . . .
+. . 7 0 . . . .
+. 7 . 21 0 7 . .
+. . 7 12 7 . . .
+. . . 7 . . . .
+. . . . . . . .
+. . . . . . . .
+layer 7
+. . . . . . . .
+. . 7 . . . . .
+. 7 7 7 7 . . .
+. 8 8 24 7 8 . .
+. . 8 7 8 . . .
+. . . . 7 . . .
+. . . . . . . .
+. . . . . . . .
+layer 8
+. . . . . . . .
+. . . . . . . .
+. . 7 . . . . .
+. . 7 24 7 . . .
+. . 8 . . 7 . .
+. . 7 . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 9
+. . . . . . . .
+. . . . . . . .
+. . . 8 . . . .
+. . 7 8 . . . .
+. 7 . 7 . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 10
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . 8 7 . . .
+. . . 7 . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 11
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . 7 7 . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 12
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . 7 . . . .
+. . . 7 . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+layer 13
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . 8 . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
