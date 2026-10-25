@@ -345,8 +345,9 @@ the dropped items (19,065: flowers, wheat seeds from grass, berries, mushrooms) 
   left: 3 armor stands, 1 simulated:honey_glue (as in the 21:53 backup). Live match: items and mobs killed by RCON.
 - Generators fixed (`BorderHills.holdsPlants`). Prepared, NOT applied yet (needs DEV mode): `plantfix_0..3`
   (strips of 512 along x; scratchpad PlantFix): 12,997 flowers get a grass block under them, 40,012 grass/fern plants on
-  painted cells removed, 604 mushrooms outside podzol removed. Apply with `clear`, then `save-all flush`.
-  The original map (v3) had ~400 such plants.
+  painted cells removed, 604 mushrooms outside podzol removed. Superseded on 2026-10-25 by `plantclean_0..3`, regenerated
+  from the map of that day (PlantFix) and applied: 40,535 plants cleared, 12,893 flowers got a grass block; a re-scan finds
+  none left. The original map (v3) had ~400 such plants.
 
 ### Электростанция turbine hall: lights and machinery (2026-10-25)
 
@@ -399,3 +400,14 @@ beige blocks are not registered). The 4 old design_decor signs were left out (`-
 decals themselves after the catwalk ones dropped). Screenshots `yard_before_*`, `yard_after_*`.
 Dropped items: 7 killed in game_dim; 3 red tulip items remain in the template's entity files (unloaded chunks): strip
 them with `Entities strip` the next time the map is closed.
+
+### Clean-up and transfer to prod (2026-10-25)
+
+`plantclean_0..3` applied (see the lag fix above); dropped items killed in game_dim, then with the server stopped the
+template's `entities/` stripped of 12 `minecraft:item` (backup `unrealfrontiers-testing/backups/
+capturepoints_entities_before_strip_2026-10-25`); left: 3 armor stands, 1 honey glue. Dev restarted in DEV.
+The template (`game_worlds/capturepointsgamemode/dimensions`) and `objectives.json` + `economy.json` copied to the prod
+server (teamData, barriervolumes, scoring were already the same); prod's previous template and configs are in
+`zaruba-server/backups/capturepoints_before_transfer_2026-10-25`. Copy procedure: dev `save-off` + `save-all flush`,
+prod stopped, copy, dev `save-on`, prod started (it stays in GAME mode; the match copies the new template). The
+pre-rendered Xaero maps (`unrealzaruba/xaero-maps`, 2026-10-05) are stale on both servers: `/mapscan` refreshes them.
