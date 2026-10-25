@@ -30,3 +30,6 @@ buildClientServerDev.bat
 *.lnk
 .prettierrc
 downloads
+# Local runtime logs and the IDE launch file ModDevGradle generates (absolute paths)
+logs/
+.vscode/launch.json
