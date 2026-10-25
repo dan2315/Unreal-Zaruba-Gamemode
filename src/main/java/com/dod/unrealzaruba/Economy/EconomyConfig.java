@@ -18,6 +18,11 @@ import java.util.Map;
 public class EconomyConfig {
     public int startingMoney = 1000;
     public int killReward = 300;
+    /**
+     * A death with no clear killer (a fall, a blast or a shell that names nobody): the reward is shared by the enemies within this
+     * many blocks of the body, or goes to the nearest enemy when none is that close.
+     */
+    public int unclearKillRadius = 30;
     public boolean buyMenuEnabled = true;
     /** The buy menu only opens in the team's respawn zones (around respawn points and in held capture areas). */
     public boolean buyOnlyInRespawnZones = true;

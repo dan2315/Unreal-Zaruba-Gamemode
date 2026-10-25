@@ -74,18 +74,20 @@ public final class SideIncome {
     }
 
     /**
-     * Called for every death in a match. {@code enemyKiller} is the killing player when they're on another team,
-     * otherwise null (suicide, team kill, environment): the streak ends but nobody collects.
+     * Called for every death in a match. {@code enemyKillers} are the killing players on another team, nearest first (several
+     * share an unclear kill); empty for a suicide, a team kill or nobody's death: the streak ends but nobody collects. Returns
+     * the bounty each of them got.
      */
-    public static int onDeath(ServerPlayer victim, ServerPlayer enemyKiller, MinecraftServer server) {
+    public static int onDeath(ServerPlayer victim, List<ServerPlayer> enemyKillers, MinecraftServer server) {
         // The kills the victim has made so far are not paid for yet: the one who kills them is paid for all of them
         int victimKills = STREAKS.getOrDefault(victim.getUUID(), 0);
         STREAKS.remove(victim.getUUID());
-        if (enemyKiller == null) return 0;
+        if (enemyKillers.isEmpty()) return 0;
 
-        int bonus = bountyFor(victimKills, EconomyData.current().bounties);
-        if (bonus > 0) Wallets.add(enemyKiller, bonus);
-        STREAKS.merge(enemyKiller.getUUID(), 1, Integer::sum);
+        int bonus = Math.round((float) bountyFor(victimKills, EconomyData.current().bounties) / enemyKillers.size());
+        if (bonus > 0) enemyKillers.forEach(killer -> Wallets.add(killer, bonus));
+        // The streak counts for the nearest one only, so a shared kill does not raise several bounties
+        STREAKS.merge(enemyKillers.get(0).getUUID(), 1, Integer::sum);
         return bonus;
     }
 

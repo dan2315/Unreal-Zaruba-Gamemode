@@ -241,20 +241,24 @@ public abstract class BaseGamemode implements IPhaseHolder {
             return;
         }
 
-        ServerPlayer killerPlayer = resolveKiller(player, event.getSource());
-        int reward = 0;
-        if (killerPlayer != null) {
-            reward = isEnemy(killerPlayer, player) ? EconomyData.current().killReward : 0;
-            if (reward > 0) {
-                Wallets.add(killerPlayer, reward);
-                killerPlayer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill_reward", player.getDisplayName(), Money.format(reward)), true);
+        List<ServerPlayer> killers = resolveKillers(player, event.getSource());
+        ServerPlayer killerPlayer = killers.isEmpty() ? null : killers.get(0);
+        List<ServerPlayer> enemyKillers = killers.stream().filter(killer -> isEnemy(killer, player)).toList();
+        // Several enemies credited with an unclear kill share the reward
+        int reward = enemyKillers.isEmpty() ? 0 : Math.round((float) EconomyData.current().killReward / enemyKillers.size());
+        for (ServerPlayer killer : killers) {
+            if (reward > 0 && enemyKillers.contains(killer)) {
+                Wallets.add(killer, reward);
+                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill_reward", player.getDisplayName(), Money.format(reward)), true);
             } else {
-                killerPlayer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill", player.getDisplayName()), true);
+                killer.displayClientMessage(Component.translatable("economy.unrealzaruba.kill", player.getDisplayName()), true);
             }
+        }
+        if (killerPlayer != null) {
             player.displayClientMessage(Component.literal("You have been killed by " + killerPlayer.getDisplayName().getString()), true);
         }
-        ServerPlayer enemyKiller = killerPlayer != null && isEnemy(killerPlayer, player) ? killerPlayer : null;
-        int bounty = SideIncome.onDeath(player, enemyKiller, server);
+        ServerPlayer enemyKiller = enemyKillers.isEmpty() ? null : enemyKillers.get(0);
+        int bounty = SideIncome.onDeath(player, enemyKillers, server);
         com.dod.unrealzaruba.Feed.MatchStats.onDeath(player, enemyKiller);
         int streak = enemyKiller == null ? 0 : SideIncome.streakOf(enemyKiller);
         // The kill line of the event feed: the weapon, the teams, what it paid
@@ -330,30 +334,38 @@ public abstract class BaseGamemode implements IPhaseHolder {
     }
 
     /**
-     * Who gets the kill. Normally the player who dealt the damage; for a shot from a vehicle or an explosion that does not name a player
-     * (a cannon shell, a blast) the owner of the projectile, then whoever last hurt the victim, and failing that the nearest enemy of the
-     * victim in reach of the weapon. Falls, the void and the like are nobody's kill.
+     * Who gets the kill, nearest first. Normally the player who dealt the damage; for a shot from a vehicle or an explosion that does
+     * not name a player (a cannon shell, a blast) the owner of the projectile, then whoever last hurt the victim. A death with no clear
+     * killer (a fall, the void, a blast of nobody's) goes to the enemies within unclearKillRadius of the body, and when none is that
+     * close, to the nearest enemy. The /kill command is nobody's kill.
      */
-    private ServerPlayer resolveKiller(ServerPlayer victim, net.minecraft.world.damagesource.DamageSource source) {
+    private List<ServerPlayer> resolveKillers(ServerPlayer victim, net.minecraft.world.damagesource.DamageSource source) {
+        ServerPlayer clear = clearKiller(victim, source);
+        if (clear != null) return List.of(clear);
+        if (server == null || source.is(net.minecraft.world.damagesource.DamageTypes.GENERIC_KILL)) return List.of();
+        List<ServerPlayer> enemies = server.getPlayerList().getPlayers().stream()
+                .filter(other -> other.level() == victim.level() && !other.isSpectator() && other.isAlive() && onOpposingTeams(other, victim))
+                .sorted(java.util.Comparator.comparingDouble(other -> other.distanceToSqr(victim)))
+                .toList();
+        if (enemies.isEmpty()) return enemies;
+        double radius = EconomyData.current().unclearKillRadius;
+        List<ServerPlayer> near = enemies.stream().filter(other -> other.distanceToSqr(victim) <= radius * radius).toList();
+        return near.isEmpty() ? enemies.subList(0, 1) : near;
+    }
+
+    private static ServerPlayer clearKiller(ServerPlayer victim, net.minecraft.world.damagesource.DamageSource source) {
         if (source.getEntity() instanceof ServerPlayer k) return k;
         for (net.minecraft.world.entity.Entity cause : new net.minecraft.world.entity.Entity[]{source.getEntity(), source.getDirectEntity()}) {
             if (cause instanceof net.minecraft.world.entity.projectile.Projectile projectile && projectile.getOwner() instanceof ServerPlayer owner) return owner;
         }
         if (victim.getKillCredit() instanceof ServerPlayer credit && credit != victim) return credit;
-        boolean weapon = source.getEntity() != null || source.getDirectEntity() != null
-                || source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION) || source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE);
-        if (!weapon || server == null) return null;
-        ServerPlayer nearest = null;
-        double best = 100.0 * 100.0;
-        for (ServerPlayer other : server.getPlayerList().getPlayers()) {
-            if (other == victim || other.level() != victim.level() || other.isSpectator() || !isEnemy(other, victim)) continue;
-            double distance = other.distanceToSqr(victim);
-            if (distance < best) {
-                best = distance;
-                nearest = other;
-            }
-        }
-        return nearest;
+        return null;
+    }
+
+    /** Both players are in teams, and not the same one. */
+    private static boolean onOpposingTeams(ServerPlayer a, ServerPlayer b) {
+        return PlayerContext.Get(a.getUUID()) instanceof TeamPlayerContext teamA && PlayerContext.Get(b.getUUID()) instanceof TeamPlayerContext teamB
+                && teamA.Team() != null && teamB.Team() != null && teamA.Team() != teamB.Team();
     }
 
     // No money for suicides and team kills
