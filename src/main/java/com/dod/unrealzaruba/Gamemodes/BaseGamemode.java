@@ -313,6 +313,9 @@ public abstract class BaseGamemode implements IPhaseHolder {
     public void HandleLeaveInMatch(ServerPlayer player) {
         if (server == null || !server.isRunning() || !IsBattleActive() || !IsRealDeath(player)) return;
         if (dead.contains(player.getUUID()) || player.isSpectator() || player.isDeadOrDying()) return;
+        // In the team's own zone (around its respawn points, its capture areas) leaving is free: the player comes back there
+        // with what they carried, as the hint in that zone says
+        if (com.dod.unrealzaruba.Economy.TeamZones.isInOwnZone(player)) return;
         player.getInventory().dropAll();
         com.dod.unrealzaruba.Feed.MatchStats.onDeath(player, null);
         leftInBattle.add(player.getUUID());

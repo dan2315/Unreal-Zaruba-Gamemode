@@ -15,8 +15,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 /**
- * Leaving the server from the pause menu in the middle of a match asks first: the server counts leaving as a death and what the
- * player carries is lost, so the exit is not a way to keep it.
+ * Leaving the server from the pause menu in the middle of a match asks first: outside the team's own zone the server counts
+ * leaving as a death and what the player carries is lost, so the exit is not a way to keep it. In the zone it does not ask.
  */
 @EventBusSubscriber(modid = UnrealZaruba.MOD_ID, value = Dist.CLIENT)
 public final class QuitGuard {
@@ -28,6 +28,8 @@ public final class QuitGuard {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.isLocalServer() || !ScoreOverlay.INSTANCE.isShown()
                 || TeamRosterState.teamOf(mc.player.getUUID()) == null) return;
+        // In the team's own zone leaving costs nothing (the server checks the same zone when the player leaves)
+        if (ZoneHintsOverlay.INSTANCE.inOwnZone()) return;
 
         for (var listener : event.getListenersList()) {
             if (!(listener instanceof Button button)) continue;
