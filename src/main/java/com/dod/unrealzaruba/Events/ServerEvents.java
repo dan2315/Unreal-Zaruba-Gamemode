@@ -74,6 +74,7 @@ public class ServerEvents {
             com.dod.unrealzaruba.Vehicles.TrackedVehicles.tick(server);
             com.dod.unrealzaruba.TeamLogic.TeamRoster.tick(server);
             SideIncome.tick(server);
+            com.dod.unrealzaruba.Economy.ZoneHints.tick(server);
             com.dod.unrealzaruba.Vehicles.VehicleFlip.tick(server);
             gamemodeManager.ForGamemode(gamemode -> gamemode.onServerTick(event));
         }

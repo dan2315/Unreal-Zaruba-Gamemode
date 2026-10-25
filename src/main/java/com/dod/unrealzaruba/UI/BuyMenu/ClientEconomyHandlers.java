@@ -17,6 +17,10 @@ public final class ClientEconomyHandlers {
         MoneyOverlay.INSTANCE.set(visible, balance);
     }
 
+    public static void setZoneHints(boolean shown, boolean shopEnabled, boolean shopOpen, boolean storageOpen) {
+        com.dod.unrealzaruba.UI.ZoneHintsOverlay.INSTANCE.set(shown, shopEnabled, shopOpen, storageOpen);
+    }
+
     public static void openBuyMenu(BuyMenuView view) {
         if (Minecraft.getInstance().screen instanceof BuyMenuScreen open) {
             open.replaceView(view);

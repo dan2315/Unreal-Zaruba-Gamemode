@@ -29,6 +29,7 @@ public class ModSetupEvents {
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "score"), ScoreOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "objectives_strip"), com.dod.unrealzaruba.UI.Objectives.ObjectivesStrip.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "money"), MoneyOverlay.INSTANCE);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "zone_hints"), com.dod.unrealzaruba.UI.ZoneHintsOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "respawn"), RespawnOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "purchase"), com.dod.unrealzaruba.Schematics.PurchaseOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "lobby"), com.dod.unrealzaruba.UI.Lobby.LobbyOverlay.INSTANCE);

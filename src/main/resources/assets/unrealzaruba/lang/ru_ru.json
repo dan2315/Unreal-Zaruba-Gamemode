@@ -125,6 +125,8 @@
     "supplydrop.unrealzaruba.case_cashed": "%s доставил кейс снабжения: %s каждому в %s, ещё %s носителю",
 
     "hud.unrealzaruba.tips.controls": "Управление",
+    "hud.unrealzaruba.hint.shop": "Магазин",
+    "hud.unrealzaruba.hint.storage": "Хранилище",
     "hud.unrealzaruba.tips.title": "Подсказки",
     "hud.unrealzaruba.tips.tip1": "Магазин и возрождение работают только в зоне вашей команды.",
     "hud.unrealzaruba.tips.tip2": "Точки захватываются, пока вы стоите на них: чем вас больше, тем быстрее.",
@@ -230,6 +232,8 @@
     "buymenu.unrealzaruba.category.stocks": "Приклады",
     "buymenu.unrealzaruba.category.lasers": "ЛЦУ",
     "buymenu.unrealzaruba.category.mags": "Магазины",
+    "buymenu.unrealzaruba.category.bayonets": "Штыки",
+    "buymenu.unrealzaruba.category.ammo_mods": "Спецпатроны",
     "buymenu.unrealzaruba.category.ammo": "Патроны",
     "buymenu.unrealzaruba.hint.guns": "Обвесы и патроны продаются отдельно",
     "buymenu.unrealzaruba.hint.attachments": "Попадает в инвентарь, ставится через экран обвесов оружия",

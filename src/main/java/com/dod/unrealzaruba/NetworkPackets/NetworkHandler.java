@@ -93,6 +93,10 @@ public class NetworkHandler {
         toServer("gamemode_vote", GamemodeVotePacket.class, GamemodeVotePacket::encode, GamemodeVotePacket::decode, GamemodeVotePacket::handle);
         toClient("update_top_score", ClientboundUpdateTopScorePacket.class, ClientboundUpdateTopScorePacket::encode, ClientboundUpdateTopScorePacket::decode, ClientboundUpdateTopScorePacket::handle);
         toClient("money", ClientboundMoneyPacket.class, ClientboundMoneyPacket::encode, ClientboundMoneyPacket::decode, ClientboundMoneyPacket::handle);
+        toClient("zone_hints", com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundZoneHintsPacket.class,
+                com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundZoneHintsPacket::encode,
+                com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundZoneHintsPacket::decode,
+                com.dod.unrealzaruba.NetworkPackets.Economy.ClientboundZoneHintsPacket::handle);
         toServer("request_buy_menu", RequestBuyMenuPacket.class, RequestBuyMenuPacket::encode, RequestBuyMenuPacket::decode, RequestBuyMenuPacket::handle);
         toServer("request_team_storage", RequestTeamStoragePacket.class, RequestTeamStoragePacket::encode, RequestTeamStoragePacket::decode, RequestTeamStoragePacket::handle);
         toClient("open_schematic_spawner", ClientboundOpenSchematicSpawnerPacket.class, ClientboundOpenSchematicSpawnerPacket::encode, ClientboundOpenSchematicSpawnerPacket::decode, ClientboundOpenSchematicSpawnerPacket::handle);

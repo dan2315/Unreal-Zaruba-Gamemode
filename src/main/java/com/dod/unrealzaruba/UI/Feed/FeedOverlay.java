@@ -45,8 +45,8 @@ public class FeedOverlay implements ZarubaOverlay {
         Font font = UiFont.get();
         String me = mc.player.getGameProfile().getName();
         long now = System.currentTimeMillis();
-        // Under the money panel, which has its own height
-        int y = com.dod.unrealzaruba.UI.MoneyOverlay.INSTANCE.bottom(font, screenWidth) + 6;
+        // Under the money panel and the shop hints, which have their own heights
+        int y = com.dod.unrealzaruba.UI.ZoneHintsOverlay.INSTANCE.bottom(font, screenWidth) + 6;
         int right = screenWidth - HudStyle.MARGIN;
 
         // The newest few that have not expired

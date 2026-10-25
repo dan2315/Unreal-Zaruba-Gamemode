@@ -87,6 +87,7 @@ public class ClientEvents {
         com.dod.unrealzaruba.UI.MatchHud.resetAll();
         wasInGame = false;
         MoneyOverlay.INSTANCE.set(false, 0);
+        com.dod.unrealzaruba.UI.ZoneHintsOverlay.INSTANCE.reset();
         com.dod.unrealzaruba.UI.Lobby.LobbyClientState.reset();
         com.dod.unrealzaruba.Schematics.PurchaseClientState.reset();
         com.dod.unrealzaruba.UI.Vehicles.TeamVehiclesState.reset();
