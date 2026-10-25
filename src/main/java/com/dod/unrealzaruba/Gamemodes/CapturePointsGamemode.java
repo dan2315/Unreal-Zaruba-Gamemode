@@ -340,6 +340,7 @@ public class CapturePointsGamemode extends TeamGamemode {
     public void CompleteGameDelayed(MinecraftServer server) {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
+        WorldManager.DisposeGameWorld();
         for (ServerPlayer player : players) {
             PacketDistributor.sendToPlayer(player, new ClientboundRemoveObjectivesPacket());
             player.setGameMode(GameType.ADVENTURE);

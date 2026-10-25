@@ -149,6 +149,7 @@ public class ShipsGamemode extends TeamGamemode {
     public void CompleteGameDelayed(MinecraftServer server) {
         var players = server.getPlayerList().getPlayers();
         WorldManager.TeleportAllPlayersTo(server, WorldManager.LOBBY_DIMENSION);
+        WorldManager.DisposeGameWorld();
         for (ServerPlayer player : players) {
             player.setGameMode(GameType.ADVENTURE);
             player.getInventory().clearContent();

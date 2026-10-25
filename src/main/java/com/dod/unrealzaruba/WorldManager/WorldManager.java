@@ -264,6 +264,24 @@ public class WorldManager {
         ReloadGameWorldDelayed(gamemodeName, gamemode::GetPreloadPositions);
     }
 
+    /**
+     * The match is over and everyone is in the lobby: removes the ships and closes the game level right away, so it does not
+     * keep ticking and holding its memory through the vote. The next match creates a new one.
+     */
+    public static void DisposeGameWorld() {
+        if (gameLevel == null) return;
+        int generation = ++reloadGeneration;
+        UnrealZaruba.LOGGER.info("Deleting ships in game world");
+        clearShipsInDimension(gameLevel);
+
+        // Sable finishes removing sub-levels on the level's next tick; close the level only after that
+        TimerManager.createRealTimeTimer(SHIP_REMOVAL_DELAY_MS, () -> {
+            if (generation != reloadGeneration) return; // a reload took over
+            UnrealZaruba.LOGGER.info("Disposing game world");
+            deleteGameWorld();
+        }, null);
+    }
+
     private static void prepareWorldStorage(String gamemodeName) {
         currentMapKey = gamemodeName;
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(worldsRoot().toPath());
