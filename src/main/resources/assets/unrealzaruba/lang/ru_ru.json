@@ -47,6 +47,7 @@
     "lobby.unrealzaruba.game_running": "Игра уже идёт",
     "lobby.unrealzaruba.ready_count": "Готовы %s/%s",
     "lobby.unrealzaruba.need_players": "для старта нужно минимум %s игроков",
+    "lobby.unrealzaruba.min_players": "Минимум игроков: %s",
     "lobby.unrealzaruba.votes": "Голосов: %s",
     "lobby.unrealzaruba.leader": "ЛИДИРУЕТ",
     "lobby.unrealzaruba.your_vote": "ВАШ ГОЛОС",

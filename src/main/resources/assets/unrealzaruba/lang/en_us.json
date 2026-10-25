@@ -50,6 +50,7 @@
     "lobby.unrealzaruba.game_running": "The game is already running",
     "lobby.unrealzaruba.ready_count": "Ready %s/%s",
     "lobby.unrealzaruba.need_players": "at least %s players to start",
+    "lobby.unrealzaruba.min_players": "Minimum players: %s",
     "lobby.unrealzaruba.votes": "Votes: %s",
     "lobby.unrealzaruba.leader": "LEADING",
     "lobby.unrealzaruba.your_vote": "YOUR VOTE",

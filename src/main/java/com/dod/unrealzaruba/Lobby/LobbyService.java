@@ -6,10 +6,8 @@ import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket;
 import com.dod.unrealzaruba.Player.PlayerContext;
-import com.dod.unrealzaruba.Title.TitleMessage;
 import com.dod.unrealzaruba.UnrealZaruba;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -23,13 +21,7 @@ public final class LobbyService {
         PlayerContext context = PlayerContext.Get(player.getUUID());
         if (context == null) return;
         context.SetReady(!context.IsReady());
-
-        MinecraftServer server = UnrealZaruba.server;
-        var players = server.getPlayerList().getPlayers();
-        int minPlayers = ConfigManager.getMainConfig().getMinPlayersToStart();
-        if (players.size() < minPlayers) {
-            TitleMessage.sendActionbar(player, Component.literal("§6Чтобы начать игру, нужно минимум " + minPlayers + " игроков"));
-        }
+        // The minimum number of players is on the lobby panel in the top right corner
         broadcast();
     }
 

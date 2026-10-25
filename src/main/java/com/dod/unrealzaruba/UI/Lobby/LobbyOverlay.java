@@ -12,8 +12,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 /**
- * The lobby on the screen while voting is on: a small panel in the top right corner with the voted mode and how many
- * players are ready, and a bar above the hotbar once the player is ready themselves.
+ * The lobby on the screen while voting is on: a small panel in the top right corner with the voted mode, how many
+ * players are ready and, while too few are online, the minimum for a match; and a bar above the hotbar once the player
+ * is ready themselves.
  */
 public class LobbyOverlay implements ZarubaOverlay {
     public static final LobbyOverlay INSTANCE = new LobbyOverlay();
@@ -44,7 +45,11 @@ public class LobbyOverlay implements ZarubaOverlay {
                 KeyBindings.OPEN_GAMEMODE_MENU.getTranslatedKeyMessage().getString(),
                 KeyBindings.READY.getTranslatedKeyMessage().getString()).getString();
 
-        int height = 12 + 11 + 12 + 12 + 12;
+        // Too few players online for a match: the minimum, under the count, until enough have joined
+        boolean tooFew = LobbyClientState.players() < LobbyClientState.minPlayers();
+        String minimum = Component.translatable("lobby.unrealzaruba.min_players", LobbyClientState.minPlayers()).getString();
+
+        int height = 12 + 11 + 12 + 12 + 12 + (tooFew ? 12 : 0);
         int x = screenWidth - WIDTH - HudStyle.MARGIN;
         int y = HudStyle.MARGIN;
         g.fill(x, y, x + WIDTH, y + height, Brand.alpha(Brand.WINDOW, 0xD9));
@@ -59,6 +64,10 @@ public class LobbyOverlay implements ZarubaOverlay {
         cy += 12;
         g.drawString(font, ready, left, cy, Brand.TEXT_DIM, false);
         cy += 12;
+        if (tooFew) {
+            g.drawString(font, HudStyle.trim(font, minimum, WIDTH - 16), left, cy, Brand.WARN, false);
+            cy += 12;
+        }
         HudStyle.text(g, font, HudStyle.trim(font, keys, (int) ((WIDTH - 16) / 0.8f)), left, cy + 1, Brand.TEXT_MUTE, 0.8f);
     }
 
