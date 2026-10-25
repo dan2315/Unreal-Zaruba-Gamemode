@@ -70,6 +70,7 @@ public final class KeybindManager {
     static final class State {
         Map<String, Applied> binds = new HashMap<>();
         Map<String, Applied> configs = new HashMap<>();
+        Map<String, Applied> options = new HashMap<>();
     }
 
     private KeybindManager() {}
@@ -147,11 +148,27 @@ public final class KeybindManager {
         }
 
         KeyMapping.resetMapping();
+        applyOptionDefaults(state, forceAll);
         Minecraft.getInstance().options.save();
         String configReport = applyConfigs(preset, state, forceAll, FMLPaths.CONFIGDIR.get());
         writeState(state);
         return configReport + "; key bindings: " + applied + " set, " + kept + " kept as the player has them, " + conflicts + " skipped for a conflict, "
                 + missing + " not found";
+    }
+
+    /**
+     * Video options the modpack starts a player with, set once per game folder: a player who changes one back keeps it. VSync is off,
+     * as with this many mods it stutters whenever a frame misses the screen's refresh. The game's options are saved right after.
+     */
+    private static void applyOptionDefaults(State state, boolean forceAll) {
+        if (state.options == null) state.options = new HashMap<>();
+        if (forceAll || !state.options.containsKey("enableVsync")) {
+            Minecraft.getInstance().options.enableVsync().set(false);
+            Applied record = new Applied();
+            record.signature = "false";
+            state.options.put("enableVsync", record);
+            UnrealZaruba.LOGGER.info("[Keybinds] VSync turned off (the modpack's default)");
+        }
     }
 
     static String applyConfigs(Preset preset, State state, boolean forceAll, Path configDir) {
