@@ -15,44 +15,65 @@ import com.dod.unrealzaruba.Economy.EconomyConfig.Tab;
  * vanilla armor. Prices are a starting point, edit the json per map.
  *
  * Scale: the reference is a one-man tank with a 30-round magazine at $3920.8 (about $131 a shot). Guns are priced from
- * their TACZ stats: shot damage (with armor ignore and headshot bonus) x fire rate^0.6 x magazine^0.4 x range, scaled so
- * the strongest (AWP) is about half of the tank and a pistol is 6-12% of it. Armor for a whole body tops out at about a
- * third of the tank.
+ * their TACZ stats against a player with no armor, iron and diamond (armor ignore and a 15% share of headshots counted):
+ * the time to kill (shots needed x fire interval, with the bolt), the damage per second over a magazine and its reload,
+ * and the range before the damage drops. Power = sqrt(1 / (time to kill + 0.4) x sustained damage) x (range / 30)^0.35;
+ * price = 800 x (power / power of the AK-47)^2, rounded. Armor for a whole body tops out at about a third of the tank.
  */
 final class DefaultBuyMenu {
     private DefaultBuyMenu() {}
 
+    static final String WEAPONS_TAB = "buymenu.unrealzaruba.tab.weapons";
+
     static Tab weapons() {
-        Tab tab = tab("buymenu.unrealzaruba.tab.weapons", Layout.GRID);
+        Tab tab = tab(WEAPONS_TAB, Layout.GRID);
 
         tab.groups.add(group("buymenu.unrealzaruba.group.guns",
                 category("buymenu.unrealzaruba.category.rifles", "buymenu.unrealzaruba.hint.guns",
-                        gun("ak47", "AUTO", "7.62x39mm", 30, 820),
-                        gun("m4a1", "AUTO", "5.56x45mm", 30, 640),
-                        gun("hk416d", "AUTO", "5.56x45mm", 30, 730),
-                        gun("aug", "AUTO", "5.56x45mm", 30, 690),
-                        gun("scar_h", "SEMI", ".308", 20, 1310)),
+                        gun("aug", "AUTO", "5.56x45mm", 30, 550),
+                        gun("m4a1", "AUTO", "5.56x45mm", 30, 560),
+                        gun("qbz_95", "AUTO", "5.8x42mm", 30, 660),
+                        gun("hk416d", "AUTO", "5.56x45mm", 30, 710),
+                        gun("ak47", "AUTO", "7.62x39mm", 30, 800),
+                        gun("sks_tactical", "SEMI", "7.62x39mm", 10, 830),
+                        gun("m16a1", "AUTO", "5.56x45mm", 20, 920),
+                        gun("spr15hb", "SEMI", "5.56x45mm", 15, 1000),
+                        gun("mk14", "SEMI", ".308", 10, 1500),
+                        gun("scar_h", "SEMI", ".308", 20, 1700)),
                 category("buymenu.unrealzaruba.category.smgs", "buymenu.unrealzaruba.hint.guns",
-                        gun("ump45", "AUTO", ".45 ACP", 25, 780),
-                        gun("hk_mp5a5", "AUTO", "9mm", 30, 500),
-                        gun("vector45", "AUTO", ".45 ACP", 20, 520),
-                        gun("p90", "AUTO", "5.7x28mm", 50, 730)),
+                        gun("uzi", "AUTO", "9mm", 20, 260),
+                        gun("hk_mp5a5", "AUTO", "9mm", 30, 300),
+                        gun("vector45", "AUTO", ".45 ACP", 20, 380),
+                        gun("p90", "AUTO", "5.7x28mm", 50, 470),
+                        gun("ump45", "AUTO", ".45 ACP", 25, 720)),
                 category("buymenu.unrealzaruba.category.pistols", "buymenu.unrealzaruba.hint.guns",
-                        gun("glock_17", "SEMI", "9mm", 17, 240),
-                        gun("m1911", "SEMI", ".45 ACP", 7, 340),
-                        gun("cz75", "AUTO", "9mm", 16, 340),
-                        gun("deagle", "SEMI", ".50 AE", 7, 470)),
+                        gun("rhino357", "SEMI", ".357 Magnum", 6, 130),
+                        gun("glock_17", "SEMI", "9mm", 17, 150),
+                        gun("cz75", "AUTO", "9mm", 16, 190),
+                        gun("m1911", "SEMI", ".45 ACP", 7, 260),
+                        gun("p320", "SEMI", ".45 ACP", 12, 360),
+                        gun("deagle_golden", "SEMI", ".357 Magnum", 9, 370),
+                        gun("lonetrail", "SEMI", ".30-06", 1, 380),
+                        gun("deagle", "SEMI", ".50 AE", 7, 440),
+                        gun("taurus500", "SEMI", ".500 Magnum", 5, 1600)),
                 category("buymenu.unrealzaruba.category.snipers", "buymenu.unrealzaruba.hint.guns",
-                        gun("kar98", "SEMI", "7.92x57mm", 4, 860),
-                        gun("m700", "SEMI", ".30-06", 5, 840),
-                        gun("mk14", "SEMI", ".308", 10, 1080),
-                        gun("ai_awp", "SEMI", ".338", 5, 2000)),
+                        gun("springfield1873", "SEMI", ".45-70", 1, 540),
+                        gun("kar98", "SEMI", "7.92x57mm", 4, 570),
+                        gun("m700", "SEMI", ".30-06", 5, 720),
+                        gun("ai_awp", "SEMI", ".338", 5, 1900),
+                        gun("m95", "SEMI", ".50 BMG", 5, 2300)),
+                // Above the formula: at the range of a street they kill in one or two shots
                 category("buymenu.unrealzaruba.category.shotguns", "buymenu.unrealzaruba.hint.guns",
-                        gun("m870", "SEMI", "12 gauge", 5, 630),
-                        gun("spas_12", "SEMI", "12 gauge", 5, 1140),
-                        gun("aa12", "SEMI", "12 gauge", 8, 750)),
+                        gun("db_short", "SEMI", "12 gauge", 2, 100),
+                        gun("m870", "SEMI", "12 gauge", 5, 300),
+                        gun("aa12", "SEMI", "12 gauge", 8, 400),
+                        gun("m1014", "SEMI", "12 gauge", 6, 450),
+                        gun("spas_12", "SEMI", "12 gauge", 5, 650)),
+                // The minigun is fed from the inventory (no magazine) and capped below the formula (4400): it slows its carrier by a quarter
                 category("buymenu.unrealzaruba.category.machine_guns", "buymenu.unrealzaruba.hint.guns",
-                        gun("m249", "AUTO", "5.56x45mm", 75, 1240)),
+                        gun("m249", "AUTO", "5.56x45mm", 75, 700),
+                        gun("fn_evolys", "AUTO", ".308", 75, 2050),
+                        gun("minigun", "AUTO", ".308", 0, 3500)),
                 category("buymenu.unrealzaruba.category.launchers", "buymenu.unrealzaruba.hint.guns",
                         gun("m320", "SEMI", "40mm", 1, LAUNCHER_PRICE))));
 
@@ -92,6 +113,11 @@ final class DefaultBuyMenu {
                         ammo("30_06", 20, 70),
                         ammo("338", 20, 100),
                         ammo("12g", 24, 60),
+                        ammo("58x42", 60, 70),
+                        ammo("357mag", 36, 60),
+                        ammo("500mag", 15, 75),
+                        ammo("45_70", 15, 60),
+                        ammo("50bmg", 10, 100),
                         ammo("40mm", 1, GRENADE_PRICE))));
         return tab;
     }
@@ -104,6 +130,8 @@ final class DefaultBuyMenu {
         Tab tab = tab(FOOD_TAB, Layout.GRID);
         tab.groups.add(group("buymenu.unrealzaruba.group.food",
                 category("buymenu.unrealzaruba.category.food", "buymenu.unrealzaruba.hint.food",
+                        // Cheaper than steak for what it feeds: 24 hunger for 25 against 32 for 60
+                        stack("minecraft:carrot", 8, 25),
                         stack("minecraft:cooked_beef", 4, 60),
                         stack("minecraft:golden_apple", 1, 200)),
                 category("buymenu.unrealzaruba.category.potions", "buymenu.unrealzaruba.hint.potions",
@@ -118,7 +146,7 @@ final class DefaultBuyMenu {
         return category("buymenu.unrealzaruba.category.gliders", "buymenu.unrealzaruba.hint.gliders", item("vc_gliders:paraglider_wood", GLIDER_PRICE));
     }
 
-    static final int GLIDER_PRICE = 150;
+    static final int GLIDER_PRICE = 500;
     static final String FOOD_TAB = "buymenu.unrealzaruba.tab.food";
 
     private static Item stack(String item, int count, int price) {
@@ -190,7 +218,7 @@ final class DefaultBuyMenu {
                         item("minecraft:wooden_shovel", 10), item("minecraft:stone_shovel", 20),
                         item("minecraft:iron_shovel", 45), item("minecraft:diamond_shovel", 120)),
                 category("buymenu.unrealzaruba.category.other_tools", "buymenu.unrealzaruba.hint.tools",
-                        item("minecraft:shears", 60), item("minecraft:flint_and_steel", 50),
+                        item("minecraft:shears", 60), item("minecraft:flint_and_steel", 200),
                         item("minecraft:bucket", 80), item("minecraft:fishing_rod", 30)),
                 glidersCategory()));
         return tab;
@@ -255,7 +283,7 @@ final class DefaultBuyMenu {
         gun.note = ammo;
         gun.info = new LinkedHashMap<>();
         gun.info.put("buymenu.unrealzaruba.info.ammo", ammo);
-        gun.info.put("buymenu.unrealzaruba.info.magazine", String.valueOf(magazine));
+        if (magazine > 0) gun.info.put("buymenu.unrealzaruba.info.magazine", String.valueOf(magazine)); // 0: fed from the inventory
         return gun;
     }
 

@@ -94,9 +94,12 @@ public record BuyMenuView(List<Tab> tabs) {
                         entries.add(new Entry(str(item.name), str(item.note), str(item.slot), item.price,
                                 stack, map(item.stats), map(item.info), index++, stack.isEmpty() || fits.test(stack)));
                     }
-                    // What does not fit the buyer's guns goes last (stable, so the config's order holds inside each part)
+                    // What does not fit the buyer's guns goes last; the weapons tab goes by price inside each part, the other
+                    // tabs keep the config's order (the sort is stable)
                     if (!EconomyConfig.Layout.SETS.equals(tab.layout)) {
-                        entries.sort(java.util.Comparator.comparing(entry -> !entry.compatible()));
+                        java.util.Comparator<Entry> order = java.util.Comparator.comparing(entry -> !entry.compatible());
+                        if (DefaultBuyMenu.WEAPONS_TAB.equals(tab.name)) order = order.thenComparingInt(Entry::price);
+                        entries.sort(order);
                     }
                     categories.add(new Category(str(category.name), str(category.hint), str(category.note),
                             map(category.stats), entries));
