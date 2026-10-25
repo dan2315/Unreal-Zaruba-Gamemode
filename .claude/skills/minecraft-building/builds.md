@@ -384,3 +384,18 @@ re-planned around the machinery as `power_station_lights2` (62 lamps, 282 chain;
   (smooth stone + speedometer = 2 high at the corner, stressometers as 1-high arms: cover on the point); warning decals
   at the foot and head of the wall stairs and of the ring-to-platform stairs.
 - Screenshots: `ph_*` (shoot from open air: a camera next to a steam pipe sees only the pipe's model).
+
+### Электростанция: west yard restored (build `station_restore`, generator `RestoreLost`, 2026-10-25)
+
+User: outside the station blocks were missing, there should be transformers and fencing. Not lost by our builds: the
+yard (x 727-751, z 176-233) was built with mods this pack dropped, and those blocks became air when the map moved to
+1.21 (already missing in v3). Compared against `game_dim.v2` and put back as current blocks (115):
+16 `s_a_b:lightsteelblock` bases of the brick fence pillars along x 730 (the pillars stood on air) -> industrial iron
+block; 13 + 4 `cbcmodernwarfare:apds_shot` (insulators on the outer fence posts at x 727 every 6, and on the gantry) ->
+tfmg glass cable insulators; the transformer at 733-738 205-210: 43 `s_a_b:whitehardsteelblock` -> dndecor white dark
+metal block, 10 solid fuel thrusters (bushings, coolers) -> small industrial boilers, 3 `create_connected:item_silo` ->
+create fluid tank; 26 `s_a_b:sandbag` (emplacement 746-751 221-233, its oak signs were floating) -> packed mud (dndecor
+beige blocks are not registered). The 4 old design_decor signs were left out (`--no-signs`; the user removed the hall's
+decals himself after the catwalk ones dropped). Screenshots `yard_before_*`, `yard_after_*`.
+Dropped items: 7 killed in game_dim; 3 red tulip items remain in the template's entity files (unloaded chunks): strip
+them with `Entities strip` the next time the map is closed.

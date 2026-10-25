@@ -118,6 +118,7 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `Entities list <entities dir>` / `Entities strip <dir> <out> item,hostile,...` | Saved entities by id; writes the region files without the given ids (dropped items, mobs saved while the map was open). Offline, map closed |
 | `HallLights <region> <layout> [--sim-only]` | Lights for a closed hall: createdeco cage lamps (lit without redstone) on chains from the ceiling or under catwalks, planned against a block light simulation of the hall that prints the light map per standing level (digit = light, + = 10+). Layouts are code in the generator (`power_station`) |
 | `PowerHall <region> units,walls,consoles,hazard` | The Электростанция hall dressing: turbine-generator sets from dndecor boilers (large boiler = 3x3 cylinder with its own invisible structure ring), wall channels with pipes and cable tubes (clears), platform consoles, hazard decals. Template for machinery in other buildings |
+| `RestoreLost <old region> <current region> x0 y0 z0 x1 y1 z1 [--no-signs]` | Puts back blocks of mods the pack lost (s_a_b steel and sandbags, cbcmodernwarfare shells and thrusters, create_connected silos, design_decor signs) from an old map version (`MapsCity Capture Pointsgame_dim.v2`, 1.20.1) where the map now has air, as the nearest current blocks (mapping in the generator). Additive |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)
@@ -252,5 +253,9 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
 - Library trees come in pieces: trunks with gaps, fence branches, crowns joined only by leaves, floating cross tips on
   the spruces. Anchor a tree by its lowest trunk layer (not the blueprint centre), and don't treat detached pieces or
   tips as "floating" (Tidy handles both).
+- **Wall and floor decals, signs, buttons hang on a sturdy full face** (createdeco decals are FaceAttachedHorizontalDirectionalBlock).
+  On catwalks, gratings, slabs or boilers they drop as items at the first neighbour update, and in DEV those items are saved
+  into the template. Check the support block before placing one (RestoreLost does), and after a session `kill` items in
+  game_dim (`execute in unrealzaruba:game_dim run kill @e[type=item,x=-2000,y=-64,z=-2000,dx=4000,dy=400,dz=4000]`).
 - Pathway `--clear-trees` removes leaves within 6 of the cut wood: big crowns leave pieces in the air. Run `Tidy` with
   no references over the area afterwards and keep only the clears near the track.

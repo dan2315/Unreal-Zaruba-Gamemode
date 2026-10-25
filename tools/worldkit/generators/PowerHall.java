@@ -149,17 +149,12 @@ public class PowerHall {
         return "createdeco:decal_" + what + "[face=floor,facing=" + facing + "]";
     }
 
+    /**
+     * Warning decals at the foot of the wall stairs, on the hall floor. Decals hang like buttons: only on a sturdy full face. The ones
+     * first put on the catwalks and the ring (grating) dropped as items, so the heads of the stairs get none.
+     */
     static void hazard(Canvas c) {
-        // Wall stairs: west x 754 climbing north from z 208 to 203 (head at catwalk 754 49 202), east x 786 climbing south from 185 to 190
         c.set(754, 42, 209, decal("warning", "north"));
-        c.set(754, 49, 202, decal("warning", "north"));
-        c.set(786, 42, 184, decal("warning", "south"));
-        c.set(786, 49, 191, decal("warning", "south"));
-        // Stairs from the lower ring up to the platform: foot on the ring (stand 46), head on the platform edge
-        for (int z : new int[]{196, 197}) {
-            c.set(763, 46, z, decal("warning", "east"));
-            c.set(778, 46, z, decal("warning", "west"));
-        }
     }
 
     public static void main(String[] a) throws Exception {
