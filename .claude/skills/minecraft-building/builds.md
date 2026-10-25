@@ -413,3 +413,10 @@ prod stopped, copy, dev `save-on`, prod started (it stays in GAME mode; the matc
 pre-rendered Xaero map was then rescanned on dev (GAME mode, `/setgamemode capturepoints`, `execute as soslo run
 mapscan`: 8 stops at view distance 24, the client at render distance 24; 24 regions, 2.6 MB) and copied to prod
 (old pack in the same backup folder). Prod: `minPlayersToStart` 1 -> 6 in mainConfig.json (cached: restart).
+Physics junk removed from the template (dev and prod, 2026-10-25): Sable had saved two physics bodies into
+`sublevels/` during DEV sessions (a supply drop stand at 0 35 0, an unnamed test body with Drive By Wire wiring at
+283 40 146), which loaded into every match. `sublevels/` and `data/` were reset to the original v3 (empty sub-level
+index, no Sable / Gadgets & Gizmos / Drive By Wire / Simulated data, v3 chunks.dat and raids.dat), and the
+`simulated:honey_glue` entity stripped; the 3 armor stands are the map's own (v3). Backups:
+`unrealfrontiers-testing/backups/capturepoints_physics_junk_2026-10-25`, `zaruba-server/backups/...` (same name).
+Chunk timestamps (InhabitedTime, LastUpdate) stay: they live in every chunk and do nothing for play.

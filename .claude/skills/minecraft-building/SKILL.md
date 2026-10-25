@@ -253,6 +253,9 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
 - Library trees come in pieces: trunks with gaps, fence branches, crowns joined only by leaves, floating cross tips on
   the spruces. Anchor a tree by its lowest trunk layer (not the blueprint centre), and don't treat detached pieces or
   tips as "floating" (Tidy handles both).
+- **Physics bodies (Sable sub-levels) built or spawned while a map is open in DEV are saved into the template** (`sublevels/`,
+  `data/sable_*`, `gadgetsngizmos_sublevel_locations.dat`) and load into every match. v3 has none: after a DEV session check
+  `data/gadgetsngizmos_sublevel_locations.dat` with DumpNbt; to clear, reset `sublevels/` and `data/` to v3 with the map closed.
 - **Wall and floor decals, signs, buttons hang on a sturdy full face** (createdeco decals are FaceAttachedHorizontalDirectionalBlock).
   On catwalks, gratings, slabs or boilers they drop as items at the first neighbour update, and in DEV those items are saved
   into the template. Check the support block before placing one (RestoreLost does), and after a session `kill` items in
