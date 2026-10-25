@@ -347,3 +347,17 @@ the dropped items (19,065: flowers, wheat seeds from grass, berries, mushrooms) 
   (strips of 512 along x; scratchpad PlantFix): 12,997 flowers get a grass block under them, 40,012 grass/fern plants on
   painted cells removed, 604 mushrooms outside podzol removed. Apply with `clear`, then `save-all flush`.
   The original map (v3) had ~400 such plants.
+
+### Электростанция turbine hall lights (generator `HallLights <region> power_station`, build `power_station_lights`, 2026-10-25)
+
+The capture platform (767-774 x 193-200, stand 49) sits in the middle of a closed turbine hall (inside 752-788 x
+178-214, floor stand 42, catwalks stand 49 along the walls at x 754-755 / 785-786, z 180-181 / 211-212 and a spine at
+x 770-771, ceiling 59). It was nearly black: 1013 of 1167 floor spots below light 7, the platform at 0; only the two
+doors and 4 dndecor copper lamps (758/783 54 196-197) lit it. User: "make the point nicer, add lighting".
+- 58 `createdeco:yellow_industrial_iron_lamp[facing=down,inverted=true,lit=true]` (inverted: lit without redstone;
+  players can toggle one with a click), 282 `minecraft:chain` from the ceiling: 6 over the capture area at y53, 16 over
+  the catwalks at y53 every 8 blocks, 20 under the catwalks / spine / platform at y47 (floor along the walls), 16
+  pendants at y46 in the two open bays (x 760, 765, 776, 781; z 185, 192, 199, 206), clear of a jump from the floor.
+- Planned with HallLights' block light simulation (prints the predicted light map per standing level): floor average
+  7.6 with no spot at 0 (no mob spawns), catwalks 8.8, platform 9-10+. Additive, no clears; `buildkit undo
+  power_station_lights` removes all of it. Screenshots before/after: `ps_*` and `ps_*_lit`.
