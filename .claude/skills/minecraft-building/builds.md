@@ -410,4 +410,6 @@ The template (`game_worlds/capturepointsgamemode/dimensions`) and `objectives.js
 server (teamData, barriervolumes, scoring were already the same); prod's previous template and configs are in
 `zaruba-server/backups/capturepoints_before_transfer_2026-10-25`. Copy procedure: dev `save-off` + `save-all flush`,
 prod stopped, copy, dev `save-on`, prod started (it stays in GAME mode; the match copies the new template). The
-pre-rendered Xaero maps (`unrealzaruba/xaero-maps`, 2026-10-05) are stale on both servers: `/mapscan` refreshes them.
+pre-rendered Xaero map was then rescanned on dev (GAME mode, `/setgamemode capturepoints`, `execute as soslo run
+mapscan`: 8 stops at view distance 24, the client at render distance 24; 24 regions, 2.6 MB) and copied to prod
+(old pack in the same backup folder). Prod: `minPlayersToStart` 1 -> 6 in mainConfig.json (cached: restart).
