@@ -117,6 +117,7 @@ All read region files offline and print summaries. Region dir = `.../game_dim/re
 | `Meadow <region> x0 z0 x1 z1 [--avoid ...] [--density d]` | Grass, flower patches, bushes on open natural ground; ferns/berries at forest edges, verges by roads. Plants only, into air. Run last, in strips of 256 |
 | `Entities list <entities dir>` / `Entities strip <dir> <out> item,hostile,...` | Saved entities by id; writes the region files without the given ids (dropped items, mobs saved while the map was open). Offline, map closed |
 | `HallLights <region> <layout> [--sim-only]` | Lights for a closed hall: createdeco cage lamps (lit without redstone) on chains from the ceiling or under catwalks, planned against a block light simulation of the hall that prints the light map per standing level (digit = light, + = 10+). Layouts are code in the generator (`power_station`) |
+| `PowerHall <region> units,walls,consoles,hazard` | The Электростанция hall dressing: turbine-generator sets from dndecor boilers (large boiler = 3x3 cylinder with its own invisible structure ring), wall channels with pipes and cable tubes (clears), platform consoles, hazard decals. Template for machinery in other buildings |
 | `Dragon <cx> <waterY> <cz>` | Organic test statue (ender dragon on an end-stone island). Template for organic shapes: spline tubes with varying radius, bone + membrane wings, noise-mixed materials |
 
 Known mod block ids: index every `assets/<ns>/blockstates/*.json` in `data/mods/*.jar` (and their `META-INF/jarjar/*.jar`)

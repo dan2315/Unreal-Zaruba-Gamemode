@@ -348,7 +348,7 @@ the dropped items (19,065: flowers, wheat seeds from grass, berries, mushrooms) 
   painted cells removed, 604 mushrooms outside podzol removed. Apply with `clear`, then `save-all flush`.
   The original map (v3) had ~400 such plants.
 
-### Электростанция turbine hall lights (generator `HallLights <region> power_station`, build `power_station_lights`, 2026-10-25)
+### Электростанция turbine hall: lights and machinery (2026-10-25)
 
 The capture platform (767-774 x 193-200, stand 49) sits in the middle of a closed turbine hall (inside 752-788 x
 178-214, floor stand 42, catwalks stand 49 along the walls at x 754-755 / 785-786, z 180-181 / 211-212 and a spine at
@@ -361,3 +361,26 @@ doors and 4 dndecor copper lamps (758/783 54 196-197) lit it. User: "make the po
 - Planned with HallLights' block light simulation (prints the predicted light map per standing level): floor average
   7.6 with no spot at 0 (no mob spawns), catwalks 8.8, platform 9-10+. Additive, no clears; `buildkit undo
   power_station_lights` removes all of it. Screenshots before/after: `ps_*` and `ps_*_lit`.
+
+Second pass (user: "do everything" — machinery, wall pipes, consoles, hazard markings; "you may drill the walls a bit"):
+the first lights were undone (`power_station_lights`, its bay pendants would have stood inside the machines) and
+re-planned around the machinery as `power_station_lights2` (62 lamps, 282 chain; floor average 7.4, nothing at 0).
+- Hall layout found on the way: a lower catwalk ring at y45 (x 762-779, z 191-202) round the platform tower, stairs
+  from the ring up to the platform at z 196-197, and weighted ejectors in the floor (x 760 / 781, z 196-197, marked
+  with "up" decals) that launch players from the floor onto the ring. Kept clear: ring, ejector lanes, doors (north
+  x 770-772, south x 766-768), the wall stairs (west x 754 z 203-208, east x 786 z 185-190).
+- `ph_units` (generator `PowerHall <region> units`): four turbine-generator sets, point-symmetric (x mirror 1540-x,
+  z mirror 392-z): NW at x 755-761 z 181-190, NE 779-785 / 181-190, SW 755-761 / 202-211, SE 779-785 / 202-211, each
+  along z: hazard-striped plinth (railways yellow diagonal on black) with industrial iron inside; turbine = dndecor
+  industrial boilers size large (3x3 cylinder, the boiler places its own invisible boiler_structure ring) with a brass
+  band and a medium end cap, on industrial iron supports; a steam pipe (industrial boiler axis y, normal) to the
+  ceiling; green flywheel on a bearing; green dark-metal generator (5 wide, 4 high) with tfmg glass insulators on top
+  and high-voltage decals on its sides; copper exciter at the end toward the middle. They give cover at both doors.
+- `ph_walls` (`PowerHall ... walls`, applied with `clear`): a channel cut into the inner plating layer of all four
+  walls (x 753, x 787, z 179, z 213; y 44-46; around the doors), holding a copper pipe (copper boiler small) at y46 and
+  two tfmg cable tubes at y44-45. 342 plating blocks cleared; the walls stay two blocks thick. `buildkit undo ph_walls`
+  puts the plating back.
+- `ph_details` (`PowerHall ... consoles,hazard`): control desks in the four platform corners outside the capture area
+  (smooth stone + speedometer = 2 high at the corner, stressometers as 1-high arms: cover on the point); warning decals
+  at the foot and head of the wall stairs and of the ring-to-platform stairs.
+- Screenshots: `ph_*` (shoot from open air: a camera next to a steam pipe sees only the pipe's model).

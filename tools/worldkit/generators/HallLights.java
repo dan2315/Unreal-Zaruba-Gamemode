@@ -55,8 +55,15 @@ public class HallLights {
             // Under the spine and the platform
             for (int z : new int[]{186, 191, 202, 207}) l.add(new Lamp(771, 47, z, false, "yellow"));
             for (int[] p : new int[][]{{767, 193}, {774, 193}, {767, 200}, {774, 200}}) l.add(new Lamp(p[0], 47, p[1], false, "yellow"));
-            // The open bays either side of the spine: pendants low over the floor (stand 42; 46 clears a jump)
-            for (int x : new int[]{760, 765, 776, 781}) for (int z : new int[]{185, 192, 199, 206}) l.add(new Lamp(x, 46, z, true, "yellow"));
+            // The four turbine-generator sets (PowerHall units, x 755-761 / 779-785, z 181-190 / 202-211): a pendant over each
+            // generator and one over each turbine beside its steam pipe
+            for (int x : new int[]{758, 782}) for (int z : new int[]{188, 204}) l.add(new Lamp(x, 52, z, true, "yellow"));
+            for (int x : new int[]{756, 784}) for (int z : new int[]{183, 209}) l.add(new Lamp(x, 52, z, true, "yellow"));
+            // The corridor from the doors to the middle, beside the sets: pendants low over the floor (stand 42; 46 clears a jump)
+            for (int x : new int[]{764, 777}) for (int z : new int[]{184, 189, 203, 208}) l.add(new Lamp(x, 46, z, true, "yellow"));
+            // The ejector lanes either side of the tower (pads at x 760 / 781, z 196-197, launching toward the tower): behind
+            // the pads, so nothing hangs in the flight path
+            for (int x : new int[]{757, 784}) for (int z : new int[]{194, 199}) l.add(new Lamp(x, 46, z, true, "yellow"));
             return new Layout(748, 38, 172, 793, 62, 220, new int[]{42, 49}, l);
         }
         throw new IllegalArgumentException("unknown layout " + name);
