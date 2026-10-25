@@ -396,6 +396,6 @@ tfmg glass cable insulators; the transformer at 733-738 205-210: 43 `s_a_b:white
 metal block, 10 solid fuel thrusters (bushings, coolers) -> small industrial boilers, 3 `create_connected:item_silo` ->
 create fluid tank; 26 `s_a_b:sandbag` (emplacement 746-751 221-233, its oak signs were floating) -> packed mud (dndecor
 beige blocks are not registered). The 4 old design_decor signs were left out (`--no-signs`; the user removed the hall's
-decals himself after the catwalk ones dropped). Screenshots `yard_before_*`, `yard_after_*`.
+decals themselves after the catwalk ones dropped). Screenshots `yard_before_*`, `yard_after_*`.
 Dropped items: 7 killed in game_dim; 3 red tulip items remain in the template's entity files (unloaded chunks): strip
 them with `Entities strip` the next time the map is closed.
