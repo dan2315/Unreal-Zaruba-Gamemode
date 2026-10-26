@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.Comparator;
 
 import com.dod.unrealzaruba.Economy.Wallets;
+import com.dod.unrealzaruba.WorldManager.GameMaps;
 import com.dod.unrealzaruba.Title.TitleMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +23,9 @@ public class GamemodeManager {
     public static GamemodeManager instance;
     private BaseGamemode activeGamemode;
 
+    // Map key per player
     private HashMap<UUID, String> playerVotes = new HashMap<>();
+    private String forcedMap;
     private boolean isVoting = true;
     private int lobbyTicks;
 
@@ -47,7 +50,7 @@ public class GamemodeManager {
         return isVoting;
     }
 
-    /** Votes per mode id. */
+    /** Votes per map key. */
     public java.util.Map<String, Integer> VoteCounts() {
         java.util.Map<String, Integer> counts = new HashMap<>();
         playerVotes.values().forEach(vote -> counts.merge(vote, 1, Integer::sum));
@@ -58,12 +61,17 @@ public class GamemodeManager {
         return playerVotes.get(playerId);
     }
 
+    /** A vote for a map (by its key; a mode id counts for that mode's first map). */
     public int Vote(UUID playerId, String vote) {
         if (!isVoting) {
             return 0;
         }
+        GameMaps.GameMap map = GameMaps.find(vote);
+        if (map == null) {
+            return 0;
+        }
 
-        playerVotes.put(playerId, vote);
+        playerVotes.put(playerId, map.key());
         com.dod.unrealzaruba.Lobby.LobbyService.broadcast();
         return 1;
     }
@@ -109,6 +117,12 @@ public class GamemodeManager {
         ResetPlayersReady();
     }
 
+    /** /forcestart &lt;map&gt;: the match starts on this map whatever the votes say. */
+    public void StartGame(GameMaps.GameMap map) {
+        forcedMap = map.key();
+        StartGame();
+    }
+
     private void ResetPlayersReady() {
         for (ServerPlayer player : UnrealZaruba.server.getPlayerList().getPlayers()) {
             PlayerContext playerContext = PlayerContext.Get(player.getUUID());
@@ -124,14 +138,22 @@ public class GamemodeManager {
             votes.put(vote, votes.getOrDefault(vote, 0) + 1);
         });
 
-        String mostVoted = votes.keySet().stream()
+        String mostVoted = forcedMap != null ? forcedMap : votes.keySet().stream()
             .max(Comparator.comparingInt(votes::get))
-            .orElse(CapturePointsGamemode.GAMEMODE_NAME);
+            .orElse(null);
+        forcedMap = null;
+        GameMaps.GameMap map = GameMaps.get(mostVoted);
+        if (map == null) {
+            map = GameMaps.fallback(); // nobody voted, or the voted map is gone
+        }
 
-        UnrealZaruba.LOGGER.warn("Voting: {} has won", mostVoted);
+        UnrealZaruba.LOGGER.warn("Voting: {} has won", map == null ? "nothing" : map.key());
 
-        if (mostVoted != null) {
-            GamemodeFactory.createGamemode(mostVoted);
+        if (map != null) {
+            GameMaps.select(map.key());
+            GamemodeFactory.createGamemode(map.mode());
+        } else {
+            GamemodeFactory.createGamemode(CapturePointsGamemode.GAMEMODE_NAME);
         }
 
         playerVotes.clear();

@@ -2,7 +2,6 @@ package com.dod.unrealzaruba.Commands.CommandHandlers;
 
 import java.util.List;
 
-import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -15,9 +14,9 @@ import net.minecraft.network.chat.Component;
 
 /**
  * Debugging the pre-rendered world maps (see {@link MapPacks}):
- * /mappack — which scan is loaded, which one the running mode uses, the scans there are;
- * /mappack load &lt;scan&gt; — everyone online gets that scan now (until the next mode starts);
- * /mappack bind &lt;scan&gt; — the running mode uses that scan from now on, and it is loaded.
+ * /mappack — which scan is loaded, which one the open map uses, the scans there are;
+ * /mappack load &lt;scan&gt; — everyone online gets that scan now (until the next match starts);
+ * /mappack bind &lt;scan&gt; — the open map uses that scan from now on, and it is loaded.
  */
 public class MapPackCommand implements ICommandHandler {
     @Override
@@ -36,13 +35,13 @@ public class MapPackCommand implements ICommandHandler {
 
     private static int status(CommandContext<CommandSourceStack> context) {
         var pack = MapPacks.current();
-        String mode = MapPacks.currentMode();
+        String map = com.dod.unrealzaruba.WorldManager.WorldManager.currentMapKey();
         List<String> scans = MapPacks.scans();
         String loaded = pack == null
                 ? "none" + (MapPacks.currentScan() == null ? "" : " (no scan " + MapPacks.currentScan() + ")")
                 : pack.mapName() + ": " + pack.files().size() + " regions, " + pack.totalSize() / 1024 + " KB, hash " + pack.hash();
         String text = "Loaded: " + loaded
-                + "\nMode: " + (mode == null ? "none started" : mode + " uses " + MapPacks.scanFor(mode))
+                + "\nMap: " + (map == null ? "none open" : map + " uses " + MapPacks.scanFor(map))
                 + "\nScans: " + (scans.isEmpty() ? "none" : String.join(", ", scans));
         context.getSource().sendSuccess(() -> Component.literal(text), false);
         return scans.size();
@@ -55,15 +54,14 @@ public class MapPackCommand implements ICommandHandler {
             source.sendFailure(Component.literal("No scan " + scan + ". Scans: " + String.join(", ", MapPacks.scans())));
             return 0;
         }
-        String mode = null;
+        String map = null;
         if (bind) {
-            var gamemode = GamemodeManager.instance.GetActiveGamemode();
-            if (gamemode == null) {
-                source.sendFailure(Component.literal("No mode is running to bind the scan to"));
+            map = com.dod.unrealzaruba.WorldManager.WorldManager.currentMapKey();
+            if (map == null) {
+                source.sendFailure(Component.literal("No map is open to bind the scan to"));
                 return 0;
             }
-            mode = gamemode.getClass().getSimpleName();
-            MapPacks.bind(mode, scan);
+            MapPacks.bind(map, scan);
         }
         var pack = MapPacks.load(source.getServer(), scan);
         if (pack == null) {
@@ -71,7 +69,7 @@ public class MapPackCommand implements ICommandHandler {
             return 0;
         }
         String text = "Loaded " + scan + " for " + source.getServer().getPlayerCount() + " players: " + pack.files().size()
-                + " regions, " + pack.totalSize() / 1024 + " KB" + (mode == null ? "" : ". " + mode + " uses it from now on");
+                + " regions, " + pack.totalSize() / 1024 + " KB" + (map == null ? "" : ". " + map + " uses it from now on");
         source.sendSuccess(() -> Component.literal(text), true);
         return 1;
     }

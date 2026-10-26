@@ -1,6 +1,5 @@
 package com.dod.unrealzaruba.Commands.CommandHandlers;
 
-import com.dod.unrealzaruba.Gamemodes.GamemodeManager;
 import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.dod.unrealzaruba.WorldManager.MapScan;
 import com.mojang.brigadier.CommandDispatcher;
@@ -15,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * /mapscan &lt;name&gt; [seconds per stop]: flies you over the loaded map so Xaero's World Map renders all of it, then
- * saves the result as the scan of that name, which becomes the running mode's pre-rendered world map for every player.
+ * saves the result as the scan of that name, which becomes the open map's pre-rendered world map for every player.
  */
 public class MapScanCommand implements ICommandHandler {
     private static final int DEFAULT_WAIT_SECONDS = 6;
@@ -37,12 +36,12 @@ public class MapScanCommand implements ICommandHandler {
             context.getSource().sendFailure(Component.literal("A scan name is up to 32 letters, digits, _ and -"));
             return 0;
         }
-        var gamemode = GamemodeManager.instance.GetActiveGamemode();
-        if (gamemode == null) {
-            context.getSource().sendFailure(Component.literal("Start a match on the map first, the scan needs its world loaded"));
+        String mapKey = com.dod.unrealzaruba.WorldManager.WorldManager.currentMapKey();
+        if (mapKey == null) {
+            context.getSource().sendFailure(Component.literal("Open the map first (/openmap or a match), the scan needs its world loaded"));
             return 0;
         }
-        Component result = MapScan.start(player, name, gamemode.getClass().getSimpleName(), seconds);
+        Component result = MapScan.start(player, name, mapKey, seconds);
         context.getSource().sendSuccess(() -> result, false);
         return 1;
     }

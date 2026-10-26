@@ -12,20 +12,34 @@ import com.dod.unrealzaruba.UnrealZaruba;
  * @param <T> The type of data being managed
  */
 public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
-    
+
     private final Class<T> dataClass;
     private final Class<? extends BaseGamemode> gamemodeClass;
     private final String dataName;
+    // Map settings are read from and saved to the map that was selected when they were loaded
+    private final String mapKey;
     protected T data;
 
-    public AbstractGamemodeData(Class<T> dataClass, Class<? extends BaseGamemode> gamemodeClass, 
+    public AbstractGamemodeData(Class<T> dataClass, Class<? extends BaseGamemode> gamemodeClass,
                                String dataName, T defaultData) {
         this.dataClass = dataClass;
         this.gamemodeClass = gamemodeClass;
         this.dataName = dataName;
         this.data = defaultData;
-        
+        var map = perMap() ? com.dod.unrealzaruba.WorldManager.GameMaps.selected() : null;
+        this.mapKey = map == null ? null : map.key();
+
         GamemodeDataManager.registerHandler(gamemodeClass, this);
+    }
+
+    /** Whether this is a setting of the map (in the map's data folder) rather than of the mode. */
+    protected boolean perMap() {
+        return false;
+    }
+
+    private java.nio.file.Path dataDir() {
+        var map = mapKey == null ? null : com.dod.unrealzaruba.WorldManager.GameMaps.get(mapKey);
+        return map != null ? map.dataDir() : java.nio.file.Path.of(GamemodeDataManager.getGamemodeDataPath(gamemodeClass));
     }
     
     @Override
@@ -58,7 +72,7 @@ public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
     
     @Override
     public T loadData() {
-        T loadedData = GamemodeDataManager.loadData(gamemodeClass, dataName, dataClass);
+        T loadedData = GamemodeDataManager.loadData(dataDir(), dataName, dataClass);
         if (loadedData != null) {
             UnrealZaruba.LOGGER.warn("Loaded data: {}", loadedData);
             this.data = loadedData;
@@ -70,7 +84,7 @@ public abstract class AbstractGamemodeData<T> implements GamemodeData<T> {
     @Override
     public void saveData()  {
         try {
-            GamemodeDataManager.saveData(gamemodeClass, dataName, data);
+            GamemodeDataManager.saveData(dataDir(), dataName, data);
             UnrealZaruba.LOGGER.info("[" + getClass().getSimpleName() + "] Saved data");
         } catch (IOException e) {
             UnrealZaruba.LOGGER.error("[" + getClass().getSimpleName() + "] Failed to save data after update", e);

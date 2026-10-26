@@ -7,15 +7,16 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 
-import static com.dod.unrealzaruba.Commands.CommandHandlers.Suggestions.GamemodeSuggestions.GAMEMODE_SUGGESTIONS;
+import static com.dod.unrealzaruba.Commands.CommandHandlers.Suggestions.MapSuggestions.MAP_SUGGESTIONS;
 
+/** /voteForGamemode &lt;map&gt;: a vote for the next match's map (a mode id votes for that mode's first map). */
 public class VoteForGamemodeCommand implements ICommandHandler {
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("voteForGamemode")
                 .then(Commands.argument("gamemodeName", StringArgumentType.word())
-                        .suggests(GAMEMODE_SUGGESTIONS).executes(context -> {
+                        .suggests(MAP_SUGGESTIONS).executes(context -> {
                             var player = context.getSource().getPlayer();
                             String gamemodeName = StringArgumentType.getString(context, "gamemodeName").toLowerCase();
 

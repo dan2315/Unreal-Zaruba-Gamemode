@@ -18,6 +18,12 @@ public class TeamData extends AbstractGamemodeData<TeamData.TeamDataPayload> {
     public TeamData(Class<? extends BaseGamemode> gamemodeClass) {
         super(TeamDataPayload.class, gamemodeClass, DATA_NAME, new TeamDataPayload());
     }
+
+    // A setting of the map, kept in its data folder
+    @Override
+    protected boolean perMap() {
+        return true;
+    }
     
     @Override
     public Class<TeamDataPayload> getDataClass() {

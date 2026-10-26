@@ -53,24 +53,23 @@ public class GamemodeDataManager {
         return BASE_PATH + File.separator + gamemodeClass.getSimpleName();
     }
 
-    public static <T> void saveData(Class<? extends BaseGamemode> gamemodeClass, String dataName, T data) throws IOException {
-        String directoryPath = getGamemodeDataPath(gamemodeClass);
-        Path dirPath = Paths.get(directoryPath);
+    /** Writes {@code <dataName>.json} into a mode's or a map's data folder. */
+    public static <T> void saveData(Path dirPath, String dataName, T data) throws IOException {
         
         // Create directories if they don't exist
         if (!Files.exists(dirPath)) {
             Files.createDirectories(dirPath);
         }
         
-        String filePath = directoryPath + File.separator + dataName + ".json";
+        String filePath = dirPath.resolve(dataName + ".json").toString();
         try (FileWriter writer = new FileWriter(filePath)) {
             GSON.toJson(data, writer);
             UnrealZaruba.LOGGER.info("[GamemodeDataManager] Saved data: " + filePath);
         }
     }
 
-    public static <T> T loadData(Class<? extends BaseGamemode> gamemodeClass, String dataName, Class<T> dataClass) {
-        String filePath = getGamemodeDataPath(gamemodeClass) + File.separator + dataName + ".json";
+    public static <T> T loadData(Path dirPath, String dataName, Class<T> dataClass) {
+        String filePath = dirPath.resolve(dataName + ".json").toString();
         File file = new File(filePath);
         
         if (!file.exists()) {

@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.dod.unrealzaruba.Events.KeyBindings;
 import com.dod.unrealzaruba.NetworkPackets.GamemodeVotePacket;
+import com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket;
 import com.dod.unrealzaruba.NetworkPackets.Lobby.ToggleReadyPacket;
 import com.dod.unrealzaruba.UI.Lobby.LobbyClientState;
 import com.google.gson.Gson;
@@ -22,8 +23,9 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * Lobby mode selection in the Unreal Frontiers look: a card per mode (click to vote, with the vote count and share)
- * and one primary button that marks the player ready.
+ * Lobby map selection in the Unreal Frontiers look: a card per map with its mode (click to vote, with the vote count
+ * and share), up to three in a row, and one primary button that marks the player ready. The maps come from the
+ * server; the modes' names and descriptions from the gamemodes/*.json resources, and only maps of those modes are shown.
  */
 @OnlyIn(Dist.CLIENT)
 public class GamemodeSelectionScreen extends Screen {
@@ -95,18 +97,25 @@ public class GamemodeSelectionScreen extends Screen {
         String subtitle = Component.translatable("lobby.unrealzaruba.vote_hint").getString();
         g.drawCenteredString(font, subtitle, width / 2, 52, Brand.TEXT_MUTE);
 
-        // Cards
+        // Cards, up to three in a row
+        List<ClientboundLobbyStatePacket.MapCard> maps = new ArrayList<>();
+        for (var map : LobbyClientState.maps()) {
+            if (mode(map.mode()) != null) maps.add(map);
+        }
         int top = 74;
         int bottomArea = 104;
-        int cardHeight = Math.max(110, Math.min(240, height - top - bottomArea));
-        int count = Math.max(1, gamemodes.size());
-        int cardWidth = (contentWidth - GAP * (count - 1)) / count;
+        int columns = Math.max(1, Math.min(3, maps.size()));
+        int rows = Math.max(1, (maps.size() + columns - 1) / columns);
+        int cardHeight = Math.max(70, Math.min(240, (height - top - bottomArea - GAP * (rows - 1)) / rows));
+        int cardWidth = (contentWidth - GAP * (columns - 1)) / columns;
         int totalVotes = 0;
-        for (GamemodeDefinition mode : gamemodes) totalVotes += LobbyClientState.votesFor(mode.id());
+        for (var map : maps) totalVotes += LobbyClientState.votesFor(map.key());
         String leader = LobbyClientState.leader();
-        for (int i = 0; i < gamemodes.size(); i++) {
-            renderCard(g, gamemodes.get(i), left + i * (cardWidth + GAP), top, cardWidth, cardHeight, mouseX, mouseY, totalVotes,
-                    gamemodes.get(i).id().equals(leader));
+        for (int i = 0; i < maps.size(); i++) {
+            var map = maps.get(i);
+            int x = left + (i % columns) * (cardWidth + GAP);
+            int y = top + (i / columns) * (cardHeight + GAP);
+            renderCard(g, map, mode(map.mode()), x, y, cardWidth, cardHeight, mouseX, mouseY, totalVotes, map.key().equals(leader));
         }
 
         // Status line and the ready button
@@ -124,21 +133,32 @@ public class GamemodeSelectionScreen extends Screen {
         g.drawCenteredString(font, hint, width / 2, height - 28, Brand.TEXT_MUTE);
     }
 
-    private void renderCard(GuiGraphics g, GamemodeDefinition mode, int x, int y, int w, int h, int mouseX, int mouseY,
-                            int totalVotes, boolean leader) {
+    private GamemodeDefinition mode(String id) {
+        for (GamemodeDefinition mode : gamemodes) {
+            if (mode.id().equals(id)) return mode;
+        }
+        return null;
+    }
+
+    private void renderCard(GuiGraphics g, ClientboundLobbyStatePacket.MapCard map, GamemodeDefinition mode, int x, int y, int w, int h,
+                            int mouseX, int mouseY, int totalVotes, boolean leader) {
         boolean hover = mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
-        boolean selected = mode.id().equals(LobbyClientState.myVote());
+        boolean selected = map.key().equals(LobbyClientState.myVote());
+        // A map without a name of its own is shown as its mode, the way the lobby showed modes before maps
+        String title = map.name().isEmpty() ? mode.name() : map.name();
+        String subtitle = map.name().isEmpty() ? null : mode.name();
+        String description = map.description().isEmpty() ? mode.description() : map.description();
         g.fill(x, y, x + w, y + h, hover ? Brand.CARD_HI : Brand.CARD);
         g.renderOutline(x, y, w, h, selected || hover ? Brand.MINT : Brand.BORDER);
         if (selected) g.renderOutline(x + 1, y + 1, w - 2, h - 2, Brand.alpha(Brand.MINT, 0x66));
 
-        // Icon tile with the initial of the mode
+        // Icon tile with the initial of the map
         int tile = Math.min(56, h / 3);
         int tileX = x + PAD;
         int tileY = y + PAD;
         g.fill(tileX, tileY, tileX + tile, tileY + tile, 0xFF26232C);
         g.renderOutline(tileX, tileY, tile, tile, Brand.DIVIDER);
-        String initial = mode.name().isEmpty() ? "?" : mode.name().substring(0, 1).toUpperCase();
+        String initial = title.isEmpty() ? "?" : title.substring(0, 1).toUpperCase();
         float scale = tile / 14f;
         HudStyle.text(g, font, initial, tileX + (int) ((tile - font.width(initial) * scale) / 2),
                 tileY + (int) ((tile - 8 * scale) / 2), Brand.MINT, scale);
@@ -152,12 +172,17 @@ public class GamemodeSelectionScreen extends Screen {
             tag(g, tagX, tileY, Component.translatable("lobby.unrealzaruba.your_vote").getString(), Brand.MINT);
         }
 
-        // Name and description
+        // Name, mode and description
         int textY = tileY + tile + 8;
-        g.drawString(font, Component.literal(mode.name()).withStyle(net.minecraft.ChatFormatting.BOLD), x + PAD, textY, Brand.TEXT, false);
+        g.drawString(font, Component.literal(HudStyle.trim(font, title, w - 2 * PAD)).withStyle(net.minecraft.ChatFormatting.BOLD),
+                x + PAD, textY, Brand.TEXT, false);
         textY += font.lineHeight + 4;
+        if (subtitle != null) {
+            g.drawString(font, HudStyle.trim(font, subtitle, w - 2 * PAD), x + PAD, textY, Brand.MINT, false);
+            textY += font.lineHeight + 3;
+        }
         int footerTop = y + h - 34;
-        List<FormattedCharSequence> lines = font.split(Component.literal(mode.description()), w - 2 * PAD);
+        List<FormattedCharSequence> lines = font.split(Component.literal(description), w - 2 * PAD);
         for (FormattedCharSequence line : lines) {
             if (textY + font.lineHeight > footerTop - 2) break;
             g.drawString(font, line, x + PAD, textY, Brand.TEXT_DIM, false);
@@ -166,7 +191,7 @@ public class GamemodeSelectionScreen extends Screen {
 
         // Votes and their share
         g.fill(x + PAD, footerTop, x + w - PAD, footerTop + 1, Brand.DIVIDER);
-        int votes = LobbyClientState.votesFor(mode.id());
+        int votes = LobbyClientState.votesFor(map.key());
         String votesText = Component.translatable("lobby.unrealzaruba.votes", votes).getString();
         HudStyle.text(g, font, votesText, x + PAD, footerTop + 7, Brand.TEXT_DIM, 0.9f);
         int barLeft = x + PAD;
@@ -179,8 +204,8 @@ public class GamemodeSelectionScreen extends Screen {
         }
 
         hits.add(new Hit(x, y, x + w, y + h, () -> {
-            LobbyClientState.setMyVote(mode.id());
-            PacketDistributor.sendToServer(new GamemodeVotePacket(mode.id()));
+            LobbyClientState.setMyVote(map.key());
+            PacketDistributor.sendToServer(new GamemodeVotePacket(map.key()));
         }));
     }
 

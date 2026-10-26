@@ -54,7 +54,7 @@ public class ClientEvents {
             wasInGame = inGame;
         }
         while (KeyBindings.OPEN_GAMEMODE_MENU.consumeClick()) {
-            Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.literal("Выбор игрового режима")));
+            Minecraft.getInstance().setScreen(new GamemodeSelectionScreen(Component.translatable("lobby.unrealzaruba.mode_selection")));
         }
         // Held beside an overturned vehicle: the server counts the ticks
         if (KeyBindings.FLIP_VEHICLE.isDown() && Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null

@@ -65,7 +65,7 @@ public class WorldManager {
     private static final String RUNTIME_WORLDS_DIR = "game_worlds_runtime";
 
     // The map template being copied for a match, and the template the game level currently runs on (a folder name in
-    // game_worlds, i.e. the gamemode key). Read by the world commit command from other threads
+    // game_worlds, i.e. the map key). Read by the world commit command from other threads
     private static volatile String copyingKey;
     private static volatile String currentMapKey;
 
@@ -118,7 +118,7 @@ public class WorldManager {
     }
 
     public static void ReloadGameWorld(BaseGamemode gamemode) {
-        var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
+        var gamemodeName = gamemode.MapKey();
         deleteGameWorld();
         prepareRuntimeCopy(gamemodeName);
         prepareWorldStorage(gamemodeName);
@@ -235,7 +235,8 @@ public class WorldManager {
         }
     }
 
-    private static void copyRecursively(Path source, Path target) throws IOException {
+    /** Copies a map folder, leaving out its session.lock. */
+    static void copyRecursively(Path source, Path target) throws IOException {
         try (Stream<Path> paths = Files.walk(source)) {
             for (Path path : (Iterable<Path>) paths::iterator) {
                 Path destination = target.resolve(source.relativize(path).toString());
@@ -260,7 +261,7 @@ public class WorldManager {
     }
 
     public static void ReloadGameWorldDelayed(BaseGamemode gamemode) {
-        var gamemodeName = gamemode.getClass().getSimpleName().toLowerCase();
+        var gamemodeName = gamemode.MapKey();
         ReloadGameWorldDelayed(gamemodeName, gamemode::GetPreloadPositions);
     }
 

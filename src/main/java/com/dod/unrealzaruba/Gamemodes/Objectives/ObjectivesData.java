@@ -10,6 +10,12 @@ public class ObjectivesData extends AbstractGamemodeData<ObjectivesData.Objectiv
     public ObjectivesData(Class<? extends BaseGamemode> gamemodeClass) {
         super(ObjectivesPayload.class, gamemodeClass, DATA_NAME, new ObjectivesPayload());
     }
+
+    // A setting of the map, kept in its data folder
+    @Override
+    protected boolean perMap() {
+        return true;
+    }
     
     @Override
     public Class<ObjectivesPayload> getDataClass() {

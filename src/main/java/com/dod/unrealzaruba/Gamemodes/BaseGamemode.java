@@ -57,12 +57,17 @@ public abstract class BaseGamemode implements IPhaseHolder {
     protected int currentPhaseIndex = 0;
     protected MinecraftServer server;
     private boolean isConditionalPhase = false;
+    private final String mapKey;
 
     public BaseGamemode() {
         GamemodeManager.instance.SetActiveGamemode(this);
+        // The map this match is on: the voted or opened one, or the mode's first map. Its settings load below
+        var map = com.dod.unrealzaruba.WorldManager.GameMaps.selectFor(GamemodeFactory.idOf(this.getClass()));
+        this.mapKey = map != null ? map.key() : this.getClass().getSimpleName().toLowerCase();
         new TeamData(this.getClass());
         new VehicleSpawnData(this.getClass());
         new BarrierVolumesData(this.getClass());
+        new com.dod.unrealzaruba.Economy.SupplyAreaData(this.getClass());
         new EconomyData(this.getClass());
         new ScoringData(this.getClass());
         this.server = ServerLifecycleHooks.getCurrentServer();
@@ -72,8 +77,13 @@ public abstract class BaseGamemode implements IPhaseHolder {
         // A new match, or a restarted mode: the previous one leaves no vehicles or purchases on the clients
         com.dod.unrealzaruba.Vehicles.TrackedVehicles.reset();
         com.dod.unrealzaruba.Vehicles.PurchaseSessions.reset();
-        MapPacks.selectForMode(server, this.getClass().getSimpleName());
+        MapPacks.selectForMap(server, MapKey());
         WorldManager.ReloadGameWorldDelayed(this);
+    }
+
+    /** The template folder of the map this match is on (game_worlds/&lt;key&gt;). */
+    public String MapKey() {
+        return mapKey;
     }
 
     public void LateInitialize() {

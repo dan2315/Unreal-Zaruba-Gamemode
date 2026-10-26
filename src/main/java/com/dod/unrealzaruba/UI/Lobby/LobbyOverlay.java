@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 /**
- * The lobby on the screen while voting is on: a small panel in the top right corner with the voted mode, how many
+ * The lobby on the screen while voting is on: a small panel in the top right corner with the leading map, how many
  * players are ready and, while too few are online, the minimum for a match; and a bar above the hotbar once the player
  * is ready themselves.
  */
@@ -39,7 +39,7 @@ public class LobbyOverlay implements ZarubaOverlay {
         String leader = LobbyClientState.leader();
         String mode = leader == null
                 ? Component.translatable("lobby.unrealzaruba.mode_none").getString()
-                : modeName(leader);
+                : mapTitle(leader);
         String ready = Component.translatable("lobby.unrealzaruba.ready_count", LobbyClientState.ready(), LobbyClientState.players()).getString();
         String keys = Component.translatable("lobby.unrealzaruba.keys",
                 KeyBindings.OPEN_GAMEMODE_MENU.getTranslatedKeyMessage().getString(),
@@ -87,6 +87,14 @@ public class LobbyOverlay implements ZarubaOverlay {
         g.fill(x + 14, y + 8, x + 16, y + 12, Brand.MINT);
         g.drawString(font, text, x + 22, y + 5, Brand.TEXT, false);
         HudStyle.text(g, font, hint, x + 22, y + 17, Brand.TEXT_MUTE, 0.8f);
+    }
+
+    /** "Map · Mode", or the mode alone for a map without a name. */
+    private static String mapTitle(String key) {
+        var map = LobbyClientState.map(key);
+        if (map == null) return key;
+        String mode = modeName(map.mode());
+        return map.name().isEmpty() ? mode : map.name() + " · " + mode;
     }
 
     private static String modeName(String id) {

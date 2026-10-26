@@ -423,9 +423,9 @@ Chunk timestamps (InhabitedTime, LastUpdate) stay: they live in every chunk and 
 
 ### Pre-rendered world map: named scans (2026-10-26)
 
-`/mapscan <name> [seconds]` (GAME mode, match running) renders into an empty Xaero map and saves the result as
-`unrealzaruba/xaero-maps/<name>/`; it becomes the running mode's map (`xaero-maps/modes.json`, mode class name ->
-scan; a mode without an entry uses the scan named after it, which is how the old `CapturePointsGamemode` pack keeps
+`/mapscan <name> [seconds]` (any open map, also DEV after `/openmap`) renders into an empty Xaero map and saves the result as
+`unrealzaruba/xaero-maps/<name>/`; it becomes the open map's world map (`xaero-maps/maps.json`, map key ->
+scan; a mode's first map without an entry uses the scan named after the mode class, which is how the old `CapturePointsGamemode` pack keeps
 working). A mode start loads its scan for everyone; clients switch to it at once, also inside the game dimension.
 `/mappack` shows the loaded scan, the mode's scan and all scans; `/mappack load <scan>` loads one for everyone until
 the next mode start; `/mappack bind <scan>` makes it the running mode's map. Copy `xaero-maps/` (with `modes.json`)

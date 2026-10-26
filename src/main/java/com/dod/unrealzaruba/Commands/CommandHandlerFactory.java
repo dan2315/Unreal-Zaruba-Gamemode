@@ -26,6 +26,7 @@ public class CommandHandlerFactory {
         handlers.add(new AddBarrierVolumeCommand());
         handlers.add(new VoteForGamemodeCommand());
         handlers.add(new OpenGamemodeMapCommand());
+        handlers.add(new NewMapCommand());
         handlers.add(new ForceStartGameCommand());
         handlers.add(new MoneyCommand());
         handlers.add(new MapScanCommand());

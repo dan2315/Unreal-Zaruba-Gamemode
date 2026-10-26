@@ -26,13 +26,14 @@ import net.neoforged.neoforge.network.PacketDistributor;
 /**
  * Pre-rendered Xaero's World Map region files, so players see the whole map instead of only what they have explored.
  * Each /mapscan is saved under its name as unrealzaruba/xaero-maps/&lt;scan&gt;/ (the region .zip files) and becomes
- * the map of the mode it was made in (xaero-maps/modes.json; a mode without an entry uses the scan named after it).
- * When a mode starts, its scan is offered to everyone by hash; clients download it once in pieces and show it right
- * away. /mappack loads any scan for everyone, for checking it.
+ * the scan of the map it was made on (xaero-maps/maps.json, map key to scan; see {@link #scanFor}). When a match
+ * starts, its map's scan is offered to everyone by hash; clients download it once in pieces and show it right away.
+ * /mappack loads any scan for everyone, for checking it.
  */
 public final class MapPacks {
     private static final Path ROOT = Path.of("unrealzaruba", "xaero-maps");
-    private static final Path MODES = ROOT.resolve("modes.json");
+    private static final Path BINDINGS = ROOT.resolve("maps.json");
+    private static final Path LEGACY_BINDINGS = ROOT.resolve("modes.json");
     public static final java.util.regex.Pattern NAME = java.util.regex.Pattern.compile("[A-Za-z0-9_-]{1,32}");
     private static final int CHUNK_SIZE = 64 * 1024;
     private static final int CHUNKS_PER_TICK = 2;
@@ -51,14 +52,14 @@ public final class MapPacks {
     private static final Map<UUID, Transfer> TRANSFERS = new HashMap<>();
     private static Pack current;
     private static String currentScan;
-    private static String currentMode;
+    private static String currentMap;
 
     private MapPacks() {}
 
-    /** A new match of this mode: its scan (read again, so a newer upload is picked up) for everyone online. */
-    public static void selectForMode(MinecraftServer server, String modeName) {
-        currentMode = modeName;
-        load(server, scanFor(modeName));
+    /** A new match on this map: its scan (read again, so a newer upload is picked up) for everyone online. */
+    public static void selectForMap(MinecraftServer server, String mapKey) {
+        currentMap = mapKey;
+        load(server, scanFor(mapKey));
     }
 
     /** Makes this scan the world map everyone online gets now. Null if there is no such scan (then nobody gets one). */
@@ -93,8 +94,9 @@ public final class MapPacks {
         return currentScan;
     }
 
-    public static String currentMode() {
-        return currentMode;
+    /** The map whose scan was selected last (a match start), or null. */
+    public static String currentMap() {
+        return currentMap;
     }
 
     /** The scans on disk: folders under xaero-maps with region files. */
@@ -120,30 +122,57 @@ public final class MapPacks {
         }
     }
 
-    /** The scan a mode shows: the one bound to it, else the scan named after the mode. */
-    public static String scanFor(String modeName) {
-        return modes().getOrDefault(modeName, modeName);
+    /**
+     * The scan a map shows: the one bound to it, else the scan named after it. A mode's old template falls back to the
+     * scan named after the mode class (CapturePointsGamemode), where its pack was before maps had names.
+     */
+    public static String scanFor(String mapKey) {
+        String bound = bindings().get(mapKey);
+        if (bound != null) return bound;
+        GameMaps.GameMap map = GameMaps.get(mapKey);
+        var modeClass = map == null || !map.legacy() ? null : com.dod.unrealzaruba.Gamemodes.GamemodeFactory.classes.get(map.mode());
+        return modeClass != null ? modeClass.getSimpleName() : mapKey;
     }
 
-    public static void bind(String modeName, String scanName) {
-        Map<String, String> modes = new java.util.TreeMap<>(modes());
-        modes.put(modeName, scanName);
+    public static void bind(String mapKey, String scanName) {
+        Map<String, String> maps = new java.util.TreeMap<>(bindings());
+        maps.put(mapKey, scanName);
+        save(maps);
+    }
+
+    private static void save(Map<String, String> maps) {
         try {
             Files.createDirectories(ROOT);
-            Files.writeString(MODES, new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(modes));
+            Files.writeString(BINDINGS, new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(maps));
         } catch (IOException e) {
-            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not save {}", MODES, e);
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not save {}", BINDINGS, e);
         }
     }
 
-    private static Map<String, String> modes() {
-        if (!Files.exists(MODES)) return Map.of();
+    /** Map key to scan. Bindings made per mode (modes.json, mode class to scan) become those of the modes' old templates. */
+    private static Map<String, String> bindings() {
+        if (!Files.exists(BINDINGS) && Files.exists(LEGACY_BINDINGS)) {
+            Map<String, String> maps = new java.util.TreeMap<>();
+            readMap(LEGACY_BINDINGS).forEach((modeClass, scan) -> maps.put(modeClass.toLowerCase(), scan));
+            save(maps);
+            try {
+                Files.delete(LEGACY_BINDINGS);
+            } catch (IOException e) {
+                UnrealZaruba.LOGGER.warn("[UnrealZaruba] Could not remove {}", LEGACY_BINDINGS, e);
+            }
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] World map scan bindings moved from {} to {}: {}", LEGACY_BINDINGS, BINDINGS, maps);
+        }
+        return readMap(BINDINGS);
+    }
+
+    private static Map<String, String> readMap(Path file) {
+        if (!Files.exists(file)) return Map.of();
         try {
-            Map<String, String> modes = new com.google.gson.Gson().fromJson(Files.readString(MODES),
+            Map<String, String> map = new com.google.gson.Gson().fromJson(Files.readString(file),
                     new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
-            return modes == null ? Map.of() : modes;
+            return map == null ? Map.of() : map;
         } catch (IOException | com.google.gson.JsonParseException e) {
-            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not read {}", MODES, e);
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not read {}", file, e);
             return Map.of();
         }
     }
@@ -199,7 +228,7 @@ public final class MapPacks {
     public static void onUpload(ServerPlayer player, com.dod.unrealzaruba.NetworkPackets.MapPack.UploadMapPackPacket piece) {
         if (!player.hasPermissions(2) || !MapScan.isExpectedUpload(player, piece.mapName)) return;
         if (!NAME.matcher(piece.mapName).matches()) return;
-        String modeName = MapScan.uploadMode();
+        String mapKey = MapScan.uploadMap();
         if (piece.fileCount <= 0 || piece.fileCount > MAX_UPLOAD_FILES) {
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Nothing to upload: the client has no rendered map"));
             MapScan.uploadFinished();
@@ -255,11 +284,11 @@ public final class MapPacks {
             return;
         }
         UnrealZaruba.LOGGER.info("[UnrealZaruba] {} uploaded the world map scan {} of {} ({} regions)",
-                player.getName().getString(), piece.mapName, modeName, upload.fileCount());
-        if (modeName != null) bind(modeName, piece.mapName);
+                player.getName().getString(), piece.mapName, mapKey, upload.fileCount());
+        if (mapKey != null) bind(mapKey, piece.mapName);
         load(player.server, piece.mapName);
         player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Saved the world map scan " + piece.mapName
-                + " (" + upload.fileCount() + " regions)" + (modeName == null ? "" : ", now the map of " + modeName)));
+                + " (" + upload.fileCount() + " regions)" + (mapKey == null ? "" : ", now the world map of " + mapKey)));
     }
 
     private static Pack read(String mapName) {

@@ -14,6 +14,12 @@ public class BarrierVolumesData extends AbstractGamemodeData<BarrierVolumesData.
         super(BarriersPayload.class, gamemodeClass, DATA_NAME, new BarriersPayload());
     }
 
+    // A setting of the map, kept in its data folder
+    @Override
+    protected boolean perMap() {
+        return true;
+    }
+
     public Class<BarrierVolumesData.BarriersPayload> getDataClass() {
         return BarrierVolumesData.BarriersPayload.class;
     }

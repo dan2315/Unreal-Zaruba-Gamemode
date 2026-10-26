@@ -39,11 +39,14 @@ approach. Coordinates are game_dim's; the command always shoots in the game map.
 
 - Server: Docker container `zaruba`, data at `X:\Projects\UnrealFrontiers\zaruba-server\data` (bind mount, `/data` inside).
 - RCON: `X:\Projects\UnrealFrontiers\zaruba-server\tools\rcon.sh "<command>"` (one command per call).
-- Map templates: `data/game_worlds/<gamemode>/dimensions/unrealzaruba/game_dim/{region,entities,poi,data}`
-  (`capturepointsgamemode`, `destroyobjectivesgamemode`). Matches in GAME mode run on a throwaway copy in
-  `data/game_worlds_runtime/` that never saves.
-- Map config: `data/unrealzaruba/gamemodedata/<Gamemode>/objectives.json` (capture areas, `respawnPosition`),
-  `teamData.json` (team bases), `economy.json`, `barriervolumes.json`. Read once per match start.
+- Maps: several per mode. A map is `data/game_worlds/<map>/dimensions/unrealzaruba/game_dim/{region,entities,poi,data}`;
+  each mode's first map is its old template (`capturepointsgamemode`, `destroyobjectivesgamemode`), others are made
+  with `/newmap <key> <mode> [from]` and described in `data/unrealzaruba/maps/<map>/map.json`. `/mapinfo` lists them,
+  `/openmap <map>` opens one. Matches in GAME mode run on a throwaway copy in `data/game_worlds_runtime/` that never saves.
+- Map config (per map): `objectives.json` (capture areas, `respawnPosition`), `teamData.json` (team bases),
+  `barriervolumes.json`, `supplydroparea.json`. For a mode's first map in `data/unrealzaruba/gamemodedata/<Gamemode>/`
+  (the admin panel edits those), for other maps in `data/unrealzaruba/maps/<map>/`. Per mode, in
+  `gamemodedata/<Gamemode>/`: `economy.json`, `scoring.json`. Read once per match start.
 - Mode: `data/unrealzaruba/mainConfig.json` `"mode": "DEV" | "GAME"`; restart to switch.
 - Source maps (user's own): `X:\Projects\UnrealZaruba\Maps\<Map>\game_dim.vN`.
 - World is 1.21.1 (DataVersion 3955). Much of the map is still 1.18.2 (2975) / 1.20.1 (3465) chunks that upgrade on load.

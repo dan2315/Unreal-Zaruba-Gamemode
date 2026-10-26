@@ -1,5 +1,6 @@
 package com.dod.unrealzaruba.UI.Lobby;
 
+import java.util.List;
 import java.util.Map;
 
 import com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket;
@@ -13,6 +14,7 @@ public final class LobbyClientState {
     private static boolean myReady;
     private static String myVote = "";
     private static Map<String, Integer> votes = Map.of();
+    private static List<ClientboundLobbyStatePacket.MapCard> maps = List.of();
 
     private LobbyClientState() {}
 
@@ -24,10 +26,11 @@ public final class LobbyClientState {
         myReady = packet.myReady;
         myVote = packet.myVote;
         votes = packet.votes;
+        maps = packet.maps;
     }
 
-    public static void setMyVote(String mode) {
-        myVote = mode;
+    public static void setMyVote(String map) {
+        myVote = map;
     }
 
     public static void reset() {
@@ -37,6 +40,7 @@ public final class LobbyClientState {
         myReady = false;
         myVote = "";
         votes = Map.of();
+        maps = List.of();
     }
 
     public static boolean active() { return active; }
@@ -45,9 +49,18 @@ public final class LobbyClientState {
     public static int minPlayers() { return minPlayers; }
     public static boolean myReady() { return myReady; }
     public static String myVote() { return myVote; }
-    public static int votesFor(String mode) { return votes.getOrDefault(mode, 0); }
+    public static int votesFor(String map) { return votes.getOrDefault(map, 0); }
+    public static List<ClientboundLobbyStatePacket.MapCard> maps() { return maps; }
 
-    /** The mode with the most votes, or null while nobody has voted. */
+    /** A map in the vote by its key, or null. */
+    public static ClientboundLobbyStatePacket.MapCard map(String key) {
+        for (var map : maps) {
+            if (map.key().equals(key)) return map;
+        }
+        return null;
+    }
+
+    /** The map with the most votes, or null while nobody has voted. */
     public static String leader() {
         String best = null;
         int bestVotes = 0;

@@ -31,6 +31,12 @@ public class VehicleSpawnData extends AbstractGamemodeData<VehicleSpawnData.Vehi
     public VehicleSpawnData(Class<? extends BaseGamemode> gamemodeClass) {
         super(VehicleSpawnPayload.class, gamemodeClass, DATA_NAME, new VehicleSpawnPayload());
     }
+
+    // A setting of the map, kept in its data folder
+    @Override
+    protected boolean perMap() {
+        return true;
+    }
     
     @Override
     public Class<VehicleSpawnPayload> getDataClass() {

@@ -214,7 +214,7 @@ public final class SupplyParadrop {
      */
     static void tickAuto(MinecraftServer server, EconomyConfig.SupplyDrops config, int battleTicks) {
         EconomyConfig.Paradrop settings = config.paradrop;
-        if (!settings.area.isValid()) return;
+        if (!SupplyAreaData.area(settings).isValid()) return;
         if (nextAutoTick < 0) nextAutoTick = Math.max(0, settings.firstDropSeconds) * 20;
         if (battleTicks < nextAutoTick) return;
         if (ACTIVE.size() >= Math.max(1, settings.maxActive)) {
@@ -234,15 +234,17 @@ public final class SupplyParadrop {
     /** A random spot of the area, leaning along the axis toward the team that is behind (when the config asks for it). */
     private static BlockPos pickTarget(EconomyConfig.Paradrop settings) {
         Double fraction = leanFraction(settings);
-        if (fraction == null) return settings.area.randomSpot(RANDOM);
-        return settings.area.randomSpot(RANDOM, "X".equalsIgnoreCase(settings.biasAxis), fraction);
+        EconomyConfig.Area area = SupplyAreaData.area(settings);
+        if (fraction == null) return area.randomSpot(RANDOM);
+        return area.randomSpot(RANDOM, "X".equalsIgnoreCase(SupplyAreaData.biasAxis(settings)), fraction);
     }
 
     /** Where along the axis the drop goes (0 = the low end), or null for no leaning. */
     private static Double leanFraction(EconomyConfig.Paradrop settings) {
-        if (settings.biasAxis == null || settings.biasStrength <= 0) return null;
-        boolean alongX = "X".equalsIgnoreCase(settings.biasAxis);
-        if (!alongX && !"Z".equalsIgnoreCase(settings.biasAxis)) return null;
+        String axis = SupplyAreaData.biasAxis(settings);
+        if (axis == null || settings.biasStrength <= 0) return null;
+        boolean alongX = "X".equalsIgnoreCase(axis);
+        if (!alongX && !"Z".equalsIgnoreCase(axis)) return null;
         try {
             var gamemode = com.dod.unrealzaruba.Gamemodes.GamemodeManager.instance == null ? null
                     : com.dod.unrealzaruba.Gamemodes.GamemodeManager.instance.GetActiveGamemode();

@@ -2,6 +2,7 @@ package com.dod.unrealzaruba.Commands.CommandHandlers;
 
 import com.dod.unrealzaruba.Economy.EconomyConfig;
 import com.dod.unrealzaruba.Economy.EconomyData;
+import com.dod.unrealzaruba.Economy.SupplyAreaData;
 import com.dod.unrealzaruba.Economy.SupplyParadrop;
 import com.dod.unrealzaruba.Gamemodes.BaseGamemode;
 import com.dod.unrealzaruba.Gamemodes.GamemodeData.GamemodeDataManager;
@@ -19,8 +20,8 @@ import net.minecraft.util.RandomSource;
 
 /**
  * /supplydrop now [ground x y z] | area pos1 | pos2 | floor | show | auto on | off. Supply drops come down by parachute
- * during the battle at a random spot of the area; {@code now} sends one right away. The settings are saved in the
- * current map's economy.json.
+ * during the battle at a random spot of the area; {@code now} sends one right away. The area is saved in the current
+ * map's supplydroparea.json, the other settings in the mode's economy.json.
  */
 public class SupplyDropCommand implements ICommandHandler {
     private static final RandomSource RANDOM = RandomSource.create();
@@ -51,8 +52,8 @@ public class SupplyDropCommand implements ICommandHandler {
         BlockPos target;
         if (given != null) {
             target = given;
-        } else if (config.paradrop.area.isValid()) {
-            target = config.paradrop.area.randomSpot(RANDOM);
+        } else if (SupplyAreaData.area(config.paradrop).isValid()) {
+            target = SupplyAreaData.area(config.paradrop).randomSpot(RANDOM);
         } else {
             ServerPlayer player = context.getSource().getPlayer();
             if (player == null) {
@@ -72,8 +73,9 @@ public class SupplyDropCommand implements ICommandHandler {
     private static int setCorner(CommandContext<CommandSourceStack> context, int corner) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         EconomyData data = data(context);
-        if (data == null) return 0;
-        EconomyConfig.Area area = data.getData().supplyDrops.paradrop.area;
+        SupplyAreaData map = SupplyAreaData.current();
+        if (data == null || map == null) return 0;
+        EconomyConfig.Area area = map.ownArea(data.getData().supplyDrops.paradrop);
         BlockPos pos = player.blockPosition();
         if (corner == 1) {
             area.x1 = pos.getX();
@@ -82,7 +84,7 @@ public class SupplyDropCommand implements ICommandHandler {
             area.x2 = pos.getX();
             area.z2 = pos.getZ();
         }
-        data.saveData();
+        map.saveData();
         context.getSource().sendSuccess(() -> Component.literal("Supply drop area corner " + corner + " set to x=" + pos.getX() + " z=" + pos.getZ()
                 + (area.isValid() ? ". " + describe(area) : ". Set the other corner too.")), true);
         return 1;
@@ -92,10 +94,11 @@ public class SupplyDropCommand implements ICommandHandler {
     private static int setFloor(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         EconomyData data = data(context);
-        if (data == null) return 0;
-        EconomyConfig.Area area = data.getData().supplyDrops.paradrop.area;
+        SupplyAreaData map = SupplyAreaData.current();
+        if (data == null || map == null) return 0;
+        EconomyConfig.Area area = map.ownArea(data.getData().supplyDrops.paradrop);
         area.floorY = player.blockPosition().getY() - 1;
-        data.saveData();
+        map.saveData();
         context.getSource().sendSuccess(() -> Component.literal("Supply drop floor y set to " + area.floorY), true);
         return 1;
     }
@@ -104,9 +107,13 @@ public class SupplyDropCommand implements ICommandHandler {
         EconomyData data = data(context);
         if (data == null) return 0;
         EconomyConfig.Paradrop paradrop = data.getData().supplyDrops.paradrop;
+        EconomyConfig.Area area = SupplyAreaData.area(paradrop);
+        SupplyAreaData map = SupplyAreaData.current();
+        boolean own = map != null && map.getData() != null && map.getData().area != null;
         context.getSource().sendSuccess(() -> Component.literal("Automatic supply drops are " + (paradrop.auto ? "ON" : "OFF")
                 + ": first after " + paradrop.firstDropSeconds + " s, then every " + paradrop.intervalSeconds + " s, at most "
-                + paradrop.maxActive + " at once. " + (paradrop.area.isValid() ? describe(paradrop.area) : "The area is not set (use /supplydrop area pos1 and pos2).")), false);
+                + paradrop.maxActive + " at once. " + (area.isValid() ? describe(area) + (own ? " (this map's)" : " (from economy.json)")
+                : "The area is not set (use /supplydrop area pos1 and pos2).")), false);
         return 1;
     }
 
@@ -117,7 +124,7 @@ public class SupplyDropCommand implements ICommandHandler {
         paradrop.auto = on;
         data.saveData();
         context.getSource().sendSuccess(() -> Component.literal("Automatic supply drops " + (on ? "ON" : "OFF")
-                + (on && !paradrop.area.isValid() ? ", but the area is not set yet" : "")), true);
+                + (on && !SupplyAreaData.area(paradrop).isValid() ? ", but the area is not set yet" : "")), true);
         return 1;
     }
 

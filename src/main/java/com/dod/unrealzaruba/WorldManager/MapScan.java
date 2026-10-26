@@ -28,7 +28,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 /**
  * /mapscan &lt;name&gt;: flies an op over every part of the loaded map that has terrain so their Xaero's World Map renders
  * all of it into an empty map, then sends them back to the lobby (Xaero saves the map when leaving a dimension) and
- * has their client upload the rendered regions as the scan of that name, which becomes the running mode's map.
+ * has their client upload the rendered regions as the scan of that name, which becomes the world map of the open map.
  */
 public final class MapScan {
     private static final Pattern REGION_FILE = Pattern.compile("r\\.(-?\\d+)\\.(-?\\d+)\\.mca");
@@ -39,7 +39,7 @@ public final class MapScan {
     private static final int SCAN_Y = 140;
     private static final int UPLOAD_DELAY_TICKS = 100;
 
-    private record Scan(UUID player, String mapName, String modeName, List<ChunkPos> stops, int waitTicks, GameType originalMode) {}
+    private record Scan(UUID player, String mapName, String mapKey, List<ChunkPos> stops, int waitTicks, GameType originalMode) {}
 
     private static Scan scan;
     private static int stopIndex;
@@ -47,11 +47,11 @@ public final class MapScan {
     private static boolean returning;
     private static UUID expectedUploader;
     private static String expectedUploadMap;
-    private static String expectedUploadMode;
+    private static String expectedUploadMapKey;
 
     private MapScan() {}
 
-    public static Component start(ServerPlayer player, String mapName, String modeName, int waitSeconds) {
+    public static Component start(ServerPlayer player, String mapName, String mapKey, int waitSeconds) {
         if (scan != null) return Component.literal("A map scan is already running");
         Path regions = WorldManager.gameRegionFolder();
         if (WorldManager.gameLevel == null || regions == null || !Files.isDirectory(regions)) {
@@ -64,7 +64,7 @@ public final class MapScan {
         List<ChunkPos> stops = planStops(terrainChunks(regions), step);
         if (stops.isEmpty()) return Component.literal("The map has no terrain to scan");
 
-        scan = new Scan(player.getUUID(), mapName, modeName, stops, waitSeconds * 20, player.gameMode.getGameModeForPlayer());
+        scan = new Scan(player.getUUID(), mapName, mapKey, stops, waitSeconds * 20, player.gameMode.getGameModeForPlayer());
         stopIndex = 0;
         ticksLeft = 0;
         returning = false;
@@ -88,7 +88,7 @@ public final class MapScan {
             // Back in the lobby long enough for Xaero to have saved the game dimension: ask for the files
             expectedUploader = scan.player();
             expectedUploadMap = scan.mapName();
-            expectedUploadMode = scan.modeName();
+            expectedUploadMapKey = scan.mapKey();
             PacketDistributor.sendToPlayer(player, new ClientboundMapPackUploadRequestPacket(scan.mapName()));
             player.sendSystemMessage(Component.literal("Uploading the rendered map..."));
             scan = null;
@@ -114,15 +114,15 @@ public final class MapScan {
         return player.getUUID().equals(expectedUploader) && mapName.equals(expectedUploadMap);
     }
 
-    /** The mode the expected upload was scanned in. */
-    public static String uploadMode() {
-        return expectedUploadMode;
+    /** The map the expected upload was scanned on. */
+    public static String uploadMap() {
+        return expectedUploadMapKey;
     }
 
     public static void uploadFinished() {
         expectedUploader = null;
         expectedUploadMap = null;
-        expectedUploadMode = null;
+        expectedUploadMapKey = null;
     }
 
     /** Chunks saved with real data, read from the region files' location tables. */
