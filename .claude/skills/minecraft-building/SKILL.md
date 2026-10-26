@@ -206,7 +206,7 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
    where, and ask before `apply <name> clear` or before moving the build. Wrong result: `buildkit undo`, fix, re-apply.
 6. **Verify**: camera shots (overview + each approach), then `save-all flush`; `Probe` key spots (respawn block + 2 air
    above, spawner present) if needed.
-7. **Wire up config**: `respawnPosition` (feet position) on the capture point; new capture points need
+7. **Wire up config** (in game the user can do it with the map editor, `/mapeditor`, DEV mode: capture areas, owners, respawns, targets, team bases): `respawnPosition` (feet position) on the capture point; new capture points need
    `captureArea {minPos, maxPos, center}`, `position`, `name`, `type: "capturepoint"`, `progress`, `isCompleted`.
    Edit `objectives.json` textually (keep formatting), validate with PowerShell `ConvertFrom-Json`.
 8. **Record it in builds.md**: location, generator and arguments, layout, gameplay intent, config wiring, leftovers.

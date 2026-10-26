@@ -70,7 +70,9 @@ public class DestroyObjective extends PositionedGameobjective implements IResett
     private Set<BlockPos> InitializeTrackedBlocks(BlockVolume volume) {
         UnrealZaruba.LOGGER.info("Начал прогружать: {}", name);
         Set<BlockPos> solidBlocks = new HashSet<>();
-        
+        // Counted afresh: the number saved in objectives.json is not the map's, and adding to it doubled the target
+        this.blockAmount = 0;
+
         volume.ForEachBlock(pos -> {
             if (world.getBlockState(pos).getBlock() != Blocks.AIR) {
                 solidBlocks.add(pos);

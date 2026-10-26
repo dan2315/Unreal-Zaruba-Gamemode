@@ -46,6 +46,9 @@ public class ModItems {
     public static final DeferredHolder<Item, Item> VEHICLE_SPAWN_BLOCK_ITEM = ModItems.ITEMS.register("vehicle_spawn_block",
             () -> new BlockItem(ModBlocks.VEHICLE_SPAWN_BLOCK.get(), new Item.Properties()));
 
+    /** An op's map editor: capture points, targets to destroy and team bases of the open map (see MapEditorClient). */
+    public static final DeferredHolder<Item, Item> MAP_EDITOR = ModItems.ITEMS.register("map_editor",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
     public static final DeferredHolder<Item, Item> PARACHUTE_PACK_ITEM = ModItems.ITEMS.register("parachute_pack",
             () -> new BlockItem(ModBlocks.PARACHUTE_PACK_BLOCK.get(), new Item.Properties()));
 
