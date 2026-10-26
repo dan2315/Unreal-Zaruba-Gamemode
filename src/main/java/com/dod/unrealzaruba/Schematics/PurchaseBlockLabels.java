@@ -86,7 +86,7 @@ public final class PurchaseBlockLabels {
             pose.translate(dx, dy, dz);
             pose.mulPose(camera.rotation());
             pose.scale(-scale, -scale, scale);
-            Matrix4f matrix = pose.last().pose();
+            Matrix4f matrix = new Matrix4f(event.getModelViewMatrix()).mul(pose.last().pose());
             Component label = Component.translatable("schematics.unrealzaruba.purchase.block_label").withStyle(UiFont.bold());
             font.drawInBatch(label, -font.width(label) / 2f, 0, Brand.TEXT, false, matrix, buffers,
                     Font.DisplayMode.SEE_THROUGH, 0x66000000, 0xF000F0);
@@ -105,8 +105,8 @@ public final class PurchaseBlockLabels {
             pose.translate(dx, dy, dz);
             pose.mulPose(camera.rotation());
             pose.scale(-scale, -scale, scale);
-            // The camera rotation is already on the model-view stack while the level is drawn: the pose is enough
-            Matrix4f matrix = pose.last().pose();
+            // The level stage hands over the pose without the camera view, so it is added here
+            Matrix4f matrix = new Matrix4f(event.getModelViewMatrix()).mul(pose.last().pose());
 
             Component name = Component.literal(view.name()).withStyle(UiFont.bold());
             font.drawInBatch(name, -font.width(name) / 2f, 0, Brand.TEXT, false, matrix, buffers,
