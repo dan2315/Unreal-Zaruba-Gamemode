@@ -307,24 +307,23 @@ public final class MapEditorClient {
         Font font = UiFont.get();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         PoseStack pose = event.getPoseStack();
-        Matrix4f view = event.getModelViewMatrix();
 
         for (EditorState.Point p : state.points()) {
             AABB area = box(p.min(), p.max());
-            label(pose, view, camera, font, buffers, new Vec3(area.getCenter().x, area.maxY + 0.6, area.getCenter().z),
+            label(pose, camera, font, buffers, new Vec3(area.getCenter().x, area.maxY + 0.6, area.getCenter().z),
                     p.name(), Component.translatable("editor.unrealzaruba.owner." + ownerKey(p.owner())).getString(), ownerColor(p.owner()));
             if (p.respawn() != null) {
-                label(pose, view, camera, font, buffers, Vec3.atBottomCenterOf(p.respawn()).add(0, 2.2, 0),
+                label(pose, camera, font, buffers, Vec3.atBottomCenterOf(p.respawn()).add(0, 2.2, 0),
                         Component.translatable("editor.unrealzaruba.respawn_of", p.name()).getString(), null, ownerColor(p.owner()));
             }
         }
         for (EditorState.Target t : state.targets()) {
             AABB volume = box(t.min(), t.max());
-            label(pose, view, camera, font, buffers, new Vec3(volume.getCenter().x, volume.maxY + 0.6, volume.getCenter().z),
+            label(pose, camera, font, buffers, new Vec3(volume.getCenter().x, volume.maxY + 0.6, volume.getCenter().z),
                     t.name(), Component.translatable("editor.unrealzaruba.target_label", Math.round(t.required() * 1000) / 10.0).getString(), BLUE);
         }
         for (var base : state.bases().entrySet()) {
-            label(pose, view, camera, font, buffers, Vec3.atBottomCenterOf(base.getValue()).add(0, 3.2, 0),
+            label(pose, camera, font, buffers, Vec3.atBottomCenterOf(base.getValue()).add(0, 3.2, 0),
                     Component.translatable("editor.unrealzaruba.base." + ownerKey(base.getKey())).getString(), null, ownerColor(base.getKey()));
         }
         buffers.endBatch();
@@ -338,7 +337,7 @@ public final class MapEditorClient {
         };
     }
 
-    private static void label(PoseStack pose, Matrix4f view, Camera camera, Font font, MultiBufferSource buffers, Vec3 at,
+    private static void label(PoseStack pose, Camera camera, Font font, MultiBufferSource buffers, Vec3 at,
                               String title, String detail, int color) {
         Vec3 eye = camera.getPosition();
         double dx = at.x - eye.x, dy = at.y - eye.y, dz = at.z - eye.z;
@@ -349,7 +348,8 @@ public final class MapEditorClient {
         pose.translate(dx, dy, dz);
         pose.mulPose(camera.rotation());
         pose.scale(-scale, -scale, scale);
-        Matrix4f matrix = new Matrix4f(view).mul(pose.last().pose());
+        // The level is drawn with the camera rotation already on the model-view stack: the pose is all that is needed
+        Matrix4f matrix = pose.last().pose();
         Component name = Component.literal(title).withStyle(UiFont.bold());
         font.drawInBatch(name, -font.width(name) / 2f, 0, 0xFF000000 | color, false, matrix, buffers, Font.DisplayMode.SEE_THROUGH, 0x66000000, 0xF000F0);
         if (detail != null) {
