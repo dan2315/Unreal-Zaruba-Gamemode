@@ -15,7 +15,11 @@ public class GamemodeFactory {
             CapturePointsGamemode.GAMEMODE_NAME, CapturePointsGamemode.class,
             ShipsGamemode.GAMEMODE_NAME, ShipsGamemode.class);
 
+    /** The match timer every mode shares (stopped when a match is called off). */
+    public static IGameTimer timer;
+
     public static void Initialize(VehicleManager vehicleManager, GameStatisticsService gameStatisticsService, IGameTimer gameTimer) {
+        timer = gameTimer;
         gamemodes.put(DestroyObjectivesGamemode.GAMEMODE_NAME, () -> new DestroyObjectivesGamemode(gameStatisticsService, gameTimer));
         gamemodes.put(CapturePointsGamemode.GAMEMODE_NAME, () -> new CapturePointsGamemode(gameStatisticsService, gameTimer));
         gamemodes.put(ShipsGamemode.GAMEMODE_NAME, () -> new ShipsGamemode(vehicleManager, gameStatisticsService, gameTimer));

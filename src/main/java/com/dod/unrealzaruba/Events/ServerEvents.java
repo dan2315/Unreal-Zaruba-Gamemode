@@ -12,6 +12,7 @@ import com.dod.unrealzaruba.WorldManager.WorldManager;
 import com.dod.unrealzaruba.WorldManager.MapPacks;
 import com.dod.unrealzaruba.WorldManager.MapScan;
 import com.dod.unrealzaruba.Config.MainConfig;
+import com.dod.unrealzaruba.ConfigurationManager.ConfigManager;
 import com.dod.unrealzaruba.Economy.Wallets;
 import com.dod.unrealzaruba.Economy.SideIncome;
 import com.dod.unrealzaruba.Economy.SupplyDrops;
@@ -43,7 +44,6 @@ import static com.dod.unrealzaruba.UnrealZaruba.vehicleManager;
 public class ServerEvents {
     private GamemodeManager gamemodeManager;
     private GameStatisticsService GameStatisticsService;
-    private static boolean isDevMode = MainConfig.getInstance().getMode() == MainConfig.Mode.DEV;
 
     public ServerEvents(GameStatisticsService gameStatisticsService, GamemodeManager gamemodeManager) {
         GameStatisticsService = gameStatisticsService;
@@ -68,7 +68,7 @@ public class ServerEvents {
         TimerManager.updateAll();
         MapPacks.tick(server);
         MapScan.tick(server);
-        if (!isDevMode) {
+        if (!ConfigManager.isDevMode()) {
             gamemodeManager.Tick();
             com.dod.unrealzaruba.Vehicles.PurchaseSessions.tick(server);
             com.dod.unrealzaruba.Vehicles.TrackedVehicles.tick(server);
@@ -85,7 +85,7 @@ public class ServerEvents {
         MinecraftServer server = event.getEntity().getServer();
         if (server == null || !server.isDedicatedServer()) return;
 
-        if (!isDevMode) gamemodeManager.ForGamemode(gamemode -> gamemode.onPlayerTick(event));
+        if (!ConfigManager.isDevMode()) gamemodeManager.ForGamemode(gamemode -> gamemode.onPlayerTick(event));
     }
 
     @SubscribeEvent
@@ -93,7 +93,7 @@ public class ServerEvents {
         MinecraftServer server = event.getServer();
         if (!server.isDedicatedServer())
             return;
-        if (isDevMode)
+        if (ConfigManager.isDevMode())
             return;
 
         UnrealZaruba.LOGGER.info("Server has stopped. Finalizing...");
@@ -112,7 +112,7 @@ public class ServerEvents {
         }
         if (!server.isDedicatedServer())
             return;
-        if (isDevMode)
+        if (ConfigManager.isDevMode())
             return;
 
         var activeGamemode = gamemodeManager.GetActiveGamemode();
@@ -143,7 +143,7 @@ public class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             com.dod.unrealzaruba.Vehicles.SchematicSpawner.forget(player);
             com.dod.unrealzaruba.Vehicles.VehicleFlip.forget(player.getUUID());
-            if (!isDevMode) gamemodeManager.ForGamemode(gamemode -> gamemode.HandleLeaveInMatch(player));
+            if (!ConfigManager.isDevMode()) gamemodeManager.ForGamemode(gamemode -> gamemode.HandleLeaveInMatch(player));
             gamemodeManager.ForGamemode(gamemode -> gamemode.forgetDead(player.getUUID()));
         }
     }
@@ -152,7 +152,7 @@ public class ServerEvents {
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.isEndConquered()) return;
         if (!(event.getEntity() instanceof ServerPlayer player) || player.getServer() == null) return;
-        if (!player.getServer().isDedicatedServer() || isDevMode) return;
+        if (!player.getServer().isDedicatedServer() || ConfigManager.isDevMode()) return;
         // A player who died has come back as a new ServerPlayer: they wait out the respawn as a spectator
         gamemodeManager.ForGamemode(gamemode -> gamemode.HandleDeathRespawn(player));
     }
@@ -173,7 +173,7 @@ public class ServerEvents {
         MinecraftServer server = serverPlayer.getServer();
         if (server == null || !server.isDedicatedServer())
             return;
-        if (isDevMode)
+        if (ConfigManager.isDevMode())
             return;
 
         gamemodeManager.ForGamemode(gamemode -> gamemode.HandleDeath(serverPlayer, event));

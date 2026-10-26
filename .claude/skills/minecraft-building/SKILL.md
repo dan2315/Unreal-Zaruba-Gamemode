@@ -47,7 +47,9 @@ approach. Coordinates are game_dim's; the command always shoots in the game map.
   `barriervolumes.json`, `supplydroparea.json`. For a mode's first map in `data/unrealzaruba/gamemodedata/<Gamemode>/`
   (the admin panel edits those), for other maps in `data/unrealzaruba/maps/<map>/`. Per mode, in
   `gamemodedata/<Gamemode>/`: `economy.json`, `scoring.json`. Read once per match start.
-- Mode: `data/unrealzaruba/mainConfig.json` `"mode": "DEV" | "GAME"`; restart to switch.
+- Mode: `data/unrealzaruba/mainConfig.json` `"mode": "DEV" | "GAME"`. `/servermode dev|game` switches without a restart
+  (to GAME: the open map is saved, everyone goes to the lobby, a match starts on that map; to DEV: the match is called
+  off and its map opens for editing); editing the file needs a restart.
 - Source maps (user's own): `X:\Projects\UnrealZaruba\Maps\<Map>\game_dim.vN`.
 - World is 1.21.1 (DataVersion 3955). Much of the map is still 1.18.2 (2975) / 1.20.1 (3465) chunks that upgrade on load.
 - Ground in the capture points map is y=32 (top ground block), players stand at y=33. Dimension min y is -64.
