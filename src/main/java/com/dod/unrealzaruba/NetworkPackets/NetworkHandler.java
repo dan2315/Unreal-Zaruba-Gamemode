@@ -46,6 +46,7 @@ import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackDataPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackOfferPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.RequestMapPackPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapPackUploadRequestPacket;
+import com.dod.unrealzaruba.NetworkPackets.MapPack.ClientboundMapScanStartPacket;
 import com.dod.unrealzaruba.NetworkPackets.MapPack.UploadMapPackPacket;
 import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundDeathStatePacket;
 import com.dod.unrealzaruba.NetworkPackets.RespawnPoints.ClientboundRespawnPointsPacket;
@@ -117,6 +118,7 @@ public class NetworkHandler {
         toClient("map_pack_data", ClientboundMapPackDataPacket.class, ClientboundMapPackDataPacket::encode, ClientboundMapPackDataPacket::decode, ClientboundMapPackDataPacket::handle);
         toServer("request_map_pack", RequestMapPackPacket.class, RequestMapPackPacket::encode, RequestMapPackPacket::decode, RequestMapPackPacket::handle);
         toClient("map_pack_upload_request", ClientboundMapPackUploadRequestPacket.class, ClientboundMapPackUploadRequestPacket::encode, ClientboundMapPackUploadRequestPacket::decode, ClientboundMapPackUploadRequestPacket::handle);
+        toClient("map_scan_start", ClientboundMapScanStartPacket.class, ClientboundMapScanStartPacket::encode, ClientboundMapScanStartPacket::decode, ClientboundMapScanStartPacket::handle);
         toServer("upload_map_pack", UploadMapPackPacket.class, UploadMapPackPacket::encode, UploadMapPackPacket::decode, UploadMapPackPacket::handle);
         toClient("lobby_state", com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket.class, com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket::encode, com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket::decode, com.dod.unrealzaruba.NetworkPackets.Lobby.ClientboundLobbyStatePacket::handle);
         toServer("flip_vehicle", com.dod.unrealzaruba.NetworkPackets.Vehicles.FlipVehiclePacket.class, com.dod.unrealzaruba.NetworkPackets.Vehicles.FlipVehiclePacket::encode, com.dod.unrealzaruba.NetworkPackets.Vehicles.FlipVehiclePacket::decode, com.dod.unrealzaruba.NetworkPackets.Vehicles.FlipVehiclePacket::handle);

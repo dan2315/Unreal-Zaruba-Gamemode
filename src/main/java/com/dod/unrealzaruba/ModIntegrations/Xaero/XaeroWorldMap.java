@@ -82,49 +82,125 @@ public class XaeroWorldMap {
         openedForRespawn = false;
     }
 
-    /** Xaero's folder with the game dimension's map for this server and multiworld, or null if not known yet. */
-    public Path gameDimensionFolder() {
+    // ---- which map the game dimension shows ----
+    //
+    // Xaero keeps a dimension's map per multiworld, in a folder mw$<id> named after the level id the server sends,
+    // and switches folders (saving the old map, reading the new one from disk) as soon as that id changes, even while
+    // the player stays in the dimension. Each map pack gets its own folder and id, so showing another map is only
+    // a matter of handing Xaero another id in the game dimension; the lobby keeps the server's own.
+
+    private Integer packLevelId;   // the installed pack the game dimension shows, or null for the server's own map
+    private Integer scanLevelId;   // during /mapscan: the empty map the scan renders into
+    private Integer serverLevelId; // the level id Xaero's server part sent
+    private boolean settingLevelId;
+
+    /** The level id (and folder mw$<id>) of a pack. Packs stay below 2^28, scans get ids above. */
+    public static int packLevelId(String hash) {
+        return Integer.parseInt(hash.substring(0, 7), 16);
+    }
+
+    private static MapProcessor processor() {
         WorldMapSession session = WorldMapSession.getCurrentSession();
-        MapProcessor processor = session == null ? null : session.getMapProcessor();
-        if (processor == null) return null;
-        String worldId = processor.getCurrentWorldId();
-        String mwId = processor.getCurrentMWId();
-        if (worldId == null || mwId == null) return null;
+        return session == null ? null : session.getMapProcessor();
+    }
+
+    private static boolean inGameDimension() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.level != null && mc.level.dimension().equals(XaeroWaypoints.GAME_DIMENSION);
+    }
+
+    /** Xaero's folder with the game dimension's map for this server under a level id, or null if not known yet. */
+    private static Path gameDimensionFolder(int levelId) {
+        MapProcessor processor = processor();
+        String worldId = processor == null ? null : processor.getCurrentWorldId();
+        if (worldId == null) return null;
         String dimName = processor.getDimensionName(XaeroWaypoints.GAME_DIMENSION);
-        return processor.getMapSaveLoad().getMWSubFolder(worldId, dimName, mwId);
+        return processor.getMapSaveLoad().getMWSubFolder(worldId, dimName, "mw$" + levelId);
     }
 
     /**
-     * Puts a map pack's region files into Xaero's folder for the game dimension (same server, same multiworld as the
-     * current one), replacing regions left there by other maps. Returns false if Xaero isn't ready yet.
+     * Puts a map pack's region files into the pack's own folder for the game dimension and makes it the map shown
+     * there. Returns false if Xaero isn't ready yet.
      */
     public boolean installMapPack(Path source, List<String> fileNames, String hash) {
         try {
-            Path target = gameDimensionFolder();
+            Path target = gameDimensionFolder(packLevelId(hash));
             if (target == null) return false;
 
             Path marker = target.resolve(PACK_MARKER);
-            if (Files.exists(marker) && hash.equals(Files.readString(marker, StandardCharsets.UTF_8).trim())) {
-                return true;
-            }
-            Files.createDirectories(target);
-            try (var existing = Files.list(target)) {
-                for (Path file : existing.filter(path -> path.getFileName().toString().endsWith(".zip")).toList()) {
-                    if (!fileNames.contains(file.getFileName().toString())) {
-                        Files.delete(file); // terrain of another map in the same dimension
-                    }
+            if (!Files.exists(marker) || !hash.equals(Files.readString(marker, StandardCharsets.UTF_8).trim())) {
+                Files.createDirectories(target);
+                for (String name : fileNames) {
+                    Files.copy(source.resolve(name), target.resolve(name), StandardCopyOption.REPLACE_EXISTING);
                 }
+                Files.writeString(marker, hash, StandardCharsets.UTF_8);
+                UnrealZaruba.LOGGER.info("[UnrealZaruba] Installed world map pack {} into {}", hash, target);
             }
-            for (String name : fileNames) {
-                Files.copy(source.resolve(name), target.resolve(name), StandardCopyOption.REPLACE_EXISTING);
-            }
-            Files.writeString(marker, hash, StandardCharsets.UTF_8);
-            UnrealZaruba.LOGGER.info("[UnrealZaruba] Installed world map pack {} into {}", hash, target);
+            packLevelId = packLevelId(hash);
             return true;
         } catch (Throwable e) {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] Could not install world map pack", e);
             return false;
         }
+    }
+
+    /** The server has no pack for the running map: the game dimension shows the server's own map again. */
+    public void clearMapPack() {
+        packLevelId = null;
+    }
+
+    /** /mapscan: the game dimension's map switches to a new empty folder, so the scan holds only what it renders. */
+    public void startScan() {
+        scanLevelId = 0x40000000 | java.util.concurrent.ThreadLocalRandom.current().nextInt(0x10000000);
+    }
+
+    /** The folder the running scan renders into, or null if no scan is running. */
+    public Path scanFolder() {
+        return scanLevelId == null ? null : gameDimensionFolder(scanLevelId);
+    }
+
+    public void endScan() {
+        scanLevelId = null;
+    }
+
+    private Integer wantedLevelId() {
+        if (scanLevelId != null) return scanLevelId;
+        return packLevelId != null ? packLevelId : serverLevelId;
+    }
+
+    /** Called from the MapProcessor mixin with the level id the server sent: remembered, and swapped for ours in the game dimension. */
+    public int onServerLevelId(int id) {
+        if (settingLevelId) return id;
+        serverLevelId = id;
+        Integer wanted = wantedLevelId();
+        return wanted != null && inGameDimension() ? wanted : id;
+    }
+
+    /** Every tick: in the game dimension Xaero is moved to the map it should show when that changed. */
+    private void tickLevelId() {
+        if (!inGameDimension()) return;
+        try {
+            Integer wanted = wantedLevelId();
+            MapProcessor processor = processor();
+            var data = xaero.map.mcworld.WorldMapClientWorldDataHelper.getCurrentWorldData();
+            if (wanted == null || processor == null || data == null || wanted.equals(data.serverLevelId)) return;
+            settingLevelId = true;
+            try {
+                processor.onServerLevelId(wanted);
+            } finally {
+                settingLevelId = false;
+            }
+            UnrealZaruba.LOGGER.info("[UnrealZaruba] World map of the game dimension switched to mw${}", wanted);
+        } catch (Throwable e) {
+            UnrealZaruba.LOGGER.warn("[UnrealZaruba] Could not switch the world map", e);
+        }
+    }
+
+    /** Disconnected: the next server says again what to show. */
+    public void resetLevelIds() {
+        packLevelId = null;
+        scanLevelId = null;
+        serverLevelId = null;
     }
 
     public void refresh() {
@@ -216,6 +292,7 @@ public class XaeroWorldMap {
 
     /** If the map got closed anyway (another screen, a reload) while waiting, it is opened again. */
     private void onClientTick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+        tickLevelId();
         Minecraft mc = Minecraft.getInstance();
         if (!RespawnClientState.isChoosing() || mc.screen != null || mc.player == null || mc.level == null) return;
         if (mc.level.getGameTime() % 20 != 0) return;

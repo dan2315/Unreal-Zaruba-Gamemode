@@ -20,20 +20,18 @@ import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * Downloads the current map's pre-rendered world map pack once (cached by hash in unrealzaruba/xaero-maps/), then
- * installs it into Xaero's folder for the game dimension. Installing waits until the player is outside the game
- * dimension, because Xaero reloads a dimension's map from disk when the player enters it.
+ * Downloads the running map's pre-rendered world map pack once (cached by hash in unrealzaruba/xaero-maps/), then
+ * installs it into its own Xaero folder for the game dimension and has Xaero show it, at once, wherever the player is
+ * (see {@link XaeroWorldMap}). An offer without a hash means the map has no pack: the server's own map is shown.
  */
 public final class MapPackClient {
     private static final Pattern REGION_FILE = Pattern.compile("-?\\d+_-?\\d+\\.zip");
     private static final String COMPLETE_MARKER = ".complete";
-    private static final int INSTALL_DELAY_TICKS = 60; // let Xaero finish saving the dimension the player left
 
     private static String offeredHash;
     private static List<ClientboundMapPackOfferPacket.FileInfo> offeredFiles = List.of();
     private static long[] received;
     private static String pendingInstall;
-    private static int ticksOutsideGame;
 
     private MapPackClient() {}
 
@@ -42,7 +40,17 @@ public final class MapPackClient {
     }
 
     public static void onOffer(String mapName, String hash, List<ClientboundMapPackOfferPacket.FileInfo> files) {
-        if (WaypointManager.INSTANCE.worldMap() == null || !hash.matches("[0-9a-f]{1,64}")) return;
+        XaeroWorldMap worldMap = WaypointManager.INSTANCE.worldMap();
+        if (worldMap == null) return;
+        if (hash.isEmpty()) {
+            offeredHash = null;
+            offeredFiles = List.of();
+            received = null;
+            pendingInstall = null;
+            worldMap.clearMapPack();
+            return;
+        }
+        if (!hash.matches("[0-9a-f]{7,64}")) return;
         if (files.stream().anyMatch(file -> !REGION_FILE.matcher(file.name()).matches() || file.size() < 0)) {
             UnrealZaruba.LOGGER.warn("[UnrealZaruba] Ignoring map pack {} with unexpected file names", mapName);
             return;
@@ -107,15 +115,9 @@ public final class MapPackClient {
 
     public static void tick() {
         tickUpload();
-        if (pendingInstall == null) return;
-        Minecraft mc = Minecraft.getInstance();
+        if (pendingInstall == null || Minecraft.getInstance().level == null) return;
         XaeroWorldMap worldMap = WaypointManager.INSTANCE.worldMap();
-        if (mc.level == null || worldMap == null) return;
-        if (mc.level.dimension().equals(XaeroWaypoints.GAME_DIMENSION)) {
-            ticksOutsideGame = 0;
-            return;
-        }
-        if (++ticksOutsideGame < INSTALL_DELAY_TICKS) return;
+        if (worldMap == null) return;
 
         List<String> names = offeredFiles.stream().map(ClientboundMapPackOfferPacket.FileInfo::name).toList();
         if (worldMap.installMapPack(cacheDir(pendingInstall), names, pendingInstall)) {
@@ -123,15 +125,21 @@ public final class MapPackClient {
         }
     }
 
-    // ---- upload after /mapscan ----
+    // ---- /mapscan: render into an empty map, then upload it ----
 
     private static final int UPLOAD_PIECES_PER_TICK = 8;
     private static final java.util.Queue<UploadMapPackPacket> UPLOAD = new java.util.ArrayDeque<>();
 
-    /** Sends this client's rendered game dimension regions to the server as the map's pack. */
+    public static void startScan() {
+        XaeroWorldMap worldMap = WaypointManager.INSTANCE.worldMap();
+        if (worldMap != null) worldMap.startScan();
+    }
+
+    /** Sends the regions this client rendered during the scan to the server as the scan's pack. */
     public static void startUpload(String mapName) {
         XaeroWorldMap worldMap = WaypointManager.INSTANCE.worldMap();
-        Path folder = worldMap == null ? null : worldMap.gameDimensionFolder();
+        Path folder = worldMap == null ? null : worldMap.scanFolder();
+        if (worldMap != null) worldMap.endScan();
         UPLOAD.clear();
         List<Path> files = List.of();
         if (folder != null && Files.isDirectory(folder)) {
@@ -176,7 +184,8 @@ public final class MapPackClient {
         offeredFiles = List.of();
         received = null;
         pendingInstall = null;
-        ticksOutsideGame = 0;
+        XaeroWorldMap worldMap = WaypointManager.INSTANCE.worldMap();
+        if (worldMap != null) worldMap.resetLevelIds();
     }
 
     private static void deleteRecursively(Path dir) throws IOException {

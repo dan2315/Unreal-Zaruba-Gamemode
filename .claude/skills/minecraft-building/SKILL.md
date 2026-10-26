@@ -208,7 +208,7 @@ java -cp "$SCRATCH/wk" Skipped cmds_lf.txt out.txt       # what an additive buil
    Edit `objectives.json` textually (keep formatting), validate with PowerShell `ConvertFrom-Json`.
 8. **Record it in builds.md**: location, generator and arguments, layout, gameplay intent, config wiring, leftovers.
 9. **Report** what was built where, what was kept/cleared, then ask for screenshots of specific spots
-   (give tp commands: `execute in unrealzaruba:game_dim run tp <player> x y z`). Remind: `/mapscan` refreshes the
+   (give tp commands: `execute in unrealzaruba:game_dim run tp <player> x y z`). Remind: `/mapscan <name>` refreshes the
    pre-rendered Xaero map; GAME mode to play.
 
 ## Gameplay design rules (capture points)

@@ -420,3 +420,13 @@ index, no Sable / Gadgets & Gizmos / Drive By Wire / Simulated data, v3 chunks.d
 `simulated:honey_glue` entity stripped; the 3 armor stands are the map's own (v3). Backups:
 `unrealfrontiers-testing/backups/capturepoints_physics_junk_2026-10-25`, `zaruba-server/backups/...` (same name).
 Chunk timestamps (InhabitedTime, LastUpdate) stay: they live in every chunk and do nothing for play.
+
+### Pre-rendered world map: named scans (2026-10-26)
+
+`/mapscan <name> [seconds]` (GAME mode, match running) renders into an empty Xaero map and saves the result as
+`unrealzaruba/xaero-maps/<name>/`; it becomes the running mode's map (`xaero-maps/modes.json`, mode class name ->
+scan; a mode without an entry uses the scan named after it, which is how the old `CapturePointsGamemode` pack keeps
+working). A mode start loads its scan for everyone; clients switch to it at once, also inside the game dimension.
+`/mappack` shows the loaded scan, the mode's scan and all scans; `/mappack load <scan>` loads one for everyone until
+the next mode start; `/mappack bind <scan>` makes it the running mode's map. Copy `xaero-maps/` (with `modes.json`)
+when moving a map to prod.

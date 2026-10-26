@@ -29,6 +29,7 @@ public class CommandHandlerFactory {
         handlers.add(new ForceStartGameCommand());
         handlers.add(new MoneyCommand());
         handlers.add(new MapScanCommand());
+        handlers.add(new MapPackCommand());
         handlers.add(new CameraCommand());
         handlers.add(new BuildKitCommand());
         handlers.add(new UfWorldCommand());

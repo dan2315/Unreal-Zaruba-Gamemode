@@ -24,13 +24,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * Pre-rendered Xaero's World Map region files per map, so players see the whole map instead of only what they have
- * explored. A map's pack is the region .zip files in unrealzaruba/xaero-maps/&lt;Gamemode&gt;/ (copied from a client that
- * explored the map fully). Clients get offered the pack by hash, download it once in pieces, and install it into
- * their Xaero folder for the game dimension.
+ * Pre-rendered Xaero's World Map region files, so players see the whole map instead of only what they have explored.
+ * Each /mapscan is saved under its name as unrealzaruba/xaero-maps/&lt;scan&gt;/ (the region .zip files) and becomes
+ * the map of the mode it was made in (xaero-maps/modes.json; a mode without an entry uses the scan named after it).
+ * When a mode starts, its scan is offered to everyone by hash; clients download it once in pieces and show it right
+ * away. /mappack loads any scan for everyone, for checking it.
  */
 public final class MapPacks {
     private static final Path ROOT = Path.of("unrealzaruba", "xaero-maps");
+    private static final Path MODES = ROOT.resolve("modes.json");
+    public static final java.util.regex.Pattern NAME = java.util.regex.Pattern.compile("[A-Za-z0-9_-]{1,32}");
     private static final int CHUNK_SIZE = 64 * 1024;
     private static final int CHUNKS_PER_TICK = 2;
 
@@ -47,27 +50,102 @@ public final class MapPacks {
     private static final Map<String, Pack> PACKS = new HashMap<>();
     private static final Map<UUID, Transfer> TRANSFERS = new HashMap<>();
     private static Pack current;
-    private static String currentMapName;
+    private static String currentScan;
+    private static String currentMode;
 
     private MapPacks() {}
 
-    /** A new match on this map: (re)read its pack and offer it to everyone online. */
-    public static void select(MinecraftServer server, String mapName) {
-        PACKS.remove(mapName); // pick up packs edited since the last match
-        currentMapName = mapName;
-        current = load(mapName);
+    /** A new match of this mode: its scan (read again, so a newer upload is picked up) for everyone online. */
+    public static void selectForMode(MinecraftServer server, String modeName) {
+        currentMode = modeName;
+        load(server, scanFor(modeName));
+    }
+
+    /** Makes this scan the world map everyone online gets now. Null if there is no such scan (then nobody gets one). */
+    public static Pack load(MinecraftServer server, String scanName) {
+        PACKS.remove(scanName);
+        currentScan = scanName;
+        current = read(scanName);
         TRANSFERS.clear();
         if (server != null) {
             server.getPlayerList().getPlayers().forEach(MapPacks::offer);
         }
+        return current;
     }
 
+    /** Tells a player which world map to show: the current pack, or none (an offer without a hash). */
     public static void offer(ServerPlayer player) {
-        if (current == null) return;
+        if (current == null) {
+            PacketDistributor.sendToPlayer(player, new ClientboundMapPackOfferPacket("", "", List.of()));
+            return;
+        }
         List<ClientboundMapPackOfferPacket.FileInfo> files = current.files().stream()
                 .map(file -> new ClientboundMapPackOfferPacket.FileInfo(file.name(), file.data().length))
                 .toList();
         PacketDistributor.sendToPlayer(player, new ClientboundMapPackOfferPacket(current.mapName(), current.hash(), files));
+    }
+
+    public static Pack current() {
+        return current;
+    }
+
+    public static String currentScan() {
+        return currentScan;
+    }
+
+    public static String currentMode() {
+        return currentMode;
+    }
+
+    /** The scans on disk: folders under xaero-maps with region files. */
+    public static List<String> scans() {
+        if (!Files.isDirectory(ROOT)) return List.of();
+        try (Stream<Path> dirs = Files.list(ROOT)) {
+            return dirs.filter(Files::isDirectory)
+                    .map(dir -> dir.getFileName().toString())
+                    .filter(name -> NAME.matcher(name).matches() && hasRegions(ROOT.resolve(name)))
+                    .sorted()
+                    .toList();
+        } catch (IOException e) {
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not list the world map scans", e);
+            return List.of();
+        }
+    }
+
+    private static boolean hasRegions(Path dir) {
+        try (Stream<Path> files = Files.list(dir)) {
+            return files.anyMatch(file -> file.getFileName().toString().endsWith(".zip"));
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /** The scan a mode shows: the one bound to it, else the scan named after the mode. */
+    public static String scanFor(String modeName) {
+        return modes().getOrDefault(modeName, modeName);
+    }
+
+    public static void bind(String modeName, String scanName) {
+        Map<String, String> modes = new java.util.TreeMap<>(modes());
+        modes.put(modeName, scanName);
+        try {
+            Files.createDirectories(ROOT);
+            Files.writeString(MODES, new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(modes));
+        } catch (IOException e) {
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not save {}", MODES, e);
+        }
+    }
+
+    private static Map<String, String> modes() {
+        if (!Files.exists(MODES)) return Map.of();
+        try {
+            Map<String, String> modes = new com.google.gson.Gson().fromJson(Files.readString(MODES),
+                    new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
+            return modes == null ? Map.of() : modes;
+        } catch (IOException | com.google.gson.JsonParseException e) {
+            UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not read {}", MODES, e);
+            return Map.of();
+        }
     }
 
     /** The client doesn't have the offered pack yet. */
@@ -120,7 +198,8 @@ public final class MapPacks {
 
     public static void onUpload(ServerPlayer player, com.dod.unrealzaruba.NetworkPackets.MapPack.UploadMapPackPacket piece) {
         if (!player.hasPermissions(2) || !MapScan.isExpectedUpload(player, piece.mapName)) return;
-        if (!piece.mapName.matches("[A-Za-z0-9_]+")) return;
+        if (!NAME.matcher(piece.mapName).matches()) return;
+        String modeName = MapScan.uploadMode();
         if (piece.fileCount <= 0 || piece.fileCount > MAX_UPLOAD_FILES) {
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Nothing to upload: the client has no rendered map"));
             MapScan.uploadFinished();
@@ -175,17 +254,15 @@ public final class MapPacks {
             UnrealZaruba.LOGGER.error("[UnrealZaruba] Could not save uploaded map pack", e);
             return;
         }
-        UnrealZaruba.LOGGER.info("[UnrealZaruba] {} uploaded the world map pack for {} ({} regions)",
-                player.getName().getString(), piece.mapName, upload.fileCount());
-        player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
-                "Saved the world map for " + piece.mapName + " (" + upload.fileCount() + " regions)"));
-        PACKS.remove(piece.mapName);
-        if (piece.mapName.equals(currentMapName)) {
-            select(player.server, piece.mapName);
-        }
+        UnrealZaruba.LOGGER.info("[UnrealZaruba] {} uploaded the world map scan {} of {} ({} regions)",
+                player.getName().getString(), piece.mapName, modeName, upload.fileCount());
+        if (modeName != null) bind(modeName, piece.mapName);
+        load(player.server, piece.mapName);
+        player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Saved the world map scan " + piece.mapName
+                + " (" + upload.fileCount() + " regions)" + (modeName == null ? "" : ", now the map of " + modeName)));
     }
 
-    private static Pack load(String mapName) {
+    private static Pack read(String mapName) {
         return PACKS.computeIfAbsent(mapName, name -> {
             Path dir = ROOT.resolve(name);
             if (!Files.isDirectory(dir)) {
