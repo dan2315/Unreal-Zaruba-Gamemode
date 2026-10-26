@@ -79,6 +79,22 @@ public class ClientEvents {
         while (KeyBindings.OPEN_SCHEMATICS.consumeClick()) {
             Minecraft.getInstance().setScreen(new SchematicsBrowserScreen());
         }
+        while (KeyBindings.RADIO_MENU.consumeClick()) {
+            if (Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null) {
+                com.dod.unrealzaruba.Radiopings.RadioMenuScreen.open();
+            }
+        }
+        while (KeyBindings.QUICK_PING.consumeClick()) {
+            if (Minecraft.getInstance().screen != null || Minecraft.getInstance().getConnection() == null) continue;
+            com.dod.unrealzaruba.Radiopings.PingAim.aim(Minecraft.getInstance())
+                    .ifPresent(aim -> com.dod.unrealzaruba.Radiopings.RadioClient.sendPing(
+                            com.dod.unrealzaruba.Radiopings.PingClientState.selected(), aim.pos(), aim.entityId(), true));
+        }
+        while (KeyBindings.PING_TYPE.consumeClick()) {
+            if (Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null) {
+                com.dod.unrealzaruba.Radiopings.RadioClient.cycleType();
+            }
+        }
     }
 
     @SubscribeEvent

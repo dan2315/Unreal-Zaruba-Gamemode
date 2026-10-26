@@ -35,6 +35,7 @@ public class ModSetupEvents {
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "lobby"), com.dod.unrealzaruba.UI.Lobby.LobbyOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "contraption_report"), com.dod.unrealzaruba.UI.ContraptionReportOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "compass"), CompassOverlay.INSTANCE);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "ping"), com.dod.unrealzaruba.UI.Compass.PingScreenOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "feed"), com.dod.unrealzaruba.UI.Feed.FeedOverlay.INSTANCE);
         event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(UnrealZaruba.MOD_ID, "tablist"), com.dod.unrealzaruba.UI.TabList.TabListOverlay.INSTANCE);
     }

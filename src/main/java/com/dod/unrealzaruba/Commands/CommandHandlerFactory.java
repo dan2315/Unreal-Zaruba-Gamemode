@@ -38,6 +38,7 @@ public class CommandHandlerFactory {
         handlers.add(new UfWorldCommand());
         handlers.add(new SupplyDropCommand());
         handlers.add(new CompassDebugCommand()); // /compass debug toggle for the compass strip
+        handlers.add(new PingDebugCommand()); // /pingdebug singleplayer testing bypass for radio and pings
 
         //Objectives registration
         handlers.add(new CreateObjectiveCommand());

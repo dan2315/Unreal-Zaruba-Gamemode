@@ -61,6 +61,27 @@ public class KeyBindings {
             CATEGORY
     );
 
+    /** Counter-Strike style radio menu with the team's phrases. */
+    public static final KeyMapping RADIO_MENU = new KeyMapping(
+            "key.unrealzaruba.radio_menu",
+            InputConstants.KEY_Z,
+            CATEGORY
+    );
+
+    /** A quick ping of the selected kind where the crosshair points. */
+    public static final KeyMapping QUICK_PING = new KeyMapping(
+            "key.unrealzaruba.quick_ping",
+            InputConstants.KEY_X,
+            CATEGORY
+    );
+
+    /** Cycles the ping kind for the next quick ping. */
+    public static final KeyMapping PING_TYPE = new KeyMapping(
+            "key.unrealzaruba.ping_type",
+            InputConstants.KEY_C,
+            CATEGORY
+    );
+
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         event.register(OPEN_GAMEMODE_MENU);
@@ -69,5 +90,8 @@ public class KeyBindings {
         event.register(OPEN_SCHEMATICS);
         event.register(READY);
         event.register(FLIP_VEHICLE);
+        event.register(RADIO_MENU);
+        event.register(QUICK_PING);
+        event.register(PING_TYPE);
     }
 }

@@ -86,9 +86,9 @@ public class CompassOverlay implements ZarubaOverlay {
     private static final int TICK_MAJOR = 0xFFB0B5BD;
     private static final int ON_TILE = 0xFF0B0E12;
 
-    private enum Kind { CAPTURE, DESTROY, SUPPLY, RESPAWN, RESPAWN_SELECTED, ENEMY_BASE }
+    private enum Kind { CAPTURE, DESTROY, SUPPLY, RESPAWN, RESPAWN_SELECTED, ENEMY_BASE, PING }
 
-    private record Marker(BlockPos pos, String label, int color, Kind kind, boolean capturing, double dist) {}
+    private record Marker(Vec3 pos, String label, int color, Kind kind, boolean capturing, double dist) {}
 
     /** True when the compass should be drawn (the objectives under it move with it). */
     public static boolean shouldRender(Minecraft mc) {
@@ -148,7 +148,7 @@ public class CompassOverlay implements ZarubaOverlay {
 
         List<Double> markerXs = new ArrayList<>(markers.size());
         for (Marker m : markers) {
-            double tb = CompassMath.bearingTo(pp.x, pp.z, m.pos().getCenter().x, m.pos().getCenter().z);
+            double tb = CompassMath.bearingTo(pp.x, pp.z, m.pos().x, m.pos().z);
             double rel = CompassMath.relative(tb, bearing);
             markerXs.add(Math.abs(rel) <= halfFov ? centerX + rel / halfFov * halfW : null);
         }
@@ -200,10 +200,15 @@ public class CompassOverlay implements ZarubaOverlay {
             int color = fade(m.color(), m.dist());
             if ((color >>> 24) <= 4) continue; // standing on the marker: hide it entirely
             int cy = midY + 0;
-            int rim = m.capturing() && (System.currentTimeMillis() / 400) % 2 == 0 ? fade(TEXT, m.dist())
-                    : m.kind() == Kind.RESPAWN_SELECTED ? fade(TEXT, m.dist()) : fade(0xFF000000, m.dist());
-            disc(g, cx, cy, MARKER_R + 1, rim);
-            disc(g, cx, cy, MARKER_R, color);
+            if (m.kind() == Kind.PING) {
+                // Pings are diamonds, everything else is a circle: the two never mix up at a glance
+                diamond(g, cx, cy, MARKER_R, color);
+            } else {
+                int rim = m.capturing() && (System.currentTimeMillis() / 400) % 2 == 0 ? fade(TEXT, m.dist())
+                        : m.kind() == Kind.RESPAWN_SELECTED ? fade(TEXT, m.dist()) : fade(0xFF000000, m.dist());
+                disc(g, cx, cy, MARKER_R + 1, rim);
+                disc(g, cx, cy, MARKER_R, color);
+            }
             if (HOME.equals(m.label())) {
                 house(g, cx, cy, fade(ON_TILE, m.dist()), color);
             } else {
@@ -252,15 +257,15 @@ public class CompassOverlay implements ZarubaOverlay {
                 } else {
                     color = HudStyle.NEUTRAL;
                 }
-                out.add(new Marker(p.GetPosition(), letter, color, Kind.CAPTURE, capturing, dist(pp, p.GetPosition())));
+                out.add(new Marker(Vec3.atCenterOf(p.GetPosition()), letter, color, Kind.CAPTURE, capturing, dist(pp, Vec3.atCenterOf(p.GetPosition()))));
             } else if (o instanceof HudDestroyObjective t) {
-                out.add(new Marker(t.GetPosition(), "!", HudStyle.ACCENT, Kind.DESTROY, false, dist(pp, t.GetPosition())));
+                out.add(new Marker(Vec3.atCenterOf(t.GetPosition()), "!", HudStyle.ACCENT, Kind.DESTROY, false, dist(pp, Vec3.atCenterOf(t.GetPosition()))));
             }
         }
 
         BlockPos drop = RespawnClientState.supplyDrop();
         if (drop != null) {
-            out.add(new Marker(drop, "$", HudStyle.YELLOW, Kind.SUPPLY, false, dist(pp, drop)));
+            out.add(new Marker(drop.getCenter(), "$", HudStyle.YELLOW, Kind.SUPPLY, false, dist(pp, drop.getCenter())));
         }
 
         RespawnPointsView view = RespawnClientState.view();
@@ -271,11 +276,19 @@ public class CompassOverlay implements ZarubaOverlay {
                 if (e.kind() == RespawnPointsView.Kind.CAPTURE_POINT) continue;
                 boolean selected = effective != null && e.id() == effective;
                 int color = selected ? 0xFFE8B83A : 0xFF4CC24C; // warn gold / ok green
-                out.add(new Marker(e.position(), kindInitial(e.kind()), color,
-                        selected ? Kind.RESPAWN_SELECTED : Kind.RESPAWN, false, dist(pp, e.position())));
+                out.add(new Marker(e.position().getCenter(), kindInitial(e.kind()), color,
+                        selected ? Kind.RESPAWN_SELECTED : Kind.RESPAWN, false, dist(pp, e.position().getCenter())));
             }
             for (RespawnPointsView.EnemyBase b : view.enemyBases()) {
-                out.add(new Marker(b.position(), HOME, HudStyle.teamColor(b.team()), Kind.ENEMY_BASE, false, dist(pp, b.position())));
+                out.add(new Marker(b.position().getCenter(), HOME, HudStyle.teamColor(b.team()), Kind.ENEMY_BASE, false, dist(pp, b.position().getCenter())));
+            }
+        }
+        // Teammate pings: diamonds in the ping colour. The dead see none (the server only sends to the living).
+        if (!RespawnClientState.isDead()) {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            for (com.dod.unrealzaruba.Radiopings.PingClientState.Entry e : com.dod.unrealzaruba.Radiopings.PingClientState.entries()) {
+                Vec3 shown = com.dod.unrealzaruba.Radiopings.PingClientState.liveAnchor(mc == null ? null : mc.level, e);
+                out.add(new Marker(shown, e.type().letter, e.type().color, Kind.PING, false, dist(pp, shown)));
             }
         }
         if (DEBUG_FORCE && out.isEmpty()) {
@@ -312,14 +325,13 @@ public class CompassOverlay implements ZarubaOverlay {
     }
 
     private static Marker demoMarker(BlockPos pos, String label, int color, Kind kind, boolean capturing, Vec3 pp) {
-        return new Marker(pos, label, color, kind, capturing, dist(pp, pos));
+        return new Marker(Vec3.atCenterOf(pos), label, color, kind, capturing, dist(pp, Vec3.atCenterOf(pos)));
     }
 
-    private static double dist(Vec3 pp, BlockPos pos) {
-        Vec3 c = pos.getCenter();
-        double dx = c.x - pp.x;
-        double dy = c.y - pp.y;
-        double dz = c.z - pp.z;
+    private static double dist(Vec3 pp, Vec3 pos) {
+        double dx = pos.x - pp.x;
+        double dy = pos.y - pp.y;
+        double dz = pos.z - pp.z;
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 

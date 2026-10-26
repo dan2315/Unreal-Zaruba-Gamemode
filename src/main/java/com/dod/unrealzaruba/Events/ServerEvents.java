@@ -62,7 +62,12 @@ public class ServerEvents {
     @SubscribeEvent
     public void onServerTick(ServerTickEvent.Pre event) {
         MinecraftServer server = event.getServer();
-        if (server == null || !server.isDedicatedServer())
+        if (server == null)
+            return;
+
+        // Runs on the integrated server too: singleplayer radio/ping debugging needs the follow updates.
+        com.dod.unrealzaruba.Radiopings.PingService.tick(server);
+        if (!server.isDedicatedServer())
             return;
 
         TimerManager.updateAll();
@@ -143,6 +148,8 @@ public class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             com.dod.unrealzaruba.Vehicles.SchematicSpawner.forget(player);
             com.dod.unrealzaruba.Vehicles.VehicleFlip.forget(player.getUUID());
+            com.dod.unrealzaruba.Radiopings.RadioService.forget(player.getUUID());
+            com.dod.unrealzaruba.Radiopings.PingService.forget(player.getUUID());
             if (!ConfigManager.isDevMode()) gamemodeManager.ForGamemode(gamemode -> gamemode.HandleLeaveInMatch(player));
             gamemodeManager.ForGamemode(gamemode -> gamemode.forgetDead(player.getUUID()));
         }

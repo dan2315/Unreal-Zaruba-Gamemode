@@ -30,5 +30,6 @@ public final class MatchHud {
         PurchaseGhostRenderer.reset();
         SupplyCaseClientState.set(List.of());
         if (UnrealZaruba.geometryRenderer != null) UnrealZaruba.geometryRenderer.clear();
+        com.dod.unrealzaruba.Radiopings.PingClientState.reset();
     }
 }

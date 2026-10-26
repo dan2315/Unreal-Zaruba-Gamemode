@@ -16,6 +16,7 @@ public class CompassDebugCommand implements ICommandHandler {
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("compass")
+                .requires(source -> source.hasPermission(2))
                 .executes(context -> {
                     boolean on = CompassOverlay.toggleDebug();
                     context.getSource().sendSuccess(
