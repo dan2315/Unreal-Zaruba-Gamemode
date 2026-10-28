@@ -182,6 +182,7 @@
     "key.unrealzaruba.quick_ping": "Quick ping",
     "key.unrealzaruba.ping_type": "Ping type",
     "radio.unrealzaruba.menu.title": "Radio — to the team",
+    "radio.unrealzaruba.wheel.hint": "Release Z to send, Esc to cancel",
     "radio.unrealzaruba.tag": "RADIO",
     "radio.unrealzaruba.phrase.enemy": "Enemy spotted",
     "radio.unrealzaruba.phrase.rally": "Rally here",

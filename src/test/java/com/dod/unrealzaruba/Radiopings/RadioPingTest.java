@@ -36,6 +36,23 @@ class RadioPingTest {
     }
 
     @Test
+    void glyphMappingsAreComplete() {
+        for (RadioPhrase phrase : RadioPhrase.values()) {
+            assertNotNull(phrase.glyph, phrase.name());
+        }
+        for (PingType type : PingType.values()) {
+            assertNotNull(type.glyph());
+        }
+        // auto-ping phrases share the glyph of their ping kind
+        assertEquals(PingGlyph.EXCLAMATION, RadioPhrase.ENEMY_SPOTTED.glyph);
+        assertEquals(PingGlyph.DOWN_ARROW, RadioPhrase.RALLY_HERE.glyph);
+        assertEquals(PingGlyph.WARN_TRIANGLE, RadioPhrase.DANGER.glyph);
+        assertEquals(PingGlyph.EXCLAMATION, PingType.ENEMY.glyph());
+        assertEquals(PingGlyph.DOWN_ARROW, PingType.RALLY.glyph());
+        assertEquals(PingGlyph.WARN_TRIANGLE, PingType.DANGER.glyph());
+    }
+
+    @Test
     void cooldowns() {
         Map<UUID, Long> last = new HashMap<>();
         UUID id = UUID.randomUUID();

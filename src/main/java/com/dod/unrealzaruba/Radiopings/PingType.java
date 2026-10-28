@@ -12,6 +12,16 @@ public enum PingType {
     public final String letter;
     public final String langKey;
 
+    /** Glyph for world markers of this kind. */
+    public PingGlyph glyph() {
+        return switch (this) {
+            case ENEMY -> PingGlyph.EXCLAMATION;
+            case RALLY -> PingGlyph.DOWN_ARROW;
+            case DEFEND -> PingGlyph.SHIELD;
+            case DANGER -> PingGlyph.WARN_TRIANGLE;
+        };
+    }
+
     PingType(int color, String letter, String langKey) {
         this.color = color;
         this.letter = letter;

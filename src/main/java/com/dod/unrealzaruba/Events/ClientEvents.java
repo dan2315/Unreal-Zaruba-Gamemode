@@ -79,10 +79,10 @@ public class ClientEvents {
         while (KeyBindings.OPEN_SCHEMATICS.consumeClick()) {
             Minecraft.getInstance().setScreen(new SchematicsBrowserScreen());
         }
-        while (KeyBindings.RADIO_MENU.consumeClick()) {
-            if (Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null) {
-                com.dod.unrealzaruba.Radiopings.RadioMenuScreen.open();
-            }
+        boolean radioPressed = false;
+        while (KeyBindings.RADIO_MENU.consumeClick()) radioPressed = true; // drain every tick so nothing lingers
+        if (radioPressed && Minecraft.getInstance().screen == null && Minecraft.getInstance().getConnection() != null) {
+            com.dod.unrealzaruba.Radiopings.RadioMenuScreen.open();
         }
         while (KeyBindings.QUICK_PING.consumeClick()) {
             if (Minecraft.getInstance().screen != null || Minecraft.getInstance().getConnection() == null) continue;

@@ -27,10 +27,7 @@ import org.joml.Vector4f;
 public class PingScreenOverlay implements ZarubaOverlay {
     public static final PingScreenOverlay INSTANCE = new PingScreenOverlay();
 
-    private static final int DOT_R = 4;
-    private static final int CENTER_R = 2;
-    private static final int RING = 0xFFFFFFFF;
-    private static final int BACKING = 0xFF101215;
+    private static final int GLYPH_R = 5;
     private static final int EDGE_MARGIN = 16;
     private static final double NEAR_HIDE_DIST = 2.0;
     private static final double LABEL_MAX_DIST = 40.0;
@@ -83,18 +80,14 @@ public class PingScreenOverlay implements ZarubaOverlay {
             if (p.onScreen()) {
                 int cx = Math.round(p.x());
                 int cy = Math.round(p.y());
-                int ring = withAlpha(RING, life);
-                int fill = withAlpha(ping.type().color, life);
-                disc(g, cx, cy, DOT_R, ring);
-                disc(g, cx, cy, DOT_R - 1, withAlpha(BACKING, life));
-                disc(g, cx, cy, CENTER_R, fill);
+                ping.type().glyph().draw(g, cx, cy, GLYPH_R, withAlpha(ping.type().color, life));
                 Component distText = Component.literal(d);
                 int tw = font.width(distText);
-                g.drawString(font, distText, cx - tw / 2, cy - DOT_R - 11, withAlpha(0xFFF2F5F3, life), true);
+                g.drawString(font, distText, cx - tw / 2, cy - GLYPH_R - 11, withAlpha(0xFFF2F5F3, life), true);
                 if (dist <= LABEL_MAX_DIST) {
                     Component name = Component.literal(ping.senderName());
                     int nw = font.width(name);
-                    g.drawString(font, name, cx - nw / 2, cy + DOT_R + 3, withAlpha(HudStyle.MUTED, life), true);
+                    g.drawString(font, name, cx - nw / 2, cy + GLYPH_R + 3, withAlpha(HudStyle.MUTED, life), true);
                 }
             } else {
                 float[] edge = clampToEdge(p.x(), p.y(), screenWidth, screenHeight, EDGE_MARGIN);
@@ -159,14 +152,6 @@ public class PingScreenOverlay implements ZarubaOverlay {
     private static int withAlpha(int argb, float alpha) {
         int a = Math.round((argb >>> 24) * Math.max(0f, Math.min(1f, alpha)));
         return (a << 24) | (argb & 0xFFFFFF);
-    }
-
-    /** A filled circle, a pixel row at a time. */
-    private static void disc(GuiGraphics g, int cx, int cy, int r, int color) {
-        for (int dy = -r; dy <= r; dy++) {
-            int half = (int) Math.round(Math.sqrt((r + 0.5) * (r + 0.5) - dy * dy));
-            g.fill(cx - half, cy + dy, cx + half + 1, cy + dy + 1, color);
-        }
     }
 
     /** A triangle pointing along angle (screen coords, 0 = up), drawn in the rotated pose. */
